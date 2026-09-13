@@ -14,7 +14,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../vChewing_OSFrameworkImpl"),
-    .package(path: "../vChewing_Shared"),
+    .package(path: "../vChewing_OSNeutralAssembly"),
     .package(path: "../vChewing_IMKUtils"),
   ],
   targets: [
@@ -22,7 +22,7 @@ let package = Package(
       name: "Shared_DarwinImpl",
       dependencies: [
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
-        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
       ],
       swiftSettings: [
@@ -34,7 +34,7 @@ let package = Package(
       dependencies: [
         "Shared_DarwinImpl",
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
-        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
       ],
       swiftSettings: [

@@ -17,7 +17,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_SwiftExtension"),
+    .package(path: "../vChewing_OSNeutralAssembly"),
   ],
   targets: [
     .target(
@@ -40,7 +40,7 @@ let package = Package(
       name: "IMKUtils",
       dependencies: [
         "IMKSwift",
-        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

@@ -6,13 +6,36 @@
 // http://github.com/ButTaiwan/bpmfvs/raw/refs/heads/master/NOTICE.txt
 
 import Foundation
+import ResourceLocator
 
 public enum BPMFVS {
   // MARK: Public
 
+  /// 手動指定的 BPMFVS 資料表位置。`nil` 代表退回預設查找邏輯。
+  ///
+  /// 本模組被編譯成動態庫、或被置於非 SwiftPM 佈局時，預設查找會落空；
+  /// 宿主可藉此指定資料表位置，或改由
+  /// `ResourceLocator.specifyResourceBundleURL(_:forBundleNamed:)` 指定整包資源。
+  public static var dataURLOverride: URL? {
+    didSet { cachedLookupTable = loadLookupTable() }
+  }
+
+  /// 資料表是否已成功載入。載入失敗時，所有轉換皆原樣回傳輸入值。
+  public static var isDataTableLoaded: Bool { cachedLookupTable != nil }
+
+  /// 手動指定 BPMFVS 資料表位置。傳入 `nil` 代表清除指定、退回預設查找。
+  public static func specifyDataURL(_ url: URL?) {
+    dataURLOverride = url
+  }
+
+  /// BPMFVS 資料表的路徑。查找失敗時回傳 `nil`，呼叫端須自行實裝 fail-safe。
   public static func getBPMFVSDataURL() -> URL? {
-    // Bundle.module is MainActor-isolated in this context.
-    Bundle.module.url(forResource: "phonic_table_Z", withExtension: "txt")
+    dataURLOverride ?? ResourceLocator.url(
+      forResource: "phonic_table_Z",
+      withExtension: "txt",
+      inSwiftPMResourceBundleNamed: Self.resourceBundleName,
+      anchor: ResourceBundleAnchor.self
+    )
   }
 
   public static func normalizeBPMFVSReading(_ reading: String) -> String {
@@ -68,6 +91,9 @@ public enum BPMFVS {
 
   // MARK: Private
 
+  /// 用於推得編譯產物所在位置的錨定型別。
+  private final class ResourceBundleAnchor {}
+
   private struct LookupTable {
     // MARK: Lifecycle
 
@@ -102,8 +128,14 @@ public enum BPMFVS {
 
   private static let variationSelectorBase: UInt32 = 0xE01E0
 
-  private static let cachedLookupTable: LookupTable? = {
+  /// SwiftPM 資源 bundle 名稱（`套件名_目標名`）。
+  private static let resourceBundleName = "OSNeutralAssembly_BPMFVS"
+
+  /// 查找結果的快取。查找落空時為 `nil`，此時所有轉換皆原樣回傳輸入值。
+  private static var cachedLookupTable: LookupTable? = loadLookupTable()
+
+  private static func loadLookupTable() -> LookupTable? {
     guard let fileURL = getBPMFVSDataURL() else { return nil }
     return try? LookupTable(fileURL: fileURL)
-  }()
+  }
 }

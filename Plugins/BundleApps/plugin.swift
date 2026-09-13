@@ -98,23 +98,37 @@ struct BundleAppsPlugin: CommandPlugin {
       throw PluginError("vChewingInstaller executable not found at \(installerExeURL.path)")
     }
 
-    // Discover SPM resource bundles next to the built executables.
-    let spmBundles: [URL] = (try? fm.contentsOfDirectory(
+    // Discover SPM resource bundles and dynamic libraries next to the built executables.
+    let spmArtifacts = (try? fm.contentsOfDirectory(
       at: spmBuildDir, includingPropertiesForKeys: [.isDirectoryKey]
-    ))?.filter { $0.pathExtension == "bundle" } ?? []
+    )) ?? []
+    let spmBundles = spmArtifacts.filter { $0.pathExtension == "bundle" }
+    // Dynamic products (`Product.library(type: .dynamic)`) land here as `lib<Name>.dylib`.
+    let spmDylibs = spmArtifacts.filter { $0.pathExtension == "dylib" }
 
     // Prepare output directory.
-    try? fm.removeItem(at: outputDir)
+    //
+    // Only the artifacts this plugin owns are removed.  The same
+    // `Build/Products/<Config>/` directory is also written by Xcode when the build
+    // location is `<workspace>/Build/Products` (Xcode's `IDECustomBuildProductsPath`),
+    // so removing the whole directory would destroy artifacts this plugin does not own
+    // (`vChewingDebuggable.app`, the per-target `.o`/`.swiftmodule` blobs, and Xcode's
+    // own `.app.dSYM` bundles).
     try fm.createDirectory(at: outputDir, withIntermediateDirectories: true)
+    let vChewingApp = outputDir.appending(path: "vChewing.app")
+    let installerApp = outputDir.appending(path: "vChewingInstaller.app")
+    for ownedApp in [vChewingApp, installerApp] {
+      try? fm.removeItem(at: ownedApp)
+    }
 
     // ── Step 2: Assemble vChewing.app ──────────────────────────────────
     print("📦 Assembling vChewing.app...")
-    let vChewingApp = outputDir.appending(path: "vChewing.app")
     try assembleMainIMEApp(
       appDir: vChewingApp,
       packageDir: packageDir,
       executableURL: vChewingExeURL,
       spmBundles: spmBundles,
+      spmDylibs: spmDylibs,
       marketingVersion: marketingVersion,
       buildVersion: buildVersion,
       deploymentTarget: deploymentTarget,
@@ -124,12 +138,12 @@ struct BundleAppsPlugin: CommandPlugin {
 
     // ── Step 3: Assemble vChewingInstaller.app ─────────────────────────
     print("📦 Assembling vChewingInstaller.app...")
-    let installerApp = outputDir.appending(path: "vChewingInstaller.app")
     try assembleInstallerApp(
       appDir: installerApp,
       packageDir: packageDir,
       executableURL: installerExeURL,
       embeddedMainIMEApp: vChewingApp,
+      spmDylibs: spmDylibs,
       marketingVersion: marketingVersion,
       buildVersion: buildVersion,
       deploymentTarget: deploymentTarget,
@@ -163,6 +177,7 @@ extension BundleAppsPlugin {
     packageDir: URL,
     executableURL: URL,
     spmBundles: [URL],
+    spmDylibs: [URL],
     marketingVersion: String,
     buildVersion: String,
     deploymentTarget: String,
@@ -178,7 +193,13 @@ extension BundleAppsPlugin {
     try fm.createDirectory(at: resources, withIntermediateDirectories: true)
 
     // ── Executable ──
-    try fm.copyItem(at: executableURL, to: macOS.appending(path: "vChewing"))
+    let mainExecutable = macOS.appending(path: "vChewing")
+    try fm.copyItem(at: executableURL, to: mainExecutable)
+
+    // ── Frameworks (SwiftPM dynamic products) ──
+    let embeddedDylibs = try embedLinkedDylibs(
+      of: mainExecutable, into: appDir, availableDylibs: spmDylibs
+    )
 
     // ── PkgInfo ──
     try Data("APPLMACV".utf8).write(to: contents.appending(path: "PkgInfo"))
@@ -263,15 +284,20 @@ extension BundleAppsPlugin {
 
     // ── SPM resource bundles from dependencies ──
     // Placed in Contents/Resources/ (standard macOS bundle location).
-    // The Makefile patches SwiftPM's auto-generated resource_bundle_accessor.swift
-    // to check Bundle.main.resourceURL before Bundle.main.bundleURL, ensuring
-    // the bundles are found when the .app is launched by the system.
+    // Lookups go through ResourceLocator, which probes Bundle.main.resourceURL
+    // before Bundle.main.bundleURL — no custom resource_bundle_accessor is involved.
     //
-    // Exclude build-tool-only bundles that are not needed at runtime.
-    let excludedBundlePrefixes = ["VanguardLexicon_", "LexiconAssembly_"]
+    // Exclude build-tool-only bundles that are not needed at runtime.  The old
+    // `LexiconAssembly_` prefix no longer exists: the test-material target lives in the
+    // `OSNeutralAssembly` package now, so its bundle is `OSNeutralAssembly_LXAssemblyMaterials4Tests.bundle`.
+    // A prefix match on `OSNeutralAssembly_` would wrongly drop `OSNeutralAssembly_BPMFVS.bundle`,
+    // which the BPMFVS lookup table needs at runtime — hence the exact-name match.
+    let excludedBundlePrefixes = ["VanguardLexicon_"]
+    let excludedBundleNames: Set<String> = ["OSNeutralAssembly_LXAssemblyMaterials4Tests"]
     for bundle in spmBundles {
       let name = bundle.lastPathComponent
       if excludedBundlePrefixes.contains(where: { name.hasPrefix($0) }) { continue }
+      if excludedBundleNames.contains(name) { continue }
       try fm.copyItem(at: bundle, to: resources.appending(path: name))
     }
 
@@ -280,16 +306,25 @@ extension BundleAppsPlugin {
     //   ENABLE_APP_SANDBOX = YES
     //   ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES
     //   ENABLE_USER_SELECTED_FILES = readwrite
+    var additionalEntitlements: [String: Any] = [
+      "com.apple.security.app-sandbox": true,
+      "com.apple.security.network.client": true,
+      "com.apple.security.files.user-selected.read-write": true,
+    ]
+    // Ad-hoc signing (`--sign -`) leaves the process with no Team ID, and library validation
+    // rejects any framework whose Team ID differs from the process's — including one this very
+    // bundle ships.  The relaxation is therefore only injected when frameworks are embedded,
+    // and only on this path: the distribution path re-signs every nested binary with a real
+    // Team ID (see `BuildPKG.sh`), where validation passes on its own terms.
+    if !embeddedDylibs.isEmpty {
+      additionalEntitlements["com.apple.security.cs.disable-library-validation"] = true
+    }
     let processedEntitlements = try processEntitlements(
       source: srcRes.appending(path: "vChewing.entitlements"),
       bundleIdentifier: "org.atelierInmu.inputmethod.vChewing",
-      additionalEntitlements: [
-        "com.apple.security.app-sandbox": true,
-        "com.apple.security.network.client": true,
-        "com.apple.security.files.user-selected.read-write": true,
-      ]
+      additionalEntitlements: additionalEntitlements
     )
-    try codesign(at: appDir, entitlements: processedEntitlements)
+    try codesign(at: appDir, entitlements: processedEntitlements, nestedCode: embeddedDylibs)
   }
 }
 
@@ -301,6 +336,7 @@ extension BundleAppsPlugin {
     packageDir: URL,
     executableURL: URL,
     embeddedMainIMEApp: URL,
+    spmDylibs: [URL],
     marketingVersion: String,
     buildVersion: String,
     deploymentTarget: String,
@@ -316,7 +352,13 @@ extension BundleAppsPlugin {
     try fm.createDirectory(at: resources, withIntermediateDirectories: true)
 
     // ── Executable ──
-    try fm.copyItem(at: executableURL, to: macOS.appending(path: "vChewingInstaller"))
+    let mainExecutable = macOS.appending(path: "vChewingInstaller")
+    try fm.copyItem(at: executableURL, to: mainExecutable)
+
+    // ── Frameworks (SwiftPM dynamic products) ──
+    let embeddedDylibs = try embedLinkedDylibs(
+      of: mainExecutable, into: appDir, availableDylibs: spmDylibs
+    )
 
     // ── PkgInfo ──
     try Data("APPLMBIN".utf8).write(to: contents.appending(path: "PkgInfo"))
@@ -362,8 +404,20 @@ extension BundleAppsPlugin {
       to: resources.appending(path: "vChewing.app")
     )
 
-    // ── Code sign (installer entitlements are empty — no substitution needed) ──
-    try codesign(at: appDir, entitlements: srcRes.appending(path: "vChewingInstaller.entitlements"))
+    // ── Code sign ──
+    // Ad-hoc signing leaves the process with no Team ID, so library validation would reject
+    // the dylibs this bundle ships; the relaxation is therefore injected only when they are
+    // actually embedded.  See `embedLinkedDylibs(of:into:availableDylibs:)`.
+    var additionalEntitlements: [String: Any] = [:]
+    if !embeddedDylibs.isEmpty {
+      additionalEntitlements["com.apple.security.cs.disable-library-validation"] = true
+    }
+    let processedEntitlements = try processEntitlements(
+      source: srcRes.appending(path: "vChewingInstaller.entitlements"),
+      bundleIdentifier: "org.atelierInmu.vChewing.vChewingInstaller",
+      additionalEntitlements: additionalEntitlements
+    )
+    try codesign(at: appDir, entitlements: processedEntitlements, nestedCode: embeddedDylibs)
   }
 }
 
@@ -581,15 +635,89 @@ extension BundleAppsPlugin {
     ])
   }
 
-  /// Ad-hoc code signs an app bundle with hardened runtime and the given entitlements file.
-  private func codesign(at appDir: URL, entitlements: URL) throws {
-    try run("/usr/bin/codesign", arguments: [
-      "--sign", "-",
-      "--entitlements", entitlements.path,
-      "--options", "runtime",
-      "--force", "--deep",
-      appDir.path,
+  /// Copies the dynamic products the executable actually links into `Contents/Frameworks/`
+  /// and adds the rpath entry that resolves them.
+  ///
+  /// Only dylibs named in the executable's `@rpath/` dependency list are copied, so a stale
+  /// artifact left behind in the build directory cannot smuggle itself into the bundle.
+  /// They are linked as `@rpath/lib<Name>.dylib` while SwiftPM's own rpath entry is
+  /// `@loader_path` (which resolves to `Contents/MacOS/` for the executable), hence the extra
+  /// rpath entry.  `install_name_tool` invalidates any existing signature, so it must run
+  /// before signing.
+  @discardableResult
+  private func embedLinkedDylibs(
+    of executable: URL,
+    into appDir: URL,
+    availableDylibs: [URL]
+  ) throws
+    -> [URL] {
+    let fm = FileManager.default
+    let linkedNames = try linkedDylibNames(of: executable)
+    guard !linkedNames.isEmpty else { return [] }
+    let frameworks = appDir.appending(path: "Contents/Frameworks")
+    let available = Dictionary(
+      availableDylibs.map { ($0.lastPathComponent, $0) }, uniquingKeysWith: { first, _ in first }
+    )
+    var embedded = [URL]()
+    var unmatched = [String]()
+    for name in linkedNames {
+      guard let source = available[name] else {
+        unmatched.append(name)
+        continue
+      }
+      if embedded.isEmpty {
+        try fm.createDirectory(at: frameworks, withIntermediateDirectories: true)
+      }
+      let destination = frameworks.appending(path: name)
+      try fm.copyItem(at: source, to: destination)
+      embedded.append(destination)
+    }
+    guard unmatched.isEmpty else {
+      throw PluginError(
+        "Executable links dylib(s) that are not next to the built binaries: "
+          + unmatched.joined(separator: ", ")
+      )
+    }
+    try run("/usr/bin/install_name_tool", arguments: [
+      "-add_rpath", "@executable_path/../Frameworks", executable.path,
     ])
+    return embedded
+  }
+
+  /// Names of the `@rpath/…` dylibs the given executable links against, de-duplicated.
+  ///
+  /// `otool -L` prints the dependency list once per architecture slice, so a universal
+  /// executable would otherwise yield the same name twice.
+  private func linkedDylibNames(of executable: URL) throws -> [String] {
+    let output = try capture("/usr/bin/otool", arguments: ["-L", executable.path])
+    var seen = Set<String>()
+    var names = [String]()
+    for line in output.split(separator: "\n") {
+      let trimmed = line.trimmingCharacters(in: .whitespaces)
+      guard trimmed.hasPrefix("@rpath/") else { continue }
+      let name = String(trimmed.dropFirst("@rpath/".count).prefix { $0 != " " })
+      guard name.hasSuffix(".dylib"), seen.insert(name).inserted else { continue }
+      names.append(name)
+    }
+    return names
+  }
+
+  /// Signs a code object ad-hoc with the hardened runtime.  Entitlements belong to the
+  /// app itself; nested code (e.g. embedded dylibs) gets none.
+  ///
+  /// Nested code is signed first and the app afterwards, so no `--deep` is used: Apple
+  /// deprecates `--deep` for signing, and it does not reliably propagate
+  /// hardened-runtime options to nested binaries.
+  private func codesign(at target: URL, entitlements: URL? = nil, nestedCode: [URL] = []) throws {
+    for nested in nestedCode {
+      try codesign(at: nested)
+    }
+    var arguments = ["--sign", "-", "--options", "runtime", "--force"]
+    if let entitlements {
+      arguments += ["--entitlements", entitlements.path]
+    }
+    arguments.append(target.path)
+    try run("/usr/bin/codesign", arguments: arguments)
   }
 
   /// Captures the stdout of an external process, trimmed of trailing whitespace.

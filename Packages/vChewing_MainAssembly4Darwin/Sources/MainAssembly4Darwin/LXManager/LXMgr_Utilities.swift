@@ -24,8 +24,8 @@ extension LXMgr {
     ext: String
   )
     -> String? {
-    let factoryPath = Bundle.currentSPM.path(forResource: filenameSansExt, ofType: ext)
-    guard let factoryPath = factoryPath else { return nil }
+    guard let factoryPath = Bundle.currentSPM?.path(forResource: filenameSansExt, ofType: ext)
+    else { return nil }
     let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
     let containerPath = Self.appSupportURL
       .appendingPathComponent("vChewingFactoryData/\(filenameSansExt).\(ext)").path

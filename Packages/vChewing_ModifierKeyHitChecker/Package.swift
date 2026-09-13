@@ -13,13 +13,13 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_Shared"),
+    .package(path: "../vChewing_OSNeutralAssembly"),
   ],
   targets: [
     .target(
       name: "ModifierKeyHitChecker",
       dependencies: [
-        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

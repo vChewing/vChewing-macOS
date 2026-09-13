@@ -44,9 +44,9 @@
 
 - Packages/vChewing_MainAssembly4Darwin：IMK 進入點與整合。Sessions 體系（`InputSession` 等）已遷移至 OSNeutralAssembly 且 OS-independent；本套件僅保留 Darwin 表面（`InputSession_DarwinSurface.swift`：controller 綁定、NSEvent→KBEvent 轉換、IMKInputController surface、`toggleInputMode`）與 `SessionHostWiring.swift`（`SessionHost` 閉包注入）。InputSession 也參與態械管理。
 - Packages/vChewing_OSNeutralAssembly：輸入處理邏輯、態械與鍵盤事件分診；亦提供整個 OS-independent 會話體系（`Session` 子目錄）：`SessionCoreProtocol` 作為所有輸入法會話（含測試用 MockSession 與 Darwin SessionProtocol）的共用基底協定，另有 `SessionProtocol`＋`InputSession`（會話類別）、`IMEState` factories／`IMEStateParsed`、`SessionClientProxy`（跨平台客戶端 proxy 抽象）、`SessionHost`（OS-dependent 動作注入點，未注入＝無操作預設）。
-- Packages/vChewing_Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
-- Packages/vChewing_Homa：句子組裝（DAG-DP 動態規劃求最大分數路徑、候選覆寫與上下文鞏固）。
-- Packages/vChewing_LexiconAssembly：語言模型匯流與資料來源整合。
+- Packages/vChewing_OSNeutralAssembly/Sources/Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
+- Packages/vChewing_OSNeutralAssembly/Sources/Homa：句子組裝（DAG-DP 動態規劃求最大分數路徑、候選覆寫與上下文鞏固）。
+- Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly：語言模型匯流與資料來源整合。
 - Lexicon 資料：由遠端 `vChewing-VanguardLexicon` 倉庫的 `VanguardTextMapPlugin` Swift Package plugin 於建置時編譯注入（非 git 子模組）。
 
 ### 事件到輸出的基本流程
@@ -69,7 +69,7 @@
 - 支援多種鍵盤排列與使用者偏好（如「ㄓㄔㄕ」是否允許單獨作韻）。
 - 產物是「鍵序列」，之後交由語言模型查詢。
 
-> 關鍵檔案：Packages/vChewing_Tekkon/Sources/Tekkon/
+> 關鍵檔案：Packages/vChewing_OSNeutralAssembly/Sources/Tekkon/
 
 ---
 
@@ -106,7 +106,7 @@ OSNeutralAssembly 是可以在 Linux 系統下建置的 Swift Package，以一�
 
 ### 資料模型
 
-檔案位置：Packages/vChewing_Homa/Sources/Homa/
+檔案位置：Packages/vChewing_OSNeutralAssembly/Sources/Homa/
 - Gram：單一候選（值＋機率分數；可選 previous／anterior 字段承載雙元／三元語法的前驅字詞值、不含讀音）。
 - Node：某一段鍵序列對應的一組 Gram，含：
   - keyArray：覆蓋的鍵數。
@@ -121,7 +121,7 @@ OSNeutralAssembly 是可以在 Linux 系統下建置的 Swift Package，以一�
 
 ### 尋路演算法（PathFinder）
 
-核心實作：Packages/vChewing_Homa/Sources/Homa/Homa_MainComponents/Homa_PathFinder.swift
+核心實作：Packages/vChewing_OSNeutralAssembly/Sources/Homa/Homa_MainComponents/Homa_PathFinder.swift
 
 - 令 keyCount 為鍵序列長度；建立陣列：
   - dp[i]：到達位置 i 的最佳分數（預設負無限，dp[0]=0）
@@ -147,7 +147,7 @@ OSNeutralAssembly 是可以在 Linux 系統下建置的 Swift Package，以一�
 
 LexiconAssembly 對多個子語言模型進行匯整、去重、替換與增益調整，對外提供以「鍵序列」為鍵的 Homa Gram 陣列。
 
-關鍵檔案：Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/
+關鍵檔案：Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/
 
 ### 子語言模型與分數
 
@@ -194,16 +194,16 @@ LexiconAssembly 對多個子語言模型進行匯整、去重、替換與增益�
   - Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/InputHandler/*.swift
   - Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/Session/（OS-independent 會話體系：`SessionCoreProtocol`、`SessionProtocol`、`InputSession`、`IMEState` factories、`IMEStateParsed`、`SessionClientProxy`、`SessionHost`）
 - Tekkon：
-  - Packages/vChewing_Tekkon/Sources/Tekkon/
+  - Packages/vChewing_OSNeutralAssembly/Sources/Tekkon/
 - Homa：
-  - Packages/vChewing_Homa/Sources/Homa/Homa_MainComponents/Homa_Assembler.swift
-  - Packages/vChewing_Homa/Sources/Homa/Homa_MainComponents/Homa_PathFinder.swift
-  - Packages/vChewing_Homa/Sources/Homa/Homa_MainComponents/Homa_CandidateAPIs_FetchAndApply.swift
-  - Packages/vChewing_Homa/Sources/Homa/Homa_MainComponents/Homa_ConsolidatorAPIs.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/Homa/Homa_MainComponents/Homa_Assembler.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/Homa/Homa_MainComponents/Homa_PathFinder.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/Homa/Homa_MainComponents/Homa_CandidateAPIs_FetchAndApply.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/Homa/Homa_MainComponents/Homa_ConsolidatorAPIs.swift
 - LexiconAssembly：
-  - Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/LXConsolidator.swift
-  - Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/LXFacade*.swift
-  - Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/SubLMs/*.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/LXConsolidator.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/LXFacade*.swift
+  - Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/SubLMs/*.swift
 - VanguardLexicon（外部倉庫）：
   - `vChewing-VanguardLexicon`（詞庫編譯工具與語料來源，非本倉庫子模組）
 
@@ -212,9 +212,9 @@ LexiconAssembly 對多個子語言模型進行匯整、去重、替換與增益�
 ## 延伸閱讀
 
 - AGENTS.md（本庫工作流程與規範總覽）
-- Packages/vChewing_Homa/Sources/Homa/Homa_MainComponents/Homa_PathFinder.swift（DAG 動規實作）
-- Packages/vChewing_Tekkon/（注音組音與鍵盤邏輯）
-- Packages/vChewing_LexiconAssembly/（語言模型匯流）
+- Packages/vChewing_OSNeutralAssembly/Sources/Homa/Homa_MainComponents/Homa_PathFinder.swift（DAG 動規實作）
+- Packages/vChewing_OSNeutralAssembly/Sources/Tekkon/（注音組音與鍵盤邏輯）
+- Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/（語言模型匯流）
 
 ---
 

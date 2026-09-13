@@ -51,19 +51,15 @@
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
-		5B5CE5FF2F8D539700E767A0 /* vChewing_BPMFVS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_BPMFVS; path = Packages/vChewing_BPMFVS; sourceTree = "<group>"; };
 		5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly4Darwin; path = Packages/vChewing_InstallerAssembly4Darwin; sourceTree = "<group>"; };
 		5B61DB312FA901CF005DE65A /* vChewing_Shared_DarwinImpl */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared_DarwinImpl; path = Packages/vChewing_Shared_DarwinImpl; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_MainAssembly4Darwin; path = Packages/vChewing_MainAssembly4Darwin; sourceTree = "<group>"; };
-		5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_BrailleSputnik; path = Packages/vChewing_BrailleSputnik; sourceTree = "<group>"; };
 		5B7CE1B42F3B2D9D0014EDFC /* Release-Version.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Release-Version.plist"; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
 		5B9184D62F3B04DD006B48E8 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B9184D72F3B04DD006B48E8 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B91852E2F3B080A006B48E8 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		5B963C9E28D5C14600DCEE88 /* vChewing_Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared; path = Packages/vChewing_Shared; sourceTree = "<group>"; };
-		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_OtherIMEDataReader; path = Packages/vChewing_OtherIMEDataReader; sourceTree = "<group>"; };
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
@@ -79,13 +75,10 @@
 		5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_FolderMonitor; path = Packages/vChewing_FolderMonitor; sourceTree = "<group>"; };
 		5BDB7A3228D47587001AC277 /* vChewing_Hotenka */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Hotenka; path = Packages/vChewing_Hotenka; sourceTree = "<group>"; };
 		5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ModifierKeyHitChecker; path = Packages/vChewing_ModifierKeyHitChecker; sourceTree = "<group>"; };
-		5BDB7A3628D47587001AC277 /* vChewing_Tekkon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Tekkon; path = Packages/vChewing_Tekkon; sourceTree = "<group>"; };
-		5BE2E7652F951AC60072E5DB /* vChewing_Homa */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Homa; path = Packages/vChewing_Homa; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SettingsUI; path = Packages/vChewing_SettingsUI; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
-		5BFC63CD28D4AC98004A77B7 /* vChewing_LexiconAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LexiconAssembly; path = Packages/vChewing_LexiconAssembly; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -202,17 +195,13 @@
 		5BDB7A2D28D47570001AC277 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				5B5CE5FF2F8D539700E767A0 /* vChewing_BPMFVS */,
 				5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
-				5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */,
 				5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */,
 				5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */,
-				5BE2E7652F951AC60072E5DB /* vChewing_Homa */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
 				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */,
-				5BFC63CD28D4AC98004A77B7 /* vChewing_LexiconAssembly */,
 				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */,
 				5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
@@ -220,11 +209,8 @@
 				5B09A5172E9957F3002C2EC3 /* vChewing_OSNeutralAssembly */,
 				5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
-				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
 				5B61DB312FA901CF005DE65A /* vChewing_Shared_DarwinImpl */,
 				5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */,
-				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
-				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,
 				5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */,
 				5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */,
@@ -733,6 +719,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = YES;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
@@ -798,6 +785,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.inputmethod.vChewing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = YES;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
@@ -845,6 +833,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = YES;
 				SKIP_INSTALL = NO;
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
@@ -885,6 +874,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingInstaller;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = YES;
 				SKIP_INSTALL = NO;
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;

@@ -1458,7 +1458,8 @@ extension InputHandlerProtocol {
     }
 
     var newState = generateStateOfInputting()
-    let locID = Bundle.main.preferredLocalizations[0]
+    // 本模組以動態庫身分被裝載時，宿主未必有任何本地化資源；取不到時退回英文。
+    let locID = Bundle.main.preferredLocalizations.first ?? "en"
     var newTooltip = ContiguousArray<String>()
     newTooltip.insert("　" + tooltipPayload.value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {

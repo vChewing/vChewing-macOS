@@ -1,0 +1,2 @@
+vChewing ResourceLocator fixture.
+This file exists only to prove that the resource lookup finds a real file.

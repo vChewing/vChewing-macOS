@@ -16,8 +16,8 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - **Language restriction:** Use only English or zh-Hant-TW in all documentation, comments, and reviews. An exception is that `zh-Hans` is allowed in any file name stem ended with `-CHS`. Other exceptions may be given by the developer.
 
 ## Project Context
-- Input method for macOS built with AppKit/IMKit in Swift, backed by statistic-based language models loaded into `./Packages/vChewing_LexiconAssembly` package.
-- The current mainline sentence assembler is `./Packages/vChewing_Homa`, which replaced the old Megrez runtime path during a big surgery in late April 2026 while keeping the same DAG-DP design direction.
+- Input method for macOS built with AppKit/IMKit in Swift, backed by statistic-based language models loaded into `./Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly` module.
+- The current mainline sentence assembler is `./Packages/vChewing_OSNeutralAssembly/Sources/Homa`, which replaced the old Megrez runtime path during a big surgery in late April 2026 while keeping the same DAG-DP design direction.
 - If you are on Linux or Windows NT, your only workspace is `./Packages/vChewing_OSNeutralAssembly` and its dependencies situated in `./Packages`. If you are on Windows, you can also work with `./Packages/vChewing_MainAssembly4Darwin` and its dependencies situated in `./Packages` folder. Note that the session system (`InputSession`, `SessionProtocol`, `SessionHost`, etc.) now lives in `vChewing_OSNeutralAssembly` — session-involving development is possible on Linux/Windows, with all OS-dependent actions injected via `SessionHost` closures.
 - Lexicon assets are provided by remote Swift Package plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon` repository) and compiled at build-time as `.txtMap` / `.revlookup` pairs, then injected into `vChewing_MainAssembly4Darwin`.
 - Tests are written among local Swift Packages situated in `./Packages/` folder. Tests are usually implemented on a case-by-case basis when an issue case comes out: Write a new test case to confirm the bug exists. 
@@ -39,7 +39,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - Always use Google Format of Style for Objective-C(++) & C(++).
 
 ## Tests and Tooling
-- GitHub Coding Agent can only access Linux devenv in most times. `./Packages/vChewing_OSNeutralAssembly/` is the Linux-compilable target that the developer usually ask GitHub Coding Agent to work on. This package and `./Packages/vChewing_Homa/` are the primary places to add migration-related tests.
+- GitHub Coding Agent can only access Linux devenv in most times. `./Packages/vChewing_OSNeutralAssembly/` is the Linux-compilable target that the developer usually ask GitHub Coding Agent to work on. This package and `./Packages/vChewing_OSNeutralAssembly/Sources/Homa/` are the primary places to add migration-related tests.
 - Factory lexicons come from the separate `vChewing-VanguardLexicon` repository in Vanguard TextMap format (`.txtMap` + `.revlookup`), injected into `vChewing_MainAssembly4Darwin` at build time by the remote `VanguardTextMapPlugin` Swift Package plugin (no git submodule). The legacy `CSQLite3` dependency has been fully removed from this repository; Yahoo KeyKey data import in `vChewing_OtherIMEDataReader` now uses the system libsqlite3. Regenerate lexicon assets via `make update` when explicitly instructed.
 
 ## Git Commit Convention
@@ -73,8 +73,8 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 ## Reference Files and Folders
 - `./Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/`: `InputSession_DarwinSurface.swift` hosts the IMK-facing surface (controller binding, NSEvent→KBEvent conversion, `recognizedEvents`/`showPreferences`/IMKInputController surface, `toggleInputMode` TIS logic); `SessionControllerSputnik.swift` binds it to IMK's `IMKInputSessionController` (from `vChewing_IMKUtils`), working with candidate window, IME settings, etc.; `SessionHostWiring.swift` injects `SessionHost` closures.
 - `./Packages/vChewing_OSNeutralAssembly/`: The typing module `InputHandler` protocol working with the IMEStateProtocol-based finite state machine. Also hosts the OS-independent session system in the `Session/` subdirectory: `SessionCoreProtocol` (shared session state-transition logic `switchState()`/`resetInputHandler()` with default implementations), `SessionProtocol` + `InputSession` (the session class), `IMEState` factories / `IMEStateParsed`, `SessionClientProxy` (cross-platform client-proxy abstraction), and `SessionHost` (host-injection point for all OS-dependent actions).
-- `./Packages/vChewing_LexiconAssembly/`: Language model assembly (factory lexicon, user phrases, perceptor (LX_Perceptor), associated phrases).
-- `./Packages/vChewing_Homa/`: The current sentence assembler used by OSNeutralAssembly and MainAssembly.
-- `./Packages/vChewing_Tekkon/`: The phonabet composer designed for Chinese Phonabet (Zhuyin, Bopomofo) pronunciation data.
+- `./Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/`: Language model assembly (factory lexicon, user phrases, perceptor (LX_Perceptor), associated phrases).
+- `./Packages/vChewing_OSNeutralAssembly/Sources/Homa/`: The current sentence assembler used by OSNeutralAssembly and MainAssembly.
+- `./Packages/vChewing_OSNeutralAssembly/Sources/Tekkon/`: The phonabet composer designed for Chinese Phonabet (Zhuyin, Bopomofo) pronunciation data.
 - `./Packages/vChewing_MainAssembly4Darwin/`: The sole module imported to the Xcode project. It integrates everything together. Real-simulation of typing experiences are handled in the unit tests of this package.
 - `./Packages/vChewing_SettingsUI/`: Standalone preferences package — SwiftUI `SettingsUI` (macOS 14+) and AppKit `SettingsCocoa`, incl. the phrase editor UI; host actions are injected via `SettingsUIHost` closures (see `MainAssembly4Darwin/SettingsUIHostWiring.swift`).

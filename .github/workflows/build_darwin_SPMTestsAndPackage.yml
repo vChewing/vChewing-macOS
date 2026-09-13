@@ -50,11 +50,11 @@ jobs:
         timeout-minutes: 15
         run: |
           # Run tests sequentially to avoid parallel pressure. Use zsh syntax.
+          # The former `vChewing_Shared` / `vChewing_LexiconAssembly` / `vChewing_Homa`
+          # packages are now targets inside `vChewing_OSNeutralAssembly`, so their suites
+          # run as part of that package — see its Package.swift.
           packages=(
-            './Packages/vChewing_Shared'
             './Packages/vChewing_MainAssembly4Darwin'
-            './Packages/vChewing_LexiconAssembly'
-            './Packages/vChewing_Homa'
             './Packages/vChewing_OSNeutralAssembly'
             './Packages/vChewing_Hotenka'
             './Packages/vChewing_OSFrameworkImpl'

@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 import Foundation
+import ResourceLocator
 
 // MARK: - _BundleFinder
 
@@ -10,39 +11,24 @@ import Foundation
 private class _BundleFinder {}
 
 extension Foundation.Bundle {
-  /// Resource bundle resolver that works in both SPM build directories
-  /// and macOS `.app` bundles.
+  /// 本專案原廠資源 bundle 的查找器。
   ///
-  /// SwiftPM's auto-generated `Bundle.module` only checks
-  /// `Bundle.main.bundleURL` (the `.app/` root), but macOS code-signing
-  /// forbids placing files there. Xcode's version also checks
-  /// `Bundle.main.resourceURL` (`Contents/Resources/`).
+  /// 資源 bundle 在 `.app` 內位於 `Contents/Resources/`，在 SwiftPM 建置產物目錄內則與
+  /// 執行檔同層；其餘候選位置由 `ResourceLocator` 依序嘗試。全部落空時回傳 `nil`，
+  /// 由呼叫端決定退避行為，不再以 `fatalError` 中斷宿主行程。
   ///
-  /// This property mirrors the Xcode-style lookup order so that the
-  /// Makefile no longer needs to patch the auto-generated accessor.
-  ///
-  /// Swift 6.3.x (`swift test`) 會將測試 bundle 佈署在舊式
-  /// `.build/<triple>/<config>/` 佈局，資源 bundle 是測試 bundle 的同層兄弟
-  /// （而非複製進 `Contents/Resources/`）；Swift 6.4 的新式 `.build/out/Products/`
-  /// 佈局則會把資源 bundle 複製進測試 bundle 的 Resources。兩者都要能命中，
-  /// 故在既有候選之外補上「類別 bundle 所在目錄（測試 bundle 的同層目錄）」。
-  static let currentSPM: Bundle = {
-    let bundleName = "MainAssembly4Darwin_MainAssembly4Darwin"
-    let candidates: [URL?] = [
-      // .app → Contents/Resources/ (standard macOS bundle location).
-      Bundle.main.resourceURL,
-      // Framework embedding.
-      Bundle(for: _BundleFinder.self).resourceURL,
-      // SPM build directory / command-line tools.
-      Bundle.main.bundleURL,
-      // Swift 6.3.x `swift test`：資源 bundle 是測試 bundle 的同層兄弟。
-      Bundle(for: _BundleFinder.self).bundleURL.deletingLastPathComponent(),
-    ]
-    for candidate in candidates {
-      guard let url = candidate?.appendingPathComponent(bundleName + ".bundle"),
-            let bundle = Bundle(url: url) else { continue }
-      return bundle
-    }
-    fatalError("unable to find bundle named \(bundleName)")
-  }()
+  /// 查找成功後快取結果；查找失敗則不快取，令宿主於啟動階段補做的手動指定仍然有效
+  /// （見 `ResourceLocator.specifyResourceBundleURL(_:forBundleNamed:)`）。
+  static var currentSPM: Bundle? {
+    if let cached = cachedCurrentSPM { return cached }
+    guard let resolved = ResourceLocator.resourceBundle(
+      named: "MainAssembly4Darwin_MainAssembly4Darwin",
+      anchor: _BundleFinder.self
+    )
+    else { return nil }
+    cachedCurrentSPM = resolved
+    return resolved
+  }
+
+  private static var cachedCurrentSPM: Bundle?
 }

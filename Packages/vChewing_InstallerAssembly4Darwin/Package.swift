@@ -15,14 +15,14 @@ let package = Package(
   dependencies: [
     .package(path: "../vChewing_IMKUtils"),
     .package(path: "../vChewing_OSFrameworkImpl"),
-    .package(path: "../vChewing_SwiftExtension"),
+    .package(path: "../vChewing_OSNeutralAssembly"),
   ],
   targets: [
     .target(
       name: "InstallerAssembly4Darwin",
       dependencies: [
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
-        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
       ],
       swiftSettings: [

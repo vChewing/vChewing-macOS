@@ -6,6 +6,7 @@
 @_exported import BrailleSputnik
 @_exported import Homa
 @_exported import LexiconAssembly
+@_exported import ResourceLocator
 @_exported import Shared
 @_exported import SwiftExtension
 @_exported import Tekkon

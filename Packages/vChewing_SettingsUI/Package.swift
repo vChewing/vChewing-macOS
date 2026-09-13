@@ -13,24 +13,20 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_Shared"),
+    .package(path: "../vChewing_OSNeutralAssembly"),
     .package(path: "../vChewing_Shared_DarwinImpl"),
-    .package(path: "../vChewing_SwiftExtension"),
     .package(path: "../vChewing_OSFrameworkImpl"),
     .package(path: "../vChewing_IMKUtils"),
-    .package(path: "../vChewing_LexiconAssembly"),
     .package(path: "../Jad_BookmarkManager"),
   ],
   targets: [
     .target(
       name: "SettingsUI",
       dependencies: [
-        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
         .product(name: "Shared_DarwinImpl", package: "vChewing_Shared_DarwinImpl"),
-        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
-        .product(name: "LexiconAssembly", package: "vChewing_LexiconAssembly"),
         .product(name: "BookmarkManager", package: "Jad_BookmarkManager"),
       ],
       swiftSettings: [
@@ -41,8 +37,7 @@ let package = Package(
       name: "SettingsUITests",
       dependencies: [
         "SettingsUI",
-        .product(name: "Shared", package: "vChewing_Shared"),
-        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

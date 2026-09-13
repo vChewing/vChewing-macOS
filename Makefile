@@ -56,6 +56,9 @@ universal-build:
 	@rm -f $(ARM64_DIR)/vChewing $(ARM64_DIR)/vChewingInstaller
 	@rm -f $(X86_64_DIR)/vChewing $(X86_64_DIR)/vChewingInstaller
 	@rm -f $(NEXUS_DIR)/vChewing $(NEXUS_DIR)/vChewingInstaller
+	@# Dynamic products (`Product.library(type: .dynamic)`) are architecture-specific, so
+	@# stale copies must go as well — a leftover dylib would otherwise be lipo'd and embedded.
+	@rm -f $(ARM64_DIR)/*.dylib $(X86_64_DIR)/*.dylib
 	@echo "Building arm64 (Release)..."
 	@mkdir -p $(NEXUS_DIR)
 	@touch $(NEXUS_DIR)/.pre-build-marker
@@ -76,6 +79,13 @@ universal-build:
 			cp -R "$$bundle" $(ARM64_DIR)/; \
 		fi; \
 	done
+	@# Dynamic products are architecture-specific: keep this arch's copies for the later lipo pass.
+	@for dylib in $(NEXUS_DIR)/*.dylib; do \
+		if [ -f "$$dylib" ]; then \
+			mkdir -p $(ARM64_DIR); \
+			cp -f "$$dylib" $(ARM64_DIR)/; \
+		fi; \
+	done
 	@echo "Building x86_64 (Release)..."
 	@touch $(NEXUS_DIR)/.pre-build-marker
 	swift build -c release --arch x86_64
@@ -88,12 +98,32 @@ universal-build:
 		mkdir -p $(X86_64_DIR); \
 		cp -f $(NEXUS_DIR)/vChewingInstaller $(X86_64_DIR)/vChewingInstaller; \
 	fi
+	@for dylib in $(NEXUS_DIR)/*.dylib; do \
+		if [ -f "$$dylib" ]; then \
+			mkdir -p $(X86_64_DIR); \
+			cp -f "$$dylib" $(X86_64_DIR)/; \
+		fi; \
+	done
 	@echo "Creating universal binaries..."
 	@mkdir -p $(UNIVERSAL_DIR)
 	@lipo -create $(ARM64_DIR)/vChewing $(X86_64_DIR)/vChewing \
 		-output $(UNIVERSAL_DIR)/vChewing
 	@lipo -create $(ARM64_DIR)/vChewingInstaller $(X86_64_DIR)/vChewingInstaller \
 		-output $(UNIVERSAL_DIR)/vChewingInstaller
+	@# Dynamic products need their own per-arch lipo: the bundles below are arch-independent,
+	@# the executables are handled above, and neither loop would carry a `.dylib` across.
+	@for dylib in $(ARM64_DIR)/*.dylib; do \
+		if [ -f "$$dylib" ]; then \
+			name=$$(basename "$$dylib"); \
+			if [ -f "$(X86_64_DIR)/$$name" ]; then \
+				lipo -create "$(ARM64_DIR)/$$name" "$(X86_64_DIR)/$$name" \
+					-output "$(UNIVERSAL_DIR)/$$name"; \
+			else \
+				echo "  ⚠️  dylib $$name has no x86_64 slice; copying arm64 only."; \
+				cp -f "$(ARM64_DIR)/$$name" "$(UNIVERSAL_DIR)/$$name"; \
+			fi; \
+		fi; \
+	done
 	@for bundle in $(ARM64_DIR)/*.bundle; do \
 		if [ -d "$$bundle" ]; then \
 			rm -rf "$(UNIVERSAL_DIR)/$$(basename $$bundle)"; \

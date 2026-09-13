@@ -20,9 +20,9 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 - `Packages/vChewing_SettingsUI/`：偏好設定獨立套件——SwiftUI `SettingsUI`（macOS 14+，含 PhraseEditor 語彙編輯器與 About 窗格）與 AppKit `SettingsCocoa` 並存；主程式端以 `SettingsUIHostWiring.swift`（`SettingsUIHost` 閉包注入）接線。
 - `Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/InputHandler/`：FSM 實作、Tekkon/Homa 橋接。
 - `Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/Session/`：OS-independent 會話體系——`SessionCoreProtocol`（共用基底協定，提供 `switchState()`/`resetInputHandler()` 預設實作）、`SessionProtocol`＋`InputSession`（會話類別）、`IMEState` factories／`IMEStateParsed`、`SessionClientProxy`（跨平台客戶端 proxy 抽象）、`SessionHost`（OS-dependent 動作注入點）。Darwin 專屬行為由 MainAssembly 的 `SessionHostWiring` 注入＋Darwin surface 提供。
-- `Packages/vChewing_Tekkon/Sources/Tekkon/`：注音/拼音解析、組筆處理。
-- `Packages/vChewing_Homa/Sources/Homa/`：DAG-DP 組字器、候選輪替／鞏固 API、POM 觀測資料生成器。
-- `Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/`：語言模型匯流、使用者詞語、關聯詞、POM 記憶管理。
+- `Packages/vChewing_OSNeutralAssembly/Sources/Tekkon/`：注音/拼音解析、組筆處理。
+- `Packages/vChewing_OSNeutralAssembly/Sources/Homa/`：DAG-DP 組字器、候選輪替／鞏固 API、POM 觀測資料生成器。
+- `Packages/vChewing_OSNeutralAssembly/Sources/LexiconAssembly/`：語言模型匯流、使用者詞語、關聯詞、POM 記憶管理。
 
 ## Testing & Tooling
 
