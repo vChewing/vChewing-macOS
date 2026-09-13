@@ -9,8 +9,6 @@ extension SettingsPanesCocoa.About {
     .localizedInfoDictionary?["NSHumanReadableCopyright"] as? String ?? "BAD_COPYRIGHT_LABEL"
   public static let eulaContent = Bundle.main
     .localizedInfoDictionary?["CFEULAContent"] as? String ?? "BAD_EULA_CONTENT"
-  public static let eulaContentUpstream = Bundle.main
-    .infoDictionary?["CFUpstreamEULAContent"] as? String ?? "BAD_EULA_UPSTREAM"
 }
 
 // MARK: - SettingsPanesCocoa.About
@@ -145,7 +143,7 @@ extension SettingsPanesCocoa {
       textView.isVerticallyResizable = true
       textView.smartInsertDeleteEnabled = true
       textView.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-      textView.string = Self.eulaContent + "\n" + Self.eulaContentUpstream
+      textView.string = Self.eulaContent
       clipView.documentView = textView
       clipView.autoresizingMask = [.width, .height]
       clipView.drawsBackground = false

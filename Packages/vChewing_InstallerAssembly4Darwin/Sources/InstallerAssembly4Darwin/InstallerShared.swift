@@ -68,8 +68,6 @@ let copyrightLabel = Bundle.main
   .localizedInfoDictionary?["NSHumanReadableCopyright"] as? String ?? "BAD_COPYRIGHT_LABEL"
 let eulaContent = Bundle.main
   .localizedInfoDictionary?["CFEULAContent"] as? String ?? "BAD_EULA_CONTENT"
-let eulaContentUpstream = Bundle.main
-  .infoDictionary?["CFUpstreamEULAContent"] as? String ?? "BAD_EULA_UPSTREAM"
 let lsMinOSVerStr = Bundle.main
   .infoDictionary?["LSMinimumSystemVersion"] as? String
 

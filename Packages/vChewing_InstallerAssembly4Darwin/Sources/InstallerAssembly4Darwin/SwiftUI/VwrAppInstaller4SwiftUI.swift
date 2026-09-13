@@ -46,7 +46,7 @@ struct VwrAppInstaller4SwiftUI: View {
           GroupBox(label: Text("i18n:installer.LICENSE_TITLE")) {
             ScrollView(.vertical, showsIndicators: true) {
               HStack {
-                Text(eulaContent + "\n" + eulaContentUpstream).textSelection(.enabled)
+                Text(eulaContent).textSelection(.enabled)
                   .frame(maxWidth: .infinity, alignment: .leading)
                   .frame(maxWidth: 455)
                   .font(.custom("Tahoma", size: 11))

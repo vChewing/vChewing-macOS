@@ -10,7 +10,6 @@ import SwiftUI
 public struct VwrSettingsPaneAbout: View {
   public static var copyrightLabel: String { SettingsPanesCocoa.About.copyrightLabel }
   public static var eulaContent: String { SettingsPanesCocoa.About.eulaContent }
-  public static var eulaContentUpstream: String { SettingsPanesCocoa.About.eulaContentUpstream }
 
   // MARK: - Main View
 
@@ -47,7 +46,7 @@ public struct VwrSettingsPaneAbout: View {
             GroupBox(label: Text("i18n:aboutWindow.LICENSE_TITLE")) {
               ScrollView(.vertical, showsIndicators: true) {
                 HStack {
-                  Text(Self.eulaContent + "\n" + Self.eulaContentUpstream).textSelection(.enabled)
+                  Text(Self.eulaContent).textSelection(.enabled)
                     .frame(maxWidth: 455)
                     .font(.system(size: 11))
                   Spacer()

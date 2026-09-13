@@ -11,8 +11,6 @@ extension VwrAppInstaller4Cocoa {
     .localizedInfoDictionary?["NSHumanReadableCopyright"] as? String ?? "BAD_COPYRIGHT_LABEL"
   public static let eulaContent = Bundle.main
     .localizedInfoDictionary?["CFEULAContent"] as? String ?? "BAD_EULA_CONTENT"
-  public static let eulaContentUpstream = Bundle.main
-    .infoDictionary?["CFUpstreamEULAContent"] as? String ?? "BAD_EULA_UPSTREAM"
 
   /// 主視窗的 content size，與 SwiftUI 版安裝程式的 Window Size（1000×630）一致。
   public static let meshWindowWidth: CGFloat = 1_000
@@ -235,7 +233,7 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
     textView.isVerticallyResizable = true
     textView.smartInsertDeleteEnabled = true
     textView.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-    textView.string = Self.eulaContent + "\n" + Self.eulaContentUpstream
+    textView.string = Self.eulaContent
     clipView.documentView = textView
     clipView.autoresizingMask = [.width, .height]
     clipView.drawsBackground = false

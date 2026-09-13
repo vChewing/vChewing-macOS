@@ -26,8 +26,6 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CFEULAContent</key>
 	<string>License texts used in the customized about window.</string>
-	<key>CFUpstreamEULAContent</key>
-	<string>[The previous upstream EULA contents have been removed since this project is not including program contents from McBopomofo anymore. You may refer to their EULA contents hosted in their repository (GitHub://OpenVanilla/McBopomofo/). OpenVanilla is both &quot;the name of a FOSS software developer group&quot; and the name of a software developed by them (GitHub://OpenVanilla/OpenVanilla/). The OpenVanilla software (and SpaceChewing, commonly referred as &quot;香草注音&quot;) is totally different from McBopomofo and is out-of-topic.]</string>
 	<key>ComponentInputModeDict</key>
 	<dict>
 		<key>tsInputModeListKey</key>
