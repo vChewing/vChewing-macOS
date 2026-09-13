@@ -1,6 +1,6 @@
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Testing
 
