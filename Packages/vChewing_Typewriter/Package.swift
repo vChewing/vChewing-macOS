@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../ButKo_BPMFVS"),
+    .package(path: "../vChewing_BPMFVS"),
     .package(path: "../vChewing_BrailleSputnik"),
     .package(path: "../vChewing_LangModelAssembly"),
     .package(path: "../vChewing_Homa"),
@@ -27,7 +27,7 @@ let package = Package(
     .target(
       name: "Typewriter",
       dependencies: [
-        .product(name: "BPMFVS", package: "ButKo_BPMFVS"),
+        .product(name: "BPMFVS", package: "vChewing_BPMFVS"),
         .product(name: "BrailleSputnik", package: "vChewing_BrailleSputnik"),
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
         .product(name: "Homa", package: "vChewing_Homa"),

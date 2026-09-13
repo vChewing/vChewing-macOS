@@ -25,7 +25,7 @@ limitations under the License.
 
 ---
 
-本專案所有程式碼（.rb）
+本專案所有 Ruby 程式碼（.rb）
 與標註用注音字型（GenyoMinBopomofo-Regular.ttf／f_bpmfgen.js）
 均以 Apache 2.0 授權條款釋出。
 
@@ -33,3 +33,8 @@ limitations under the License.
 
 衍生自此專案所製作之各字型檔，可訂定不同授權條款。
 但應依循 Apache 2.0 規範標示原始著作權聲明與修改內容。
+
+----------------------------------------------------------------------------
+
+vChewing_BPMFVS 乃唯音專案自訂之資料橋接介面，
+相關 LICENSE 請見 Swift 檔案的標頭。

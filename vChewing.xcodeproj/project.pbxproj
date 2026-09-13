@@ -51,7 +51,7 @@
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
-		5B5CE5FF2F8D539700E767A0 /* ButKo_BPMFVS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ButKo_BPMFVS; path = Packages/ButKo_BPMFVS; sourceTree = "<group>"; };
+		5B5CE5FF2F8D539700E767A0 /* vChewing_BPMFVS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_BPMFVS; path = Packages/vChewing_BPMFVS; sourceTree = "<group>"; };
 		5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly4Darwin; path = Packages/vChewing_InstallerAssembly4Darwin; sourceTree = "<group>"; };
 		5B61DB312FA901CF005DE65A /* vChewing_Shared_DarwinImpl */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared_DarwinImpl; path = Packages/vChewing_Shared_DarwinImpl; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -202,7 +202,7 @@
 		5BDB7A2D28D47570001AC277 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				5B5CE5FF2F8D539700E767A0 /* ButKo_BPMFVS */,
+				5B5CE5FF2F8D539700E767A0 /* vChewing_BPMFVS */,
 				5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
 				5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */,
