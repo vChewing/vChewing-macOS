@@ -81,7 +81,7 @@ public struct KBEvent: InputSignalProtocol, Hashable {
 // MARK: - KBEvent Extension - SubTypes
 
 extension KBEvent {
-  public struct ModifierFlags: OptionSet, Hashable {
+  public struct ModifierFlags: OptionSet, Hashable, Sendable {
     // MARK: Lifecycle
 
     public init(rawValue: UInt) {

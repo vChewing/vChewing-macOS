@@ -128,6 +128,60 @@ final class SharedTests {
     #expect(CandidateTextService(key: "file2", definedValue: def2, param: "a") == nil)
   }
 
+  @Test
+  func testFcitxKeyboardEventConversion() throws {
+    // Unshifted / shifted letters resolve through the QWERTY map.
+    let keyA = try #require(KBEvent(fcitxKeyCode: 0x041, fcitxModifierFlags: 0))
+    #expect(keyA.keyCode == 0x00)
+    #expect(keyA.characters == "a")
+    #expect(keyA.charactersIgnoringModifiers == "a")
+    #expect(keyA.modifierFlags.isEmpty)
+    #expect(keyA.type == .keyDown)
+
+    let shiftedA = try #require(KBEvent(fcitxKeyCode: 0x041, fcitxModifierFlags: 1 << 0))
+    #expect(shiftedA.keyCode == 0x00)
+    #expect(shiftedA.characters == "A")
+    #expect(shiftedA.charactersIgnoringModifiers == "a")
+    #expect(shiftedA.modifierFlags == .shift)
+
+    // The Fcitx modifier bits are re-mapped onto their Darwin counterparts.
+    let expectations: [(UInt32, KBEvent.ModifierFlags)] = [
+      (1 << 1, .capsLock), (1 << 2, .control), (1 << 3, .option), (1 << 6, .command),
+      (1 << 4, .numericPad), (1 << 5, .function), (1 << 27, .function), (1 << 26, .command),
+      (1 << 28, .option),
+    ]
+    for (fcitxFlag, darwinFlag) in expectations {
+      let event = try #require(KBEvent(fcitxKeyCode: 0x041, fcitxModifierFlags: fcitxFlag))
+      #expect(event.modifierFlags == darwinFlag, "Fcitx flag \(fcitxFlag) was not mapped correctly.")
+    }
+
+    // The Fcitx repeat bit rides on isARepeat instead of any Darwin modifier.
+    let repeated = try #require(
+      KBEvent(fcitxKeyCode: 0x041, fcitxModifierFlags: 1 << 31, isKeyDown: true)
+    )
+    #expect(repeated.isARepeat)
+    #expect(repeated.modifierFlags.isEmpty)
+
+    // Key-down state, including the `nil` case which means a modifier-only event.
+    let released = try #require(KBEvent(fcitxKeyCode: 0x041, fcitxModifierFlags: 0, isKeyDown: false))
+    #expect(released.type == .keyUp)
+    let flagsChanged = try #require(KBEvent(fcitxKeyCode: 0x041, fcitxModifierFlags: 0, isKeyDown: nil))
+    #expect(flagsChanged.type == .flagsChanged)
+
+    // JIS-only keys absent from the QWERTY map still yield their literal glyph.
+    let yen = try #require(KBEvent(fcitxKeyCode: 0x0A5, fcitxModifierFlags: 0))
+    #expect(yen.keyCode == 0x5D)
+    #expect(yen.characters == "¥")
+    #expect(yen.charactersIgnoringModifiers == "¥")
+
+    // Special keys resolve through the key-code table rather than the character map.
+    let backspace = try #require(KBEvent(fcitxKeyCode: 0xFF08, fcitxModifierFlags: 0))
+    #expect(backspace.keyCode == KeyCode.kBackSpace.rawValue)
+
+    // Unmapped Fcitx key codes are rejected outright.
+    #expect(KBEvent(fcitxKeyCode: 0x1234_5678, fcitxModifierFlags: 0) == nil)
+  }
+
   // MARK: Private
 
   // MARK: - CandidateTextService (Basic Tests)
