@@ -15,9 +15,6 @@ protocol InstallerVMProtocol: AnyObject {
 
   // 實作所需的計時器儲存欄位
   var installRetryTimer: DispatchSourceTimer? { get set }
-
-  // DispatchQueue
-  var taskQueue: DispatchQueue { get }
 }
 
 extension InstallerVMProtocol {
@@ -99,7 +96,12 @@ extension InstallerVMProtocol {
     config.timeRemaining = kInstallRetryTimeout
     config.retryDeadline = nil
 
-    let timer = DispatchSource.makeTimerSource(queue: taskQueue)
+    // 計時器必須直接建在主佇列上：本 target 採 `defaultIsolation(MainActor.self)`，事件處理器
+    // 閉包因此是 MainActor 隔離的；若計時器跑在私有佇列，Swift 執行期會在閉包入口就以
+    // `_swift_task_checkIsolatedSwift` → `dispatch_assert_queue` 失敗而 SIGTRAP（閉包本體
+    // 根本不會執行，所以「用 main.sync 包住呼叫」也救不了）。安裝流程另會碰 TIS 系列 API，
+    // HIToolbox 同樣對呼叫端斷言主佇列，至此兩者一併滿足。
+    let timer = DispatchSource.makeTimerSource(queue: .main)
     timer.schedule(deadline: .now(), repeating: kInstallRetryInterval)
     timer.setEventHandler { [weak self] in
       self?.installInputMethod()

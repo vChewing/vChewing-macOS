@@ -109,7 +109,6 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   let windowWidth: CGFloat = 533
   let contentWidth: CGFloat = 510
   let imgWidth: CGFloat = 63
-  let taskQueue: DispatchQueue = .init(label: "vChewingInstaller.Queue.\(UUID().uuidString)")
   var installRetryTimer: DispatchSourceTimer?
 
   var config: InstallerUIConfig = .init() {

@@ -174,7 +174,6 @@ private final class InstallerMainViewModel: ObservableObject, InstallerVMProtoco
 
   @Published
   var config: InstallerUIConfig = .init()
-  let taskQueue: DispatchQueue = .init(label: "vChewingInstaller.Queue.\(UUID().uuidString)")
   var installRetryTimer: DispatchSourceTimer?
 
   /// 將 `currentAlertContent` 與 `adminRenameFailureAlertPaths` 同步成單一 `alertItem`，
