@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_OSNeutral_LibVanguard"),
+    .package(path: "../vChewing_OSNeutral_LibVanguard/Deps/VanguardSwiftExtension"),
   ],
   targets: [
     .target(
@@ -26,7 +26,7 @@ let package = Package(
       name: "OSFrameworkImpl",
       dependencies: [
         "OSFrameworkImplViaObjC",
-        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
+        .product(name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

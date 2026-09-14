@@ -4,8 +4,12 @@
 import PackageDescription
 
 // 本套件是整個輸入核心依賴閉包的聚合包：原 `vChewing_BPMFVS`、`vChewing_BrailleSputnik`、
-// `vChewing_Homa`、`vChewing_LexiconAssembly`、`vChewing_Shared`、`vChewing_SwiftExtension`、
-// `vChewing_Tekkon` 諸套件的所有 target 都併於其中。
+// `vChewing_Homa`、`vChewing_LexiconAssembly`、`vChewing_Shared`、`vChewing_Tekkon` 諸套件的
+// 所有 target 都併於其中。
+//
+// `vChewing_VanguardSwiftExtension` 是例外：它已被析出為獨立套件。原因是
+// App-based installer 只用到該模組、卻因併包而被迫連帶吃下整條打字閉包；析出後本聚合體對它
+// 是**動態相倚**（Darwin：該產品為 dynamic）而非靜態內嵌，故每個行程內該模組恰有一份 image。
 //
 // 之所以必須是聚合體：SwiftPM 拒絕讓同一個 target 同時被「動態產品」與「靜態產品」取用
 // （`This will result in duplication of library code.`），因此整個閉包只能以單一動態庫出貨。
@@ -32,7 +36,6 @@ let package = Package(
       targets: buildStrings {
         "LibVanguard"
         "Shared"
-        "SwiftExtension"
         "ResourceLocator"
         "LexiconAssembly"
         "TrieKit"
@@ -64,26 +67,26 @@ let package = Package(
       }
     )
   },
-  dependencies: buildPackageDependencies {},
+  dependencies: buildPackageDependencies {
+    .package(path: "Deps/VanguardSwiftExtension")
+  },
   targets: buildTargets {
     // MARK: - Library Targets
 
     Target.target(
-      name: "SwiftExtension",
-      swiftSettings: buildSwiftSettings {
-        .defaultIsolation(MainActor.self) // set Default Actor Isolation
-      }
-    )
-    Target.target(
       name: "ResourceLocator",
       dependencies: buildTargetDependencies {
-        "SwiftExtension"
+        Target.Dependency.product(
+          name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
+        )
       }
     )
     Target.target(
       name: "TrieKit",
       dependencies: buildTargetDependencies {
-        "SwiftExtension"
+        Target.Dependency.product(
+          name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
+        )
       }
     )
     Target.target(
@@ -107,7 +110,9 @@ let package = Package(
     Target.target(
       name: "Shared",
       dependencies: buildTargetDependencies {
-        "SwiftExtension"
+        Target.Dependency.product(
+          name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
+        )
       },
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
@@ -129,7 +134,9 @@ let package = Package(
         "TrieKit"
         "Homa"
         "Shared"
-        "SwiftExtension"
+        Target.Dependency.product(
+          name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
+        )
       },
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
@@ -144,7 +151,9 @@ let package = Package(
         "Homa"
         "ResourceLocator"
         "Shared"
-        "SwiftExtension"
+        Target.Dependency.product(
+          name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
+        )
         "Tekkon"
       },
       swiftSettings: buildSwiftSettings {
@@ -221,15 +230,6 @@ let package = Package(
       name: "SharedTests",
       dependencies: buildTargetDependencies {
         "Shared"
-      },
-      swiftSettings: buildSwiftSettings {
-        .defaultIsolation(MainActor.self) // set Default Actor Isolation
-      }
-    )
-    Target.testTarget(
-      name: "SwiftExtensionTests",
-      dependencies: buildTargetDependencies {
-        "SwiftExtension"
       },
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation

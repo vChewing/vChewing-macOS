@@ -77,6 +77,7 @@
 		5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ModifierKeyHitChecker; path = Packages/vChewing_ModifierKeyHitChecker; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SettingsUI; path = Packages/vChewing_SettingsUI; sourceTree = "<group>"; };
+		5BF215AF2FAC7D0100A1B2C3 /* VanguardSwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = VanguardSwiftExtension; path = Packages/vChewing_OSNeutral_LibVanguard/Deps/VanguardSwiftExtension; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -207,6 +208,7 @@
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */,
 				5B09A5172E9957F3002C2EC3 /* vChewing_OSNeutral_LibVanguard */,
+				5BF215AF2FAC7D0100A1B2C3 /* VanguardSwiftExtension */,
 				5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */,

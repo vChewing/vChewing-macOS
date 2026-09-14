@@ -36,6 +36,14 @@ spmClean:
 			swift package clean --package-path "./Packages/$$currentDir" || true; \
 		fi; \
 	done;
+	@# 聚合體目錄內之巢狀子套件（`<聚合體>/Deps/<子套件>`）：僅在直接對其建置時才會生成
+	@# 獨立的 .build，故須一併清掃，否則殘留物件會在下一次建置造成假失敗。
+	@for nestedDep in ./Packages/*/Deps/*; do \
+		if [ -f "$$nestedDep/Package.swift" ]; then \
+			echo "processing nested dep $$nestedDep"; \
+			swift package clean --package-path "$$nestedDep" || true; \
+		fi; \
+	done;
 
 spmLinuxTest-LibVanguard:
 	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_OSNeutral_LibVanguard swift:latest swift test --filter InputHandlerTests
