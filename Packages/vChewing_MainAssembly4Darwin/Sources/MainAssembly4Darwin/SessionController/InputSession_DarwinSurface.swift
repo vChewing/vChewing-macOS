@@ -4,7 +4,7 @@
 
 import AppKit
 import IMKUtils
-import OSNeutralAssembly
+import LibVanguard
 import Shared
 import Shared_DarwinImpl
 import SwiftExtension

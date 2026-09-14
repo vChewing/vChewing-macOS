@@ -100,7 +100,7 @@
 - 护摩组句引擎（Homa）：Shiki Suen (LGPL v3.0 or later, with Swift App Development exception)。
 - 唯音词库（先锋语料库）由 Shiki Suen 维护，以木兰宽松授权条款第 2 版（MulanPSL-2.0）授权释出。其中的词频资料[由 NAER 授权用于非商业用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
-> 自 2026 年 04 月下旬，本仓库的组句引擎已由天权星（Megrez）迁移为敝专案自研先锋引擎套件 LibVanguard 当中的护摩（Homa）。Homa 元件本身以 LGPL v3.0 or later 授权释出，且附带与 Swift App Development 情境的额外许可；详见 `./Packages/vChewing_OSNeutralAssembly/LICENSES/Homa-CUSTOM_LGPLv3_EXCEPTION.md` 与 `./Packages/vChewing_OSNeutralAssembly/LICENSES/Homa-LICENSE.txt`。
+> 自 2026 年 04 月下旬，本仓库的组句引擎已由天权星（Megrez）迁移为敝专案自研先锋引擎套件 LibVanguard 当中的护摩（Homa）。Homa 元件本身以 LGPL v3.0 or later 授权释出，且附带与 Swift App Development 情境的额外许可；详见 `./Packages/vChewing_OSNeutral_LibVanguard/LICENSES/Homa-CUSTOM_LGPLv3_EXCEPTION.md` 与 `./Packages/vChewing_OSNeutral_LibVanguard/LICENSES/Homa-LICENSE.txt`。
 
 使用者可自由使用、散播本软体，惟散播时必须完整保留版权声明及软体授权、且「一旦经过修改便不可以再继续使用唯音的产品名称」。木兰宽松授权条款第 2 版特示：一是第 3 条的商标不许可规定（你 Fork 可以，但 Fork 成单独发行的产品名称时就必须修改产品名称）；二是专利授权与专利诉讼反制条款。详见全文。
 

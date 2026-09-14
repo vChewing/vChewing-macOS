@@ -100,7 +100,7 @@
 - 護摩組句引擎（Homa）：Shiki Suen (LGPL v3.0 or later, with Swift App Development exception)。
 - 唯音詞庫（先鋒語料庫）由 Shiki Suen 維護，以木蘭寬鬆授權條款第 2 版（MulanPSL-2.0）授權釋出。其中的詞頻資料[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
-> 自 2026 年 04 月下旬，本倉庫的組句引擎已由天權星（Megrez）遷移為敝專案自研先鋒引擎套件 LibVanguard 當中的護摩（Homa）。Homa 元件本身以 LGPL v3.0 or later 授權釋出，且附帶與 Swift App Development 情境的額外許可；詳見 `./Packages/vChewing_OSNeutralAssembly/LICENSES/Homa-CUSTOM_LGPLv3_EXCEPTION.md` 與 `./Packages/vChewing_OSNeutralAssembly/LICENSES/Homa-LICENSE.txt`。
+> 自 2026 年 04 月下旬，本倉庫的組句引擎已由天權星（Megrez）遷移為敝專案自研先鋒引擎套件 LibVanguard 當中的護摩（Homa）。Homa 元件本身以 LGPL v3.0 or later 授權釋出，且附帶與 Swift App Development 情境的額外許可；詳見 `./Packages/vChewing_OSNeutral_LibVanguard/LICENSES/Homa-CUSTOM_LGPLv3_EXCEPTION.md` 與 `./Packages/vChewing_OSNeutral_LibVanguard/LICENSES/Homa-LICENSE.txt`。
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且「一旦經過修改便不可以再繼續使用唯音的產品名稱」。木蘭寬鬆授權條款第 2 版特示：一是第 3 條的商標不許可規定（你 Fork 可以，但 Fork 成單獨發行的產品名稱時就必須修改產品名稱）；二是專利授權與專利訴訟反制條款。詳見全文。
 

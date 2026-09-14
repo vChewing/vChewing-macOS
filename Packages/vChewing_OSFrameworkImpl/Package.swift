@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_OSNeutralAssembly"),
+    .package(path: "../vChewing_OSNeutral_LibVanguard"),
   ],
   targets: [
     .target(
@@ -26,7 +26,7 @@ let package = Package(
       name: "OSFrameworkImpl",
       dependencies: [
         "OSFrameworkImplViaObjC",
-        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
+        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

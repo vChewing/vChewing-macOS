@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_OSNeutralAssembly"),
+    .package(path: "../vChewing_OSNeutral_LibVanguard"),
     .package(path: "../vChewing_Shared_DarwinImpl"),
     .package(path: "../vChewing_OSFrameworkImpl"),
     .package(path: "../vChewing_IMKUtils"),
@@ -23,7 +23,7 @@ let package = Package(
     .target(
       name: "SettingsUI",
       dependencies: [
-        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
+        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
         .product(name: "Shared_DarwinImpl", package: "vChewing_Shared_DarwinImpl"),
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
@@ -37,7 +37,7 @@ let package = Package(
       name: "SettingsUITests",
       dependencies: [
         "SettingsUI",
-        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
+        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

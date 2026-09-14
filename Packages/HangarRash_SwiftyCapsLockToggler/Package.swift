@@ -14,7 +14,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_OSNeutralAssembly"),
+    .package(path: "../vChewing_OSNeutral_LibVanguard"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -33,7 +33,7 @@ let package = Package(
       name: "SwiftyCapsLockToggler",
       dependencies: [
         "CapsLockToggler",
-        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
+        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

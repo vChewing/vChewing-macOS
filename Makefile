@@ -37,8 +37,8 @@ spmClean:
 		fi; \
 	done;
 
-spmLinuxTest-OSNeutralAssembly:
-	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_OSNeutralAssembly swift:latest swift test --filter InputHandlerTests
+spmLinuxTest-LibVanguard:
+	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_OSNeutral_LibVanguard swift:latest swift test --filter InputHandlerTests
 
 # ── App Bundle Assembly (via SwiftPM CommandPlugin) ──────────────────
 
@@ -268,7 +268,7 @@ gc:
 
 test:
 	swift test
-	swift test --package-path ./Packages/vChewing_OSNeutralAssembly
+	swift test --package-path ./Packages/vChewing_OSNeutral_LibVanguard
 
 xcode-test:
 	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test

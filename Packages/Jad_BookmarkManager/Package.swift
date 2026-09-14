@@ -13,13 +13,13 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_OSNeutralAssembly"),
+    .package(path: "../vChewing_OSNeutral_LibVanguard"),
   ],
   targets: [
     .target(
       name: "BookmarkManager",
       dependencies: [
-        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
+        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
@@ -29,7 +29,7 @@ let package = Package(
       name: "BookmarkManagerTests",
       dependencies: [
         "BookmarkManager",
-        .product(name: "OSNeutralAssembly", package: "vChewing_OSNeutralAssembly"),
+        .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
       ],
       path: "Tests/BookmarkManagerTests",
       swiftSettings: [

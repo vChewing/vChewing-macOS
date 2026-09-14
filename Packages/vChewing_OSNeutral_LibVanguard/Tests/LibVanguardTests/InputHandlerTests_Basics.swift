@@ -1,0 +1,316 @@
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
+// ====================
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
+
+import Foundation
+@testable import LexiconAssembly
+@testable import LibVanguard
+import LXAssemblyMaterials4Tests
+import Shared
+import Testing
+
+func vCTestLog(_ str: String) {
+  print("[VCLOG] \(str)")
+}
+
+// MARK: - 測試用 KBEvent 按鍵實例
+
+extension KBEvent.KeyEventData {
+  static let dataArrowHome = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.home.unicodeScalar.description,
+    keyCode: KeyCode.kHome.rawValue
+  )
+  static let dataArrowEnd = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.end.unicodeScalar.description,
+    keyCode: KeyCode.kEnd.rawValue
+  )
+  static let dataArrowLeft = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.leftArrow.unicodeScalar.description,
+    keyCode: KeyCode.kLeftArrow.rawValue
+  )
+  static let dataArrowRight = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    keyCode: KeyCode.kRightArrow.rawValue
+  )
+  static let dataArrowDown = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.downArrow.unicodeScalar.description,
+    keyCode: KeyCode.kDownArrow.rawValue
+  )
+  static let dataEnterReturn = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.carriageReturn.unicodeScalar.description,
+    keyCode: KeyCode.kLineFeed.rawValue
+  )
+  static let dataTab = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.tab.unicodeScalar.description,
+    keyCode: KeyCode.kTab.rawValue
+  )
+  static let forwardDelete = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    keyCode: KeyCode.kWindowsDelete.rawValue
+  )
+  static let backspace = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.backspace.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
+  static let symbolMenuKeyEventIntl = KBEvent.KeyEventData(
+    chars: "`",
+    keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+  )
+}
+
+extension KBEvent {
+  public struct KeyEventData {
+    // MARK: Lifecycle
+
+    public init(
+      type: EventType = .keyDown,
+      flags: ModifierFlags = [],
+      chars: String,
+      charsSansModifiers: String? = nil,
+      keyCode: UInt16? = nil
+    ) {
+      self.type = type
+      self.flags = flags
+      self.chars = chars
+      self.charsSansModifiers = charsSansModifiers ?? chars
+      self.keyCode = keyCode ?? mapKeyCodesANSIForTests[chars] ?? 65_535
+    }
+
+    // MARK: Public
+
+    public var type: EventType = .keyDown
+    public var flags: ModifierFlags
+    public var chars: String
+    public var charsSansModifiers: String
+    public var keyCode: UInt16
+
+    public var asPairedEvents: [KBEvent] {
+      KBEvent.keyEvents(data: self, paired: true)
+    }
+
+    public var asEvent: KBEvent {
+      KBEvent.keyEvent(data: self)
+    }
+
+    public func toEvents(paired: Bool = false) -> [KBEvent] {
+      KBEvent.keyEvents(data: self, paired: paired)
+    }
+  }
+
+  public static func keyEvents(data: KeyEventData, paired: Bool = false) -> [KBEvent] {
+    var resultArray = [KBEvent]()
+    let eventA: KBEvent = Self.keyEvent(data: data)
+    resultArray.append(eventA)
+    if paired, eventA.type == .keyDown {
+      let eventB = eventA.reinitiate(
+        with: .keyUp,
+        characters: nil,
+        charactersIgnoringModifiers: nil
+      )
+      resultArray.append(eventB)
+    }
+    return resultArray
+  }
+
+  public static func keyEvent(data: KeyEventData) -> KBEvent {
+    Self.keyEventSimple(
+      type: data.type,
+      flags: data.flags,
+      chars: data.chars,
+      charsSansModifiers: data.charsSansModifiers,
+      keyCode: data.keyCode
+    )
+  }
+
+  public static func keyEventSimple(
+    type: EventType,
+    flags: ModifierFlags,
+    chars: String,
+    charsSansModifiers: String? = nil,
+    keyCode: UInt16
+  )
+    -> KBEvent {
+    KBEvent(
+      with: type,
+      modifierFlags: flags,
+      timestamp: .init(),
+      windowNumber: 0,
+      characters: chars,
+      charactersIgnoringModifiers: charsSansModifiers ?? chars,
+      isARepeat: false,
+      keyCode: keyCode
+    )
+  }
+}
+
+// MARK: - 測試用鍵碼對照
+
+/// ANSI 鍵盤字符到 KeyCode 的映射表（用於測試）
+let mapKeyCodesANSIForTests: [String: UInt16] = [
+  "1": 18, "2": 19, "3": 20, "4": 21, "5": 23, "6": 22, "7": 26, "8": 28, "9": 25, "0": 29, "-": 27,
+  "=": 24, "q": 12, "w": 13, "e": 14, "r": 15, "t": 17, "y": 16, "u": 32, "i": 34, "o": 31, "p": 35,
+  "[": 33, "]": 30, "\\": 42, "a": 0, "s": 1, "d": 2, "f": 3, "g": 5, "h": 4, "j": 38, "k": 40,
+  "l": 37, ";": 41, "'": 39, "z": 6, "x": 7, "c": 8, "v": 9, "b": 11, "n": 45, "m": 46, ",": 43,
+  ".": 47, "/": 44, " ": 49,
+]
+
+func cassetteURLForTests(_ fileNameStem: String, ext: String) -> URL? {
+  guard let path = LXATestsData.getCINPath4Tests(fileNameStem, ext: ext) else { return nil }
+  return URL(fileURLWithPath: path)
+}
+
+// MARK: - InputHandlerTests
+
+/// 唯音輸入法的 InputHandler 單元測試（LibVanguard 模組）
+@Suite("InputHandlerTests", .serialized)
+final class InputHandlerTests {
+  // MARK: Lifecycle
+
+  // MARK: - 測試前後流程
+
+  init() throws {
+    // 設定專用於單元測試的 UserDefaults
+    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
+    UserDefaults.pendingUnitTests = true
+    UserDef.resetAll()
+
+    // 初期化測試 LM
+    let lx = LXAssembly.LXFacade(isCHS: false)
+    self.testLX = lx
+    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+
+    // 初期化測試用的 handler 和 session
+    let handler = MockInputHandler(lx: lx, pref: PrefMgr.sharedSansDidSetOps)
+    let session = MockSession()
+    handler.session = session
+    session.inputHandler = handler
+    self.testHandler = handler
+    self.testSession = session
+  }
+
+  deinit {
+    mainSync {
+      testHandler?.errorCallback = nil
+      testSession?.switchState(IMEState.ofAbortion())
+      LXAssembly.resetSharedState()
+    }
+    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
+    UserDef.resetAll()
+  }
+
+  // MARK: Internal
+
+  var testLX: LXAssembly.LXFacade?
+  var testHandler: MockInputHandler?
+  var testSession: MockSession?
+
+  // MARK: - 工具函式
+
+  func clearTestPOM() {
+    testHandler?.currentLM.clearPOMData()
+  }
+
+  func typeSentence(_ sequence: String) {
+    // 此處刻意跳過 KeyUp，因為 InputHandler 不處理 KeyUp。
+    // 如果要做與 KeyUp 有關的測試的話，需在 MainAssemblyTests 進行。
+    guard let testHandler, let testSession else { return }
+    // 使用 KBEvent 模擬輸入，類似 MainAssembly 的 typeSentenceOrCandidates
+    // 這樣可以正確處理注音、磁帶等各種輸入模式。
+    let isCandidateContainer = testSession.state.isCandidateContainer
+    let stateType = testSession.state.type
+    if !(
+      [.ofEmpty, .ofInputting].contains(stateType) || isCandidateContainer
+    ) { return }
+
+    // 為每個字符建立 KBEvent（按下事件）
+    let typingSequence: [KBEvent] = sequence.map { charRAW in
+      var finalArray = [KBEvent]()
+      let char = charRAW.description
+      let keyEventData = KBEvent.KeyEventData(chars: char)
+      finalArray.append(keyEventData.asEvent)
+      return finalArray
+    }.flatMap { $0 }
+
+    // 處理每個 keyDown 事件。
+    typingSequence.forEach { event in
+      _ = testHandler.triageInput(event: event)
+    }
+  }
+
+  func generateDisplayedText() -> String {
+    guard let testHandler else { return "" }
+    return testHandler.assembler.assembledSentence.values.joined()
+  }
+
+  func extractGrams(from source: String, readingsToKeep: [String]? = nil) -> [Homa.Gram] {
+    var extractedGrams: [Homa.Gram] = []
+    source.enumerateLines { currentLine, _ in
+      let cells = currentLine.split(separator: " ")
+      guard cells.count >= 3 else { return }
+      if let readingsToKeep, !readingsToKeep.isEmpty {
+        guard readingsToKeep.contains(cells[0].description) else { return }
+      }
+      let readingChainPinyin = cells[0]
+      let readingArray: [String] = Tekkon.cnvHanyuPinyinToPhona(
+        targetJoined: readingChainPinyin.description
+      ).split(separator: "-").map(\.description)
+      let cellScoreStr = cells[2].description
+      guard let cellScore = Double(cellScoreStr) else { return }
+      let unigram = Homa.Gram(
+        keyArray: readingArray, value: cells[1].description, score: cellScore
+      )
+      if unigram.segLength > 1 {
+        extractedGrams.insert(
+          .init(keyArray: readingArray, value: cells[1].description, score: cellScore),
+          at: 0
+        )
+      } else {
+        extractedGrams.append(
+          .init(keyArray: readingArray, value: cells[1].description, score: cellScore)
+        )
+      }
+    }
+    return extractedGrams
+  }
+
+  func makeTypingTextMap(
+    _ entriesByKey: [(String, [(value: String, probability: Double, typeID: Int32)])]
+  )
+    -> String {
+    var valueLines: [String] = []
+    var keyLines: [String] = []
+
+    for (key, entries) in entriesByKey {
+      let startLine = valueLines.count
+      entries.forEach { entry in
+        let probabilityText = entry.probability.description.hasSuffix(".0")
+          ? String(entry.probability.description.dropLast(2))
+          : entry.probability.description
+        valueLines.append("\(entry.value)\t\(probabilityText)\t\(entry.typeID)")
+      }
+      keyLines.append("\(key)\t\(startLine)\t\(entries.count)")
+    }
+
+    var result = ""
+    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
+    result += "VERSION\t1.1\n"
+    result += "TYPE\tTYPING\n"
+    result += "READING_SEPARATOR\t-\n"
+    result += "ENTRY_COUNT\t\(valueLines.count)\n"
+    result += "KEY_COUNT\t\(keyLines.count)\n"
+    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\n"
+    valueLines.forEach { result += $0 + "\n" }
+    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\n"
+    keyLines.forEach { result += $0 + "\n" }
+    return result
+  }
+
+  func uniqueSingleIdeographicValues(_ values: [String]) -> [String] {
+    values.reduce(into: [String]()) { partialResult, currentValue in
+      guard currentValue.count == 1 else { return }
+      guard currentValue.unicodeScalars.allSatisfy({ $0.properties.isIdeographic }) else { return }
+      guard !partialResult.contains(currentValue) else { return }
+      partialResult.append(currentValue)
+    }
+  }
+}

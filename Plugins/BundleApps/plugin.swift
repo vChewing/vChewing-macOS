@@ -289,11 +289,11 @@ extension BundleAppsPlugin {
     //
     // Exclude build-tool-only bundles that are not needed at runtime.  The old
     // `LexiconAssembly_` prefix no longer exists: the test-material target lives in the
-    // `OSNeutralAssembly` package now, so its bundle is `OSNeutralAssembly_LXAssemblyMaterials4Tests.bundle`.
-    // A prefix match on `OSNeutralAssembly_` would wrongly drop `OSNeutralAssembly_BPMFVS.bundle`,
+    // `LibVanguard` package now, so its bundle is `LibVanguard_LXAssemblyMaterials4Tests.bundle`.
+    // A prefix match on `LibVanguard_` would wrongly drop `LibVanguard_BPMFVS.bundle`,
     // which the BPMFVS lookup table needs at runtime — hence the exact-name match.
     let excludedBundlePrefixes = ["VanguardLexicon_"]
-    let excludedBundleNames: Set<String> = ["OSNeutralAssembly_LXAssemblyMaterials4Tests"]
+    let excludedBundleNames: Set<String> = ["LibVanguard_LXAssemblyMaterials4Tests"]
     for bundle in spmBundles {
       let name = bundle.lastPathComponent
       if excludedBundlePrefixes.contains(where: { name.hasPrefix($0) }) { continue }

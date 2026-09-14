@@ -3,14 +3,14 @@
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 import Foundation
-import OSNeutralAssembly
+import LibVanguard
 import Shared
 import Shared_DarwinImpl
 
 // MARK: - SessionHost 動作依賴注入
 
 extension SessionHost {
-  /// 由宿主（MainAssembly4Darwin）於啟動時呼叫，將 OSNeutralAssembly 套件
+  /// 由宿主（MainAssembly4Darwin）於啟動時呼叫，將 LibVanguard 套件
   /// 所需的宿主服務（LXMgr、IMEApp、Notifier、AppDelegate、SessionUI 等）注入。
   public static func wireUp() {
     let host = SessionHost.shared

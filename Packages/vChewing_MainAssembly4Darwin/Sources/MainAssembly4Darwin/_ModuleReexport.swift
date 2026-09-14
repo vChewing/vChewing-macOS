@@ -10,9 +10,9 @@
 @_exported import IMKSwift
 @_exported import IMKUtils
 @_exported import LexiconAssembly
+@_exported import LibVanguard
 @_exported import ModifierKeyHitChecker
 @_exported import NotifierUI
-@_exported import OSNeutralAssembly
 @_exported import OtherIMEDataReader
 @_exported import PopupCompositionBuffer
 @_exported import SettingsUI
