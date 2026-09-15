@@ -159,158 +159,162 @@ func cassetteURLForTests(_ fileNameStem: String, ext: String) -> URL? {
   return URL(fileURLWithPath: path)
 }
 
-// MARK: - InputHandlerTests
+// MARK: - LibVanguardTestsRoot.InputHandlerTests
 
-/// 唯音輸入法的 InputHandler 單元測試（LibVanguard 模組）
-@Suite("InputHandlerTests", .serialized)
-final class InputHandlerTests {
-  // MARK: Lifecycle
+// 歸入本靶唯一根 suite（見 `LibVanguardTests_Root.swift`）：本靶測試共用全域狀態，不得並行。
+extension LibVanguardTestsRoot {
+  /// 唯音輸入法的 InputHandler 單元測試（LibVanguard 模組）。
+  /// 其子 suite `SessionTests` 亦隨之落入同一 serialized 子樹。
+  @Suite("InputHandlerTests", .serialized)
+  final class InputHandlerTests {
+    // MARK: Lifecycle
 
-  // MARK: - 測試前後流程
+    // MARK: - 測試前後流程
 
-  init() throws {
-    // 設定專用於單元測試的 UserDefaults
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
-    UserDefaults.pendingUnitTests = true
-    UserDef.resetAll()
-
-    // 初期化測試 LM
-    let lx = LXAssembly.LXFacade(isCHS: false)
-    self.testLX = lx
-    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
-
-    // 初期化測試用的 handler 和 session
-    let handler = MockInputHandler(lx: lx, pref: PrefMgr.sharedSansDidSetOps)
-    let session = MockSession()
-    handler.session = session
-    session.inputHandler = handler
-    self.testHandler = handler
-    self.testSession = session
-  }
-
-  deinit {
-    mainSync {
-      testHandler?.errorCallback = nil
-      testSession?.switchState(IMEState.ofAbortion())
-      LXAssembly.resetSharedState()
-      UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
+    init() throws {
+      // 設定專用於單元測試的 UserDefaults
+      UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
+      UserDefaults.pendingUnitTests = true
       UserDef.resetAll()
+
+      // 初期化測試 LM
+      let lx = LXAssembly.LXFacade(isCHS: false)
+      self.testLX = lx
+      LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+
+      // 初期化測試用的 handler 和 session
+      let handler = MockInputHandler(lx: lx, pref: PrefMgr.sharedSansDidSetOps)
+      let session = MockSession()
+      handler.session = session
+      session.inputHandler = handler
+      self.testHandler = handler
+      self.testSession = session
     }
-  }
 
-  // MARK: Internal
-
-  var testLX: LXAssembly.LXFacade?
-  var testHandler: MockInputHandler?
-  var testSession: MockSession?
-
-  // MARK: - 工具函式
-
-  func clearTestPOM() {
-    testHandler?.currentLM.clearPOMData()
-  }
-
-  func typeSentence(_ sequence: String) {
-    // 此處刻意跳過 KeyUp，因為 InputHandler 不處理 KeyUp。
-    // 如果要做與 KeyUp 有關的測試的話，需在 MainAssemblyTests 進行。
-    guard let testHandler, let testSession else { return }
-    // 使用 KBEvent 模擬輸入，類似 MainAssembly 的 typeSentenceOrCandidates
-    // 這樣可以正確處理注音、磁帶等各種輸入模式。
-    let isCandidateContainer = testSession.state.isCandidateContainer
-    let stateType = testSession.state.type
-    if !(
-      [.ofEmpty, .ofInputting].contains(stateType) || isCandidateContainer
-    ) { return }
-
-    // 為每個字符建立 KBEvent（按下事件）
-    let typingSequence: [KBEvent] = sequence.map { charRAW in
-      var finalArray = [KBEvent]()
-      let char = charRAW.description
-      let keyEventData = KBEvent.KeyEventData(chars: char)
-      finalArray.append(keyEventData.asEvent)
-      return finalArray
-    }.flatMap { $0 }
-
-    // 處理每個 keyDown 事件。
-    typingSequence.forEach { event in
-      _ = testHandler.triageInput(event: event)
-    }
-  }
-
-  func generateDisplayedText() -> String {
-    guard let testHandler else { return "" }
-    return testHandler.assembler.assembledSentence.values.joined()
-  }
-
-  func extractGrams(from source: String, readingsToKeep: [String]? = nil) -> [Homa.Gram] {
-    var extractedGrams: [Homa.Gram] = []
-    source.enumerateLines { currentLine, _ in
-      let cells = currentLine.split(separator: " ")
-      guard cells.count >= 3 else { return }
-      if let readingsToKeep, !readingsToKeep.isEmpty {
-        guard readingsToKeep.contains(cells[0].description) else { return }
+    deinit {
+      mainSync {
+        testHandler?.errorCallback = nil
+        testSession?.switchState(IMEState.ofAbortion())
+        LXAssembly.resetSharedState()
+        UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
+        UserDef.resetAll()
       }
-      let readingChainPinyin = cells[0]
-      let readingArray: [String] = Tekkon.cnvHanyuPinyinToPhona(
-        targetJoined: readingChainPinyin.description
-      ).split(separator: "-").map(\.description)
-      let cellScoreStr = cells[2].description
-      guard let cellScore = Double(cellScoreStr) else { return }
-      let unigram = Homa.Gram(
-        keyArray: readingArray, value: cells[1].description, score: cellScore
-      )
-      if unigram.segLength > 1 {
-        extractedGrams.insert(
-          .init(keyArray: readingArray, value: cells[1].description, score: cellScore),
-          at: 0
+    }
+
+    // MARK: Internal
+
+    var testLX: LXAssembly.LXFacade?
+    var testHandler: MockInputHandler?
+    var testSession: MockSession?
+
+    // MARK: - 工具函式
+
+    func clearTestPOM() {
+      testHandler?.currentLM.clearPOMData()
+    }
+
+    func typeSentence(_ sequence: String) {
+      // 此處刻意跳過 KeyUp，因為 InputHandler 不處理 KeyUp。
+      // 如果要做與 KeyUp 有關的測試的話，需在 MainAssemblyTests 進行。
+      guard let testHandler, let testSession else { return }
+      // 使用 KBEvent 模擬輸入，類似 MainAssembly 的 typeSentenceOrCandidates
+      // 這樣可以正確處理注音、磁帶等各種輸入模式。
+      let isCandidateContainer = testSession.state.isCandidateContainer
+      let stateType = testSession.state.type
+      if !(
+        [.ofEmpty, .ofInputting].contains(stateType) || isCandidateContainer
+      ) { return }
+
+      // 為每個字符建立 KBEvent（按下事件）
+      let typingSequence: [KBEvent] = sequence.map { charRAW in
+        var finalArray = [KBEvent]()
+        let char = charRAW.description
+        let keyEventData = KBEvent.KeyEventData(chars: char)
+        finalArray.append(keyEventData.asEvent)
+        return finalArray
+      }.flatMap { $0 }
+
+      // 處理每個 keyDown 事件。
+      typingSequence.forEach { event in
+        _ = testHandler.triageInput(event: event)
+      }
+    }
+
+    func generateDisplayedText() -> String {
+      guard let testHandler else { return "" }
+      return testHandler.assembler.assembledSentence.values.joined()
+    }
+
+    func extractGrams(from source: String, readingsToKeep: [String]? = nil) -> [Homa.Gram] {
+      var extractedGrams: [Homa.Gram] = []
+      source.enumerateLines { currentLine, _ in
+        let cells = currentLine.split(separator: " ")
+        guard cells.count >= 3 else { return }
+        if let readingsToKeep, !readingsToKeep.isEmpty {
+          guard readingsToKeep.contains(cells[0].description) else { return }
+        }
+        let readingChainPinyin = cells[0]
+        let readingArray: [String] = Tekkon.cnvHanyuPinyinToPhona(
+          targetJoined: readingChainPinyin.description
+        ).split(separator: "-").map(\.description)
+        let cellScoreStr = cells[2].description
+        guard let cellScore = Double(cellScoreStr) else { return }
+        let unigram = Homa.Gram(
+          keyArray: readingArray, value: cells[1].description, score: cellScore
         )
-      } else {
-        extractedGrams.append(
-          .init(keyArray: readingArray, value: cells[1].description, score: cellScore)
-        )
+        if unigram.segLength > 1 {
+          extractedGrams.insert(
+            .init(keyArray: readingArray, value: cells[1].description, score: cellScore),
+            at: 0
+          )
+        } else {
+          extractedGrams.append(
+            .init(keyArray: readingArray, value: cells[1].description, score: cellScore)
+          )
+        }
       }
-    }
-    return extractedGrams
-  }
-
-  func makeTypingTextMap(
-    _ entriesByKey: [(String, [(value: String, probability: Double, typeID: Int32)])]
-  )
-    -> String {
-    var valueLines: [String] = []
-    var keyLines: [String] = []
-
-    for (key, entries) in entriesByKey {
-      let startLine = valueLines.count
-      entries.forEach { entry in
-        let probabilityText = entry.probability.description.hasSuffix(".0")
-          ? String(entry.probability.description.dropLast(2))
-          : entry.probability.description
-        valueLines.append("\(entry.value)\t\(probabilityText)\t\(entry.typeID)")
-      }
-      keyLines.append("\(key)\t\(startLine)\t\(entries.count)")
+      return extractedGrams
     }
 
-    var result = ""
-    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
-    result += "VERSION\t1.1\n"
-    result += "TYPE\tTYPING\n"
-    result += "READING_SEPARATOR\t-\n"
-    result += "ENTRY_COUNT\t\(valueLines.count)\n"
-    result += "KEY_COUNT\t\(keyLines.count)\n"
-    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\n"
-    valueLines.forEach { result += $0 + "\n" }
-    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\n"
-    keyLines.forEach { result += $0 + "\n" }
-    return result
-  }
+    func makeTypingTextMap(
+      _ entriesByKey: [(String, [(value: String, probability: Double, typeID: Int32)])]
+    )
+      -> String {
+      var valueLines: [String] = []
+      var keyLines: [String] = []
 
-  func uniqueSingleIdeographicValues(_ values: [String]) -> [String] {
-    values.reduce(into: [String]()) { partialResult, currentValue in
-      guard currentValue.count == 1 else { return }
-      guard currentValue.unicodeScalars.allSatisfy({ $0.properties.isIdeographic }) else { return }
-      guard !partialResult.contains(currentValue) else { return }
-      partialResult.append(currentValue)
+      for (key, entries) in entriesByKey {
+        let startLine = valueLines.count
+        entries.forEach { entry in
+          let probabilityText = entry.probability.description.hasSuffix(".0")
+            ? String(entry.probability.description.dropLast(2))
+            : entry.probability.description
+          valueLines.append("\(entry.value)\t\(probabilityText)\t\(entry.typeID)")
+        }
+        keyLines.append("\(key)\t\(startLine)\t\(entries.count)")
+      }
+
+      var result = ""
+      result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
+      result += "VERSION\t1.1\n"
+      result += "TYPE\tTYPING\n"
+      result += "READING_SEPARATOR\t-\n"
+      result += "ENTRY_COUNT\t\(valueLines.count)\n"
+      result += "KEY_COUNT\t\(keyLines.count)\n"
+      result += "#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\n"
+      valueLines.forEach { result += $0 + "\n" }
+      result += "#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\n"
+      keyLines.forEach { result += $0 + "\n" }
+      return result
+    }
+
+    func uniqueSingleIdeographicValues(_ values: [String]) -> [String] {
+      values.reduce(into: [String]()) { partialResult, currentValue in
+        guard currentValue.count == 1 else { return }
+        guard currentValue.unicodeScalars.allSatisfy({ $0.properties.isIdeographic }) else { return }
+        guard !partialResult.contains(currentValue) else { return }
+        partialResult.append(currentValue)
+      }
     }
   }
 }

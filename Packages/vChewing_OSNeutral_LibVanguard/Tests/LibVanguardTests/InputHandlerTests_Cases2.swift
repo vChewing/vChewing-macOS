@@ -14,7 +14,7 @@ import HomaSharedTestComponents
 
 // MARK: - 測試案例 Vol 2 (Candidates with POM Interactions)
 
-extension InputHandlerTests {
+extension LibVanguardTestsRoot.InputHandlerTests {
   /// 測試就地輪替候選字。
   @Test
   func test_IH201_RevolvingCandidates() throws {

@@ -12,7 +12,7 @@ import Testing
 
 // MARK: - NarrationTests
 
-extension InputHandlerTests {
+extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: A) 防禦性注音轉換
 
   @Test

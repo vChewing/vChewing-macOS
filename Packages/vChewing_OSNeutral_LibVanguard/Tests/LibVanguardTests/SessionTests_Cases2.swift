@@ -18,7 +18,7 @@ import Testing
 /// 本檔將原本以 `NSEvent` 驅動真 `InputSession` 的個案，移植到跨平台的
 /// `SessionTests` harness（真 `InputSession` + 真 `InputHandler` + `MockClientProxy`）。
 /// 個案編號沿用原檔，方便與 `MainAssembly4Darwin` 的既有案例互相對照。
-extension InputHandlerTests.Session {
+extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 在候選清單內高亮至一個「值至少 `minValueCount` 字、讀音鍵至少 `minKeyLength` 鍵」的候選。
   /// 供選字窗的降權／升權操作使用（這兩種操作僅對多字詞生效）。
   func highlightEligibleCandidate(minValueCount: Int = 2, minKeyLength: Int = 2) {

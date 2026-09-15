@@ -16,7 +16,7 @@ import HomaSharedTestComponents
 
 // MARK: - 測試案例 Vol 4 (Mixed Alphanumerical Mode)
 
-extension InputHandlerTests {
+extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: - Izanami Tests
 
   /// Izanami tests for MixedAlnum LibVanguard to make sure all applausable kanji readings are inputtable.
@@ -40,7 +40,15 @@ extension InputHandlerTests {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
-    defer { testHandler.clear() }
+    // 本測試逐音跑遍整個注音表、大量觸及使用者資料路徑；載入**必須為同步**，
+    // 否則斷言會在資料尚未落定時執行，失敗且**時過時不過**（既有案例：`Early commission is tearing …`、
+    // `Commissions missing prefix …`）。這與同靶九支磁帶測試的處置一致。
+    let originalAsyncLoading = LXAssembly.LXFacade.asyncLoadingUserData
+    LXAssembly.LXFacade.asyncLoadingUserData = false
+    defer {
+      LXAssembly.LXFacade.asyncLoadingUserData = originalAsyncLoading
+      testHandler.clear()
+    }
     let testStartTS = Date()
     let (parserTag, mandarinParser, rawKeyMap) = parserConfig
     let pfTag = thePrefix.isEmpty ? "\(parserTag)/NoPF" : "\(parserTag)/PF `\(thePrefix)`"

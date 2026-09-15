@@ -16,7 +16,7 @@ import HomaSharedTestComponents
 
 // MARK: - 測試案例 Vol 1 (Basic Functions)
 
-extension InputHandlerTests {
+extension LibVanguardTestsRoot.InputHandlerTests {
   /// 測試基本的打字組句（不是ㄅ半注音）。
   @Test
   func test_IH101_BasicSentenceComposition() throws {

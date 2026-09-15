@@ -15,7 +15,7 @@ import HomaSharedTestComponents
 
 // MARK: - 測試案例 Vol 3 (POM Dedicated)
 
-extension InputHandlerTests {
+extension LibVanguardTestsRoot.InputHandlerTests {
   @Test
   func test_IH301_POMBleacherIntegrationTest() throws {
     // 備註：該測試用例不適合鏡照至 MainAssemblyTests。

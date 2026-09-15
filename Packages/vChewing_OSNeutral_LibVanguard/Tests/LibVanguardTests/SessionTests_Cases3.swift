@@ -14,7 +14,7 @@ import Testing
 /// 本檔將原本以 `NSEvent` 驅動真 `InputSession` 的個案，移植到跨平台的
 /// `SessionTests` harness（真 `InputSession` + 真 `InputHandler` + `MockClientProxy`）。
 /// 個案編號沿用原檔，方便與 `MainAssembly4Darwin` 的既有案例互相對照。
-extension InputHandlerTests.Session {
+extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 選字窗項目操作任務：動作、觸發熱鍵、欲先高亮的候選值。
   private typealias CandidateManipulatorTask = (
     action: CandidateContextMenuAction, key: KBEvent.KeyEventData, target: String

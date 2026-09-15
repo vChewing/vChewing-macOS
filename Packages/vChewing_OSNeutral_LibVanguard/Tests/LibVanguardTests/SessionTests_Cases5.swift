@@ -17,7 +17,7 @@ import Testing
 /// 本檔將原本以 `NSEvent` 驅動真 `InputSession` 的個案，移植到跨平台的
 /// `SessionTests` harness（真 `InputSession` + 真 `InputHandler` + `MockClientProxy`）。
 /// 個案編號沿用原檔，方便與 `MainAssembly4Darwin` 的既有案例互相對照。
-extension InputHandlerTests.Session {
+extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 建立帶有可攔截 statusUI 的 SessionUI 替身，對應 Darwin 端的
   /// `MockSessionUI4ModeDescriptionHint`：可控 Caps Lock 燈態與（可選的）PCB。
   func makeModeDescriptionHintUI(

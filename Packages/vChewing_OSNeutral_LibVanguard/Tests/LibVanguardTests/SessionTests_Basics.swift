@@ -14,7 +14,7 @@ import Testing
 
 // MARK: - SessionTests
 
-extension InputHandlerTests {
+extension LibVanguardTestsRoot.InputHandlerTests {
   /// Session 層的跨平台單元測試群。
   ///
   /// 與父 Suite（以 `MockInputHandler` + `MockSession` 直呼 `triageInput`）不同，
