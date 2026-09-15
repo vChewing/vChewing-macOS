@@ -305,9 +305,9 @@
 
   // MARK: - Typed 解序列化相容性輔助
 
-  nonisolated extension NSKeyedUnarchiver {
+  extension NSKeyedUnarchiver {
     /// 相容性 wrapper：在 macOS 11+ 優先使用 typed API 取得 [URL: Data]，舊平台則使用備援解序列化流程並做類型轉換。
-    static func unarchivedURLDataDictionaryCompat(from data: Data) -> [URL: Data]? {
+    nonisolated static func unarchivedURLDataDictionaryCompat(from data: Data) -> [URL: Data]? {
       // 優先採用 macOS 11 的 typed API
       if #available(macOS 11.0, *) {
         if let typed = try? NSKeyedUnarchiver.unarchivedDictionary(
@@ -339,7 +339,7 @@
     /// 輔助函式：驗證並將解序列化後的物件強制轉換為 [URL: Data]
     /// 將任意解序列化物件轉換為 [URL: Data]。
     /// 這是 `extractURLDataMap` 的通用實作，已從 BookmarkManager 中抽出。
-    static func extractURLDataMap(from d: Any) -> [URL: Data]? {
+    nonisolated static func extractURLDataMap(from d: Any) -> [URL: Data]? {
       switch d {
       case let d as [URL: Data]: return d
       case let d as [NSURL: NSData]:
@@ -359,7 +359,7 @@
       }
     }
 
-    fileprivate static func parseAnyHashMapKeyToURL(_ k: AnyHashable) -> URL? {
+    nonisolated fileprivate static func parseAnyHashMapKeyToURL(_ k: AnyHashable) -> URL? {
       switch k {
       case let k as URL: return k
       case let k as NSURL: return k as URL
@@ -382,7 +382,7 @@
       }
     }
 
-    fileprivate static func parseAnyHashMapValueToData(_ dd: Any) -> Data? {
+    nonisolated fileprivate static func parseAnyHashMapValueToData(_ dd: Any) -> Data? {
       switch dd {
       case let dd as Data: return dd
       case let dd as NSData: return dd as Data
