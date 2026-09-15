@@ -15,6 +15,8 @@ public final class MainSputnik4Installer {
 
   // MARK: Public
 
+  // `async` 所需的 concurrency 執行期起於 macOS 10.15，故標註其可用性下限（呼叫端為 12+ 的 SwiftUI 安裝程式）。
+  @available(macOS 10.15, *)
   public static func asyncInit() async -> MainSputnik4Installer {
     MainSputnik4Installer()
   }
@@ -23,22 +25,26 @@ public final class MainSputnik4Installer {
     if let isLegacyDistro {
       AppInstallerDelegate.shared.isLegacyDistro = isLegacyDistro
     }
-    let isOptPressed = NSEvent.modifierFlags.intersection(
-      .deviceIndependentFlagsMask
-    ).contains(.command)
-    let newInstaller = !AppInstallerDelegate.shared.isLegacyDistro && !isOptPressed
-    if #available(macOS 12, *), newInstaller {
-      InstallerApp4SwiftUI.main()
-    } else {
-      NSApplication.shared.delegate = AppInstallerDelegate.shared
-      CtlAppInstaller4Cocoa.show()
-      NSApplication.shared.setValue(
-        CtlAppInstaller4Cocoa.shared?.window,
-        forKey: "mainWindow"
-      )
-      NSApp.mainMenu = AppInstallerDelegate.shared.buildNSAppMainMenu()
-      _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
-    }
+    // SwiftUI 版安裝程式僅存在於 6.2 側；5.10 側一律走 AppKit 版——與 `vChewing-OSX-Legacy` 的安裝程式一致
+    // （該倉無 SwiftUI 版，其 `main.swift` 即直接呼叫 `runNSApp(isLegacyDistro: true)`）。
+    #if compiler(>=6.2)
+      let isOptPressed = NSEvent.modifierFlags.intersection(
+        .deviceIndependentFlagsMask
+      ).contains(.command)
+      let newInstaller = !AppInstallerDelegate.shared.isLegacyDistro && !isOptPressed
+      if #available(macOS 12, *), newInstaller {
+        InstallerApp4SwiftUI.main()
+        return
+      }
+    #endif
+    NSApplication.shared.delegate = AppInstallerDelegate.shared
+    CtlAppInstaller4Cocoa.show()
+    NSApplication.shared.setValue(
+      CtlAppInstaller4Cocoa.shared?.window,
+      forKey: "mainWindow"
+    )
+    NSApp.mainMenu = AppInstallerDelegate.shared.buildNSAppMainMenu()
+    _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
   }
 }
 

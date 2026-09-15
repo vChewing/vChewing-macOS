@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 import AppKit
+import IMKUtils
 import InputMethodKit
 import SwiftExtension
 
