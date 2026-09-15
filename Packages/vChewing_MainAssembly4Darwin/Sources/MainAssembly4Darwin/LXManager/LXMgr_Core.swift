@@ -520,7 +520,11 @@ extension LXMgr {
             return targetModes.map(\.lexicon)
           }
           // Perform disk I/O on this background queue – avoids blocking MainActor.
-          targetLexicons.forEach { $0.savePOMData() }
+          asyncOnMain {
+            targetLexicons.forEach {
+              $0.savePOMData()
+            }
+          }
         }
       }
     }
