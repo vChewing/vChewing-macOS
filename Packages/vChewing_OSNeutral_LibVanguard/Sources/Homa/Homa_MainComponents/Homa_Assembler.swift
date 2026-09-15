@@ -95,7 +95,7 @@ extension Homa {
     ///
     /// 護摩引擎支援對讀音鍵的部分比對，所以需要這個 API 以返回真實結果。
     public var actualKeys: [String] {
-      config.assembledSentence.keyArrays.flatMap(\.self)
+      config.assembledSentence.keyArrays.flatMap { $0 }
     }
 
     /// 該組字器的幅節單元陣列。

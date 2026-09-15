@@ -62,16 +62,18 @@ extension LXAssembly.LXFacade {
       }
     } else {
       LXAssembly.fileHandleQueue.async {
-        do {
-          let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
-          let newTrie = try VanguardTrie.TextMapTrie(data: textMapData)
-          factoryTrie = newTrie
-          vCLMLog("Factory TextMap async loading complete: \(resolvedTextMapPath)")
-          completionHandler?(true)
-        } catch {
-          vCLMLog("Factory TextMap async loading failed: \(error.localizedDescription)")
-          factoryTrie = nil
-          completionHandler?(false)
+        mainSync {
+          do {
+            let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
+            let newTrie = try VanguardTrie.TextMapTrie(data: textMapData)
+            factoryTrie = newTrie
+            vCLMLog("Factory TextMap async loading complete: \(resolvedTextMapPath)")
+            completionHandler?(true)
+          } catch {
+            vCLMLog("Factory TextMap async loading failed: \(error.localizedDescription)")
+            factoryTrie = nil
+            completionHandler?(false)
+          }
         }
       }
       return

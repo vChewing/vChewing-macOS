@@ -193,9 +193,9 @@ final class InputHandlerTests {
       testHandler?.errorCallback = nil
       testSession?.switchState(IMEState.ofAbortion())
       LXAssembly.resetSharedState()
+      UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
+      UserDef.resetAll()
     }
-    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
-    UserDef.resetAll()
   }
 
   // MARK: Internal

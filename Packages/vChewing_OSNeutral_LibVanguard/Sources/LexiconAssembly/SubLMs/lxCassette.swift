@@ -17,7 +17,7 @@ import SwiftExtension
 extension LXAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
   /// 以連續記憶體 [UInt8] blob + byte-range 索引取代各大型 Dictionary。
-  nonisolated struct LXCassette: Sendable {
+  struct LXCassette: Sendable {
     // MARK: Internal
 
     private(set) var filePath: String?
@@ -71,7 +71,7 @@ extension LXAssembly {
   /// 以連續 [UInt8] blob 承載的 sorted key→[value] 對照表。
   /// 所有 key / value 字串皆以 byte range 指向 `rawData`，
   /// 查詢時二分搜尋 + 按需物化，避免大量 String / Dictionary 開銷。
-  nonisolated struct CassetteSortedMap: Sendable {
+  struct CassetteSortedMap: Sendable {
     // MARK: Internal
 
     /// 唯一 key 數量。
@@ -90,7 +90,7 @@ extension LXAssembly {
   }
 
   /// CassetteSortedMap 的單筆 key entry。
-  nonisolated struct CassetteMapEntry: Sendable {
+  struct CassetteMapEntry: Sendable {
     let keyStart: UInt32
     let keyEnd: UInt32
     /// 指向 `valueOffsets` 的範圍（每個 value 佔兩個 slot）。
@@ -99,7 +99,7 @@ extension LXAssembly {
   }
 
   /// CassetteReverseIndex 的單筆反查 entry（反查字詞 → 碼 refs 範圍）。
-  nonisolated struct CassetteReverseEntry: Sendable {
+  struct CassetteReverseEntry: Sendable {
     /// 反查字詞在 `revChars` 內的範圍。
     let charStart: UInt32
     let charEnd: UInt32
@@ -110,7 +110,7 @@ extension LXAssembly {
 
   /// 字→碼反向查詢索引：僅複製去重後的反查字詞 bytes，
   /// 碼字串以 entry 索引引用 charDefMap / symbolDefMap 的既有 rawData，不做全量複製。
-  nonisolated struct CassetteReverseIndex: Sendable {
+  struct CassetteReverseIndex: Sendable {
     // MARK: Internal
 
     var isEmpty: Bool { revEntries.isEmpty }
@@ -129,7 +129,7 @@ extension LXAssembly {
   }
 
   /// key→single value 的 contiguous-memory 對照表（取代 quickDef Dictionary）。
-  nonisolated struct CassetteQuickMap: Sendable {
+  struct CassetteQuickMap: Sendable {
     // MARK: Internal
 
     var count: Int { entries.count }
@@ -141,7 +141,7 @@ extension LXAssembly {
     fileprivate var entries: [CassetteQuickEntry] = []
   }
 
-  nonisolated struct CassetteQuickEntry: Sendable {
+  struct CassetteQuickEntry: Sendable {
     let keyStart: UInt32
     let keyEnd: UInt32
     let valueStart: UInt32
@@ -149,7 +149,7 @@ extension LXAssembly {
   }
 
   /// 八股文 sorted map：字詞→頻次。
-  nonisolated struct CassetteOctagramMap: Sendable {
+  struct CassetteOctagramMap: Sendable {
     // MARK: Internal
 
     var count: Int { entries.count }
@@ -162,14 +162,14 @@ extension LXAssembly {
     fileprivate var entries: [CassetteOctagramEntry] = []
   }
 
-  nonisolated struct CassetteOctagramEntry: Sendable {
+  struct CassetteOctagramEntry: Sendable {
     let keyStart: UInt32
     let keyEnd: UInt32
     let count: UInt32
   }
 
   /// 八股文 divided sorted map：字詞→(頻次, 讀音)。
-  nonisolated struct CassetteOctagramDividedMap: Sendable {
+  struct CassetteOctagramDividedMap: Sendable {
     // MARK: Internal
 
     var count: Int { entries.count }
@@ -182,7 +182,7 @@ extension LXAssembly {
     fileprivate var entries: [CassetteOctagramDividedEntry] = []
   }
 
-  nonisolated struct CassetteOctagramDividedEntry: Sendable {
+  struct CassetteOctagramDividedEntry: Sendable {
     let keyStart: UInt32
     let keyEnd: UInt32
     let count: UInt32
@@ -196,7 +196,7 @@ extension LXAssembly {
 // 字典序比較統一使用 `RangeParserAPI.swift` 的 `compareByteRange` / `compareByteSlices`；
 // 此處僅保留磁帶模組專用的 prefix 比較。
 
-nonisolated extension Array where Element == UInt8 {
+extension Array where Element == UInt8 {
   /// 比較 range 內的 bytes 是否「大於等於」prefix bytes（用於 lower-bound 搜尋）。
   fileprivate func cassetteCompareUTF8RangePrefix(_ range: Range<Int>, with prefix: [UInt8]) -> Int {
     let lhsCount = range.count
@@ -215,7 +215,7 @@ nonisolated extension Array where Element == UInt8 {
 
 // MARK: - CassetteSortedMap: Binary Search & Query API
 
-nonisolated extension LXAssembly.CassetteSortedMap {
+extension LXAssembly.CassetteSortedMap {
   /// 二分搜尋精確匹配。
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
@@ -517,7 +517,7 @@ nonisolated extension LXAssembly.CassetteSortedMap {
 
 // MARK: - CassetteQuickMap: Binary Search & Query API
 
-nonisolated extension LXAssembly.CassetteQuickMap {
+extension LXAssembly.CassetteQuickMap {
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
     var lo = 0, hi = entries.count - 1
@@ -550,7 +550,7 @@ nonisolated extension LXAssembly.CassetteQuickMap {
 
 // MARK: - CassetteOctagramMap: Binary Search
 
-nonisolated extension LXAssembly.CassetteOctagramMap {
+extension LXAssembly.CassetteOctagramMap {
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
     var lo = 0, hi = entries.count - 1
@@ -570,7 +570,7 @@ nonisolated extension LXAssembly.CassetteOctagramMap {
   }
 }
 
-nonisolated extension LXAssembly.CassetteOctagramDividedMap {
+extension LXAssembly.CassetteOctagramDividedMap {
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
     var lo = 0, hi = entries.count - 1
@@ -597,7 +597,7 @@ nonisolated extension LXAssembly.CassetteOctagramDividedMap {
 
 // MARK: - CassetteSortedMap Builder
 
-nonisolated extension LXAssembly.CassetteSortedMap {
+extension LXAssembly.CassetteSortedMap {
   /// 直接從 grouped Dictionary 建構 sorted map，避免中間 `map {}` 與巢狀暫存陣列。
   static func build(from dictionary: [String: [String]]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
@@ -647,7 +647,7 @@ nonisolated extension LXAssembly.CassetteSortedMap {
 
 // MARK: - CassetteReverseIndex Builder & Query
 
-nonisolated extension LXAssembly.CassetteReverseIndex {
+extension LXAssembly.CassetteReverseIndex {
   /// 反查記錄原型：value bytes 留在來源 map 的 rawData 內，僅記範圍與來源 entry 索引。
   private struct RevPrototype {
     let valueStart: UInt32
@@ -759,7 +759,7 @@ nonisolated extension LXAssembly.CassetteReverseIndex {
 
 // MARK: - CassetteQuickMap Builder
 
-nonisolated extension LXAssembly.CassetteQuickMap {
+extension LXAssembly.CassetteQuickMap {
   static func build(from dictionary: [String: String]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
     let sortedKeys = dictionary.keys.sorted { lhs, rhs in
@@ -797,7 +797,7 @@ nonisolated extension LXAssembly.CassetteQuickMap {
 
 // MARK: - CassetteOctagramMap Builder
 
-nonisolated extension LXAssembly.CassetteOctagramMap {
+extension LXAssembly.CassetteOctagramMap {
   static func build(from dictionary: [String: Int]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
     let sortedKeys = dictionary.keys.sorted { lhs, rhs in
@@ -822,7 +822,7 @@ nonisolated extension LXAssembly.CassetteOctagramMap {
   }
 }
 
-nonisolated extension LXAssembly.CassetteOctagramDividedMap {
+extension LXAssembly.CassetteOctagramDividedMap {
   static func build(from dictionary: [String: (Int, String)]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
     let sortedKeys = dictionary.keys.sorted { lhs, rhs in
@@ -861,7 +861,7 @@ nonisolated extension LXAssembly.CassetteOctagramDividedMap {
 
 // MARK: - LXCassette Public API
 
-nonisolated extension LXAssembly.LXCassette {
+extension LXAssembly.LXCassette {
   /// 計算頻率時要用到的東西 - fscale
   private static let fscale = 2.7
   /// 萬用花牌字符，哪怕花牌鍵仍不可用。

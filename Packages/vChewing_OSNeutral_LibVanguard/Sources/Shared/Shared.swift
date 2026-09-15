@@ -12,7 +12,7 @@ import Foundation
   import OSLog
 #endif
 
-nonisolated public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
+public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
   // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
   // 以免 mixedAlnum 等大量觸發偵錯路徑的案例在完整測試時刷屏。
   if UserDefaults.pendingUnitTests, !hasTestFilterArguments() {
@@ -23,7 +23,7 @@ nonisolated public func vCLog(forced: Bool = false, _ strPrint: StringLiteralTyp
 }
 
 /// 偵測目前程序是否帶有測試過濾參數（例如 `swift test --filter ...`、`--skip ...` 或 XCTest 的 `-XCTest ...`）。
-nonisolated private func hasTestFilterArguments() -> Bool {
+private func hasTestFilterArguments() -> Bool {
   ProcessInfo.processInfo.arguments.contains {
     $0.hasPrefix("--filter") || $0.hasPrefix("--skip") || $0.hasPrefix("-XCTest")
   }
@@ -31,7 +31,7 @@ nonisolated private func hasTestFilterArguments() -> Bool {
 
 // MARK: - TooltipColorState
 
-nonisolated public enum TooltipColorState {
+public enum TooltipColorState {
   case normal
   case information
   case redAlert
@@ -45,7 +45,7 @@ nonisolated public enum TooltipColorState {
 // MARK: - StateType
 
 /// 用以讓每個狀態自描述的 enum。
-nonisolated public enum StateType: String {
+public enum StateType: String {
   /// **失活狀態 .ofDeactivated**: 使用者沒在使用輸入法、或者使用者已經切換到另一個客體應用來敲字。
   case ofDeactivated = "Deactivated"
   /// **空狀態 .ofEmpty**: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
@@ -76,7 +76,7 @@ nonisolated public enum StateType: String {
 
 // MARK: - KeyboardParser
 
-nonisolated public enum KeyboardParser: Int, CaseIterable {
+public enum KeyboardParser: Int, CaseIterable {
   case ofStandard = 0
   case ofETen = 1
   case ofIBM = 4
@@ -164,36 +164,49 @@ nonisolated public enum KeyboardParser: Int, CaseIterable {
 
 // MARK: - CandidateKey
 
-nonisolated public enum CandidateKey {
-  /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
-  nonisolated public enum ValidationError {
-    case noError
-    case invalidCharacters
-    case countMismatch
-
-    // MARK: Public
-
-    public var description: String {
-      switch self {
-      case .invalidCharacters:
-        return "- "
-          + "i18n:ErrorMessage.CandidateKeysASCIIOnly".i18n
-          + "\n" + "- " + "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes".i18n
-          + "\n" + "- " + "i18n:ErrorMessage.CandidateKeysNoSpace".i18n
-      case .countMismatch:
-        return "- " + "i18n:ErrorMessage.MinCandidateKeys".i18n
-          + "\n" + "- " + "i18n:ErrorMessage.MaxCandidateKeys".i18n
-      case .noError:
-        return ""
-      }
+#if compiler(>=6.2)
+  nonisolated public enum CandidateKey {
+    /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
+    nonisolated public enum ValidationError {
+      case noError
+      case invalidCharacters
+      case countMismatch
     }
   }
+#else
+  public enum CandidateKey {
+    /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
+    public enum ValidationError {
+      case noError
+      case invalidCharacters
+      case countMismatch
+    }
+  }
+#endif
 
-  public static let suggestions: [String] = [
+extension CandidateKey.ValidationError {
+  nonisolated public var description: String {
+    switch self {
+    case .invalidCharacters:
+      return "- "
+        + "i18n:ErrorMessage.CandidateKeysASCIIOnly".i18n
+        + "\n" + "- " + "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes".i18n
+        + "\n" + "- " + "i18n:ErrorMessage.CandidateKeysNoSpace".i18n
+    case .countMismatch:
+      return "- " + "i18n:ErrorMessage.MinCandidateKeys".i18n
+        + "\n" + "- " + "i18n:ErrorMessage.MaxCandidateKeys".i18n
+    case .noError:
+      return ""
+    }
+  }
+}
+
+extension CandidateKey {
+  nonisolated public static let suggestions: [String] = [
     "123456", "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGH", "ASDFZXCVB",
   ]
 
-  public static var defaultKeys: String { suggestions[0] }
+  nonisolated public static var defaultKeys: String { suggestions[0] }
 
   /// 校驗選字鍵參數資料值的合法性。
   /// - Remark: 傳入的參數值得事先做過下述處理：
@@ -204,7 +217,7 @@ nonisolated public enum CandidateKey {
   ///   - candidateKeys: 傳入的參數值
   ///   - excluding: 指定哪些按鍵無法用作選字鍵
   /// - Returns: 返回 nil 的話，證明沒有錯誤；否則會返回錯誤描述訊息。
-  public static func validate(
+  nonisolated public static func validate(
     keys candidateKeys: String, excluding forbiddenChars: String = ""
   )
     -> String? {
@@ -232,9 +245,9 @@ nonisolated public enum CandidateKey {
 
 // MARK: - Shared
 
-nonisolated public enum Shared {
+public enum Shared {
   // The type of input modes.
-  nonisolated public enum InputMode: String, CaseIterable, Identifiable {
+  public enum InputMode: String, CaseIterable, Identifiable {
     case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
     case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
     case imeModeNULL = ""

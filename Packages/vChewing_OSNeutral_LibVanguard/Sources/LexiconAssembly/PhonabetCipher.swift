@@ -4,7 +4,7 @@
 
 // MARK: - PhonabetCipher
 
-nonisolated enum PhonabetCipher {
+enum PhonabetCipher {
   static let charPhonabet2ASCII: [Character: Character] = [
     "ㄅ": "b", "ㄆ": "p", "ㄇ": "m", "ㄈ": "f", "ㄉ": "d", "ㄊ": "t", "ㄋ": "n", "ㄌ": "l", "ㄍ": "g",
     "ㄎ": "k", "ㄏ": "h",

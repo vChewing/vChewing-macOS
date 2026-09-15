@@ -105,6 +105,8 @@ extension Tekkon {
     }
 
     private static let sharedCacheLock = NSLock()
+    // `Tekkon` 靶不受 `defaultIsolation(MainActor.self)` 規範，故此處為 SE-0412 意義下的
+    // 全域可變共享狀態：必須以 `nonisolated(unsafe)` 明示其同步責任在本類別的 `sharedCacheLock`。
     nonisolated(unsafe) private static var sharedCache: [Int: PinyinTrie] = [:]
   }
 }

@@ -9,7 +9,6 @@ import Foundation
 /// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
 /// 被封裝的「與 Homa 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
-@MainActor
 public protocol InputHandlerProtocol: AnyObject {
   associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate
     where Session.Handler == Self

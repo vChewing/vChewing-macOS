@@ -13,7 +13,7 @@ extension LXAssembly {
   /// JSON 快照、追加式 WAL 日誌、CRC32 去重與日誌壓縮。
   ///
   /// `LXPerceptor` 專注觀測邏輯；本類別專注 I/O。
-  nonisolated public final class PerceptionPersistor {
+  public final class PerceptionPersistor {
     // MARK: Lifecycle
 
     public init(baseURL: URL? = nil) {
@@ -58,13 +58,13 @@ extension LXAssembly {
 // MARK: - Journal Record Types
 
 extension LXAssembly.PerceptionPersistor {
-  nonisolated private enum JournalOperation: String, Codable {
+  private enum JournalOperation: String, Codable {
     case upsert
     case removeKey
     case clear
   }
 
-  nonisolated private struct JournalRecord: Codable {
+  private struct JournalRecord: Codable {
     // MARK: Lifecycle
 
     init(
@@ -89,7 +89,7 @@ extension LXAssembly.PerceptionPersistor {
 
 extension LXAssembly.PerceptionPersistor {
   /// 標記某鍵值需在下一次刷新時寫入日誌。
-  nonisolated func markKeyForUpsert(_ key: String) {
+  func markKeyForUpsert(_ key: String) {
     lock.withLock {
       pendingRemovedKeys.remove(key)
       let now = Date().timeIntervalSince1970
@@ -102,7 +102,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 標記某鍵值已刪除，讓變更能寫入磁碟。
-  nonisolated func markKeyForRemoval(_ key: String) {
+  func markKeyForRemoval(_ key: String) {
     lock.withLock {
       pendingUpsertKeys.remove(key)
       let now = Date().timeIntervalSince1970
@@ -115,7 +115,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 重置日誌追蹤狀態（記憶體清空時呼叫）。
-  nonisolated func resetPendingState() {
+  func resetPendingState() {
     lock.withLock {
       pendingUpsertKeys.removeAll()
       pendingRemovedKeys.removeAll()
@@ -135,7 +135,7 @@ extension LXAssembly.PerceptionPersistor {
   ///   - mapProvider: 回呼取得目前的 LRU map（用於組裝 journal records）。
   ///   - keyValidator: 回呼判斷某 key 是否應被忽略。
   ///   - fileURL: 可選的儲存路徑，覆寫預設位置。
-  nonisolated func saveData(
+  func saveData(
     dataProvider: () -> [LXAssembly.LXPerceptor.KeyPerceptionPair],
     mapProvider: () -> [String: LXAssembly.LXPerceptor.KeyPerceptionPair],
     keyValidator: (String) -> Bool,
@@ -193,7 +193,7 @@ extension LXAssembly.PerceptionPersistor {
   ///   - loadCallback: 回呼，將解碼後的資料載入 POM 記憶體。
   ///   - keyValidator: 回呼判斷某 key 是否應被忽略。
   ///   - fileURL: 可選的載入路徑。
-  nonisolated func loadData(
+  func loadData(
     loadCallback: ([LXAssembly.LXPerceptor.KeyPerceptionPair]) -> (),
     replayApplicator: (inout [String: LXAssembly.LXPerceptor.KeyPerceptionPair], inout Bool) -> () = { _, _ in
     },
@@ -249,7 +249,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 清除磁碟上的快照與日誌。
-  nonisolated func clearDataOnDisk(
+  func clearDataOnDisk(
     fileURL: URL? = nil,
     dataProvider: () -> [LXAssembly.LXPerceptor.KeyPerceptionPair]
   ) {
@@ -269,7 +269,7 @@ extension LXAssembly.PerceptionPersistor {
 
 extension LXAssembly.PerceptionPersistor {
   /// 建立待寫入日誌的記錄列表。
-  nonisolated private func preparePendingJournalRecords(
+  private func preparePendingJournalRecords(
     mapProvider: () -> [String: LXAssembly.LXPerceptor.KeyPerceptionPair],
     keyValidator: (String) -> Bool
   )
@@ -294,7 +294,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 將編碼後的日誌記錄追加至副檔。
-  nonisolated private func appendJournal(_ records: [JournalRecord], baseURL: URL) throws {
+  private func appendJournal(_ records: [JournalRecord], baseURL: URL) throws {
     guard !records.isEmpty else { return }
     let journalURL = journalFileURL(for: baseURL)
     let encoder = JSONEncoder()
@@ -305,14 +305,14 @@ extension LXAssembly.PerceptionPersistor {
     }
 
     let handle = try FileHandle(forWritingTo: journalURL)
-    defer { try? handle.close() }
-    _ = try? handle.seekToEnd()
+    defer { try? handle.closeTheFile() }
+    _ = try? handle.seekToEOF()
 
     for record in records {
       let data = try encoder.encode(record)
-      try? handle.write(contentsOf: data)
+      try? handle.writeData(data)
       if let newline = "\n".data(using: .utf8) {
-        try? handle.write(contentsOf: newline)
+        try? handle.writeData(newline)
       }
     }
 
@@ -330,13 +330,13 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 計算資料的 CRC32 雜湊並回傳十六進位字串表示。
-  nonisolated private func computeHexCRC32(_ data: Data) -> String {
+  private func computeHexCRC32(_ data: Data) -> String {
     let checksum = CRC32.checksum(data: data)
     return String(format: "%08x", checksum)
   }
 
   /// 判斷是否需要以新快照壓縮日誌。
-  nonisolated private func shouldCompactJournal(for baseURL: URL) -> Bool {
+  private func shouldCompactJournal(for baseURL: URL) -> Bool {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: journalURL.path) else { return false }
@@ -359,7 +359,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 將現有覆寫資料完整輸出為快照，並重置日誌狀態。
-  nonisolated private func writeFullSnapshot(
+  private func writeFullSnapshot(
     dataProvider: () -> [LXAssembly.LXPerceptor.KeyPerceptionPair],
     to baseURL: URL,
     force: Bool
@@ -397,7 +397,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 重播日誌操作以同步記憶體狀態。
-  nonisolated private func replayJournal(
+  private func replayJournal(
     from baseURL: URL,
     keyValidator: @escaping (String) -> Bool,
     replayApplicator: (inout [String: LXAssembly.LXPerceptor.KeyPerceptionPair], inout Bool) -> ()
@@ -473,7 +473,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 檢查 journal record 的合理性以避免受損或惡意資料回放。
-  nonisolated private func isValidJournalRecord(
+  private func isValidJournalRecord(
     _ record: JournalRecord,
     keyValidator: (String) -> Bool
   )
@@ -503,7 +503,7 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 在成功壓縮後刪除日誌副檔。
-  nonisolated private func removeJournalFile(for baseURL: URL) {
+  private func removeJournalFile(for baseURL: URL) {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: journalURL.path) else { return }
@@ -516,12 +516,12 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 依據快照檔案 URL 推導日誌副檔的路徑。
-  nonisolated private func journalFileURL(for baseURL: URL) -> URL {
+  private func journalFileURL(for baseURL: URL) -> URL {
     baseURL.appendingPathExtension("journal")
   }
 
   /// 清理 lastLogTimestampByKey 中過期的條目以防止記憶體洩漏。
-  nonisolated private func cleanupOldTimestamps() {
+  private func cleanupOldTimestamps() {
     let now = Date().timeIntervalSince1970
     let threshold = now - (Self.perKeyThrottleInterval * 10)
     lastLogTimestampByKey = lastLogTimestampByKey.filter { $0.value > threshold }

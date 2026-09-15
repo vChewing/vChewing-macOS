@@ -52,7 +52,7 @@ extension LXAssembly {
   ///
   /// POM 使用野獸常數作為衰減曲線。
   /// 預設整個生存週期是八天，但可以藉由偏好設定銳減至 12 小時內。
-  nonisolated public final class LXPerceptor {
+  public final class LXPerceptor {
     // MARK: Lifecycle
 
     public init(
@@ -113,7 +113,7 @@ extension LXAssembly {
 // MARK: - Private Structures
 
 extension LXAssembly.LXPerceptor {
-  nonisolated public struct Override: Hashable, Encodable, Decodable, CustomStringConvertible {
+  public struct Override: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init(count: Int, timestamp: Double) {
@@ -166,7 +166,7 @@ extension LXAssembly.LXPerceptor {
     }
   }
 
-  nonisolated public final class Perception: Hashable, Encodable, Decodable, CustomStringConvertible {
+  public final class Perception: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init() {}
@@ -226,7 +226,7 @@ extension LXAssembly.LXPerceptor {
     }
   }
 
-  nonisolated public final class KeyPerceptionPair: Hashable, Encodable, Decodable, CustomStringConvertible {
+  public final class KeyPerceptionPair: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init(key: String, perception: Perception) {
@@ -294,7 +294,7 @@ extension Array where Element == Homa.GramInPath {
   ///   - cursor: 給定游標位置。
   ///   - outCursorPastNode: 找出的節點的前端位置。
   /// - Returns: 查找結果。
-  nonisolated public func findGramWithRange(at cursor: Int) -> (node: Homa.GramInPath, range: Range<Int>)? {
+  public func findGramWithRange(at cursor: Int) -> (node: Homa.GramInPath, range: Range<Int>)? {
     guard !isEmpty else { return nil }
     let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
     let range = contextRange(ofGivenCursor: cursor)
@@ -305,7 +305,7 @@ extension Array where Element == Homa.GramInPath {
 }
 
 extension LXAssembly.LXPerceptor {
-  nonisolated public func fetchSuggestion(
+  public func fetchSuggestion(
     assembledResult: [Homa.GramInPath],
     cursor: Int,
     timestamp: Double,
@@ -366,7 +366,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 獲取由洞察過的記憶內容生成的選字建議。
-  nonisolated func getSuggestion(
+  func getSuggestion(
     key: String,
     timestamp: Double
   )
@@ -452,7 +452,7 @@ extension LXAssembly.LXPerceptor {
   ///   （與 `alternateKeys` 的 `compareContextPart` 同語義）。
   /// - head：values 放寬（容許建議替換當前最佳猜測——POM 修正的核心用途）。
   /// - 回傳候選的 keyArray 採用 query 的 head 讀音段（套用至當前位置）。
-  nonisolated func getToneInsensitiveSuggestion(
+  func getToneInsensitiveSuggestion(
     key: String,
     timestamp: Double
   )
@@ -529,7 +529,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 容錯比對：三位置讀音「逐段去聲調等值」＋上下文 values exact。
-  nonisolated private func matchesToneInsensitively(
+  private func matchesToneInsensitively(
     _ stored: PerceptionKeyParts,
     query: PerceptionKeyParts,
     separatorString: String
@@ -566,7 +566,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 去除讀音尾端的聲調記號（拼音數字聲調 1–5 與注音聲調記號 ˊˇˋ˙）。
-  nonisolated private func toneStrippedReading(_ reading: String) -> String {
+  private func toneStrippedReading(_ reading: String) -> String {
     let toneScalars: Set<Unicode.Scalar> = ["1", "2", "3", "4", "5", "ˊ", "ˇ", "ˋ", "˙"]
     var scalars = Array(reading.unicodeScalars)
     while let last = scalars.last, toneScalars.contains(last) {
@@ -578,7 +578,7 @@ extension LXAssembly.LXPerceptor {
   /// 判斷一組 head 讀音段是否為「注音字形」讀音（Bopomofo 或注音聲調記號）。
   /// 用以限定 P192 錯位記憶守衛只作用於真實注音讀音——合成測試常用 ASCII 讀音
   /// （如 "target"）配多字候選，字數與段數本就不等、不屬資料錯位。
-  nonisolated private func isZhuyinReading(_ segments: [String]) -> Bool {
+  private func isZhuyinReading(_ segments: [String]) -> Bool {
     guard !segments.isEmpty else { return false }
     let toneMarks: Set<Unicode.Scalar> = ["ˊ", "ˇ", "ˋ", "˙"]
     func isZhuyinScalar(_ scalar: Unicode.Scalar) -> Bool {
@@ -597,7 +597,7 @@ extension LXAssembly.LXPerceptor {
   /// （引擎 alternatives 路徑、狂拼 LibVanguard 建議查詢）。
   /// 回傳每筆記憶的 previous 值（若有）與候選、權重。不做「只留最高分」篩選——n-gram 餵入
   /// 需要全量記憶，各記憶的前後文（previous）即是 bigram 的條件鍵。
-  nonisolated func perceptionsFor(
+  func perceptionsFor(
     headReading: String,
     timestamp: Double,
     matchMode: LXAssembly.POMQueryMode = .exact
@@ -660,7 +660,7 @@ extension LXAssembly.LXPerceptor {
     return results
   }
 
-  nonisolated public func memorizePerception(
+  public func memorizePerception(
     _ perception: (ngramKey: String, candidate: String),
     timestamp: Double,
     saveCallback: (() -> ())? = nil
@@ -714,7 +714,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 清除指定的建議（基於 context + candidate 對）
-  nonisolated func bleachSpecifiedSuggestions(
+  func bleachSpecifiedSuggestions(
     targets: [(ngramKey: String, candidate: String)],
     saveCallback: (() -> ())? = nil
   ) {
@@ -763,7 +763,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 清除指定的建議（基於 candidate，移除所有上下文中的該候選詞）
-  nonisolated func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
+  func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
     if candidateTargets.isEmpty { return }
 
     let hasChanges: Bool = lock.withLock {
@@ -814,7 +814,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 清除指定讀音（head reading）底下的所有建議。
-  nonisolated func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
+  func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
     let targets = Set(headReadingTargets.filter { !$0.isEmpty })
     guard !targets.isEmpty else { return }
 
@@ -848,7 +848,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 自 LRU 辭典內移除所有的單元圖。
-  nonisolated func bleachUnigrams(saveCallback: (() -> ())? = nil) {
+  func bleachUnigrams(saveCallback: (() -> ())? = nil) {
     let hasChanges: Bool = lock.withLock {
       var keysToRemove: [String] = []
       for key in mutLRUMap.keys {
@@ -871,7 +871,7 @@ extension LXAssembly.LXPerceptor {
     }
   }
 
-  nonisolated public func resetLRUList() {
+  public func resetLRUList() {
     purgeUnderscorePrefixedKeys()
     mutLRUKeySeqList.removeAll()
     let mapLRUSorted = mutLRUMap.sorted {
@@ -883,7 +883,7 @@ extension LXAssembly.LXPerceptor {
   }
 
   /// 將記憶中的覆寫資料清空，並重置日誌追蹤狀態。
-  nonisolated public func clearData() {
+  public func clearData() {
     lock.withLock {
       mutLRUMap = [:]
       mutLRUKeySeqList = []
@@ -893,12 +893,12 @@ extension LXAssembly.LXPerceptor {
 
   /// 同時清除記憶體與磁碟上的快照與日誌。
   /// - Parameter fileURL: 可選的覆寫儲存位置 URL。
-  nonisolated func clearData(withURL fileURL: URL? = nil) {
+  func clearData(withURL fileURL: URL? = nil) {
     clearData()
     persistor.clearDataOnDisk(fileURL: fileURL, dataProvider: { [] })
   }
 
-  nonisolated public func getSavableData() -> [KeyPerceptionPair] {
+  public func getSavableData() -> [KeyPerceptionPair] {
     lock.withLock {
       mutLRUMap.values.sorted {
         $0.latestTimeStamp > $1.latestTimeStamp
@@ -906,7 +906,7 @@ extension LXAssembly.LXPerceptor {
     }
   }
 
-  nonisolated public func loadData(from data: [KeyPerceptionPair]) {
+  public func loadData(from data: [KeyPerceptionPair]) {
     lock.withLock {
       var newMap = [String: KeyPerceptionPair]()
       data.forEach { currentPair in
@@ -922,7 +922,7 @@ extension LXAssembly.LXPerceptor {
   /// - Parameters:
   ///   - fileURL: 可選的儲存路徑，覆寫預設位置。
   ///   - skipDebounce: 為了 API 相容性而保留，實際的防抖處理由外部負責。
-  nonisolated func saveData(toURL fileURL: URL? = nil, skipDebounce _: Bool = false) {
+  func saveData(toURL fileURL: URL? = nil, skipDebounce _: Bool = false) {
     persistor.saveData(
       dataProvider: { [self] in getSavableData() },
       mapProvider: { [self] in lock.withLock { mutLRUMap } },
@@ -933,7 +933,7 @@ extension LXAssembly.LXPerceptor {
 
   /// 從磁碟載入覆寫資料並重播未處理的日誌。
   /// - Parameter fileURL: 可選的載入路徑，覆寫預設位置。
-  nonisolated func loadData(fromURL fileURL: URL? = nil) {
+  func loadData(fromURL fileURL: URL? = nil) {
     persistor.loadData(
       loadCallback: { [self] in loadData(from: $0) },
       replayApplicator: { [self] tempMap, mutated in
@@ -954,24 +954,24 @@ extension LXAssembly.LXPerceptor {
 
 extension LXAssembly.LXPerceptor {
   /// 判斷一個鍵是否為單漢字 (SegLength == 1)
-  nonisolated private func isSegLengthOne(key: String) -> Bool {
+  private func isSegLengthOne(key: String) -> Bool {
     !key.contains("-")
   }
 
   // 解析 Perception Key 的健壯 parser（不用正則）。
   // 現行格式示例：(anteReading,anteValue)&(prevReading,prevValue)&(headReading,headValue)
-  nonisolated struct PerceptionKeyParts {
+  struct PerceptionKeyParts {
     let headReading: String
     let headValue: String
     let previous: (reading: String, value: String)?
     let anterior: (reading: String, value: String)?
   }
 
-  nonisolated func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
+  func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
     parseDelimitedPerceptionKey(key)
   }
 
-  nonisolated private func parseDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
+  private func parseDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
     let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
     guard trimmed.contains("&") else { return nil }
 
@@ -1020,7 +1020,7 @@ extension LXAssembly.LXPerceptor {
     )
   }
 
-  nonisolated private func compareContextPart(
+  private func compareContextPart(
     _ lhs: (reading: String, value: String)?,
     _ rhs: (reading: String, value: String)?,
     separatorString: String
@@ -1063,7 +1063,7 @@ extension LXAssembly.LXPerceptor {
     }
   }
 
-  nonisolated private func alternateKeys(for originalKey: String) -> [String] {
+  private func alternateKeys(for originalKey: String) -> [String] {
     guard let originalParts = parsePerceptionKey(originalKey) else { return [] }
     guard !shouldIgnorePerception(originalParts) else { return [] }
     let separatorString = Homa.Assembler.theSeparator
@@ -1159,11 +1159,11 @@ extension LXAssembly.LXPerceptor {
   }
 
   // 僅供單元測試使用：用於專門曝露替代 Key 的 API。
-  nonisolated internal func alternateKeysForTesting(_ originalKey: String) -> [String] {
+  internal func alternateKeysForTesting(_ originalKey: String) -> [String] {
     alternateKeys(for: originalKey)
   }
 
-  nonisolated private func forceHighScoreOverrideFlag(for key: String) -> Bool {
+  private func forceHighScoreOverrideFlag(for key: String) -> Bool {
     guard let parts = parsePerceptionKey(key) else { return false }
     guard !shouldIgnorePerception(parts) else { return false }
     let separatorString = Homa.Assembler.theSeparator
@@ -1203,7 +1203,7 @@ extension LXAssembly.LXPerceptor {
   ///   - isUnigram: 是否為 Unigram
   ///   - isSingleCharUnigram: 是否為單讀音單漢字的 Unigram
   /// - Returns: 權重分數
-  nonisolated internal func calculateWeight(
+  internal func calculateWeight(
     eventCount: Int,
     totalCount: Int,
     eventTimestamp: Double,
@@ -1255,7 +1255,7 @@ extension LXAssembly.LXPerceptor {
     return max(score, threshold + 0.001)
   }
 
-  nonisolated static func isPunctuation(_ node: Homa.GramInPath) -> Bool {
+  static func isPunctuation(_ node: Homa.GramInPath) -> Bool {
     for key in node.keyArray {
       guard let firstChar = key.first else { continue }
       return String(firstChar) == "_"
@@ -1263,22 +1263,22 @@ extension LXAssembly.LXPerceptor {
     return false
   }
 
-  nonisolated private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
+  private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
     let readings = [parts.headReading, parts.previous?.reading, parts.anterior?.reading]
       .compactMap { $0 }
     return readings.contains { containsUnderscorePrefixedReading($0) }
   }
 
-  nonisolated private func shouldIgnoreKey(_ key: String) -> Bool {
+  private func shouldIgnoreKey(_ key: String) -> Bool {
     guard let parts = parsePerceptionKey(key) else { return false }
     return shouldIgnorePerception(parts)
   }
 
-  nonisolated private func containsUnderscorePrefixedReading(_ reading: String) -> Bool {
+  private func containsUnderscorePrefixedReading(_ reading: String) -> Bool {
     readingSegments(from: reading).contains { $0.hasPrefix("_") }
   }
 
-  nonisolated private func readingSegments(from reading: String) -> [String] {
+  private func readingSegments(from reading: String) -> [String] {
     let trimmed = reading.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmed.isEmpty else { return [] }
     let separator = Homa.Assembler.theSeparator
@@ -1288,7 +1288,7 @@ extension LXAssembly.LXPerceptor {
       .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
   }
 
-  nonisolated private func purgeUnderscorePrefixedKeys() {
+  private func purgeUnderscorePrefixedKeys() {
     let invalidKeys = mutLRUMap.keys.filter { shouldIgnoreKey($0) }
     guard !invalidKeys.isEmpty else { return }
     invalidKeys.forEach { mutLRUMap.removeValue(forKey: $0) }
@@ -1297,10 +1297,10 @@ extension LXAssembly.LXPerceptor {
 
 // MARK: - POMError
 
-nonisolated struct POMError: LocalizedError {
-  nonisolated var rawValue: String
+struct POMError: LocalizedError {
+  var rawValue: String
 
-  nonisolated var errorDescription: String? {
+  var errorDescription: String? {
     rawValue.i18n
   }
 }
@@ -1314,7 +1314,7 @@ extension Double {
   /// +(114514+(114*514+(11*4*(5+14)+1*14+5-1+4))))
   /// +114*5*14+1+14+514+11-4+5-1-4)/(-11/4+51/4)**(11-4-5+14)
   /// ```
-  nonisolated fileprivate static let naturalE: Double = {
+  fileprivate static let naturalE: Double = {
     let a = 114_514.0 + 114_514.0
     let b = 114.0 * 514.0
     let c = 1.0 * -(1.0 - 4.0) * 514.0
@@ -1334,7 +1334,7 @@ extension Double {
   /// +(114*514+(114*51*4+(11*4*5*14+(-(114-5)*(1-4)+(11/(45-1)*4))))))
   /// +(114514+(114*514+(114*51*4+(1145*14+(11*4*(5+1)*4))))))/(-11/4+51/4)**(11-4-5+14)
   /// ```
-  nonisolated fileprivate static let naturalPi: Double = {
+  fileprivate static let naturalPi: Double = {
     let a = 114_514.0 + 114_514.0
     let p1 = -11.0 + 4.0 - 5.0 + 14.0
     let p2 = 114_514.0 + 114.0 * 51.0 * 4.0 + 11.0 * 4.0 * 5.0 * 14.0 + 1.0 + 1.0 + 4.0 * 5.0 + 1.0 - 4.0
@@ -1349,7 +1349,7 @@ extension Double {
   }()
 
   /// `e * (((e + π) * (e + e + π))^e) + ( (e / (π^e - e)) / (e + e^π - π^e) )`
-  nonisolated fileprivate static func getBeastConstantUsingTadokoroFormula() -> Double {
+  fileprivate static func getBeastConstantUsingTadokoroFormula() -> Double {
     let e = naturalE
     let pi = naturalPi
 
