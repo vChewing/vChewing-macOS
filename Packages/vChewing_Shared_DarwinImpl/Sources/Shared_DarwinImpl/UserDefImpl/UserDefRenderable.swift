@@ -7,109 +7,115 @@
   import Foundation
   import SwiftUI
 
-  // MARK: - UserDefRenderable
+  // 本檔為 SwiftUI 專屬（legacy 倉庫無對位模組可繼承），且 `Binding`／`some View` 等 API 起於 macOS 10.15；
+  // 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」，整段僅限 6.2+，<6.2 分支不提供替代實作。
+  #if compiler(>=6.2)
 
-  @available(macOS 10.15, *)
-  public struct UserDefRenderable<Value>: Identifiable {
-    // MARK: Lifecycle
+    // MARK: - UserDefRenderable
 
-    public init(_ userDef: UserDef, binding: Binding<Value>) {
-      self.def = userDef
-      self.binding = binding
-      self.options = (def.metaData?.options ?? [:]).sorted(by: { $0.key < $1.key })
-    }
+    @available(macOS 10.15, *)
+    public struct UserDefRenderable<Value>: Identifiable {
+      // MARK: Lifecycle
 
-    // MARK: Public
+      public init(_ userDef: UserDef, binding: Binding<Value>) {
+        self.def = userDef
+        self.binding = binding
+        self.options = (def.metaData?.options ?? [:]).sorted(by: { $0.key < $1.key })
+      }
 
-    public typealias RawFormat = (key: UserDef, value: Binding<Value>)
+      // MARK: Public
 
-    public let def: UserDef
-    public let binding: Binding<Value>
-    public let options: [Dictionary<Int, String>.Element]
+      public typealias RawFormat = (key: UserDef, value: Binding<Value>)
 
-    public var id: String { def.rawValue }
-    public var metaData: UserDef.MetaData? { def.metaData }
+      public let def: UserDef
+      public let binding: Binding<Value>
+      public let options: [Dictionary<Int, String>.Element]
 
-    public var hasInlineDescription: Bool {
-      guard let meta = def.metaData else { return false }
-      return meta.description != nil || meta.inlinePrompt != nil || meta.minimumOS > 10.9
-    }
+      public var id: String { def.rawValue }
+      public var metaData: UserDef.MetaData? { def.metaData }
 
-    @ViewBuilder
-    public func render() -> some View {
-      EmptyView()
-    }
+      public var hasInlineDescription: Bool {
+        guard let meta = def.metaData else { return false }
+        return meta.description != nil || meta.inlinePrompt != nil || meta.minimumOS > 10.9
+      }
 
-    @ViewBuilder
-    public func descriptionView(verbatim: Bool = false) -> some View {
-      if let metaData = metaData {
-        if hasInlineDescription { Spacer().frame(height: 6) }
-        let descText = metaData.description
-        let promptText = metaData.inlinePrompt
-        let descriptionSource: [String] = [promptText, descText].compactMap { $0 }
+      @ViewBuilder
+      public func render() -> some View {
+        EmptyView()
+      }
 
-        if !descriptionSource.isEmpty {
-          ForEach(Array(descriptionSource.enumerated()), id: \.offset) { _, i18nKey in
-            if verbatim {
-              Text(verbatim: i18nKey.i18n).settingsDescription()
-            } else {
-              Text(LocalizedStringKey(i18nKey)).settingsDescription()
+      @ViewBuilder
+      public func descriptionView(verbatim: Bool = false) -> some View {
+        if let metaData = metaData {
+          if hasInlineDescription { Spacer().frame(height: 6) }
+          let descText = metaData.description
+          let promptText = metaData.inlinePrompt
+          let descriptionSource: [String] = [promptText, descText].compactMap { $0 }
+
+          if !descriptionSource.isEmpty {
+            ForEach(Array(descriptionSource.enumerated()), id: \.offset) { _, i18nKey in
+              if verbatim {
+                Text(verbatim: i18nKey.i18n).settingsDescription()
+              } else {
+                Text(LocalizedStringKey(i18nKey)).settingsDescription()
+              }
             }
           }
-        }
-        if metaData.minimumOS > 10.9 {
-          Group {
-            Text(" ") +
-              Text(
-                String(
-                  format: "i18n:InfoMessage.FeatureRequiresMacOS:%@".i18n,
-                  metaData.minimumOS.description
+          if metaData.minimumOS > 10.9 {
+            Group {
+              Text(" ") +
+                Text(
+                  String(
+                    format: "i18n:InfoMessage.FeatureRequiresMacOS:%@".i18n,
+                    metaData.minimumOS.description
+                  )
                 )
-              )
-          }.settingsDescription()
+            }.settingsDescription()
+          }
         }
       }
     }
-  }
 
-  extension UserDefRenderable<Any> {
-    public func batch(_ input: [RawFormat]) -> [UserDefRenderable<Value>] {
-      input.compactMap { metaPair in
-        metaPair.key.bind(binding)
+    extension UserDefRenderable<Any> {
+      public func batch(_ input: [RawFormat]) -> [UserDefRenderable<Value>] {
+        input.compactMap { metaPair in
+          metaPair.key.bind(binding)
+        }
       }
     }
-  }
 
-  // MARK: - Identifiable + Identifiable
+    // MARK: - Identifiable + Identifiable
 
-  #if hasFeature(RetroactiveAttribute)
-    extension [UserDefRenderable<Any>]: @retroactive Identifiable {}
-  #else
-    extension [UserDefRenderable<Any>]: Identifiable {}
+    #if hasFeature(RetroactiveAttribute)
+      extension [UserDefRenderable<Any>]: @retroactive Identifiable {}
+    #else
+      extension [UserDefRenderable<Any>]: Identifiable {}
+    #endif
+
+    extension [UserDefRenderable<Any>] {
+      public var id: String { map(\.id).description }
+    }
+
+    // MARK: - UserDef metaData Extension
+
+    extension UserDef {
+      public func bind<Value>(_ binding: Binding<Value>) -> UserDefRenderable<Value> {
+        UserDefRenderable(self, binding: binding)
+      }
+    }
+
+    // MARK: - Private View Extension
+
+    @available(macOS 10.15, *)
+    extension View {
+      fileprivate func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
+        controlSize(.small)
+          .frame(maxWidth: maxWidth, alignment: .leading)
+          // TODO: Use `.foregroundStyle` when targeting macOS 12.
+          .foregroundColor(.secondary)
+      }
+    }
+
   #endif
-
-  extension [UserDefRenderable<Any>] {
-    public var id: String { map(\.id).description }
-  }
-
-  // MARK: - UserDef metaData Extension
-
-  extension UserDef {
-    public func bind<Value>(_ binding: Binding<Value>) -> UserDefRenderable<Value> {
-      UserDefRenderable(self, binding: binding)
-    }
-  }
-
-  // MARK: - Private View Extension
-
-  @available(macOS 10.15, *)
-  extension View {
-    fileprivate func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
-      controlSize(.small)
-        .frame(maxWidth: maxWidth, alignment: .leading)
-        // TODO: Use `.foregroundStyle` when targeting macOS 12.
-        .foregroundColor(.secondary)
-    }
-  }
 
 #endif
