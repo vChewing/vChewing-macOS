@@ -4,15 +4,15 @@
 
 // MARK: - Bool Operators
 
-public func |= (lhs: inout Bool, rhs: Bool) {
+nonisolated public func |= (lhs: inout Bool, rhs: Bool) {
   lhs = lhs || rhs
 }
 
-public func &= (lhs: inout Bool, rhs: Bool) {
+nonisolated public func &= (lhs: inout Bool, rhs: Bool) {
   lhs = lhs && rhs
 }
 
-public func ^= (lhs: inout Bool, rhs: Bool) {
+nonisolated public func ^= (lhs: inout Bool, rhs: Bool) {
   lhs = lhs != rhs
 }
 
@@ -20,10 +20,10 @@ public func ^= (lhs: inout Bool, rhs: Bool) {
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
-nonisolated extension RangeReplaceableCollection where Element: Hashable {
+extension RangeReplaceableCollection where Element: Hashable {
   /// 去重複化。
   /// - Remark: 該方法不適合用來處理 class，除非該 class 遵循 Identifiable 協定。
-  public var deduplicated: Self {
+  nonisolated public var deduplicated: Self {
     var set = Set<Element>()
     return filter { set.insert($0).inserted }
   }
@@ -38,8 +38,8 @@ public enum UILayoutOrientation: Int, Codable, Hashable, Sendable {
 
 // MARK: - Ensuring trailing slash of a string
 
-nonisolated extension String {
-  public mutating func ensureTrailingSlash() {
+extension String {
+  nonisolated public mutating func ensureTrailingSlash() {
     if !hasSuffix("/") {
       self += "/"
     }
@@ -48,8 +48,8 @@ nonisolated extension String {
 
 // MARK: - CharCode printability check
 
-nonisolated extension Unicode.Scalar {
-  public var isPrintableASCII: Bool {
+extension Unicode.Scalar {
+  nonisolated public var isPrintableASCII: Bool {
     (32 ... 126).contains(value)
   }
 }
@@ -57,12 +57,12 @@ nonisolated extension Unicode.Scalar {
 // MARK: - Stable Sort Extension
 
 // Ref: https://stackoverflow.com/a/50545761/4162914
-nonisolated extension Sequence {
+extension Sequence {
   /// Return a stable-sorted collection.
   ///
   /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
   /// - Returns: The sorted collection.
-  public func stableSort(
+  nonisolated public func stableSort(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   )
     rethrows -> [Element] {
@@ -77,13 +77,13 @@ nonisolated extension Sequence {
 
 // MARK: - Return toggled value.
 
-nonisolated extension Bool {
-  public mutating func toggled() -> Bool {
+extension Bool {
+  nonisolated public mutating func toggled() -> Bool {
     toggle()
     return self
   }
 
-  public static func from(integer: Int) -> Bool {
+  nonisolated public static func from(integer: Int) -> Bool {
     integer > 0 ? true : false
   }
 }
@@ -91,15 +91,15 @@ nonisolated extension Bool {
 // MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
-nonisolated extension Double {
-  public func rounded(toPlaces places: Int) -> Double {
+extension Double {
+  nonisolated public func rounded(toPlaces places: Int) -> Double {
     let divisor = 10.0.mathPowered(by: places)
     return (self * divisor).rounded() / divisor
   }
 }
 
-nonisolated extension Double {
-  public func mathPowered(by operand: Int) -> Double {
+extension Double {
+  nonisolated public func mathPowered(by operand: Int) -> Double {
     var target = self
     for _ in 0 ..< operand {
       target = target * target
@@ -110,19 +110,19 @@ nonisolated extension Double {
 
 // MARK: - String CharName and CodePoint Extension
 
-nonisolated extension String {
-  public var charDescriptions: [String] {
+extension String {
+  nonisolated public var charDescriptions: [String] {
     flatMap(\.unicodeScalars).compactMap {
       let theName: String = $0.properties.name ?? ""
       return String(format: "U+%02X %@", $0.value, theName)
     }
   }
 
-  public var codePoints: [String] {
+  nonisolated public var codePoints: [String] {
     map(\.codePoint)
   }
 
-  public var describedAsCodePoints: [String] {
+  nonisolated public var describedAsCodePoints: [String] {
     map {
       "\($0) (\($0.codePoint))"
     }
@@ -131,8 +131,8 @@ nonisolated extension String {
 
 // MARK: - Character Codepoint
 
-nonisolated extension Character {
-  public var codePoint: String {
+extension Character {
+  nonisolated public var codePoint: String {
     guard let value = unicodeScalars.first?.value else { return "U+NULL" }
     return String(format: "U+%02X", value)
   }
@@ -140,16 +140,16 @@ nonisolated extension Character {
 
 // MARK: - String Ellipsis Extension
 
-nonisolated extension String {
-  public var withEllipsis: String { self + "…" }
+extension String {
+  nonisolated public var withEllipsis: String { self + "…" }
 }
 
 // MARK: - Index Revolver (only for Array)
 
 // Further discussion: https://forums.swift.org/t/62847
 
-nonisolated extension Array {
-  public func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
+extension Array {
+  nonisolated public func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
     if id < 0 || steps < 1 { return id }
     var result = id
     func revolvedIndexByOneStep(_ id: Int, clockwise: Bool = true) -> Int {
@@ -164,8 +164,8 @@ nonisolated extension Array {
   }
 }
 
-nonisolated extension Int {
-  public mutating func revolveAsIndex(with target: [Any], clockwise: Bool = true, steps: Int = 1) {
+extension Int {
+  nonisolated public mutating func revolveAsIndex(with target: [Any], clockwise: Bool = true, steps: Int = 1) {
     if self < 0 || steps < 1 { return }
     self = target.revolvedIndex(self, clockwise: clockwise, steps: steps)
   }
@@ -173,8 +173,8 @@ nonisolated extension Int {
 
 // MARK: - Overlap Checker (for two sets)
 
-nonisolated extension Set where Element: Hashable {
-  public func isOverlapped(with target: Set<Element>) -> Bool {
+extension Set where Element: Hashable {
+  nonisolated public func isOverlapped(with target: Set<Element>) -> Bool {
     guard !target.isEmpty, !isEmpty else { return false }
     var container: (Set<Element>, Set<Element>)
     if target.count <= count {
@@ -188,17 +188,17 @@ nonisolated extension Set where Element: Hashable {
     return false
   }
 
-  public func isOverlapped(with target: [Element]) -> Bool {
+  nonisolated public func isOverlapped(with target: [Element]) -> Bool {
     isOverlapped(with: Set(target))
   }
 }
 
-nonisolated extension Array where Element: Hashable {
-  public func isOverlapped(with target: [Element]) -> Bool {
+extension Array where Element: Hashable {
+  nonisolated public func isOverlapped(with target: [Element]) -> Bool {
     Set(self).isOverlapped(with: Set(target))
   }
 
-  public func isOverlapped(with target: Set<Element>) -> Bool {
+  nonisolated public func isOverlapped(with target: Set<Element>) -> Bool {
     Set(self).isOverlapped(with: target)
   }
 }
@@ -238,8 +238,8 @@ public enum ArrayBuilder<OutputModel> {
 
 // MARK: - Extending Comparable to let it able to find its neighbor values in any collection.
 
-nonisolated extension Comparable {
-  public func findNeighborValue(
+extension Comparable {
+  nonisolated public func findNeighborValue(
     from givenSeq: any Collection<Self>,
     greater isGreater: Bool
   )
@@ -267,9 +267,9 @@ nonisolated extension Comparable {
 
 // MARK: - String.applyingTransform
 
-nonisolated extension String {
+extension String {
   /// This only works with ASCII chars for now.
-  public func applyingTransformFW2HW(reverse: Bool) -> String {
+  nonisolated public func applyingTransformFW2HW(reverse: Bool) -> String {
     var arr: [Character] = map { $0 }
     for i in 0 ..< arr.count {
       let oldChar = arr[i]

@@ -18,8 +18,8 @@ import Foundation
   import OSLog
 #endif
 
-nonisolated extension Process {
-  public static func consoleLog<S: StringProtocol>(_ msg: S) {
+extension Process {
+  nonisolated public static func consoleLog<S: StringProtocol>(_ msg: S) {
     let msgStr = msg.description
     #if canImport(Darwin)
       if #available(macOS 26.0, *) {
@@ -40,8 +40,8 @@ nonisolated extension Process {
 
 // MARK: - Real Home Dir for Sandboxed Apps
 
-nonisolated extension FileManager {
-  public static let realHomeDir: URL = {
+extension FileManager {
+  nonisolated public static let realHomeDir: URL = {
     // Avoid relativeTo: parameter (10.11+) to stay compatible with 10.9.
     #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
       let url = URL(fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir))
@@ -62,11 +62,11 @@ nonisolated extension FileManager {
 
 // MARK: - Check whether current date is the given date.
 
-nonisolated extension Date {
+extension Date {
   /// Check whether current date is the given date.
   /// - Parameter dateDigits: `yyyyMMdd`, 8-digit integer. If only `MMdd`, then the year will be the current year.
   /// - Returns: The result. Will return false if the given dateDigits is invalid.
-  public static func isTodayTheDate(from dateDigits: Int) -> Bool {
+  nonisolated public static func isTodayTheDate(from dateDigits: Int) -> Bool {
     let currentYear = Self.currentYear
     var dateDigits = dateDigits
     let strDateDigits = dateDigits.description
@@ -89,13 +89,13 @@ nonisolated extension Date {
     return false
   }
 
-  private static let dateFormaterAs4Y2M2D: DateFormatter = {
+  nonisolated private static let dateFormaterAs4Y2M2D: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyyMMdd"
     return formatter
   }()
 
-  public static var currentYear: Int {
+  nonisolated public static var currentYear: Int {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy"
     return Int(formatter.string(from: Date())) ?? 1_970
@@ -104,22 +104,22 @@ nonisolated extension Date {
 
 // MARK: - NSRange Extension
 
-nonisolated extension NSRange {
-  public static let zero = NSRange(location: 0, length: 0)
-  public static let notFound = NSRange(location: NSNotFound, length: NSNotFound)
+extension NSRange {
+  nonisolated public static let zero = NSRange(location: 0, length: 0)
+  nonisolated public static let notFound = NSRange(location: NSNotFound, length: NSNotFound)
 }
 
 // MARK: - CGRect Extension
 
-nonisolated extension CGRect {
-  public static let seniorTheBeast: CGRect = {
+extension CGRect {
+  nonisolated public static let seniorTheBeast: CGRect = {
     var result = CGRect()
     result.origin = .init(x: 0, y: 0)
     result.size = .init(width: 0.114, height: 0.514)
     return result
   }()
 
-  public static let zeroValue = CGRect(
+  nonisolated public static let zeroValue = CGRect(
     origin: .init(x: 0, y: 0),
     size: .init(width: 0, height: 0)
   )
@@ -127,17 +127,17 @@ nonisolated extension CGRect {
 
 // MARK: - String.i18n extension
 
-nonisolated extension StringLiteralType {
-  public var i18n: String { NSLocalizedString(description, comment: "") }
+extension StringLiteralType {
+  nonisolated public var i18n: String { NSLocalizedString(description, comment: "") }
 }
 
 // MARK: - Root Extensions (classDeduplicated)
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
-nonisolated extension RangeReplaceableCollection where Element: Hashable {
+extension RangeReplaceableCollection where Element: Hashable {
   /// 使用 NSOrderedSet 處理 class 陣列的「去重複化」。
-  public var classDeduplicated: Self {
+  nonisolated public var classDeduplicated: Self {
     NSOrderedSet(array: Array(self)).compactMap { $0 as? Element.Type } as? Self ?? self
     // 下述方法有 Bug 會在處理 KeyValuePaired 的時候崩掉，暫時停用。
     // var set = Set<Element>()
@@ -147,8 +147,8 @@ nonisolated extension RangeReplaceableCollection where Element: Hashable {
 
 // MARK: - String Tildes Expansion Extension
 
-nonisolated extension String {
-  public var expandingTildeInPath: String {
+extension String {
+  nonisolated public var expandingTildeInPath: String {
     (self as NSString).expandingTildeInPath
   }
 }
@@ -161,7 +161,7 @@ nonisolated extension String {
   extension String: LocalizedError {}
 #endif
 
-nonisolated extension String {
+extension String {
   nonisolated public var errorDescription: String? {
     self
   }
@@ -169,19 +169,19 @@ nonisolated extension String {
 
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
-nonisolated extension UInt16 {
-  public var isPrintableUniChar: Bool {
+extension UInt16 {
+  nonisolated public var isPrintableUniChar: Bool {
     Unicode.Scalar(UInt32(self)) != nil
   }
 
-  public var isPrintableASCII: Bool {
+  nonisolated public var isPrintableASCII: Bool {
     (32 ... 126).contains(self)
   }
 }
 
 // MARK: - User Defaults Storage
 
-nonisolated extension UserDefaults {
+extension UserDefaults {
   nonisolated public static var pendingUnitTests: Bool {
     get { _pendingUnitTests.value }
     set { _pendingUnitTests.value = newValue }
@@ -239,7 +239,7 @@ public struct AppProperty<Value: Sendable>: Sendable {
 // MARK: - String RegReplace Extension
 
 // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
-nonisolated extension String {
+extension String {
   nonisolated public mutating func regReplace(pattern: String, replaceWith: String = "") {
     do {
       let regex = try Self.cachedRegex(for: pattern)
@@ -273,8 +273,8 @@ nonisolated extension String {
 
 // MARK: - Localized String Extension for Integers and Floats
 
-nonisolated extension BinaryFloatingPoint {
-  public func i18n(loc: String) -> String {
+extension BinaryFloatingPoint {
+  nonisolated public func i18n(loc: String) -> String {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: loc)
     formatter.numberStyle = .spellOut
@@ -282,8 +282,8 @@ nonisolated extension BinaryFloatingPoint {
   }
 }
 
-nonisolated extension BinaryInteger {
-  public func i18n(loc: String) -> String {
+extension BinaryInteger {
+  nonisolated public func i18n(loc: String) -> String {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: loc)
     formatter.numberStyle = .spellOut
@@ -293,9 +293,9 @@ nonisolated extension BinaryInteger {
 
 // MARK: - Version Comparer.
 
-nonisolated extension String {
+extension String {
   /// ref: https://sarunw.com/posts/how-to-compare-two-app-version-strings-in-swift/
-  public func versionCompare(_ otherVersion: String) -> ComparisonResult {
+  nonisolated public func versionCompare(_ otherVersion: String) -> ComparisonResult {
     let versionDelimiter = "."
 
     var versionComponents = components(separatedBy: versionDelimiter) // <1>
@@ -319,69 +319,135 @@ nonisolated extension String {
 
 // MARK: - Async Task
 
-nonisolated public func asyncOnMain(
-  bypassAsync: Bool = false,
-  execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
-) {
-  guard !bypassAsync else {
-    MainActor.assumeIsolated { work() }
-    return
-  }
-  if #unavailable(macOS 12) {
-    DispatchQueue.main.async { work() }
-  } else {
-    Task { @MainActor in
-      work()
+// 本節的三個 API 以 compiler flag 分隔為兩套寫法：
+//
+// - **Swift 6.2 以上**（本倉 6.2 manifest 之 target 帶 `defaultIsolation(MainActor.self)`）：
+//   closure 參數須標 `@MainActor @Sendable`，同步路徑須以 `MainActor.assumeIsolated` 承接，
+//   否則過不了 Swift 6 的隔離檢查。
+// - **Swift 6.2 以下**：採 `vChewing-OSX-Legacy` 的寫法——closure 參數不帶 actor 標註、同步路徑
+//   直接呼叫、非同步路徑以 `if #available(macOS 12.0, *)` 把 `Task { @MainActor in … }` 包起來。
+//   該寫法在 5.10 側之所以必要：`@MainActor` 與 `MainActor.assumeIsolated` 皆被標為 macOS 10.15
+//   起可用，而本側部署目標是 10.9——`@MainActor` 一寫進簽名，即無條件觸發 availability 錯誤
+//   （`'MainActor' is only available in macOS 10.15 or newer`）。
+#if compiler(>=6.2)
+  nonisolated public func asyncOnMain(
+    bypassAsync: Bool = false,
+    execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
+  ) {
+    guard !bypassAsync else {
+      MainActor.assumeIsolated { work() }
+      return
     }
-  }
-}
-
-nonisolated public func asyncOnMain(
-  after delayInterval: TimeInterval,
-  bypassAsync: Bool = false,
-  execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
-) {
-  guard !bypassAsync else {
-    MainActor.assumeIsolated { work() }
-    return
-  }
-  let delayInterval = Swift.max(0, delayInterval)
-  if #unavailable(macOS 12) {
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
-      work()
-    }
-  } else {
-    Task { @MainActor in
-      if delayInterval > 0 {
-        let delay = UInt64(delayInterval * 1_000_000_000)
-        try? await Task<Never, Never>.sleep(nanoseconds: delay)
+    if #unavailable(macOS 12) {
+      DispatchQueue.main.async { work() }
+    } else {
+      Task { @MainActor in
+        work()
       }
+    }
+  }
+#else
+  public func asyncOnMain(
+    bypassAsync: Bool = false,
+    execute work: @escaping @convention(block) () -> ()
+  ) {
+    guard !bypassAsync else {
       work()
+      return
+    }
+    if #available(macOS 12.0, *) {
+      Task { @MainActor in
+        work()
+      }
+    } else {
+      DispatchQueue.main.async { work() }
     }
   }
-}
+#endif
 
-@discardableResult
-nonisolated public func mainSync<T>(execute work: @MainActor () throws -> T) rethrows -> T {
-  if Thread.isMainThread {
-    // safe: we are on the main thread, which is the MainActor executor
-    return try withoutActuallyEscaping(work) { fn in
-      typealias Erased = () throws -> T
-      return try (unsafeBitCast(fn, to: Erased.self))()
+#if compiler(>=6.2)
+  nonisolated public func asyncOnMain(
+    after delayInterval: TimeInterval,
+    bypassAsync: Bool = false,
+    execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
+  ) {
+    guard !bypassAsync else {
+      MainActor.assumeIsolated { work() }
+      return
+    }
+    let delayInterval = Swift.max(0, delayInterval)
+    if #unavailable(macOS 12) {
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
+        work()
+      }
+    } else {
+      Task { @MainActor in
+        if delayInterval > 0 {
+          let delay = UInt64(delayInterval * 1_000_000_000)
+          try? await Task<Never, Never>.sleep(nanoseconds: delay)
+        }
+        work()
+      }
     }
   }
-  return try DispatchQueue.main.sync(execute: work)
-}
+#else
+  public func asyncOnMain(
+    after delayInterval: TimeInterval,
+    bypassAsync: Bool = false,
+    execute work: @escaping @convention(block) () -> ()
+  ) {
+    guard !bypassAsync else {
+      work()
+      return
+    }
+    let delayInterval = Swift.max(0, delayInterval)
+    if #unavailable(macOS 12) {
+      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
+        work()
+      }
+    } else {
+      Task { @MainActor in
+        if delayInterval > 0 {
+          let delay = UInt64(delayInterval * 1_000_000_000)
+          try? await Task<Never, Never>.sleep(nanoseconds: delay)
+        }
+        work()
+      }
+    }
+  }
+#endif
+
+#if compiler(>=6.2)
+  @discardableResult
+  nonisolated public func mainSync<T>(execute work: @MainActor () throws -> T) rethrows -> T {
+    if Thread.isMainThread {
+      // safe: we are on the main thread, which is the MainActor executor
+      return try withoutActuallyEscaping(work) { fn in
+        typealias Erased = () throws -> T
+        return try (unsafeBitCast(fn, to: Erased.self))()
+      }
+    }
+    return try DispatchQueue.main.sync(execute: work)
+  }
+#else
+  @discardableResult
+  public func mainSync<T>(execute work: () throws -> T) rethrows -> T {
+    if Thread.isMainThread {
+      return try work()
+    }
+    return try DispatchQueue.main.sync(execute: work)
+  }
+#endif
 
 // MARK: - Total RAM Size.
 
-nonisolated extension Process {
-  public static let totalMemoryGiB: Int = {
+extension Process {
+  nonisolated public static let totalMemoryGiB: Int = {
     let rawBytes = Double(ProcessInfo.processInfo.physicalMemory)
     return Int((rawBytes / pow(1_024.0, 3)).rounded(.down))
   }()
 
-  public static let isAppleSilicon: Bool = {
+  nonisolated public static let isAppleSilicon: Bool = {
     #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
       var systeminfo = utsname()
       uname(&systeminfo)
@@ -403,7 +469,8 @@ nonisolated extension Process {
 
 // MARK: - Debouncer
 
-nonisolated public final class Debouncer {
+/// Debouncer 就職能來講哪怕釘死在 MainActor 上也是無所謂的。
+public final class Debouncer: @unchecked Sendable {
   // MARK: Lifecycle
 
   public init(delay: TimeInterval, queue: DispatchQueue) {
@@ -412,7 +479,9 @@ nonisolated public final class Debouncer {
   }
 
   deinit {
-    invalidate()
+    mainSync {
+      invalidate()
+    }
   }
 
   // MARK: Public
@@ -464,16 +533,39 @@ nonisolated public final class Debouncer {
 
 /// A simple NSMutex implementation using NSLock for macOS 10.9+ compatibility.
 /// Provides thread-safe access to a wrapped value.
-nonisolated public final class NSMutex<Value>: Sendable {
-  // MARK: Lifecycle
 
-  public init(_ value: Value) {
-    self.storedValue = value
+#if compiler(>=6.2)
+  nonisolated public final class NSMutex<Value>: @unchecked Sendable {
+    // MARK: Lifecycle
+
+    public init(_ value: Value) {
+      self.storedValue = value
+    }
+
+    // MARK: Private
+
+    nonisolated(unsafe) private var storedValue: Value
+    private let lock = NSLock()
   }
+#else
+  public final class NSMutex<Value>: @unchecked Sendable {
+    // MARK: Lifecycle
 
+    public init(_ value: Value) {
+      self.storedValue = value
+    }
+
+    // MARK: Private
+
+    nonisolated(unsafe) private var storedValue: Value
+    private let lock = NSLock()
+  }
+#endif
+
+extension NSMutex {
   // MARK: Public
 
-  public var value: Value {
+  nonisolated public var value: Value {
     get {
       withLock { $0 }
     }
@@ -483,27 +575,22 @@ nonisolated public final class NSMutex<Value>: Sendable {
   }
 
   /// Access the value with exclusive access (read and write).
-  public func withLock<Result>(_ body: (inout Value) throws -> Result) rethrows -> Result {
+  nonisolated public func withLock<Result>(_ body: (inout Value) throws -> Result) rethrows -> Result {
     try lock.withLock { try body(&storedValue) }
   }
 
   /// Read the value with exclusive access (read-only).
-  public func withLockRead<Result>(_ body: (Value) throws -> Result) rethrows -> Result {
+  nonisolated public func withLockRead<Result>(_ body: (Value) throws -> Result) rethrows -> Result {
     try lock.withLock { try body(storedValue) }
   }
-
-  // MARK: Private
-
-  nonisolated(unsafe) private var storedValue: Value
-  private let lock = NSLock()
 }
 
 // MARK: - CRC32
 
-nonisolated public enum CRC32 {
+public enum CRC32 {
   // MARK: Public
 
-  public static func checksum(data: Data) -> UInt32 {
+  nonisolated public static func checksum(data: Data) -> UInt32 {
     var crc: UInt32 = 0xFFFFFFFF
     data.forEach { byte in
       let index = Int((crc ^ UInt32(byte)) & 0xFF)
@@ -514,7 +601,7 @@ nonisolated public enum CRC32 {
 
   // MARK: Private
 
-  private static let table: [UInt32] = {
+  nonisolated private static let table: [UInt32] = {
     var table = [UInt32](repeating: 0, count: 256)
     let polynomial: UInt32 = 0xEDB88320
 
@@ -537,65 +624,176 @@ nonisolated public enum CRC32 {
 
 /// 一個簡單的顏色結構體，用於跨平台（包括 Linux）承載 HSBA 顏色值。
 /// 每個分量均為 Double 類型，範圍 0.0 ~ 1.0。
-nonisolated public struct HSBA: Sendable {
-  // MARK: Lifecycle
+#if compiler(>=6.2)
+  nonisolated public struct HSBA: Sendable {
+    // MARK: Lifecycle
 
-  /// 初期化 HSBA 顏色。
-  public init(hue: Double, saturation: Double, brightness: Double, alpha: Double = 1.0) {
-    self.hue = max(0.0, min(1.0, hue))
-    self.saturation = max(0.0, min(1.0, saturation))
-    self.brightness = max(0.0, min(1.0, brightness))
-    self.alpha = max(0.0, min(1.0, alpha))
+    /// 初期化 HSBA 顏色。
+    public init(hue: Double, saturation: Double, brightness: Double, alpha: Double = 1.0) {
+      self.hue = max(0.0, min(1.0, hue))
+      self.saturation = max(0.0, min(1.0, saturation))
+      self.brightness = max(0.0, min(1.0, brightness))
+      self.alpha = max(0.0, min(1.0, alpha))
+    }
+
+    // MARK: Public
+
+    public var hue: Double
+    public var saturation: Double
+    public var brightness: Double
+    public var alpha: Double
+  }
+#else
+  public struct HSBA: Sendable {
+    // MARK: Lifecycle
+
+    /// 初期化 HSBA 顏色。
+    public init(hue: Double, saturation: Double, brightness: Double, alpha: Double = 1.0) {
+      self.hue = max(0.0, min(1.0, hue))
+      self.saturation = max(0.0, min(1.0, saturation))
+      self.brightness = max(0.0, min(1.0, brightness))
+      self.alpha = max(0.0, min(1.0, alpha))
+    }
+
+    // MARK: Public
+
+    public var hue: Double
+    public var saturation: Double
+    public var brightness: Double
+    public var alpha: Double
+  }
+#endif
+
+// MARK: - FileHandle Backports (current-file only)
+
+// Apple artificially gated the modern FileHandle API names behind macOS 10.15 / 10.15.4.
+// Use @backDeployed to provide fallbacks on older Darwin via the legacy names.
+extension FileHandle {
+  nonisolated public final func read(upTo count: Int) throws -> Data? {
+    if #unavailable(macOS 10.15.4) {
+      let data = readData(ofLength: count)
+      return data.isEmpty ? nil : data
+    } else {
+      return try read(upToCount: count)
+    }
   }
 
-  // MARK: Public
+  nonisolated public final func seek(to offset: UInt64) throws {
+    if #unavailable(macOS 10.15.4) {
+      seek(toFileOffset: offset)
+    } else {
+      try seek(toOffset: offset)
+    }
+  }
 
-  public var hue: Double
-  public var saturation: Double
-  public var brightness: Double
-  public var alpha: Double
+  nonisolated public final func readToEndOfFile() throws -> Data? {
+    if #unavailable(macOS 10.15.4) {
+      let data = readDataToEndOfFile()
+      return data.isEmpty ? nil : data
+    } else {
+      return try readToEnd()
+    }
+  }
+
+  nonisolated public final func seekToEOF() throws -> UInt64 {
+    if #unavailable(macOS 10.15.4) {
+      return seekToEndOfFile()
+    } else {
+      return try seekToEnd()
+    }
+  }
+
+  nonisolated public final func writeData(_ data: Data) throws {
+    if #unavailable(macOS 10.15.4) {
+      return write(data)
+    } else {
+      return try write(contentsOf: data)
+    }
+  }
+
+  nonisolated public final func closeTheFile() throws {
+    if #unavailable(macOS 10.15) {
+      closeFile()
+    } else {
+      try close()
+    }
+  }
 }
 
 // MARK: - ByteLineIterator
 
-// Apple artificially gated the modern FileHandle API names behind macOS 10.15 / 10.15.4.
-// The macOS repo targets macOS 12+, where these modern names are directly available
-// from Foundation, so the shims below are unnecessary here and are kept only as a
-// commented-out stub for reference. Enabling them would redeclare the same API as
-// Foundation inside the SwiftExtension module, which makes cross-module call sites
-// (e.g. LexiconAssembly's LXConsolidator.checkPragma calling read(upToCount:)) hit
-// an overload ambiguity and fail to compile. The legacy repo (older deployment
-// targets) keeps these shims active.
-// #if canImport(Darwin)
-//   nonisolated extension FileHandle {
-//     @backDeployed(before: macOS 10.15)
-//     public final func read(upToCount count: Int) throws -> Data? {
-//       let data = readData(ofLength: count)
-//       return data.isEmpty ? nil : data
-//     }
-//
-//     @backDeployed(before: macOS 10.15)
-//     public final func seek(toOffset offset: UInt64) throws {
-//       seek(toFileOffset: offset)
-//     }
-//   }
-// #endif
-
 /// 以位元組為單位對檔案內容逐行迭代的迭代器。
 /// 以所有 Unicode 換行字元斷行（對齊 `CharacterSet.newlines`：U+000A–U+000D、U+0085、U+2028、U+2029；
 /// CRLF 視為單一斷行）；每行以 `ArraySlice<UInt8>` 零拷貝切片的形式回傳，不含斷行符號。
-nonisolated public final class ByteLineIterator {
-  // MARK: Lifecycle
+#if compiler(>=6.2)
+  nonisolated public final class ByteLineIterator {
+    // MARK: Lifecycle
 
-  public init(file: FileHandle, chunkSize: Int = 4_096) {
-    self.fileHandle = file
-    self.chunkSize = chunkSize
+    nonisolated public init(file: FileHandle, chunkSize: Int = 4_096) {
+      self.fileHandle = file
+      self.chunkSize = chunkSize
+    }
+
+    // MARK: Private
+
+    private let fileHandle: FileHandle
+    private let chunkSize: Int
+    private var buffer: [UInt8] = []
+    private var consumed = 0
+    private var atEof = false
+
+    /// 擷取 `[consumed, lineEnd)` 作為一行，並將已消費位置推過斷行符。
+    private func harvestLine(upTo lineEnd: Int, consuming delimiterLength: Int) -> ArraySlice<UInt8> {
+      let line = buffer[consumed ..< lineEnd]
+      consumed = lineEnd + delimiterLength
+      if consumed == buffer.count {
+        buffer.removeAll(keepingCapacity: true)
+        consumed = 0
+      }
+      return line
+    }
+  }
+#else
+  public final class ByteLineIterator {
+    // MARK: Lifecycle
+
+    nonisolated public init(file: FileHandle, chunkSize: Int = 4_096) {
+      self.fileHandle = file
+      self.chunkSize = chunkSize
+    }
+
+    // MARK: Private
+
+    private let fileHandle: FileHandle
+    private let chunkSize: Int
+    private var buffer: [UInt8] = []
+    private var consumed = 0
+    private var atEof = false
+
+    /// 擷取 `[consumed, lineEnd)` 作為一行，並將已消費位置推過斷行符。
+    private func harvestLine(upTo lineEnd: Int, consuming delimiterLength: Int) -> ArraySlice<UInt8> {
+      let line = buffer[consumed ..< lineEnd]
+      consumed = lineEnd + delimiterLength
+      if consumed == buffer.count {
+        buffer.removeAll(keepingCapacity: true)
+        consumed = 0
+      }
+      return line
+    }
+  }
+#endif
+
+// MARK: - ByteLineIterator + Sequence
+
+extension ByteLineIterator: Sequence {
+  nonisolated public func makeIterator() -> AnyIterator<ArraySlice<UInt8>> {
+    AnyIterator {
+      self.nextLine()
+    }
   }
 
-  // MARK: Public
-
   /// 取出下一行（不含斷行符號）；EOF 時回傳 nil。
-  public func nextLine() -> ArraySlice<UInt8>? {
+  nonisolated public func nextLine() -> ArraySlice<UInt8>? {
     var scan = consumed
     while true {
       scanLoop: while scan < buffer.count {
@@ -642,40 +840,11 @@ nonisolated public final class ByteLineIterator {
         return harvestLine(upTo: buffer.count, consuming: 0)
       }
       // 讀取下一個資料塊；讀取失敗或讀到空內容時視為 EOF。
-      guard let nextChunk = try? fileHandle.read(upToCount: chunkSize), !nextChunk.isEmpty else {
+      guard let nextChunk = try? fileHandle.read(upTo: chunkSize), !nextChunk.isEmpty else {
         atEof = true
         continue
       }
       buffer.append(contentsOf: nextChunk)
-    }
-  }
-
-  // MARK: Private
-
-  private let fileHandle: FileHandle
-  private let chunkSize: Int
-  private var buffer: [UInt8] = []
-  private var consumed = 0
-  private var atEof = false
-
-  /// 擷取 `[consumed, lineEnd)` 作為一行，並將已消費位置推過斷行符。
-  private func harvestLine(upTo lineEnd: Int, consuming delimiterLength: Int) -> ArraySlice<UInt8> {
-    let line = buffer[consumed ..< lineEnd]
-    consumed = lineEnd + delimiterLength
-    if consumed == buffer.count {
-      buffer.removeAll(keepingCapacity: true)
-      consumed = 0
-    }
-    return line
-  }
-}
-
-// MARK: Sequence
-
-nonisolated extension ByteLineIterator: Sequence {
-  public func makeIterator() -> AnyIterator<ArraySlice<UInt8>> {
-    AnyIterator {
-      self.nextLine()
     }
   }
 }
