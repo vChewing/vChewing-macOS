@@ -560,7 +560,10 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
 
     guard let cellIndex = findCell(from: event) else {
       isDraggingWindow = true
-      window?.performDrag(with: event)
+      // `performDrag(with:)` 起於 macOS 10.11；10.10 無對位 API，該分支留空，不另行改寫拖曳行為。
+      if #unavailable(macOS 10.11) {} else {
+        window?.performDrag(with: event)
+      }
       return
     }
     guard cellIndex != thePool.highlightedIndex else { return }
@@ -752,24 +755,30 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
 
 // MARK: - Debug Module Using Swift UI.
 
-import SwiftUI
+// 本段為 SwiftUI 專屬（preview 用的 `NSViewRepresentable` 包裝；legacy 倉庫無對位模組可繼承）；
+// 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」整段圈進 compiler condition，<6.2 分支不提供替代實作。
+#if compiler(>=6.2)
 
-// MARK: - GSI4AppKit.VwrCandidateGSI4SwiftUI
+  import SwiftUI
 
-extension GSI4AppKit {
-  @available(macOS 10.15, *)
-  struct VwrCandidateGSI4SwiftUI: NSViewRepresentable {
-    weak var controller: CtlCandidateGSI4AppKit?
-    var thePool: TDK4AppKit.CandidatePool4AppKit
+  // MARK: - GSI4AppKit.VwrCandidateGSI4SwiftUI
 
-    func makeNSView(context _: Context) -> VwrCandidateGSI4AppKit {
-      let nsView = VwrCandidateGSI4AppKit(thePool: thePool)
-      nsView.controller = controller
-      return nsView
+  extension GSI4AppKit {
+    @available(macOS 10.15, *)
+    struct VwrCandidateGSI4SwiftUI: NSViewRepresentable {
+      weak var controller: CtlCandidateGSI4AppKit?
+      var thePool: TDK4AppKit.CandidatePool4AppKit
+
+      func makeNSView(context _: Context) -> VwrCandidateGSI4AppKit {
+        let nsView = VwrCandidateGSI4AppKit(thePool: thePool)
+        nsView.controller = controller
+        return nsView
+      }
+
+      func updateNSView(_ nsView: VwrCandidateGSI4AppKit, context _: Context) {
+        nsView.thePool = thePool
+      }
     }
+  } // extension TDK4AppKit
 
-    func updateNSView(_ nsView: VwrCandidateGSI4AppKit, context _: Context) {
-      nsView.thePool = thePool
-    }
-  }
-} // extension TDK4AppKit
+#endif

@@ -280,24 +280,30 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
 
 // MARK: - Debug Module Using Swift UI.
 
-import SwiftUI
+// 本段為 SwiftUI 專屬（preview 用的 `NSViewRepresentable` 包裝；legacy 倉庫無對位模組可繼承）；
+// 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」整段圈進 compiler condition，<6.2 分支不提供替代實作。
+#if compiler(>=6.2)
 
-// MARK: - TDK4AppKit.VwrCandidateTDK4SwiftUI
+  import SwiftUI
 
-extension TDK4AppKit {
-  @available(macOS 10.15, *)
-  struct VwrCandidateTDK4SwiftUI: NSViewRepresentable {
-    weak var controller: CtlCandidateTDK4AppKit?
-    var thePool: CandidatePool4AppKit
+  // MARK: - TDK4AppKit.VwrCandidateTDK4SwiftUI
 
-    func makeNSView(context _: Context) -> VwrCandidateTDK4AppKit {
-      let nsView = VwrCandidateTDK4AppKit(thePool: thePool)
-      nsView.controller = controller
-      return nsView
+  extension TDK4AppKit {
+    @available(macOS 10.15, *)
+    struct VwrCandidateTDK4SwiftUI: NSViewRepresentable {
+      weak var controller: CtlCandidateTDK4AppKit?
+      var thePool: CandidatePool4AppKit
+
+      func makeNSView(context _: Context) -> VwrCandidateTDK4AppKit {
+        let nsView = VwrCandidateTDK4AppKit(thePool: thePool)
+        nsView.controller = controller
+        return nsView
+      }
+
+      func updateNSView(_ nsView: VwrCandidateTDK4AppKit, context _: Context) {
+        nsView.thePool = thePool
+      }
     }
+  } // extension TDK4AppKit
 
-    func updateNSView(_ nsView: VwrCandidateTDK4AppKit, context _: Context) {
-      nsView.thePool = thePool
-    }
-  }
-} // extension TDK4AppKit
+#endif
