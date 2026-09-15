@@ -189,12 +189,22 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     window?.setIsVisible(true)
   }
 
-  nonisolated public func hide() {
-    mainSync {
-      self.compositionView.prepareForHide()
-      self.window?.orderOut(nil)
+  // 6.2 側的 `mainSync` 收 `@MainActor` 閉包，故 `nonisolated` 的 `hide()` 可自其中觸及 MainActor 成員；
+  // 5.10 側的 `mainSync` 收非隔離閉包，而 `prepareForHide()` 屬 MainActor 成員，故該側採 legacy 的寫法
+  // （`hide()` 不標 `nonisolated`，直接於其 body 內呼叫——與 `vChewing-OSX-Legacy` 逐字相同）。
+  #if compiler(>=6.2)
+    nonisolated public func hide() {
+      mainSync {
+        self.compositionView.prepareForHide()
+        self.window?.orderOut(nil)
+      }
     }
-  }
+  #else
+    public func hide() {
+      compositionView.prepareForHide()
+      window?.orderOut(nil)
+    }
+  #endif
 
   // MARK: Internal
 
