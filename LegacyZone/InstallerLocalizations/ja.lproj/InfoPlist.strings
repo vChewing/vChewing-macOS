@@ -1,0 +1,3 @@
+/* Localized versions of Info.plist keys — legacy distro overrides only. */
+
+CFBundleName = "唯音入力 紀念版 実装用アプリ";

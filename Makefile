@@ -64,6 +64,157 @@ build510:
 clean510:
 	cd ./Packages/ && make clean510-all --file=./Makefile
 
+# ── Swift 5.10 (legacy) build entry point: the repo-root package ─────
+#
+# `Package@swift-5.10.swift` at the repo root is the one 5.10 manifest that produces executables
+# (`vChewing`, `vChewingInstallerLegacy`); the subpackages stop at static `.a`. Its scratch lives
+# under `.build/.legacy-root`, which the `spmClean` loop above already sweeps.
+#
+# `DEVELOPER_DIR` is pinned because `--sdk` does not reach build-plugin compilation: with a newer
+# Xcode active, the 5.10 compiler is handed its macOS 27 SDK and dies on
+# `could not build Objective-C module 'Foundation'`.
+#
+# C／ObjC 靶（`IMKSwiftModernHeaders`／`OSFrameworkImplViaObjC`／`SwiftyCapsLockToggler`）另須 `-Xcc -target`：
+# `-Xswiftc -target` 只管 Swift，clang 端仍照 SwiftPM 的地板產出（`ld: warning: object file … was built for
+# newer 'macOS' version (10.13) than being linked (10.9)`）；而 `-Xcc -mmacosx-version-min=…` 會被 SwiftPM
+# 自己那條 `-target …10.13` 壓住（clang 讓 `-target` 勝、與先後無關），故必須再下一條 `-target` 覆蓋
+# （同一個 `-target` 後出現者勝——與 Swift 側同一個道理）。
+#
+# The two executables still have to be re-pointed at the back-deployment Swift runtime afterwards
+# (they ship `@rpath/libswift*.dylib` records and macOS 10.9 has no Swift runtime of its own).
+# `BundleAppsLegacy` (declared only in the 5.10 manifest) does that and then assembles the two
+# `.app` bundles; `make bundleLegacy` runs it with the same Xcode 15 active.
+
+# Swift 5.10.1 can live in either toolchain directory: the official installer writes to `/Library`,
+# while `swiftly` manages its own set under `$HOME`. Both are the same release and carry the same
+# bundle identifier, so having both present at once makes Xcode refuse to register either and
+# every `xcodebuild` fails before it parses a single package. Prefer the system-wide copy — it is
+# the one the official installer put there and it survives a `swiftly` uninstall — and fall back to
+# the user-space one, so that removing either directory (the only way out of that Xcode conflict)
+# does not also brick this target.
+LEGACY_TOOLCHAIN ?= $(firstword $(wildcard \
+	/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
+	$(HOME)/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
+	))
+LEGACY_SDK ?= /Applications/Xcode-15.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk
+LEGACY_XCODE ?= /Applications/Xcode-15.app/Contents/Developer
+LEGACY_X86_TRIPLE ?= x86_64-apple-macosx10.9
+LEGACY_ARM_TRIPLE ?= arm64-apple-macosx11.0
+LEGACY_SCRATCH_ROOT ?= .build/.legacy-root
+LEGACY_CONFIG ?= debug
+LEGACY_ARCLITE ?= ./LegacyZone/ARCLite/libarclite_macosx.a
+LEGACY_BUILD_FLAGS = --package-path . --scratch-path "$(LEGACY_SCRATCH_ROOT)" --sdk "$(LEGACY_SDK)"
+# 鏈結期的 `-platform_version <platform> <min> <sdk>`。SwiftPM 5.10 不認得 `--sdk`，會把 triple 的版本段
+# **同時**填進 min 與 sdk 兩格，於是產物之 `LC_VERSION_MIN_MACOSX` 記成 `version 10.9 sdk 10.9`——而實情
+# 是以 13.3 的 SDK 鏈結的（`--sdk` 有生效，只是沒寫進這個欄位）。
+#
+# `sdk` 那一格不是裝飾：AppKit 用它判定「這個 app 是不是以 10.14 之後的 SDK 鏈出的」，據此決定要不要把
+# app 鎖進 Aqua 外觀。填成 10.9 的後果實測為：`vChewingInstallerLegacy` 沒有暗色模式；而 `vChewing.app`
+# 倖免，只因它的 Info.plist 另帶 `NSRequiresAquaSystemAppearance = No`（見
+# `Sources/vChewingIME_macOS/Resources/Info.plist`），安裝程式的來源 plist 沒有這一鍵。
+# 補上本旗標後兩支都記成 `sdk 13.3`，與 `vChewing-OSX-legacy` 以 Xcode 15.4 建出的參照產物一致。
+#
+# 版本值取自 `$(LEGACY_SDK)` 自己的 `SDKSettings.plist`，故換 SDK 不必另改一處。後出現者勝（同 `-target`
+# 之理），SwiftPM 自己那條會被本旗標覆寫。
+LEGACY_SDK_VERSION ?= $(shell /usr/libexec/PlistBuddy -c 'Print :Version' "$(LEGACY_SDK)/SDKSettings.plist" 2>/dev/null)
+LEGACY_PLATFORM_VERSION_FLAG = $(if $(LEGACY_SDK_VERSION),-Xlinker -platform_version -Xlinker macos -Xlinker $(1) -Xlinker $(LEGACY_SDK_VERSION))
+# 兩個架構的產物目錄：SwiftPM 收 `--triple x86_64-apple-macosx10.9` 之後，目錄名會把版本段去掉
+# （`x86_64-apple-macosx`）；`bundle-apps-legacy` 找的是產物，故須用這個名字。universal 產物就地覆寫
+# x86_64 那一份，故這裡對 debug 與 release 一體適用。
+LEGACY_X86_DIR ?= $(LEGACY_SCRATCH_ROOT)/x86_64-apple-macosx/$(LEGACY_CONFIG)
+LEGACY_ARM_DIR ?= $(LEGACY_SCRATCH_ROOT)/arm64-apple-macosx/$(LEGACY_CONFIG)
+LEGACY_PRODUCTS_DIR ?= $(LEGACY_X86_DIR)
+
+.PHONY: debugLegacy releaseLegacy cleanLegacy bundleLegacy lexiconLegacy
+
+# debug：單一 x86_64 slice。可動，但未最佳化、執行起來處處遲滯（辭典載入尤甚）——要試用請走
+# `releaseLegacy`。收尾自動組 bundle（config=debug）。
+debugLegacy: LEGACY_CONFIG := debug
+debugLegacy:
+	@export LC_ALL=C; export DEVELOPER_DIR="$(LEGACY_XCODE)"; set -e; \
+	echo "Building vChewingIME at the repo root with Swift 5.10 ($(LEGACY_CONFIG), $(LEGACY_X86_TRIPLE))…"; \
+	"$(LEGACY_TOOLCHAIN)/usr/bin/swift" build $(LEGACY_BUILD_FLAGS) \
+		--configuration "$(LEGACY_CONFIG)" \
+		--triple "$(LEGACY_X86_TRIPLE)" \
+		-Xswiftc -target -Xswiftc "$(LEGACY_X86_TRIPLE)" \
+		-Xcc -target -Xcc "$(LEGACY_X86_TRIPLE)" \
+		$(call LEGACY_PLATFORM_VERSION_FLAG,$(patsubst x86_64-apple-macosx%,%,$(LEGACY_X86_TRIPLE))) \
+		-Xlinker -force_load -Xlinker "$(LEGACY_ARCLITE)"; \
+	$(MAKE) bundleLegacy LEGACY_CONFIG=debug
+
+# release：兩個 slice 各自建置後 lipo 成 universal 產物（Apple silicon 亦得跑）。
+#
+#   x86_64-apple-macosx10.9   — legacy 那一支，另 force-load libArcLite（見下）
+#   arm64-apple-macosx11.0    — Apple silicon。arm64 沒有 11.0 以下的 macOS，且其 ARC 執行期自
+#                               macOS 11 起即在 libobjc 內，故**不摻** libArcLite——該 archive 本身
+#                               只有 x86_64 一個 slice，硬摻會直接令 arm64 連結失敗。
+#
+# 兩支的產物各落自己的 triple 目錄；lipo 之結果**就地覆寫 x86_64 那一份**，故 `LEGACY_PRODUCTS_DIR`
+# 與 `bundleLegacy` 無須為 universal 另立一套路徑。**收尾自行組 bundle**（`bundleLegacy LEGACY_CONFIG=release`）：
+# 從前得手動再接一句 `make bundleLegacy`，而那個目標的預設 config 是 `debug`——實測踩過一次
+# 「release 建完卻把 debug 產物包進 .app」（辭典載入慢十幾倍）。`debugLegacy` 亦然（config=debug）。
+releaseLegacy: LEGACY_CONFIG := release
+releaseLegacy:
+	@export LC_ALL=C; export DEVELOPER_DIR="$(LEGACY_XCODE)"; set -e; \
+	echo "Building vChewingIME at the repo root with Swift 5.10 ($(LEGACY_CONFIG), $(LEGACY_X86_TRIPLE))…"; \
+	"$(LEGACY_TOOLCHAIN)/usr/bin/swift" build $(LEGACY_BUILD_FLAGS) \
+		--configuration "$(LEGACY_CONFIG)" \
+		--triple "$(LEGACY_X86_TRIPLE)" \
+		-Xswiftc -target -Xswiftc "$(LEGACY_X86_TRIPLE)" \
+		-Xcc -target -Xcc "$(LEGACY_X86_TRIPLE)" \
+		$(call LEGACY_PLATFORM_VERSION_FLAG,$(patsubst x86_64-apple-macosx%,%,$(LEGACY_X86_TRIPLE))) \
+		-Xlinker -force_load -Xlinker "$(LEGACY_ARCLITE)"; \
+	echo "Building vChewingIME at the repo root with Swift 5.10 ($(LEGACY_CONFIG), $(LEGACY_ARM_TRIPLE))…"; \
+	"$(LEGACY_TOOLCHAIN)/usr/bin/swift" build $(LEGACY_BUILD_FLAGS) \
+		--configuration "$(LEGACY_CONFIG)" \
+		--triple "$(LEGACY_ARM_TRIPLE)" \
+		-Xswiftc -target -Xswiftc "$(LEGACY_ARM_TRIPLE)" \
+		-Xcc -target -Xcc "$(LEGACY_ARM_TRIPLE)" \
+		$(call LEGACY_PLATFORM_VERSION_FLAG,$(patsubst arm64-apple-macosx%,%,$(LEGACY_ARM_TRIPLE))); \
+	for exe in vChewing vChewingInstallerLegacy; do \
+		echo "Merging $$exe into a universal binary…"; \
+		lipo -create "$(LEGACY_ARM_DIR)/$$exe" "$(LEGACY_X86_DIR)/$$exe" -output "$(LEGACY_X86_DIR)/$$exe.universal"; \
+		mv -f "$(LEGACY_X86_DIR)/$$exe.universal" "$(LEGACY_X86_DIR)/$$exe"; \
+		lipo -archs "$(LEGACY_X86_DIR)/$$exe"; \
+	done; \
+	$(MAKE) bundleLegacy LEGACY_CONFIG=release
+
+# Assembles the two legacy `.app` bundles under `Build/Products/Legacy/` — `vChewing.app` (the IME)
+# and `vChewingInstallerLegacy.app` (the installer, embedding the IME).  Runs with Xcode 15 active
+# like the two build targets: the plugin itself is compiled by the host SDK, and `actool` is taken
+# from the active developer directory.
+#
+# It assembles whichever configuration `LEGACY_CONFIG` names (default `debug`).  Both build targets
+# already call it with their own configuration, so it only needs naming explicitly when assembling a
+# set by hand — `make bundleLegacy LEGACY_CONFIG=release`.  Naming the configuration matters: the
+# debug and release product trees sit side by side and each target overwrites `Build/Products/Legacy/`,
+# so getting it wrong silently ships unoptimised binaries.
+#
+# `LexiconBuildTrigger` has to have run first.  The 5.10 root manifest carries no lexicon
+# dependency (its plugin products require macOS 10.15), so the factory lexicon and the two
+# associated-phrase templates come from that separate package instead.  `lexiconLegacy` below runs
+# it for you — both build targets end by calling this target, so nothing needs doing by hand.
+bundleLegacy: lexiconLegacy
+	@export LC_ALL=C; export DEVELOPER_DIR="$(LEGACY_XCODE)"; \
+	echo "Assembling the legacy .app bundles from $(LEGACY_PRODUCTS_DIR)…"; \
+	"$(LEGACY_TOOLCHAIN)/usr/bin/swift" package \
+		--package-path . \
+		--scratch-path "$(LEGACY_SCRATCH_ROOT)" \
+		--allow-writing-to-package-directory bundle-apps-legacy \
+		-- --build-dir "$(LEGACY_PRODUCTS_DIR)" --sdk "$(LEGACY_SDK)"
+
+# 產出並集中辭典資產（原廠辭典 `.txtMap` ＋ 兩份使用者片語範本）。它是 `bundleLegacy` 的必經前置，
+# 故 `debugLegacy`／`releaseLegacy` 一併自動滿足；單獨跑 `make -C LegacyZone/LexiconBuildTrigger
+# build510 collect` 仍然可行，`bundleLegacy` 之 plugin 在資產缺席時也會明示這句話。
+# 該套件以 `LEXICON_CONFIG`（預設 release）建置——辭典產製 CPU 密集，debug 產物慢上許多。該變數名與
+# 本檔的 `LEGACY_CONFIG` 刻意不同：後者指 *app* 的 config，且會以 target-specific 變數外洩到 sub-make，
+# 同名會讓 `make debugLegacy` 把詞典建置一起拖回 debug。
+lexiconLegacy:
+	@$(MAKE) --no-print-directory -C LegacyZone/LexiconBuildTrigger build510 collect
+
+cleanLegacy:
+	@rm -rf "$(LEGACY_SCRATCH_ROOT)" ./Build/Products/Legacy
+
 # ── App Bundle Assembly (via SwiftPM CommandPlugin) ──────────────────
 
 UNIVERSAL_DIR := .build/universal-release

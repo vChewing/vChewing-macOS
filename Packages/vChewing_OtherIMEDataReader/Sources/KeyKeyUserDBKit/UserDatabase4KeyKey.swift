@@ -436,177 +436,184 @@ extension KeyKeyUserDBKit.UserDatabase: Sequence {
 
 // MARK: - KeyKeyUserDBKit.UserDatabase.AsyncGramSequence
 
-#if canImport(Darwin)
-  @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
-#endif
-extension KeyKeyUserDBKit.UserDatabase {
-  /// 取得非同步序列，用於在 async 環境中迭代資料庫
-  ///
-  /// 使用範例：
-  /// ```swift
-  /// for await gram in db.async {
-  ///     print(gram.current)
-  /// }
-  /// ```
-  public var async: AsyncGramSequence {
-    AsyncGramSequence(database: self)
-  }
-
-  /// 用於非同步迭代資料庫中所有 Gram 的序列
-  public struct AsyncGramSequence: AsyncSequence {
-    // MARK: Public
-
-    public typealias Element = KeyKeyUserDBKit.KeyKeyGram
-
-    public func makeAsyncIterator() -> AsyncGramIterator {
-      AsyncGramIterator(database: database)
+// 非同步迭代需要 macOS 10.15 起的 concurrency 執行期，而 Swift 5.10 靜態路徑的部署目標是 10.9，
+// 該路徑下也沒有任何呼叫端（唯一的消費者是測試，而測試不對 5.10 開放）。整塊因此以編譯器世代分流排除：
+// 只要 `next() async` 留在譯文裡，每一份 `.a` 的未定符號表都會記上 `swift_task_switch`，
+// 執行檔便被迫背著 `@rpath/libswift_Concurrency.dylib` 這條載入記錄——10.9 上並無該執行期。
+#if compiler(>=6.2)
+  #if canImport(Darwin)
+    @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
+  #endif
+  extension KeyKeyUserDBKit.UserDatabase {
+    /// 取得非同步序列，用於在 async 環境中迭代資料庫
+    ///
+    /// 使用範例：
+    /// ```swift
+    /// for await gram in db.async {
+    ///     print(gram.current)
+    /// }
+    /// ```
+    public var async: AsyncGramSequence {
+      AsyncGramSequence(database: self)
     }
 
-    // MARK: Fileprivate
+    /// 用於非同步迭代資料庫中所有 Gram 的序列
+    public struct AsyncGramSequence: AsyncSequence {
+      // MARK: Public
 
-    fileprivate let database: KeyKeyUserDBKit.UserDatabase
-  }
+      public typealias Element = KeyKeyUserDBKit.KeyKeyGram
 
-  /// 用於非同步逐行迭代資料庫中所有 Gram 的迭代器
-  public final class AsyncGramIterator: AsyncIteratorProtocol {
-    // MARK: Lifecycle
+      public func makeAsyncIterator() -> AsyncGramIterator {
+        AsyncGramIterator(database: database)
+      }
 
-    fileprivate init(database: KeyKeyUserDBKit.UserDatabase) {
-      self.database = database
-      self.iteratorQueue = DispatchQueue(label: "AsyncGramIterator.\(UUID().uuidString)")
-      self._phase = .unigrams
-      self._currentStatement = nil
+      // MARK: Fileprivate
+
+      fileprivate let database: KeyKeyUserDBKit.UserDatabase
     }
 
-    deinit {
-      cleanupCurrentStatement()
-    }
+    /// 用於非同步逐行迭代資料庫中所有 Gram 的迭代器
+    public final class AsyncGramIterator: AsyncIteratorProtocol {
+      // MARK: Lifecycle
 
-    // MARK: Public
+      fileprivate init(database: KeyKeyUserDBKit.UserDatabase) {
+        self.database = database
+        self.iteratorQueue = DispatchQueue(label: "AsyncGramIterator.\(UUID().uuidString)")
+        self._phase = .unigrams
+        self._currentStatement = nil
+      }
 
-    public typealias Element = KeyKeyUserDBKit.KeyKeyGram
+      deinit {
+        cleanupCurrentStatement()
+      }
 
-    public func next() async -> KeyKeyUserDBKit.KeyKeyGram? {
-      iteratorQueue.sync {
-        while true {
-          // 如果還沒有 statement，就準備下一個 phase 的 statement
-          if _currentStatement == nil {
-            do {
-              try prepareNextPhase()
-            } catch {
-              return nil
-            }
-            // 如果 phase 已經結束
+      // MARK: Public
+
+      public typealias Element = KeyKeyUserDBKit.KeyKeyGram
+
+      public func next() async -> KeyKeyUserDBKit.KeyKeyGram? {
+        iteratorQueue.sync {
+          while true {
+            // 如果還沒有 statement，就準備下一個 phase 的 statement
             if _currentStatement == nil {
-              return nil
+              do {
+                try prepareNextPhase()
+              } catch {
+                return nil
+              }
+              // 如果 phase 已經結束
+              if _currentStatement == nil {
+                return nil
+              }
             }
-          }
 
-          // 嘗試從當前 statement 讀取下一行
-          guard let statement = _currentStatement else { return nil }
+            // 嘗試從當前 statement 讀取下一行
+            guard let statement = _currentStatement else { return nil }
 
-          let result = database.stepStatement(statement)
-          if result == SQLITE_ROW {
-            return mapCurrentRow(statement: statement)
-          } else {
-            // 當前 phase 結束，清理並進入下一個 phase
-            cleanupCurrentStatementUnsafe()
-            advancePhase()
-            // 繼續迴圈以嘗試下一個 phase
+            let result = database.stepStatement(statement)
+            if result == SQLITE_ROW {
+              return mapCurrentRow(statement: statement)
+            } else {
+              // 當前 phase 結束，清理並進入下一個 phase
+              cleanupCurrentStatementUnsafe()
+              advancePhase()
+              // 繼續迴圈以嘗試下一個 phase
+            }
           }
         }
       }
-    }
 
-    // MARK: Private
+      // MARK: Private
 
-    private enum Phase: Sendable {
-      case unigrams
-      case bigrams
-      case candidateOverrides
-      case done
-    }
-
-    private let database: KeyKeyUserDBKit.UserDatabase
-    private let iteratorQueue: DispatchQueue
-    private nonisolated(unsafe) var _phase: Phase
-    private nonisolated(unsafe) var _currentStatement: OpaquePointer?
-
-    private func prepareNextPhase() throws {
-      switch _phase {
-      case .unigrams:
-        let sql = "SELECT qstring, current, probability FROM user_unigrams"
-        _currentStatement = try database.prepareStatement(sql: sql)
-      case .bigrams:
-        let sql = "SELECT qstring, previous, current FROM user_bigram_cache"
-        _currentStatement = try database.prepareStatement(sql: sql)
-      case .candidateOverrides:
-        let sql = "SELECT qstring, current FROM user_candidate_override_cache"
-        _currentStatement = try database.prepareStatement(sql: sql)
-      case .done:
-        _currentStatement = nil
+      private enum Phase: Sendable {
+        case unigrams
+        case bigrams
+        case candidateOverrides
+        case done
       }
-    }
 
-    private func mapCurrentRow(statement: OpaquePointer) -> KeyKeyUserDBKit.KeyKeyGram {
-      switch _phase {
-      case .unigrams:
-        let qstring = String(cString: sqlite3_column_text(statement, 0))
-        let current = String(cString: sqlite3_column_text(statement, 1))
-        let probability = sqlite3_column_double(statement, 2)
-        let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, probability: probability)
+      private let database: KeyKeyUserDBKit.UserDatabase
+      private let iteratorQueue: DispatchQueue
+      private nonisolated(unsafe) var _phase: Phase
+      private nonisolated(unsafe) var _currentStatement: OpaquePointer?
 
-      case .bigrams:
-        let qstring = String(cString: sqlite3_column_text(statement, 0))
-        let previous = String(cString: sqlite3_column_text(statement, 1))
-        let current = String(cString: sqlite3_column_text(statement, 2))
-        let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, previous: previous)
-
-      case .candidateOverrides:
-        let qstring = String(cString: sqlite3_column_text(statement, 0))
-        let current = String(cString: sqlite3_column_text(statement, 1))
-        let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.KeyKeyGram(
-          keyArray: keyArray,
-          current: current,
-          probability: KeyKeyUserDBKit.UserDatabase.candidateOverrideProbability,
-          isCandidateOverride: true
-        )
-
-      case .done:
-        fatalError("Should not map row in done phase")
+      private func prepareNextPhase() throws {
+        switch _phase {
+        case .unigrams:
+          let sql = "SELECT qstring, current, probability FROM user_unigrams"
+          _currentStatement = try database.prepareStatement(sql: sql)
+        case .bigrams:
+          let sql = "SELECT qstring, previous, current FROM user_bigram_cache"
+          _currentStatement = try database.prepareStatement(sql: sql)
+        case .candidateOverrides:
+          let sql = "SELECT qstring, current FROM user_candidate_override_cache"
+          _currentStatement = try database.prepareStatement(sql: sql)
+        case .done:
+          _currentStatement = nil
+        }
       }
-    }
 
-    private func advancePhase() {
-      switch _phase {
-      case .unigrams:
-        _phase = .bigrams
-      case .bigrams:
-        _phase = .candidateOverrides
-      case .candidateOverrides:
-        _phase = .done
-      case .done:
-        break
+      private func mapCurrentRow(statement: OpaquePointer) -> KeyKeyUserDBKit.KeyKeyGram {
+        switch _phase {
+        case .unigrams:
+          let qstring = String(cString: sqlite3_column_text(statement, 0))
+          let current = String(cString: sqlite3_column_text(statement, 1))
+          let probability = sqlite3_column_double(statement, 2)
+          let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
+          return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, probability: probability)
+
+        case .bigrams:
+          let qstring = String(cString: sqlite3_column_text(statement, 0))
+          let previous = String(cString: sqlite3_column_text(statement, 1))
+          let current = String(cString: sqlite3_column_text(statement, 2))
+          let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
+          return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, previous: previous)
+
+        case .candidateOverrides:
+          let qstring = String(cString: sqlite3_column_text(statement, 0))
+          let current = String(cString: sqlite3_column_text(statement, 1))
+          let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
+          return KeyKeyUserDBKit.KeyKeyGram(
+            keyArray: keyArray,
+            current: current,
+            probability: KeyKeyUserDBKit.UserDatabase.candidateOverrideProbability,
+            isCandidateOverride: true
+          )
+
+        case .done:
+          fatalError("Should not map row in done phase")
+        }
       }
-    }
 
-    private nonisolated func cleanupCurrentStatement() {
-      iteratorQueue.sync {
-        cleanupCurrentStatementUnsafe()
+      private func advancePhase() {
+        switch _phase {
+        case .unigrams:
+          _phase = .bigrams
+        case .bigrams:
+          _phase = .candidateOverrides
+        case .candidateOverrides:
+          _phase = .done
+        case .done:
+          break
+        }
       }
-    }
 
-    private nonisolated func cleanupCurrentStatementUnsafe() {
-      if let statement = _currentStatement {
-        database.finalizeStatement(statement)
-        _currentStatement = nil
+      private nonisolated func cleanupCurrentStatement() {
+        iteratorQueue.sync {
+          cleanupCurrentStatementUnsafe()
+        }
+      }
+
+      private nonisolated func cleanupCurrentStatementUnsafe() {
+        if let statement = _currentStatement {
+          database.finalizeStatement(statement)
+          _currentStatement = nil
+        }
       }
     }
   }
-}
+
+#endif
 
 // MARK: - KeyKeyUserDBKit.DatabaseError
 

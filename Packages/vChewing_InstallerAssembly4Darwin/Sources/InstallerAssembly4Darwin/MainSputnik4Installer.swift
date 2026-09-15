@@ -16,15 +16,21 @@ public final class MainSputnik4Installer {
   // MARK: Public
 
   // `async` 所需的 concurrency 執行期起於 macOS 10.15，故標註其可用性下限（呼叫端為 12+ 的 SwiftUI 安裝程式）。
-  @available(macOS 10.15, *)
-  public static func asyncInit() async -> MainSputnik4Installer {
-    MainSputnik4Installer()
-  }
-
-  public func runNSApp(isLegacyDistro: Bool? = nil) {
-    if let isLegacyDistro {
-      AppInstallerDelegate.shared.isLegacyDistro = isLegacyDistro
+  //
+  // 整支再以編譯器世代分流：5.10 側的入口是純同步的 `MainSputnik4Installer()`，用不到這一支；留著它只會讓
+  // `InstallerAssembly4Darwin` 的譯文去引用 `swift_async_extendedFramePointerFlags`，把
+  // `@rpath/libswift_Concurrency.dylib` 寫進執行檔的載入記錄——10.9 上並無該執行期。
+  #if compiler(>=6.2)
+    @available(macOS 10.15, *)
+    public static func asyncInit() async -> MainSputnik4Installer {
+      MainSputnik4Installer()
     }
+  #endif
+
+  /// `isLegacyDistro` **只認 `@main` 階段（各倉之 `Installer/main.swift` 一類入口）在此明示傳入的值**：
+  /// 同一份安裝程式既可能出成現代發行版、也可能出成 legacy 發行版，故不由 bundle ID 之類的線索猜測。
+  public func runNSApp(isLegacyDistro: Bool) {
+    AppInstallerDelegate.shared.isLegacyDistro = isLegacyDistro
     // SwiftUI 版安裝程式僅存在於 6.2 側；5.10 側一律走 AppKit 版——與 `vChewing-OSX-Legacy` 的安裝程式一致
     // （該倉無 SwiftUI 版，其 `main.swift` 即直接呼叫 `runNSApp(isLegacyDistro: true)`）。
     #if compiler(>=6.2)
@@ -52,11 +58,10 @@ public final class MainSputnik4Installer {
 
 @objc(AppDelegate)
 final class AppInstallerDelegate: NSObject, NSApplicationDelegate {
-  // MARK: Internal
-
   static let shared = AppInstallerDelegate()
 
-  var isLegacyDistro = isMainBundleMarkedAsLegacy()
+  /// 由 `@main` 階段以 `runNSApp(isLegacyDistro:)` 明示填入；此處僅為合法初值。
+  var isLegacyDistro = false
 
   /// 以此取代 `MainMenu.xib`。
   func buildNSAppMainMenu() -> NSMenu {
@@ -90,11 +95,5 @@ final class AppInstallerDelegate: NSObject, NSApplicationDelegate {
         NSMenu.Item.separator()
       }
     }
-  }
-
-  // MARK: Private
-
-  private static func isMainBundleMarkedAsLegacy() -> Bool {
-    Bundle.main.bundleIdentifier?.lowercased().contains("legacy") ?? false
   }
 }

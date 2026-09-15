@@ -1,0 +1,3 @@
+/* Localized versions of Info.plist keys — legacy distro overrides only. */
+
+CFBundleName = "唯音纪念版安装程式";

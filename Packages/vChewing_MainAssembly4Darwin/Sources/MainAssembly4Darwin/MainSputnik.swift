@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 import AppKit
+import UpdateSputnik
 
 /// macOS 10.9 ~ 10.14 不支援 Swift-based MainActor，但這個必須運行在 Main Thread 上。
 public final class MainSputnik4IME {
@@ -39,12 +40,23 @@ public final class MainSputnik4IME {
   // `async` 所需的 concurrency 執行期起於 macOS 10.15，故標註其可用性下限
   // （與 `InstallerAssembly4Darwin` 的 `MainSputnik4Installer.asyncInit()` 同款處置。
   //   呼叫端為 `Sources/vChewingIME_macOS/Modules/main.swift`，其部署目標為 12+。）
-  @available(macOS 10.15, *)
-  public static func asyncInit() async -> MainSputnik4IME {
-    MainSputnik4IME()
-  }
+  //
+  // 整支再以編譯器世代分流：5.10 側的入口是純同步的 `MainSputnik4IME()`，用不到這一支；留著它只會讓
+  // `MainAssembly4Darwin` 的譯文去引用 `swift_task_switch`，把 `@rpath/libswift_Concurrency.dylib`
+  // 寫進執行檔的載入記錄——10.9 上並無該執行期。
+  #if compiler(>=6.2)
+    @available(macOS 10.15, *)
+    public static func asyncInit() async -> MainSputnik4IME {
+      MainSputnik4IME()
+    }
+  #endif
 
-  public func runNSApp() {
+  /// `isLegacyDistro` **只認 `@main` 階段（`Sources/vChewingIME_macOS/Modules/main.swift`）在此明示傳入的值**：
+  /// 它同時驅動 `UpdateSputnik.isMainStreamRelease` 與 `AppDelegate` 挑選的更新資訊 feed 鍵，
+  /// 故不由 bundle ID 之類的線索猜測。
+  public func runNSApp(isLegacyDistro: Bool) {
+    AppDelegate.shared.isLegacyDistro = isLegacyDistro
+    UpdateSputnik.isMainStreamRelease = !isLegacyDistro
     // 下述内容取代 RunLoop.main.run()
     NSApplication.shared.delegate = AppDelegate.shared
     NSApplication.shared.setValue(nil, forKey: "mainWindow") // 輸入法不需要主視窗。

@@ -14,7 +14,9 @@ public final class UpdateSputnik {
 
   // MARK: Public
 
-  public static let isMainStreamRelease = true
+  /// 由 `MainSputnik4IME.runNSApp(isLegacyDistro:)` 於啟動階段填入；勿再以 bundle ID 之類的線索猜測發行版。
+  /// 讀取端落於 URLSession 的回呼，故以 `nonisolated(unsafe)` 標明「啟動時寫入一次、其後唯讀」。
+  nonisolated(unsafe) public static var isMainStreamRelease = true
   public static let shared: UpdateSputnik = .init()
 
   public let kUpdateInfoPageURLKey: String = {

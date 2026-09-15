@@ -34,15 +34,19 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
   public static let shared = AppDelegate()
 
   public static var updateInfoSourceURL: URL? {
-    guard let urlText = Bundle.main.infoDictionary?["UpdateInfoEndpoint"] as? String else {
+    let key = Self.shared.isLegacyDistro ? "UpdateInfoEndpointLegacy" : "UpdateInfoEndpoint"
+    guard let urlText = Bundle.main.infoDictionary?[key] as? String else {
       vCLog(
         forced: true,
-        "vChewingDebug: Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value."
+        "vChewingDebug: Fatal error: Info.plist wrecked. It needs to have correct '\(key)' value."
       )
       return nil
     }
     return .init(string: urlText)
   }
+
+  /// 由 `MainSputnik4IME.runNSApp(isLegacyDistro:)` 明示填入；此處僅為合法初值。
+  public var isLegacyDistro = false
 
   public func checkUpdate(forced: Bool, shouldBypass: @escaping () -> Bool) {
     guard let url = Self.updateInfoSourceURL else { return }
