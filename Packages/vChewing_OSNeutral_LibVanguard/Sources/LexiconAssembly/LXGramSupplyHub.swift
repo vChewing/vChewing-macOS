@@ -13,7 +13,7 @@ extension LXAssembly {
   /// 合流政策由 `concatFlags` 決定：預設（空集合）為「原樣串接、依掛載順序」，
   /// 也可要求 `[.sort]`、`[.deduplicate]` 或 `.all`。
   /// `hasGrams` 一律採「任一來源在庫即在庫」。
-  nonisolated public final class LXGramSupplyHub: LexiconGramSupplierProtocol {
+  public final class LXGramSupplyHub: LexiconGramSupplierProtocol {
     // MARK: Lifecycle
 
     public init(concatFlags: LXAssembly.GramConcatFlags = []) {
@@ -121,7 +121,7 @@ extension LXAssembly {
   /// - Warning: 本供應器提供的是**未經後處理**的原始元圖（不施假名抑制、不補半形變體、
   ///   不改權重正負號、不走語言模組替換）。若同時把它掛進 `LXFacade`，同一批原廠資料
   ///   會與內建原廠查詢路徑重複供應；僅在宿主自行組裝中樞時才適合單獨使用。
-  nonisolated public final class LXFactoryGramSupplier: LexiconGramSupplierProtocol {
+  public final class LXFactoryGramSupplier: LexiconGramSupplierProtocol {
     // MARK: Lifecycle
 
     public init() {}

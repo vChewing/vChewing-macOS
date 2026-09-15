@@ -5,44 +5,10 @@
 import Foundation
 import SwiftExtension
 
-// Apple artificially gated the modern FileHandle API names behind macOS 10.15 / 10.15.4,
-// even though these APIs have no version restriction on Linux/Windows.
-// Use @backDeployed to provide fallbacks on older Darwin via the legacy names.
-#if canImport(Darwin)
-  nonisolated extension FileHandle {
-    @backDeployed(before: macOS 10.15)
-    public final func close() throws {
-      closeFile()
-    }
-
-    @backDeployed(before: macOS 10.15)
-    public final func seek(toOffset offset: UInt64) throws {
-      seek(toFileOffset: offset)
-    }
-
-    @backDeployed(before: macOS 10.15)
-    @discardableResult
-    public final func seekToEnd() throws -> UInt64 {
-      seekToEndOfFile()
-    }
-
-    @backDeployed(before: macOS 10.15)
-    public final func readToEnd() throws -> Data? {
-      let data = readDataToEndOfFile()
-      return data.isEmpty ? nil : data
-    }
-
-    @backDeployed(before: macOS 10.15)
-    public final func write(contentsOf data: Data) throws {
-      write(data)
-    }
-  }
-#endif
-
 // MARK: - LXAssembly.LXConsolidator
 
 extension LXAssembly {
-  nonisolated public enum LXConsolidator {
+  public enum LXConsolidator {
     // MARK: Public
 
     public static let kPragmaHeader =
@@ -58,14 +24,14 @@ extension LXAssembly {
             guard let fileHandle = FileHandle(forReadingAtPath: path) else {
               throw FileErrors.fileHandleError("")
             }
-            defer { try? fileHandle.close() }
+            defer { try? fileHandle.closeTheFile() }
             // 純前綴判定：檔頭須與 pragma 的 UTF-8 位元組完全一致，且其後須為斷行或 EOF。
-            guard let head = try fileHandle.read(upToCount: kPragmaHeaderBytes.count),
+            guard let head = try fileHandle.read(upTo: kPragmaHeaderBytes.count),
                   head.elementsEqual(kPragmaHeaderBytes) else {
               vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
               return false
             }
-            let nextByte = try fileHandle.read(upToCount: 1)?.first
+            let nextByte = try fileHandle.read(upTo: 1)?.first
             guard nextByte == nil || nextByte == 0x0A || nextByte == 0x0D else {
               vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
               return false
@@ -101,17 +67,17 @@ extension LXAssembly {
           vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
           return false
         }
-        defer { try? writeFile.close() }
+        defer { try? writeFile.closeTheFile() }
         /// 注意：Swift 版 LXConsolidator 並未在此安排對 EOF 的去重複工序。
         /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
         if fileSize >= 1 {
-          try? writeFile.seek(toOffset: fileSize - 1)
+          try? writeFile.seek(to: fileSize - 1)
         }
-        if (try? writeFile.readToEnd())?.first != 0x0A {
+        if (try? writeFile.readToEndOfFile())?.first != 0x0A {
           vCLMLog("EOF Missing Confirmed, Start Fixing.")
           var newData = Data()
           newData.append(0x0A)
-          try? writeFile.write(contentsOf: newData)
+          try? writeFile.writeData(newData)
           vCLMLog("EOF Successfully Assured.")
         }
         return true

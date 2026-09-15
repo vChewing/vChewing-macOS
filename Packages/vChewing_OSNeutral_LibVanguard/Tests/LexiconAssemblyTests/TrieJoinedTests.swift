@@ -18,7 +18,7 @@ struct TrieJoinedTestSuite {}
 
 extension TrieJoinedTestSuite {
   @Test(
-    "[LXAssembly] TrieJoined_AssemblyingUsingFullMatch",
+    "[LXAssembly] TrieJoined_AssemblyingUsingFullMatch"
   )
   func testTrieJoinedAssemblyingUsingFullMatch() async throws {
     defer {
@@ -55,7 +55,7 @@ extension TrieJoinedTestSuite {
   }
 
   @Test(
-    "[LXAssembly] TrieJoined_AssemblyingUsingPartialMatchAndChops",
+    "[LXAssembly] TrieJoined_AssemblyingUsingPartialMatchAndChops"
   )
   func testTrieJoinedAssemblyingUsingPartialMatchAndChops() async throws {
     defer {

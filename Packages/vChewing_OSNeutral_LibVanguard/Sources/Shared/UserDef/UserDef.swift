@@ -6,7 +6,7 @@ import Foundation
 
 // MARK: - UserDef
 
-nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
+public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   // MARK: - Cases.
 
   case kIsDebugModeEnabled = "_DebugMode"
@@ -243,7 +243,11 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
       dict[userDef.rawValue] = value
     }
     guard JSONSerialization.isValidJSONObject(dict) else { return nil }
-    return try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])
+    var options: JSONSerialization.WritingOptions = [.prettyPrinted]
+    if #available(macOS 10.13, *) {
+      options.insert(.sortedKeys)
+    }
+    return try? JSONSerialization.data(withJSONObject: dict, options: options)
   }
 
   /// 從 JSON Data 匯入 UserDefaults 偏好設定，回傳匯入結果。
@@ -356,7 +360,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
 // MARK: - 各型別的範圍驗證，對應 PrefMgr.fixOddPreferencesCore() 的邏輯。
 
-nonisolated extension UserDef {
+extension UserDef {
   public var validNumeralValueRange: ClosedRange<Int>? {
     switch self {
     case .kKeyboardParser4Pinyin:
@@ -421,7 +425,7 @@ nonisolated extension UserDef {
   }
 }
 
-nonisolated extension UserDef {
+extension UserDef {
   // MARK: - dataType：以 DataType 關聯值嵌入預設值。
 
   /// 回傳此偏好鍵對應的 DataType，其關聯值即為該偏好的預設值。
@@ -545,7 +549,7 @@ nonisolated extension UserDef {
   }
 }
 
-nonisolated extension UserDef {
+extension UserDef {
   public var metaData: MetaData? {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "i18n:UserDef.kIsDebugModeEnabled.shortTitle")
@@ -772,7 +776,7 @@ nonisolated extension UserDef {
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .init(
         userDef: self,
         shortTitle: "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle",
-        description: "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description",
+        description: "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description"
       )
     case .kCurrencyNumeralsEnabled: return .init(
         userDef: self,
@@ -1116,7 +1120,7 @@ nonisolated extension UserDef {
   }
 }
 
-nonisolated extension UserDef {
+extension UserDef {
   // MARK: - 型別化預設值存取器（從 DataType 關聯值萃取）
 
   /// Bool 型別預設值。若該偏好鍵的 DataType 不是 `.bool`，則回傳 `false`。
@@ -1144,7 +1148,7 @@ nonisolated extension UserDef {
   }
 }
 
-nonisolated extension UserDef {
+extension UserDef {
   // MARK: - 預設值常數
 
   /// 候選字服務選單的預設內容。

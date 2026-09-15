@@ -417,7 +417,7 @@ extension POMTestSuite {
           candidateSuggested.pair.value,
           at: cursorForOverride,
           overrideType: suggestion.suggestedOverrideType,
-          enforceRetokenization: true,
+          enforceRetokenization: true
         )
       }
       validationCompositor.assemble()

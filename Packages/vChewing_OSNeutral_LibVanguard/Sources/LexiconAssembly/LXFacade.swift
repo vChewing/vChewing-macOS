@@ -36,7 +36,7 @@ extension LXAssembly {
       pomDataURL: URL? = nil
     ) {
       self.isCHS = isCHS
-      self.mtxLXPerceptor = .init(.init(dataURL: pomDataURL))
+      self.lxPerceptor = LXPerceptor(dataURL: pomDataURL)
     }
 
     // MARK: Public
@@ -258,20 +258,22 @@ extension LXAssembly {
       if !Self.asyncLoadingUserData {
         load()
       } else {
-        // CIN 解析在背景佇列完成，僅在成功後把結果交回 MainActor。
+        // CIN 解析經背景佇列調度、實際仍在 MainActor 上完成。
         let validator = Self.lxCassette.candidateKeysValidator
         LXAssembly.fileHandleQueue.async {
-          guard FileManager.default.isReadableFile(atPath: path) else {
-            vCLMLog("lxCassette: File access failure: \(path)")
-            return
-          }
-          var newCassette = LXCassette()
-          newCassette.candidateKeysValidator = validator
-          newCassette.open(path)
-          let count = newCassette.count
-          asyncOnMain {
-            Self.lxCassette = newCassette
-            vCLMLog("lxCassette: \(count) entries of data loaded from: \(path)")
+          mainSync {
+            guard FileManager.default.isReadableFile(atPath: path) else {
+              vCLMLog("lxCassette: File access failure: \(path)")
+              return
+            }
+            var newCassette = LXCassette()
+            newCassette.candidateKeysValidator = validator
+            newCassette.open(path)
+            let count = newCassette.count
+            asyncOnMain {
+              Self.lxCassette = newCassette
+              vCLMLog("lxCassette: \(count) entries of data loaded from: \(path)")
+            }
           }
         }
       }
@@ -595,19 +597,15 @@ extension LXAssembly {
 
     /// 原廠辭典世代計數器：每次原廠辭典被重新載入或解除安裝時遞增。
     /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保切換原廠辭典後舊快取自動失效。
-    nonisolated static let mtxFactoryGeneration: NSMutex<Int> = .init(0)
+    static var factoryGeneration: Int = 0
 
     /// 漸退記憶（POM）世代計數器：每次記憶內容變更（記憶／清除／漂白／載入）時遞增。
     /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保 POM 更新後查詢即反映新記憶。
-    nonisolated static let mtxPOMGeneration: NSMutex<Int> = .init(0)
+    static var pomGeneration: Int = 0
 
-    nonisolated static var factoryTrie: VanguardTrie.TextMapTrie? {
-      get {
-        mtxFactoryTrie.value
-      }
-      set {
-        mtxFactoryTrie.value = newValue
-        mtxFactoryGeneration.value &+= 1
+    static var factoryTrie: VanguardTrie.TextMapTrie? {
+      didSet {
+        factoryGeneration &+= 1
       }
     }
 
@@ -640,11 +638,8 @@ extension LXAssembly {
     /// 預設為空，故對既有行為零影響；宿主可經由 `mountGramSupplier(_:)` 追加來源。
     let gramSupplyHub = LXGramSupplyHub()
 
-    // LXPerceptor（NSMutex 保證執行緒安全，故標記 nonisolated）
-    nonisolated var lxPerceptor: LXPerceptor {
-      get { mtxLXPerceptor.value }
-      set { mtxLXPerceptor.value = newValue }
-    }
+    /// 漸退記憶模組。全體已回歸 MainActor，故直接以 stored property 承載。
+    var lxPerceptor: LXPerceptor
 
     // MARK: - 核心函式（對外）
 
@@ -816,8 +811,8 @@ extension LXAssembly {
       // 檢查 LRU 快取
       var hasher = Hasher()
       hasher.combine(config)
-      hasher.combine(Self.mtxFactoryGeneration.value)
-      hasher.combine(Self.mtxPOMGeneration.value)
+      hasher.combine(Self.factoryGeneration)
+      hasher.combine(Self.pomGeneration)
       hasher.combine(gramSupplyHub.generation)
       let fingerprint = hasher.finalize()
       if fingerprint != unigramCacheFingerprint {
@@ -1153,21 +1148,17 @@ extension LXAssembly {
 
     // MARK: Private
 
-    nonisolated private static let mtxFactoryTrie: NSMutex<VanguardTrie.TextMapTrie?> = .init(nil)
-
     /// 笛卡爾積爆炸防禦預算上限。
     ///
     /// 當一個查詢的展開組合數量超過此值時，放棄逐組合展開、只保留原廠辭典的
     /// "&" 連讀查詢路徑，以避免在查詢過程中被笛卡爾積卡死（例如狂拼模式下的
     /// 不完全拼寫）。此閾值與 Homa 組字器的防禦閾值一致（625，P167 依末代
     /// Intel 硬體實測再校準：4,000 仍卡、625（=5⁴）順暢——維持免聲調 4 音節查詢）。
-    nonisolated private static let kCartesianProductBudgetLimit = 625
+    private static let kCartesianProductBudgetLimit = 625
 
     // LRU cache for unigramsFor
     private var unigramCacheFingerprint: Int = 0
     private var unigramLRUCache: [String: [Homa.Gram]] = [:]
-
-    nonisolated private let mtxLXPerceptor: NSMutex<LXPerceptor>
 
     // MARK: - 工具函式
 
@@ -1216,8 +1207,8 @@ extension LXAssembly {
       // 檢查 LRU 快取
       var hasher = Hasher()
       hasher.combine(config)
-      hasher.combine(Self.mtxFactoryGeneration.value)
-      hasher.combine(Self.mtxPOMGeneration.value)
+      hasher.combine(Self.factoryGeneration)
+      hasher.combine(Self.pomGeneration)
       hasher.combine(gramSupplyHub.generation)
       let fingerprint = hasher.finalize()
       if fingerprint != unigramCacheFingerprint {

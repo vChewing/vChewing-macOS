@@ -13,7 +13,7 @@ import Homa
 extension Homa.Gram {
   /// Convenience initialiser matching the old Megrez.Unigram signature.
   @inlinable
-  nonisolated public init(
+  public init(
     keyArray: [String] = [],
     value: String = "",
     score: Double = 0,
@@ -34,7 +34,7 @@ extension Homa.Gram {
 extension Array where Element == Homa.Gram {
   /// Given a filter set, deduplicate and filter the gram array in-place.
   /// Ported from legacy `Array<Megrez.Unigram>.consolidate(filter:)`.
-  nonisolated public mutating func consolidate(filter theFilter: Set<String> = .init()) {
+  public mutating func consolidate(filter theFilter: Set<String> = .init()) {
     var inserted: [String: Double] = [:]
     var insertedArray: [Homa.Gram] = []
     for neta in self {
@@ -54,13 +54,13 @@ extension Array where Element == Homa.Gram {
 extension Homa.CandidatePair {
   /// Join keyArray into a single string with the given separator.
   @inlinable
-  nonisolated public func joinedKey(by separator: String = "-") -> String {
+  public func joinedKey(by separator: String = "-") -> String {
     keyArray.joined(separator: separator)
   }
 
   /// Produce the ngram key representation used by perception override.
   @inlinable
-  nonisolated public var toNGramKey: String {
+  public var toNGramKey: String {
     let isValid = !keyArray.joined().isEmpty && !value.isEmpty
     return !isValid ? "()" : "(\(joinedKey()),\(value))"
   }
@@ -71,9 +71,9 @@ extension Homa.CandidatePair {
 extension Homa.Assembler {
   /// The reading separator, hardcoded to "-". Matches the old `Megrez.Compositor.separator`.
   @inlinable
-  nonisolated public var separator: String { Self.theSeparator }
+  public var separator: String { Self.theSeparator }
 
   /// The reading separator, hardcoded to "-". Matches the old `Megrez.Compositor.separator`.
   @inlinable
-  nonisolated public static var theSeparator: String { "-" }
+  public static var theSeparator: String { "-" }
 }

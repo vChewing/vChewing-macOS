@@ -6,7 +6,7 @@ import Foundation
 
 // MARK: - InputSession
 
-public final class InputSession: @MainActor SessionProtocol, Sendable {
+public final class InputSession: SessionProtocol, Sendable {
   // MARK: Lifecycle
 
   /// 預配置 session（極性雙緩衝用）：不繫結任何 controller/client，僅初始化內部引擎。
@@ -33,8 +33,10 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     vCLog("InputSession preallocated. ID: \(id.uuidString)")
   }
 
-  nonisolated deinit {
-    vCLog("InputSession deconstructing. ID: \(id.uuidString)")
+  deinit {
+    mainSync {
+      vCLog("InputSession deconstructing. ID: \(id.uuidString)")
+    }
   }
 
   // MARK: Public
@@ -111,7 +113,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   public var lastAppliedKeyboardLayout: String?
 
   /// IMKInputController 副本（記憶體位址）。
-  public nonisolated(unsafe) var inputControllerAssignedAddr: UInt?
+  public var inputControllerAssignedAddr: UInt?
 
   /// 宿主可注入的 replacementRange 提供器（Darwin 端會綁定至 IMK controller）。
   public var replacementRangeProvider: () -> NSRange = {
@@ -191,7 +193,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     } else {
       guard SessionHost.shared.isControllerAddressAlive(controllerAddr) else { return nil }
     }
-    guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[controllerAddr] }),
+    guard let ssnAddr = sessionAddrByControllerAddr[controllerAddr],
           let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
     else { return nil }
     return Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
@@ -200,21 +202,19 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 登記 controller → session 對照關係。
   public static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
     let ssnKey = UInt(bitPattern: Unmanaged.passUnretained(session).toOpaque())
-    sessionAddrByControllerAddr.withLock { $0[controllerAddr] = ssnKey }
+    sessionAddrByControllerAddr[controllerAddr] = ssnKey
   }
 
   /// 以純記憶體位址移除 controller 對照關係（供 `onDealloc` block 使用，避免捕獲 self）。
   public static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
-    sessionAddrByControllerAddr.withLock { map in
-      guard let ssnKey = map[ctlKey],
-            let opaque = UnsafeRawPointer(bitPattern: ssnKey) else { return }
-      map[ctlKey] = nil
-      let session = Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
-      // 僅在 session 仍屬於該 controller 時才清空 inputControllerAssignedAddr。
-      // reassign 後 session 已歸新 controller 所有，舊 controller 的 dealloc 不應干擾。
-      if session.inputControllerAssignedAddr == ctlKey {
-        session.inputControllerAssignedAddr = nil
-      }
+    guard let ssnKey = sessionAddrByControllerAddr[ctlKey],
+          let opaque = UnsafeRawPointer(bitPattern: ssnKey) else { return }
+    sessionAddrByControllerAddr[ctlKey] = nil
+    let session = Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
+    // 僅在 session 仍屬於該 controller 時才清空 inputControllerAssignedAddr。
+    // reassign 後 session 已歸新 controller 所有，舊 controller 的 dealloc 不應干擾。
+    if session.inputControllerAssignedAddr == ctlKey {
+      session.inputControllerAssignedAddr = nil
     }
   }
 
@@ -262,7 +262,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     let oldAddr = inputControllerAssignedAddr
     inputControllerAssignedAddr = newAddr
     if let oldAddr {
-      Self.sessionAddrByControllerAddr.withLock { $0[oldAddr] = nil }
+      Self.sessionAddrByControllerAddr[oldAddr] = nil
     }
     Self.registerSessionAddr(self, for: newAddr)
   }
@@ -334,5 +334,5 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 資料值是 Session 的記憶體位址。
   /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
   ///   此處不保留強引用，避免靜態字典參與 ARC。
-  private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([UInt: UInt]())
+  private static var sessionAddrByControllerAddr = [UInt: UInt]()
 }
