@@ -6,7 +6,7 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 
 - **Language**：Documentation、comments、reviews 僅能使用 English 或 zh-Hant-TW（檔名結尾 `-CHS` 可用 zh-Hans）。尤其注意中文資訊電子術語必須得是 zh-Hant-TW。
 - **Commits**：遵循 `ModuleName // SubModuleName: Change.` 的 Conventional Commit 風格。
-- **Scope**：主要工作區位於 `Packages/`。Linux 環境僅構建 `vChewing_OSNeutral_LibVanguard` 與其依賴。macOS 構建使用 `Package.swift` + `Makefile` + `BundleApps` CommandPlugin。
+- **Scope**：主要工作區位於 `Packages/`。Linux 環境僅構建 `vChewing_OSNeutral_LibVanguard` 與其依賴。macOS 構建使用 `Package.swift` + `Makefile` + `BundleApps` CommandPlugin。另有一條**附加的、僅止於 compilability** 的 Swift 5.10 靜態路徑（Swift 5.10 toolchain ＋ Xcode 15 的 `MacOSX13.3.sdk`、目標 `x86_64-apple-macosx10.10`，只產出 static `.a` 供 legacy 倉以 Xcode 鏈接）；**權威工具鏈為 Swift 6.4+（6.2／6.3 由封堵檔擋下）、runtime 目標仍為 macOS 12+**。P217 之下，逐套件以 `Package@swift-5.10.swift`（＋ 6.0／6.1／6.2／6.3 封堵檔）與各自的 `makefile`（`make build510`／`make clean510`）為入口；聚合體 `vChewing_OSNeutral_LibVanguard` 的這一套（六份 manifest ＋ 其 `makefile`）即該佈局的參考實作。
 - **UI 規範**：視窗預設以 AppKit 實作——使用 `vChewing_OSFrameworkImpl` 的 AppKit Result Builder DSL、不得引入 Interface Builder 資產；例外為 `vChewing_SettingsUI` 的 macOS 14+ SwiftUI 設定介面（含 PhraseEditor 語彙編輯器與 About 窗格）與 `vChewing_InstallerAssembly4Darwin` 安裝程式的 SwiftUI。
 - **FSM 流程**：維持 `InputSession → InputHandler (→ Homa) → IMEState` 流程；新增 API 時先更新協定（`SessionCoreProtocol` 提供共用的 `switchState()`/`resetInputHandler()` 預設實作；`InputHandlerProtocol` 處理輸入事件分診）。Sessions 體系已遷移至 LibVanguard 且 OS-independent——所有 OS-dependent 動作（LXMgr、IMEApp、Notifier、AppDelegate、NS*、IMKHelper 等）一律經 `SessionHost` 閉包注入（見 `SessionHostWiring.swift`），不要在 portable 會話程式碼內直接呼叫 Darwin 專屬 API。
 - **Lexicon**：詞庫資源由遠端 Swift Package plugin `VanguardTextMapPlugin`（來自 `vChewing-VanguardLexicon` 倉庫）提供，構建時以 `.txtMap` / `.revlookup` 格式動態注入至 `vChewing_MainAssembly4Darwin`；編譯後的成品為暫時構建產物，不應簽入版控。
@@ -23,10 +23,12 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 - `Packages/vChewing_OSNeutral_LibVanguard/Sources/Tekkon/`：注音/拼音解析、組筆處理。
 - `Packages/vChewing_OSNeutral_LibVanguard/Sources/Homa/`：DAG-DP 組字器、候選輪替／鞏固 API、POM 觀測資料生成器。
 - `Packages/vChewing_OSNeutral_LibVanguard/Sources/LexiconAssembly/`：語言模型匯流、使用者詞語、關聯詞、POM 記憶管理。
+- `Packages/vChewing_OSNeutral_LibVanguard/Deps/VanguardSwiftExtension/`：通用 `SwiftExtension` 工具套件，以**巢狀子套件**形式置於聚合體目錄內（SwiftPM 接受巢狀套件）；如此兩倉 `.package(path:)` 同字串、manifest 得以逐位元組相同。package 名與產品名為 `VanguardSwiftExtension`、target／模組名為 `SwiftExtension`（全倉一律 `import SwiftExtension`）。
 
 ## Testing & Tooling
 
 - 針對變更的 package 執行 `swift test`；對 Tekkon/Homa 相關改動請補齊邊界案例。
+- **單元測試不對 Swift 5.10 開放**：5.10 側 manifest 不宣告任何測試靶（含僅供測試的素材靶），逐套件 makefile 亦不提供測試目標；測試一律只在 6.4 側跑（`swift test`），5.10 側僅以 `make build510` 驗編譯性。
 - 偏好 (PrefMgr) 相關測試需在測試前後還原設定，避免滲漏。
 - 若新增可視化或除錯輸出，透過偏好旗標控制，避免影響 Release 組建。
 
@@ -35,5 +37,6 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 - `AGENTS.md`：完整開發守則。
 - `algorithm.md`：Tekkon、Homa、語言模型、詞庫製程的詳細說明（zh-Hant）。
 - `.github/copilot-instructions.md`：Copilot/Claude 共用的即時守則。
+- `vChewing-DevLogs/Research/Phase217_SOP.md`：P217（把 Swift 5.10 靜態路徑推及全倉）的施工規範；未載者依本檔（`AGENTS.md`／`CLAUDE.md`），兩者衝突時上報。
 
 遵守以上規範能確保與維護者協作順暢。如遇到與守則衝突的新需求，請在 PR 說明內註記並提出調整建議。

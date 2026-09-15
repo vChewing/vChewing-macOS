@@ -44,9 +44,25 @@ spmClean:
 			swift package clean --package-path "$$nestedDep" || true; \
 		fi; \
 	done;
+	@# Swift 5.10 側的 scratch：逐包入口在套件目錄內建 `.build/.legacy*`，倉根入口（`build510-<pkg>`）
+	@# 則建在倉根 `.build/.legacy-<pkg>`。此處只清 `.legacy*`，不動 `.build` 內其餘既有產物。
+	@rm -rf ./.build/.legacy-* ./Packages/*/.build/.legacy* ./Packages/*/Deps/*/.build/.legacy*
 
 spmLinuxTest-LibVanguard:
 	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_OSNeutral_LibVanguard swift:latest swift test --filter InputHandlerTests
+
+# ── Swift 5.10 (legacy) build entry points ───────────────────────────
+#
+# The per-package entry points live in each package's own `makefile`; `Packages/Makefile` carries
+# the aggregate loop. This is only a thin forwarder so that `make build510` works at the repo root.
+
+.PHONY: build510 clean510
+
+build510:
+	cd ./Packages/ && make build510-all --file=./Makefile
+
+clean510:
+	cd ./Packages/ && make clean510-all --file=./Makefile
 
 # ── App Bundle Assembly (via SwiftPM CommandPlugin) ──────────────────
 
@@ -274,9 +290,12 @@ gc:
 
 .PHONY: test
 
+# 單元測試一律 `--no-parallel`：本倉的測試共用大量行程內靜態狀態
+# （`LXFacade` 的 factoryTrie／卡匣、`PrefMgr`、`SessionHost` 等），並行執行即互相踩踏。
+# 逐包入口（`cd Packages/<pkg> && make test`）同理。
 test:
-	swift test
-	swift test --package-path ./Packages/vChewing_OSNeutral_LibVanguard
+	swift test --no-parallel
+	swift test --no-parallel --package-path ./Packages/vChewing_OSNeutral_LibVanguard
 
 xcode-test:
 	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test
