@@ -107,22 +107,48 @@
   }
 
   extension NSWorkspace {
-    nonisolated public struct ActivationFlags: OptionSet, Sendable {
-      // MARK: Lifecycle
+    // 本型別以 compiler flag 分隔為兩套寫法：其值由 `mtxActivationFlags` 的 `NSMutex` 保護，
+    // 並在非隔離情境（`getRunningSecureInputApps` 等）之外被讀取。
+    //
+    // - **Swift 6.2 以上**：`defaultIsolation(MainActor.self)` 之下須標 `nonisolated` 方能脫離 MainActor。
+    // - **Swift 6.2 以下**：採 `vChewing-OSX-Legacy` 的寫法（標頭不帶 `nonisolated`）；5.10 拒收
+    //   型別級 `nonisolated`（`'nonisolated' modifier cannot be applied to this declaration`），
+    //   而本側沒有 `defaultIsolation`，該標註在此亦無從依附。
+    #if compiler(>=6.2)
+      nonisolated public struct ActivationFlags: OptionSet, Sendable {
+        // MARK: Lifecycle
 
-      public init(rawValue: Int) {
-        self.rawValue = rawValue
+        public init(rawValue: Int) {
+          self.rawValue = rawValue
+        }
+
+        // MARK: Public
+
+        public static let hibernating = Self(rawValue: 1 << 0)
+        public static let desktopLocked = Self(rawValue: 1 << 1)
+        public static let sessionSwitchedOut = Self(rawValue: 1 << 2)
+        public static let screenSaverRunning = Self(rawValue: 1 << 3)
+
+        public let rawValue: Int
       }
+    #else
+      public struct ActivationFlags: OptionSet, Sendable {
+        // MARK: Lifecycle
 
-      // MARK: Public
+        public init(rawValue: Int) {
+          self.rawValue = rawValue
+        }
 
-      public static let hibernating = Self(rawValue: 1 << 0)
-      public static let desktopLocked = Self(rawValue: 1 << 1)
-      public static let sessionSwitchedOut = Self(rawValue: 1 << 2)
-      public static let screenSaverRunning = Self(rawValue: 1 << 3)
+        // MARK: Public
 
-      public let rawValue: Int
-    }
+        public static let hibernating = Self(rawValue: 1 << 0)
+        public static let desktopLocked = Self(rawValue: 1 << 1)
+        public static let sessionSwitchedOut = Self(rawValue: 1 << 2)
+        public static let screenSaverRunning = Self(rawValue: 1 << 3)
+
+        public let rawValue: Int
+      }
+    #endif
 
     nonisolated public static var activationFlags: ActivationFlags {
       get { mtxActivationFlags.value }

@@ -534,20 +534,35 @@ import SwiftExtension
     /// Therefore, we have to use NSKeyedArchiver to encode this NSAttributedString
     /// into Plist Data and decode it on the MainActor as a new NSAttributedString
     /// instance to solve this value-assignment issue.
+    ///
+    /// `requiringSecureCoding:` 與 `unarchivedObject(ofClass:from:)` 皆起於 macOS 10.13，
+    /// 故低於該版本時改用 `vChewing-OSX-Legacy` 所用的舊名（`archivedData(withRootObject:)`
+    /// 與 `unarchiveObject(with:)`）。兩分支皆寫滿，不採單分支形式。
     public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSLabelView {
-      let archivedData = (try? NSKeyedArchiver.archivedData(
-        withRootObject: self,
-        requiringSecureCoding: false
-      )) ?? .init([])
+      let archivedData: Data
+      if #unavailable(macOS 10.13) {
+        archivedData = NSKeyedArchiver.archivedData(withRootObject: self)
+      } else {
+        archivedData = (try? NSKeyedArchiver.archivedData(
+          withRootObject: self,
+          requiringSecureCoding: false
+        )) ?? .init([])
+      }
       let label: NSLabelView = mainSync {
         let label = NSLabelView()
         if let fixWidth = fixWidth {
           label.preferredMaxLayoutWidth = fixWidth
         }
-        if let decodedString = try? NSKeyedUnarchiver.unarchivedObject(
-          ofClass: NSAttributedString.self,
-          from: archivedData
-        ) {
+        let decodedString: NSAttributedString?
+        if #unavailable(macOS 10.13) {
+          decodedString = NSKeyedUnarchiver.unarchiveObject(with: archivedData) as? NSAttributedString
+        } else {
+          decodedString = try? NSKeyedUnarchiver.unarchivedObject(
+            ofClass: NSAttributedString.self,
+            from: archivedData
+          )
+        }
+        if let decodedString = decodedString {
           label.attributedStringValue = decodedString
         }
         return label

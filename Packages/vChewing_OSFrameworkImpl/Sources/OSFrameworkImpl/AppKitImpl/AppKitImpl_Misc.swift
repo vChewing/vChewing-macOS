@@ -115,14 +115,32 @@
   // MARK: - AttributedStringMeasurementCache
 
   /// Isolated cache for NSAttributedString dimension measurements.
+  ///
+  /// 底下兩個型別以 compiler flag 分隔為兩套寫法：
+  ///
+  /// - **Swift 6.2 以上**：本快取的成員由非隔離的 `cacheQueue` 閉包讀寫，型別本身須標 `nonisolated`
+  ///   方能脫離 `defaultIsolation(MainActor.self)`。
+  /// - **Swift 6.2 以下**：採 `vChewing-OSX-Legacy` 的寫法（標頭不帶 `nonisolated`）。5.10 拒收
+  ///   型別級 `nonisolated`（`'nonisolated' modifier cannot be applied to this declaration`），
+  ///   而本側沒有 `defaultIsolation`，該標註在此亦無從依附。
   private enum AttributedStringMeasurementCache {
-    nonisolated enum MeasurementPath: Hashable, Sendable { case fastSingleLine, textKitFallback }
+    #if compiler(>=6.2)
+      nonisolated enum MeasurementPath: Hashable, Sendable { case fastSingleLine, textKitFallback }
 
-    nonisolated struct CacheKey: Hashable, Sendable {
-      nonisolated let stringHash: Int
-      nonisolated let attributesHash: Int
-      nonisolated let path: MeasurementPath
-    }
+      nonisolated struct CacheKey: Hashable, Sendable {
+        nonisolated let stringHash: Int
+        nonisolated let attributesHash: Int
+        nonisolated let path: MeasurementPath
+      }
+    #else
+      enum MeasurementPath: Hashable, Sendable { case fastSingleLine, textKitFallback }
+
+      struct CacheKey: Hashable, Sendable {
+        let stringHash: Int
+        let attributesHash: Int
+        let path: MeasurementPath
+      }
+    #endif
 
     nonisolated static let cachedSizes: NSMutex<[CacheKey: CGSize]> = .init([:])
 
