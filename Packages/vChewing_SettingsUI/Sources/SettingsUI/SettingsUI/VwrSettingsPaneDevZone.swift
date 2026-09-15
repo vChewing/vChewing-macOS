@@ -143,10 +143,12 @@ struct UserDefJSONDocument: FileDocument {
   static var writableContentTypes: [UTType] { [.json] }
 
   func fileWrapper(configuration _: WriteConfiguration) throws -> FileWrapper {
-    guard let data = UserDef.exportAsJSON() else {
-      throw CocoaError(.fileWriteUnknown)
+    try mainSync {
+      guard let data = UserDef.exportAsJSON() else {
+        throw CocoaError(.fileWriteUnknown)
+      }
+      return FileWrapper(regularFileWithContents: data)
     }
-    return FileWrapper(regularFileWithContents: data)
   }
 }
 
