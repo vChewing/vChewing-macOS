@@ -71,7 +71,38 @@ extension IMEMenuSputnik {
     // -------------
     let currentInputMode = IMEApp.currentInputMode
     return NSMenu().appendItems {
-      if #unavailable(macOS 14) {
+      // `CtlSettingsUI`（SwiftUI 版設定視窗）整檔圈於 `#if compiler(>=6.2)` 之內（§5.1(f)／§5.3 鐵律五：
+      // SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上，<6.2 分支不提供替代實作）。
+      // 故 5.10 側祇剩 AppKit 版一項、別無可選——這與 `vChewing-OSX-Legacy` 的選單形態一致。
+      #if compiler(>=6.2)
+        if #unavailable(macOS 14) {
+          NSMenu.Item("i18n:Menu.vChewingSettings")?
+            .act(
+              register {
+                CtlSettingsCocoa.show()
+                NSApp.popup()
+              }
+            )
+            .nulled(silentMode)
+        } else {
+          NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (SwiftUI)")?
+            .act(
+              register {
+                CtlSettingsUI.show()
+                NSApp.popup()
+              }
+            )
+            .nulled(silentMode)
+          NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (AppKit)")?
+            .act(
+              register {
+                CtlSettingsCocoa.show()
+                NSApp.popup()
+              }
+            )
+            .alternated().nulled(silentMode)
+        }
+      #else
         NSMenu.Item("i18n:Menu.vChewingSettings")?
           .act(
             register {
@@ -80,24 +111,7 @@ extension IMEMenuSputnik {
             }
           )
           .nulled(silentMode)
-      } else {
-        NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (SwiftUI)")?
-          .act(
-            register {
-              CtlSettingsUI.show()
-              NSApp.popup()
-            }
-          )
-          .nulled(silentMode)
-        NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (AppKit)")?
-          .act(
-            register {
-              CtlSettingsCocoa.show()
-              NSApp.popup()
-            }
-          )
-          .alternated().nulled(silentMode)
-      }
+      #endif
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item("i18n:Menu.SponsorTheDevelopment")?
         .act(

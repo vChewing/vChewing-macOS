@@ -9,8 +9,17 @@ public final class MainSputnik4IME {
   // MARK: Lifecycle
 
   public init() {
-    SettingsUIHost.wireUp()
-    SessionHost.wireUp()
+    // 兩個 `wireUp()` 皆落於 `defaultIsolation(MainActor.self)`（本套件與其上游套件皆然），
+    // 而本 init 不可標 `@MainActor`（§5.3 鐵律五：禁為消錯新增 `@MainActor`，會殺死 ≤ macOS 10.14 的相容性）。
+    // 本型別依設計「必須運行在 Main Thread 上」（見本檔頂註），故以 `mainSync {}` 表達
+    // 「就地於主執行緒執行」——§6.2 允許的調度寫法（Queue 只管觸發時機、任務本體套一圈 `mainSync {}`），
+    // 而非 `{ @MainActor in }`。`mainSync` 於 5.10 側之簽名為 `() throws -> T`、
+    // 於 6.2 以上為 `@MainActor () throws -> T`（見 `VanguardSwiftExtension/SwiftFoundationImpl.swift`），
+    // 故同一則呼叫在兩側皆為合法。
+    mainSync {
+      SettingsUIHost.wireUp()
+      SessionHost.wireUp()
+    }
     if let varArgsResult = Self.handleVarArgs() {
       exit(varArgsResult)
     }
@@ -27,6 +36,10 @@ public final class MainSputnik4IME {
 
   public let theServer: IMKServer
 
+  // `async` 所需的 concurrency 執行期起於 macOS 10.15，故標註其可用性下限
+  // （與 `InstallerAssembly4Darwin` 的 `MainSputnik4Installer.asyncInit()` 同款處置。
+  //   呼叫端為 `Sources/vChewingIME_macOS/Modules/main.swift`，其部署目標為 12+。）
+  @available(macOS 10.15, *)
   public static func asyncInit() async -> MainSputnik4IME {
     MainSputnik4IME()
   }

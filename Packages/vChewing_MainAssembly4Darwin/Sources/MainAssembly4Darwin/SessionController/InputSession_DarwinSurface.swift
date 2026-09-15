@@ -100,14 +100,19 @@ extension InputSession {
   public func showPreferences() {
     resetInputHandler()
     clearInlineDisplay()
-    osCheck: if #available(macOS 14, *) {
-      switch NSEvent.keyModifierFlags {
-      case .option: break osCheck
-      default: CtlSettingsUI.show()
+    // `CtlSettingsUI`（SwiftUI 版設定視窗，macOS 14+）整檔圈於 `#if compiler(>=6.2)` 之內
+    // （§5.1(f)／§5.3 鐵律五）。故 5.10 側一律走 AppKit 版，且無 `osCheck` 之分流
+    // ——這與 `vChewing-OSX-Legacy` 的同名實作一致（該倉即 `CtlSettingsCocoa.show()` 單路）。
+    #if compiler(>=6.2)
+      osCheck: if #available(macOS 14, *) {
+        switch NSEvent.keyModifierFlags {
+        case .option: break osCheck
+        default: CtlSettingsUI.show()
+        }
+        NSApp.popup()
+        return
       }
-      NSApp.popup()
-      return
-    }
+    #endif
     CtlSettingsCocoa.show()
     NSApp.popup()
   }

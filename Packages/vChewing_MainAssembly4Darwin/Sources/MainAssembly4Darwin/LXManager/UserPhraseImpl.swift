@@ -8,37 +8,41 @@ import Foundation
 // even though these APIs have no version restriction on Linux/Windows.
 // Use @backDeployed to provide fallbacks on older Darwin via the legacy names.
 #if canImport(Darwin)
-  nonisolated extension FileHandle {
+  extension FileHandle {
+    // 每個成員各標 `nonisolated`（§5.1(b)：標頭修飾詞下放至成員）。
+    // 標頭層級的 `nonisolated extension` 會令 5.10 拒收
+    // （`'nonisolated' modifier cannot be applied to this declaration`）；
+    // 而 `defaultIsolation(MainActor.self)` 之下，成員不標即落回 MainActor、脫離不了非隔離呼叫端。
     @backDeployed(before: macOS 10.15)
-    public final func close() throws {
+    nonisolated public final func close() throws {
       closeFile()
     }
 
     @backDeployed(before: macOS 10.15)
-    public final func seek(toOffset offset: UInt64) throws {
+    nonisolated public final func seek(toOffset offset: UInt64) throws {
       seek(toFileOffset: offset)
     }
 
     @backDeployed(before: macOS 10.15)
     @discardableResult
-    public final func seekToEnd() throws -> UInt64 {
+    nonisolated public final func seekToEnd() throws -> UInt64 {
       seekToEndOfFile()
     }
 
     @backDeployed(before: macOS 10.15)
-    public final func readToEnd() throws -> Data? {
+    nonisolated public final func readToEnd() throws -> Data? {
       let data = readDataToEndOfFile()
       return data.isEmpty ? nil : data
     }
 
     @backDeployed(before: macOS 10.15)
-    public final func read(upToCount count: Int) throws -> Data? {
+    nonisolated public final func read(upToCount count: Int) throws -> Data? {
       let data = readData(ofLength: count)
       return data.isEmpty ? nil : data
     }
 
     @backDeployed(before: macOS 10.15)
-    public final func write(contentsOf data: Data) throws {
+    nonisolated public final func write(contentsOf data: Data) throws {
       write(data)
     }
   }

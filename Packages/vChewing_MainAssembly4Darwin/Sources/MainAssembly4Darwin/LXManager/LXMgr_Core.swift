@@ -95,11 +95,23 @@ public final class LXMgr {
       textMapPath: path
     ) { resultBool in
       precondition(resultBool, "vChewing factory TextMap loading failed.")
-      asyncOnMain {
-        Notifier.notify(
-          message: "i18n:LXMgr.notification.FactoryLexiconLoadingComplete".i18n
-        )
-      }
+      #if compiler(>=6.2)
+        asyncOnMain {
+          Notifier.notify(
+            message: "i18n:LXMgr.notification.FactoryLexiconLoadingComplete".i18n
+          )
+        }
+      #else
+        // 5.10 側：本閉包是 `@Sendable` 的完成回呼，其內（連 `asyncOnMain` 的 block 閉包也不例外）
+        // 一律被視為 nonisolated，呼叫 `Notifier.notify` 這種 MainActor 成員會直接報錯。
+        // `DispatchQueue.main.async { @MainActor in … }` 是 legacy 倉在此處的既有寫法，也是
+        // 5.10 唯一能在此情境通過的形狀（`mainSync`／`asyncOnMain` 皆不可）。
+        DispatchQueue.main.async { @MainActor in
+          Notifier.notify(
+            message: "i18n:LXMgr.notification.FactoryLexiconLoadingComplete".i18n
+          )
+        }
+      #endif
     }
   }
 
@@ -437,18 +449,36 @@ public final class LXMgr {
       Self.recordedPathInvalidityAlerts.append(.init(msg: msg, infoText: infoText))
       return
     }
-    mainSync {
-      // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
-      if NSApp.modalWindow != nil { return }
-      // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
-      IMEApp.buzz()
-      let alert = NSAlert()
-      alert.messageText = msg
-      alert.informativeText = infoText
-      alert.addButton(withTitle: "i18n:Common.OK".i18n)
-      _ = alert.runModal()
-      NSApp.popup()
-    }
+    #if compiler(>=6.2)
+      mainSync {
+        // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
+        if NSApp.modalWindow != nil { return }
+        // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
+        IMEApp.buzz()
+        let alert = NSAlert()
+        alert.messageText = msg
+        alert.informativeText = infoText
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
+        _ = alert.runModal()
+        NSApp.popup()
+      }
+    #else
+      // 5.10 側：`mainSync` 的閉包不帶隔離，其內呼叫 `NSApp.popup()` 這類 Swift 端成員會被拒；
+      // 本函式的呼叫端全在 `asyncOnMain` 內（即已在 main），故照 legacy 倉在此處的形狀改走
+      // `DispatchQueue.main.async { @MainActor in … }`：隔離由閉包自己承擔，交付時機略後一拍但無害。
+      DispatchQueue.main.async { @MainActor in
+        // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
+        if NSApp.modalWindow != nil { return }
+        // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
+        IMEApp.buzz()
+        let alert = NSAlert()
+        alert.messageText = msg
+        alert.informativeText = infoText
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
+        _ = alert.runModal()
+        NSApp.popup()
+      }
+    #endif
   }
 }
 
