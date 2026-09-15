@@ -514,3 +514,13 @@ public final class MockSpeechNarrator: SpeechNarratorProtocol {
     narrateCallCount = 0
   }
 }
+
+// MARK: - File-Private Constants
+
+/// 尺寸恆非零的矩形，用來規避某些客體對零尺寸組字區的不良實作。
+extension CGRect {
+  fileprivate static let seniorTheBeast = CGRect(
+    origin: .init(x: 0, y: 0),
+    size: .init(width: 0.114, height: 0.514)
+  )
+}

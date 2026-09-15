@@ -109,22 +109,6 @@ extension NSRange {
   nonisolated public static let notFound = NSRange(location: NSNotFound, length: NSNotFound)
 }
 
-// MARK: - CGRect Extension
-
-extension CGRect {
-  nonisolated public static let seniorTheBeast: CGRect = {
-    var result = CGRect()
-    result.origin = .init(x: 0, y: 0)
-    result.size = .init(width: 0.114, height: 0.514)
-    return result
-  }()
-
-  nonisolated public static let zeroValue = CGRect(
-    origin: .init(x: 0, y: 0),
-    size: .init(width: 0, height: 0)
-  )
-}
-
 // MARK: - String.i18n extension
 
 extension StringLiteralType {
@@ -325,10 +309,15 @@ extension String {
 //   closure 參數須標 `@MainActor @Sendable`，同步路徑須以 `MainActor.assumeIsolated` 承接，
 //   否則過不了 Swift 6 的隔離檢查。
 // - **Swift 6.2 以下**：採 `vChewing-OSX-Legacy` 的寫法——closure 參數不帶 actor 標註、同步路徑
-//   直接呼叫、非同步路徑以 `if #available(macOS 12.0, *)` 把 `Task { @MainActor in … }` 包起來。
-//   該寫法在 5.10 側之所以必要：`@MainActor` 與 `MainActor.assumeIsolated` 皆被標為 macOS 10.15
-//   起可用，而本側部署目標是 10.9——`@MainActor` 一寫進簽名，即無條件觸發 availability 錯誤
+//   直接呼叫。該寫法在 5.10 側之所以必要：`@MainActor` 與 `MainActor.assumeIsolated` 皆被標為 macOS
+//   10.15 起可用，而本側部署目標是 10.9——`@MainActor` 一寫進簽名，即無條件觸發 availability 錯誤
 //   （`'MainActor' is only available in macOS 10.15 or newer`）。
+//
+// 兩套寫法唯一的行為差異在延遲版本：legacy 於 `#available(macOS 12.0, *)` 那一支改用
+// `Task { @MainActor in … }`，本側則不分系統版本一律走 `DispatchQueue.main`。理由與上面同一條——
+// `Task` 屬 concurrency 執行期，一引用就把 `@rpath/libswift_Concurrency.dylib` 記進每一份 `.a`
+// 的未定符號表，10.9 上的 `.app` 便只能靠同捆副本兜住；而 `DispatchQueue.main` 就是主執行緒，
+// 這兩個 API 的語意在此與 MainActor 執行器等價。
 #if compiler(>=6.2)
   nonisolated public func asyncOnMain(
     bypassAsync: Bool = false,
@@ -355,13 +344,7 @@ extension String {
       work()
       return
     }
-    if #available(macOS 12.0, *) {
-      Task { @MainActor in
-        work()
-      }
-    } else {
-      DispatchQueue.main.async { work() }
-    }
+    DispatchQueue.main.async { work() }
   }
 #endif
 
@@ -401,18 +384,8 @@ extension String {
       return
     }
     let delayInterval = Swift.max(0, delayInterval)
-    if #unavailable(macOS 12) {
-      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
-        work()
-      }
-    } else {
-      Task { @MainActor in
-        if delayInterval > 0 {
-          let delay = UInt64(delayInterval * 1_000_000_000)
-          try? await Task<Never, Never>.sleep(nanoseconds: delay)
-        }
-        work()
-      }
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
+      work()
     }
   }
 #endif

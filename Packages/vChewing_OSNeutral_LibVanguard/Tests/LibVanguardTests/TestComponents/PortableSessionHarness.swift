@@ -249,3 +249,10 @@ final class MockNavigableCandidateController: CtlCandidateProtocol {
     animated _: Bool
   ) {}
 }
+
+// MARK: - File-Private Constants
+
+/// 全零矩形，作為客體未提供行高量測資料時的替代值。
+extension CGRect {
+  fileprivate static let zeroValue = CGRect(origin: .init(x: 0, y: 0), size: .init(width: 0, height: 0))
+}
