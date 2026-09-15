@@ -306,8 +306,7 @@
         context.textStorage.setAttributedString(attributedString)
         _ = context.layoutManager.glyphRange(for: context.textContainer)
         context.layoutManager.ensureLayout(for: context.textContainer)
-        var usedRect = context.layoutManager.usedRect(for: context.textContainer)
-        if usedRect.isNull { usedRect = .zeroValue }
+        let usedRect = context.layoutManager.usedRect(for: context.textContainer)
         return CGSize(
           width: ceil(max(usedRect.width, 0)),
           height: ceil(max(usedRect.height, 0))
