@@ -176,12 +176,22 @@ public class TooltipUI: NSWindowController, TooltipUIProtocol {
   /// TooltipUI 不需外觀同步（配色由 setColor 管理）；以顯式 no-op 滿足協定必備需求。
   public func sync(accent _: HSBA?, locale _: String) {}
 
-  nonisolated public func hide() {
-    mainSync {
-      self.setColor(state: .normal)
-      self.window?.orderOut(nil)
+  // 6.2 側的 `mainSync` 收 `@MainActor` 閉包，故 `nonisolated` 的 `hide()` 可自其中觸及 MainActor 成員；
+  // 5.10 側的 `mainSync` 收非隔離閉包，而 `setColor(state:)` 屬 MainActor 成員，故該側採 legacy 的寫法
+  // （`hide()` 不標 `nonisolated`，直接於其 body 內呼叫——與 `vChewing-OSX-Legacy` 逐字相同）。
+  #if compiler(>=6.2)
+    nonisolated public func hide() {
+      mainSync {
+        self.setColor(state: .normal)
+        self.window?.orderOut(nil)
+      }
     }
-  }
+  #else
+    public func hide() {
+      setColor(state: .normal)
+      window?.orderOut(nil)
+    }
+  #endif
 
   // MARK: Internal
 
