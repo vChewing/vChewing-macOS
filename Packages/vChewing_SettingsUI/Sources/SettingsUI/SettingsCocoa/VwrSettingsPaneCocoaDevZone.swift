@@ -5,6 +5,8 @@
 import AppKit
 import UniformTypeIdentifiers
 
+// MARK: - SettingsPanesCocoa.DevZone
+
 extension SettingsPanesCocoa {
   public final class DevZone: NSViewController {
     // MARK: Public
@@ -250,7 +252,11 @@ extension SettingsPanesCocoa {
   }
 }
 
-@available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 600, height: 768)) {
-  SettingsPanesCocoa.DevZone()
-}
+// `#Preview` 是 SwiftUI 的巨集，展開需要 6.2 以上的巨集外掛（`@available` 擋不住展開）；
+// 5.10 側編不到它，故整段圈進 compiler condition。
+#if compiler(>=6.2)
+  @available(macOS 14.0, *)
+  #Preview(traits: .fixedLayout(width: 600, height: 768)) {
+    SettingsPanesCocoa.DevZone()
+  }
+#endif

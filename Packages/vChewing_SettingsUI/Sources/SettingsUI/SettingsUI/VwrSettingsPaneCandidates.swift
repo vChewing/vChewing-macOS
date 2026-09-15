@@ -2,174 +2,180 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
-import SwiftUI
+// 本檔為 SwiftUI 專屬，legacy 倉庫（＝本倉的「子集 ＋ Swift 5.10 Dialect」，砍掉了 SwiftUI）無對位模組可繼承；
+// 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」整段圈進 compiler condition，<6.2 分支不提供替代實作。
+#if compiler(>=6.2)
 
-// MARK: - VwrSettingsPaneCandidates
+  import SwiftUI
 
-@available(macOS 14, *)
-public struct VwrSettingsPaneCandidates: View {
-  // MARK: Public
+  // MARK: - VwrSettingsPaneCandidates
 
-  // MARK: - Main View
+  @available(macOS 14, *)
+  public struct VwrSettingsPaneCandidates: View {
+    // MARK: Public
 
-  public var body: some View {
-    Form {
-      Section {
-        UserDef.kUseRearCursorMode.renderUI()
-        UserDef.kCursorPlacementAfterSelectingCandidate.renderUI()
-        if !useRearCursorMode {
-          UserDef.kUseDynamicCandidateWindowOrigin.renderUI()
-            .disabled(useRearCursorMode)
+    // MARK: - Main View
+
+    public var body: some View {
+      Form {
+        Section {
+          UserDef.kUseRearCursorMode.renderUI()
+          UserDef.kCursorPlacementAfterSelectingCandidate.renderUI()
+          if !useRearCursorMode {
+            UserDef.kUseDynamicCandidateWindowOrigin.renderUI()
+              .disabled(useRearCursorMode)
+          }
+          UserDef.kDodgeInvalidEdgeCandidateCursorPosition.renderUI()
+          UserDef.kCandidateStateJKHLBehavior.renderUI {
+            // 利用該變數的 didSet 屬性自糾。
+            PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+          }
+          UserDef.kUseShiftQuestionToCallServiceMenu.renderUI {
+            // 利用該變數的 didSet 屬性自糾。
+            PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+          }
         }
-        UserDef.kDodgeInvalidEdgeCandidateCursorPosition.renderUI()
-        UserDef.kCandidateStateJKHLBehavior.renderUI {
-          // 利用該變數的 didSet 屬性自糾。
-          PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+        Section {
+          VwrSettingsPaneCandidates_SelectionKeys()
+          UserDef.kUseHorizontalCandidateList.renderUI()
+            .pickerStyle(RadioGroupPickerStyle())
+          UserDef.kCandidateListTextSize.renderUI {
+            let val = PrefMgr.shared.candidateListTextSize
+            guard !(12 ... 196).contains(val) else { return }
+            PrefMgr.shared.candidateListTextSize = max(12, min(val, 196))
+          }
+          UserDef.kCandidateWindowShowOnlyOneLine.renderUI()
+          UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.renderUI()
+          UserDef.kEnableCandidateWindowAnimation.renderUI()
+          if !candidateWindowShowOnlyOneLine {
+            UserDef.kAlwaysExpandCandidateWindow.renderUI()
+              .disabled(candidateWindowShowOnlyOneLine)
+            UserDef.kMinCellWidthForHorizontalMatrix.renderUI()
+              .disabled(candidateWindowShowOnlyOneLine)
+          }
+          UserDef.kRespectClientAccentColor.renderUI()
         }
-        UserDef.kUseShiftQuestionToCallServiceMenu.renderUI {
-          // 利用該變數的 didSet 屬性自糾。
-          PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+
+        // MARK: (header: Text("Misc Settings:"))
+
+        Section {
+          UserDef.kShowCodePointInCandidateUI.renderUI()
+          UserDef.kShowReverseLookupInCandidateUI.renderUI()
+          UserDef.kUseFixedCandidateOrderOnSelection.renderUI()
+          UserDef.kConsolidateContextOnCandidateSelection.renderUI()
+          UserDef.kCandidateNarrationToggleType.renderUI()
         }
-      }
-      Section {
-        VwrSettingsPaneCandidates_SelectionKeys()
-        UserDef.kUseHorizontalCandidateList.renderUI()
-          .pickerStyle(RadioGroupPickerStyle())
-        UserDef.kCandidateListTextSize.renderUI {
-          let val = PrefMgr.shared.candidateListTextSize
-          guard !(12 ... 196).contains(val) else { return }
-          PrefMgr.shared.candidateListTextSize = max(12, min(val, 196))
+
+        Section {
+          UserDef.kPopupCompositionBufferTextSize.renderUI()
         }
-        UserDef.kCandidateWindowShowOnlyOneLine.renderUI()
-        UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.renderUI()
-        UserDef.kEnableCandidateWindowAnimation.renderUI()
-        if !candidateWindowShowOnlyOneLine {
-          UserDef.kAlwaysExpandCandidateWindow.renderUI()
-            .disabled(candidateWindowShowOnlyOneLine)
-          UserDef.kMinCellWidthForHorizontalMatrix.renderUI()
-            .disabled(candidateWindowShowOnlyOneLine)
+
+        // MARK: (header: Text("Experimental:"))
+
+        let imkEOSNoticeButton = Button("i18n:Menu.WhereIsIMKCandidateWindow") {
+          isShowingIMKEOSNotice = true
         }
-        UserDef.kRespectClientAccentColor.renderUI()
-      }
 
-      // MARK: (header: Text("Misc Settings:"))
+        Section {
+          imkEOSNoticeButton
+        }
+      }.formStyled()
+        .frame(
+          minWidth: CtlSettingsUI.formWidth,
+          maxHeight: CtlSettingsUI.contentMaxHeight
+        )
+        .alert(
+          "i18n:Menu.EndOfIMKCandidateWindow".i18n,
+          isPresented: $isShowingIMKEOSNotice
+        ) {
+          Button("i18n:Common.OK".i18n, role: .cancel) {}
+        } message: {
+          Text("i18n:InfoMessage.EndOfIMKCandidatesExplanation".i18n)
+        }
+    }
 
-      Section {
-        UserDef.kShowCodePointInCandidateUI.renderUI()
-        UserDef.kShowReverseLookupInCandidateUI.renderUI()
-        UserDef.kUseFixedCandidateOrderOnSelection.renderUI()
-        UserDef.kConsolidateContextOnCandidateSelection.renderUI()
-        UserDef.kCandidateNarrationToggleType.renderUI()
-      }
+    // MARK: Private
 
-      Section {
-        UserDef.kPopupCompositionBufferTextSize.renderUI()
-      }
+    @State
+    private var isShowingIMKEOSNotice = false
 
-      // MARK: (header: Text("Experimental:"))
+    // MARK: - AppStorage Variables（僅保留需在 View 條件中讀取的屬性）
 
-      let imkEOSNoticeButton = Button("i18n:Menu.WhereIsIMKCandidateWindow") {
-        isShowingIMKEOSNotice = true
-      }
+    @AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
+    private var useRearCursorMode: Bool
 
-      Section {
-        imkEOSNoticeButton
-      }
-    }.formStyled()
-      .frame(
-        minWidth: CtlSettingsUI.formWidth,
-        maxHeight: CtlSettingsUI.contentMaxHeight
-      )
-      .alert(
-        "i18n:Menu.EndOfIMKCandidateWindow".i18n,
-        isPresented: $isShowingIMKEOSNotice
-      ) {
-        Button("i18n:Common.OK".i18n, role: .cancel) {}
-      } message: {
-        Text("i18n:InfoMessage.EndOfIMKCandidatesExplanation".i18n)
-      }
+    @AppStorage(wrappedValue: false, UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
+    private var candidateWindowShowOnlyOneLine: Bool
   }
 
-  // MARK: Private
+  // MARK: - VwrSettingsPaneCandidates_Previews
 
-  @State
-  private var isShowingIMKEOSNotice = false
-
-  // MARK: - AppStorage Variables（僅保留需在 View 條件中讀取的屬性）
-
-  @AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
-  private var useRearCursorMode: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
-  private var candidateWindowShowOnlyOneLine: Bool
-}
-
-// MARK: - VwrSettingsPaneCandidates_Previews
-
-@available(macOS 14, *)
-struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
-  static var previews: some View {
-    VwrSettingsPaneCandidates()
+  @available(macOS 14, *)
+  struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
+    static var previews: some View {
+      VwrSettingsPaneCandidates()
+    }
   }
-}
 
-// MARK: - VwrSettingsPaneCandidates_SelectionKeys
+  // MARK: - VwrSettingsPaneCandidates_SelectionKeys
 
-@available(macOS 14, *)
-/// 出於與效能有關的隱憂，該部件單獨以一個 View Struct 實現。
-private struct VwrSettingsPaneCandidates_SelectionKeys: View {
-  // MARK: Internal
+  @available(macOS 14, *)
+  /// 出於與效能有關的隱憂，該部件單獨以一個 View Struct 實現。
+  private struct VwrSettingsPaneCandidates_SelectionKeys: View {
+    // MARK: Internal
 
-  // MARK: - Main View
+    // MARK: - Main View
 
-  var body: some View {
-    UserDef.kCandidateKeys.renderUI {
-      // 文字框逐鍵即時寫回，故校驗需去抖動、待輸入停頓後再執行。
-      debouncer.schedule {
-        let value = candidateKeys
-        let keys = value.trimmingCharacters(
-          in: .whitespacesAndNewlines
-        ).lowercased().deduplicated
-        // Start Error Handling.
-        if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
-          if !keys.isEmpty {
-            IMEApp.buzz()
-            selectionKeyErrorMessage = errorResult
-            isShowingSelectionKeyError = true
+    var body: some View {
+      UserDef.kCandidateKeys.renderUI {
+        // 文字框逐鍵即時寫回，故校驗需去抖動、待輸入停頓後再執行。
+        debouncer.schedule {
+          let value = candidateKeys
+          let keys = value.trimmingCharacters(
+            in: .whitespacesAndNewlines
+          ).lowercased().deduplicated
+          // Start Error Handling.
+          if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
+            if !keys.isEmpty {
+              IMEApp.buzz()
+              selectionKeyErrorMessage = errorResult
+              isShowingSelectionKeyError = true
+            }
           }
         }
       }
-    }
-    .alert(
-      "i18n:ErrorMessage.InvalidSelectionKeys".i18n,
-      isPresented: $isShowingSelectionKeyError
-    ) {
-      Button("i18n:Common.OK".i18n, role: .cancel) {
-        candidateKeys = UserDef.kCandidateKeys.stringDefaultValue
+      .alert(
+        "i18n:ErrorMessage.InvalidSelectionKeys".i18n,
+        isPresented: $isShowingSelectionKeyError
+      ) {
+        Button("i18n:Common.OK".i18n, role: .cancel) {
+          candidateKeys = UserDef.kCandidateKeys.stringDefaultValue
+        }
+      } message: {
+        if let msg = selectionKeyErrorMessage {
+          Text(msg)
+        }
       }
-    } message: {
-      if let msg = selectionKeyErrorMessage {
-        Text(msg)
-      }
     }
+
+    // MARK: Private
+
+    // 以 @State 持有實例、確保跨 body 重算仍為同一枚 Debouncer。
+    @State
+    private var debouncer = Debouncer(delay: 0.5, queue: .main)
+
+    @State
+    private var isShowingSelectionKeyError = false
+    @State
+    private var selectionKeyErrorMessage: String?
+
+    // MARK: - AppStorage Variables
+
+    @AppStorage(
+      wrappedValue: UserDef.kCandidateKeys.stringDefaultValue,
+      UserDef.kCandidateKeys.rawValue
+    )
+    private var candidateKeys: String
   }
 
-  // MARK: Private
-
-  // 以 @State 持有實例、確保跨 body 重算仍為同一枚 Debouncer。
-  @State
-  private var debouncer = Debouncer(delay: 0.5, queue: .main)
-
-  @State
-  private var isShowingSelectionKeyError = false
-  @State
-  private var selectionKeyErrorMessage: String?
-
-  // MARK: - AppStorage Variables
-
-  @AppStorage(
-    wrappedValue: UserDef.kCandidateKeys.stringDefaultValue,
-    UserDef.kCandidateKeys.rawValue
-  )
-  private var candidateKeys: String
-}
+#endif

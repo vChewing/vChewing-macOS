@@ -63,24 +63,31 @@ extension PrefUITabs {
     Self.allCases.first { $0.cocoaTag == int }
   }
 
-  @available(macOS 14, *)
-  @ViewBuilder
-  public var suiView: some View {
-    switch self {
-    case .tabAbout: VwrSettingsPaneAbout()
-    case .tabGeneral: VwrSettingsPaneGeneral()
-    case .tabCandidates: VwrSettingsPaneCandidates()
-    case .tabBehavior: VwrSettingsPaneBehavior()
-    case .tabOutput: VwrSettingsPaneOutput()
-    case .tabDictionary: VwrSettingsPaneDictionary()
-    case .tabPhrases: VwrSettingsPanePhrases()
-    case .tabCassette: VwrSettingsPaneCassette()
-    case .tabKeyboard: VwrSettingsPaneKeyboard()
-    case .tabClients: VwrSettingsPaneClients()
-    case .tabServices: VwrSettingsPaneServices()
-    case .tabDevZone: VwrSettingsPaneDevZone()
+  // `suiView` 是 SwiftUI 專屬（回傳 `some View`、且逐一引用 6.2+ 專屬的 SwiftUI 面板）；
+  // 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」圈進 compiler condition，<6.2 分支不提供替代實作。
+  // 其餘成員（`cocoaTag`／`i18nTitle`／`icon` 等）為 AppKit 側所用，於兩代皆須可編。
+  #if compiler(>=6.2)
+
+    @available(macOS 14, *)
+    @ViewBuilder
+    public var suiView: some View {
+      switch self {
+      case .tabAbout: VwrSettingsPaneAbout()
+      case .tabGeneral: VwrSettingsPaneGeneral()
+      case .tabCandidates: VwrSettingsPaneCandidates()
+      case .tabBehavior: VwrSettingsPaneBehavior()
+      case .tabOutput: VwrSettingsPaneOutput()
+      case .tabDictionary: VwrSettingsPaneDictionary()
+      case .tabPhrases: VwrSettingsPanePhrases()
+      case .tabCassette: VwrSettingsPaneCassette()
+      case .tabKeyboard: VwrSettingsPaneKeyboard()
+      case .tabClients: VwrSettingsPaneClients()
+      case .tabServices: VwrSettingsPaneServices()
+      case .tabDevZone: VwrSettingsPaneDevZone()
+      }
     }
-  }
+
+  #endif
 
   public var i18nTitle: String {
     switch PrefMgr.shared.appleLanguages[0] {

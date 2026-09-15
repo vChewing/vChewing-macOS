@@ -2,312 +2,318 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
-import SwiftUI
-import UniformTypeIdentifiers
+// 本檔為 SwiftUI 專屬，legacy 倉庫（＝本倉的「子集 ＋ Swift 5.10 Dialect」，砍掉了 SwiftUI）無對位模組可繼承；
+// 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」整段圈進 compiler condition，<6.2 分支不提供替代實作。
+#if compiler(>=6.2)
 
-// MARK: - VwrSettingsPaneClients
+  import SwiftUI
+  import UniformTypeIdentifiers
 
-@available(macOS 14, *)
-public struct VwrSettingsPaneClients: View {
-  // MARK: Public
+  // MARK: - VwrSettingsPaneClients
 
-  public var body: some View {
-    GroupBox {
-      VStack(spacing: 10) {
-        HStack(spacing: 6) {
-          Button {
-            isShowingAddSheet = true
-          } label: {
-            Label {
-              Text("i18n:ClientManager.AddClient".i18n)
-                .fontWidth(.condensed)
-            } icon: {
-              Image(systemName: "plus")
-                .contentShape(.rect)
-                .frame(height: 12)
-            }
-            .help("i18n:ClientManager.AddClient".i18n)
-          }
-          .sheet(isPresented: $isShowingAddSheet) {
-            AddClientSheetView { bundleIDs, enableMitigation in
-              bundleIDs.forEach { bundleID in
-                var dict = PrefMgr.shared.clientsIMKTextInputIncapable
-                dict[bundleID] = enableMitigation
-                PrefMgr.shared.clientsIMKTextInputIncapable = dict
+  @available(macOS 14, *)
+  public struct VwrSettingsPaneClients: View {
+    // MARK: Public
+
+    public var body: some View {
+      GroupBox {
+        VStack(spacing: 10) {
+          HStack(spacing: 6) {
+            Button {
+              isShowingAddSheet = true
+            } label: {
+              Label {
+                Text("i18n:ClientManager.AddClient".i18n)
+                  .fontWidth(.condensed)
+              } icon: {
+                Image(systemName: "plus")
+                  .contentShape(.rect)
+                  .frame(height: 12)
               }
-              reloadList()
+              .help("i18n:ClientManager.AddClient".i18n)
             }
-          }
-          Button {
-            isShowingAppPicker = true
-          } label: {
-            Label {
-              Text("i18n:Common.JustSelect".i18n + "…")
-                .fontWidth(.condensed)
-            } icon: {
-              Image(systemName: "app.badge.checkmark")
-                .contentShape(.rect)
-                .frame(height: 12)
-            }
-            .help("i18n:Common.JustSelect".i18n)
-          }
-          .fileImporter(
-            isPresented: $isShowingAppPicker,
-            allowedContentTypes: [.applicationBundle],
-            allowsMultipleSelection: true
-          ) { result in
-            switch result {
-            case let .success(urls):
-              for url in urls {
-                guard let bundle = Bundle(url: url),
-                      let identifier = bundle.bundleIdentifier else {
-                  invalidBundleAlertPath = url.path
-                  isShowingInvalidBundleAlert = true
-                  continue
+            .sheet(isPresented: $isShowingAddSheet) {
+              AddClientSheetView { bundleIDs, enableMitigation in
+                bundleIDs.forEach { bundleID in
+                  var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+                  dict[bundleID] = enableMitigation
+                  PrefMgr.shared.clientsIMKTextInputIncapable = dict
                 }
-                pendingBundleIdentifier = identifier
-                isShowingMitigationPrompt = true
-              }
-            case .failure: break
-            }
-          }
-          .alert(
-            "i18n:ClientManager.EnablePopupCompositionBuffer".i18n,
-            isPresented: $isShowingMitigationPrompt
-          ) {
-            Button("i18n:Common.Yes".i18n) {
-              if let id = pendingBundleIdentifier {
-                var dict = PrefMgr.shared.clientsIMKTextInputIncapable
-                dict[id] = true
-                PrefMgr.shared.clientsIMKTextInputIncapable = dict
                 reloadList()
-                pendingBundleIdentifier = nil
               }
             }
-            Button("i18n:Common.No".i18n) {
-              if let id = pendingBundleIdentifier {
-                var dict = PrefMgr.shared.clientsIMKTextInputIncapable
-                dict[id] = false
-                PrefMgr.shared.clientsIMKTextInputIncapable = dict
-                reloadList()
-                pendingBundleIdentifier = nil
+            Button {
+              isShowingAppPicker = true
+            } label: {
+              Label {
+                Text("i18n:Common.JustSelect".i18n + "…")
+                  .fontWidth(.condensed)
+              } icon: {
+                Image(systemName: "app.badge.checkmark")
+                  .contentShape(.rect)
+                  .frame(height: 12)
+              }
+              .help("i18n:Common.JustSelect".i18n)
+            }
+            .fileImporter(
+              isPresented: $isShowingAppPicker,
+              allowedContentTypes: [.applicationBundle],
+              allowsMultipleSelection: true
+            ) { result in
+              switch result {
+              case let .success(urls):
+                for url in urls {
+                  guard let bundle = Bundle(url: url),
+                        let identifier = bundle.bundleIdentifier else {
+                    invalidBundleAlertPath = url.path
+                    isShowingInvalidBundleAlert = true
+                    continue
+                  }
+                  pendingBundleIdentifier = identifier
+                  isShowingMitigationPrompt = true
+                }
+              case .failure: break
               }
             }
-          } message: {
-            Text(
-              (pendingBundleIdentifier ?? "") + "\n\n"
-                + "i18n:ClientManager.CompatibilityNote".i18n
-            )
-          }
-          Spacer()
-          Button {
-            removeClientClicked()
-          } label: {
-            Image(systemName: "minus")
-              .contentShape(.rect)
-              .frame(height: 12)
-          }
-          .help("i18n:Common.RemoveSelected".i18n)
-          .disabled(selectedIDs.isEmpty)
-          .alert(
-            "i18n:ErrorMessage.InvalidAppBundle".i18n,
-            isPresented: $isShowingInvalidBundleAlert
-          ) {
-            Button("i18n:Common.OK".i18n, role: .cancel) {}
-          } message: {
-            Text((invalidBundleAlertPath ?? "") + "\n\n" + "i18n:Common.PleaseTryAgain".i18n)
-          }
-        }
-        .controlSize(.small)
-        Table(clientsList, selection: $selectedIDs) {
-          TableColumn("") { client in
-            Toggle(isOn: getToggleBinding(client: client)) {
-              Text(client.bundleID)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            .alert(
+              "i18n:ClientManager.EnablePopupCompositionBuffer".i18n,
+              isPresented: $isShowingMitigationPrompt
+            ) {
+              Button("i18n:Common.Yes".i18n) {
+                if let id = pendingBundleIdentifier {
+                  var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+                  dict[id] = true
+                  PrefMgr.shared.clientsIMKTextInputIncapable = dict
+                  reloadList()
+                  pendingBundleIdentifier = nil
+                }
+              }
+              Button("i18n:Common.No".i18n) {
+                if let id = pendingBundleIdentifier {
+                  var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+                  dict[id] = false
+                  PrefMgr.shared.clientsIMKTextInputIncapable = dict
+                  reloadList()
+                  pendingBundleIdentifier = nil
+                }
+              }
+            } message: {
+              Text(
+                (pendingBundleIdentifier ?? "") + "\n\n"
+                  + "i18n:ClientManager.CompatibilityNote".i18n
+              )
             }
-            .toggleStyle(.switch)
-            .controlSize(.mini)
+            Spacer()
+            Button {
+              removeClientClicked()
+            } label: {
+              Image(systemName: "minus")
+                .contentShape(.rect)
+                .frame(height: 12)
+            }
+            .help("i18n:Common.RemoveSelected".i18n)
+            .disabled(selectedIDs.isEmpty)
+            .alert(
+              "i18n:ErrorMessage.InvalidAppBundle".i18n,
+              isPresented: $isShowingInvalidBundleAlert
+            ) {
+              Button("i18n:Common.OK".i18n, role: .cancel) {}
+            } message: {
+              Text((invalidBundleAlertPath ?? "") + "\n\n" + "i18n:Common.PleaseTryAgain".i18n)
+            }
+          }
+          .controlSize(.small)
+          Table(clientsList, selection: $selectedIDs) {
+            TableColumn("") { client in
+              Toggle(isOn: getToggleBinding(client: client)) {
+                Text(client.bundleID)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+              }
+              .toggleStyle(.switch)
+              .controlSize(.mini)
+            }
+          }
+          .tableColumnHeaders(.hidden)
+          .tableStyle(.bordered)
+          .frame(minHeight: 200)
+          .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+            handleClientDrop(providers: providers)
+          }
+          HStack(alignment: .top) {
+            VStack(alignment: .leading) {
+              Text(
+                "i18n:ClientManager.ManageClientsDescription"
+                  .i18n
+              ).settingsDescription()
+            }
+            Spacer()
           }
         }
-        .tableColumnHeaders(.hidden)
-        .tableStyle(.bordered)
-        .frame(minHeight: 200)
-        .onDrop(of: [.fileURL], isTargeted: nil) { providers in
-          handleClientDrop(providers: providers)
-        }
-        HStack(alignment: .top) {
-          VStack(alignment: .leading) {
-            Text(
-              "i18n:ClientManager.ManageClientsDescription"
-                .i18n
-            ).settingsDescription()
-          }
-          Spacer()
-        }
+        .padding(4)
       }
-      .padding(4)
-    }
-    .padding()
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
-    .onAppear { reloadList() }
-  }
-
-  // MARK: Private
-
-  // MARK: - IdentifiableClient
-
-  private struct IdentifiableClient: Identifiable {
-    // MARK: Lifecycle
-
-    init(bundleID: String) {
-      self.bundleID = bundleID
+      .padding()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
+      .onAppear { reloadList() }
     }
 
-    // MARK: Internal
+    // MARK: Private
 
-    let bundleID: String
+    // MARK: - IdentifiableClient
 
-    var id: String { bundleID }
-  }
+    private struct IdentifiableClient: Identifiable {
+      // MARK: Lifecycle
 
-  @State
-  private var clientsList: [IdentifiableClient] = []
-  @State
-  private var selectedIDs: Set<String> = []
-  @State
-  private var isShowingAddSheet = false
-  @State
-  private var isShowingAppPicker = false
-  @State
-  private var isShowingMitigationPrompt = false
-  @State
-  private var isShowingInvalidBundleAlert = false
-  @State
-  private var pendingBundleIdentifier: String?
-  @State
-  private var invalidBundleAlertPath: String?
-
-  nonisolated private static func parseFileURL(from item: NSSecureCoding?) -> URL? {
-    if let data = item as? Data {
-      return URL(dataRepresentation: data, relativeTo: nil)
-    }
-    if let url = item as? URL {
-      return url
-    }
-    if let url = item as? NSURL {
-      return url as URL
-    }
-    if let string = item as? String {
-      return URL(string: string)
-    }
-    return nil
-  }
-
-  private func getToggleBinding(client: IdentifiableClient) -> Binding<Bool> {
-    Binding(
-      get: {
-        PrefMgr.shared.clientsIMKTextInputIncapable[client.bundleID] ?? true
-      },
-      set: { newValue in
-        PrefMgr.shared.clientsIMKTextInputIncapable[client.bundleID] = newValue
-        reloadList()
+      init(bundleID: String) {
+        self.bundleID = bundleID
       }
-    )
-  }
 
-  private func reloadList() {
-    clientsList = PrefMgr.shared.clientsIMKTextInputIncapable.keys.sorted()
-      .map { IdentifiableClient(bundleID: $0) }
-  }
+      // MARK: Internal
 
-  private func removeClientClicked() {
-    var dict = PrefMgr.shared.clientsIMKTextInputIncapable
-    for item in clientsList where selectedIDs.contains(item.id) {
-      dict[item.bundleID] = nil
+      let bundleID: String
+
+      var id: String { bundleID }
     }
-    PrefMgr.shared.clientsIMKTextInputIncapable = dict
-    selectedIDs.removeAll()
-    reloadList()
-  }
 
-  private func handleClientDrop(providers: [NSItemProvider]) -> Bool {
-    let acceptableProviders = providers.filter {
-      $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier)
+    @State
+    private var clientsList: [IdentifiableClient] = []
+    @State
+    private var selectedIDs: Set<String> = []
+    @State
+    private var isShowingAddSheet = false
+    @State
+    private var isShowingAppPicker = false
+    @State
+    private var isShowingMitigationPrompt = false
+    @State
+    private var isShowingInvalidBundleAlert = false
+    @State
+    private var pendingBundleIdentifier: String?
+    @State
+    private var invalidBundleAlertPath: String?
+
+    nonisolated private static func parseFileURL(from item: NSSecureCoding?) -> URL? {
+      if let data = item as? Data {
+        return URL(dataRepresentation: data, relativeTo: nil)
+      }
+      if let url = item as? URL {
+        return url
+      }
+      if let url = item as? NSURL {
+        return url as URL
+      }
+      if let string = item as? String {
+        return URL(string: string)
+      }
+      return nil
     }
-    guard !acceptableProviders.isEmpty else { return false }
-    acceptableProviders.forEach { provider in
-      provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) {
-        item, _ in
-        guard let droppedURL = Self.parseFileURL(from: item) else { return }
-        guard let bundle = Bundle(url: droppedURL),
-              let identifier = bundle.bundleIdentifier else { return }
-        DispatchQueue.main.async {
-          var dict = PrefMgr.shared.clientsIMKTextInputIncapable
-          dict[identifier] = true
-          PrefMgr.shared.clientsIMKTextInputIncapable = dict
+
+    private func getToggleBinding(client: IdentifiableClient) -> Binding<Bool> {
+      Binding(
+        get: {
+          PrefMgr.shared.clientsIMKTextInputIncapable[client.bundleID] ?? true
+        },
+        set: { newValue in
+          PrefMgr.shared.clientsIMKTextInputIncapable[client.bundleID] = newValue
           reloadList()
         }
+      )
+    }
+
+    private func reloadList() {
+      clientsList = PrefMgr.shared.clientsIMKTextInputIncapable.keys.sorted()
+        .map { IdentifiableClient(bundleID: $0) }
+    }
+
+    private func removeClientClicked() {
+      var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+      for item in clientsList where selectedIDs.contains(item.id) {
+        dict[item.bundleID] = nil
       }
+      PrefMgr.shared.clientsIMKTextInputIncapable = dict
+      selectedIDs.removeAll()
+      reloadList()
     }
-    return true
-  }
-}
 
-// MARK: - AddClientSheetView
-
-@available(macOS 14, *)
-private struct AddClientSheetView: View {
-  @Environment(\.dismiss)
-  private var dismiss
-  @State
-  private var inputText: String = {
-    let recentClients = SettingsUIHost.shared.recentClientBundleIdentifiers().keys.compactMap {
-      PrefMgr.shared.clientsIMKTextInputIncapable.keys.contains($0) ? nil : $0
-    }
-    return recentClients.sorted().joined(separator: "\n")
-  }()
-
-  var onCommit: ([String], Bool) -> ()
-
-  var body: some View {
-    VStack(spacing: 12) {
-      Text("i18n:ClientManager.EnterBundleIdentifier".i18n)
-        .font(.headline)
-      Text("i18n:PhraseEditor.OneRecordPerLine".i18n)
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(.leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
-      TextEditor(text: $inputText)
-        .font(.system(.body, design: .monospaced))
-        .frame(minWidth: 350, minHeight: 180)
-        .border(Color.secondary.opacity(0.3))
-      HStack {
-        Spacer()
-        Button("i18n:Common.Cancel".i18n, role: .cancel) { dismiss() }
-          .keyboardShortcut(.cancelAction)
-        Button("i18n:Common.OK".i18n) {
-          let ids = inputText.components(separatedBy: "\n").filter { !$0.isEmpty }
-          onCommit(ids, true)
-          dismiss()
+    private func handleClientDrop(providers: [NSItemProvider]) -> Bool {
+      let acceptableProviders = providers.filter {
+        $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier)
+      }
+      guard !acceptableProviders.isEmpty else { return false }
+      acceptableProviders.forEach { provider in
+        provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) {
+          item, _ in
+          guard let droppedURL = Self.parseFileURL(from: item) else { return }
+          guard let bundle = Bundle(url: droppedURL),
+                let identifier = bundle.bundleIdentifier else { return }
+          DispatchQueue.main.async {
+            var dict = PrefMgr.shared.clientsIMKTextInputIncapable
+            dict[identifier] = true
+            PrefMgr.shared.clientsIMKTextInputIncapable = dict
+            reloadList()
+          }
         }
-        .keyboardShortcut(.defaultAction)
-        .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
       }
+      return true
     }
-    .padding()
-    .frame(minWidth: 420)
   }
-}
 
-// MARK: - VwrSettingsPaneClients_Previews
+  // MARK: - AddClientSheetView
 
-@available(macOS 14, *)
-struct VwrSettingsPaneClients_Previews: PreviewProvider {
-  static var previews: some View {
-    VwrSettingsPaneClients()
+  @available(macOS 14, *)
+  private struct AddClientSheetView: View {
+    @Environment(\.dismiss)
+    private var dismiss
+    @State
+    private var inputText: String = {
+      let recentClients = SettingsUIHost.shared.recentClientBundleIdentifiers().keys.compactMap {
+        PrefMgr.shared.clientsIMKTextInputIncapable.keys.contains($0) ? nil : $0
+      }
+      return recentClients.sorted().joined(separator: "\n")
+    }()
+
+    var onCommit: ([String], Bool) -> ()
+
+    var body: some View {
+      VStack(spacing: 12) {
+        Text("i18n:ClientManager.EnterBundleIdentifier".i18n)
+          .font(.headline)
+        Text("i18n:PhraseEditor.OneRecordPerLine".i18n)
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.leading)
+          .frame(maxWidth: .infinity, alignment: .leading)
+        TextEditor(text: $inputText)
+          .font(.system(.body, design: .monospaced))
+          .frame(minWidth: 350, minHeight: 180)
+          .border(Color.secondary.opacity(0.3))
+        HStack {
+          Spacer()
+          Button("i18n:Common.Cancel".i18n, role: .cancel) { dismiss() }
+            .keyboardShortcut(.cancelAction)
+          Button("i18n:Common.OK".i18n) {
+            let ids = inputText.components(separatedBy: "\n").filter { !$0.isEmpty }
+            onCommit(ids, true)
+            dismiss()
+          }
+          .keyboardShortcut(.defaultAction)
+          .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+      }
+      .padding()
+      .frame(minWidth: 420)
+    }
   }
-}
+
+  // MARK: - VwrSettingsPaneClients_Previews
+
+  @available(macOS 14, *)
+  struct VwrSettingsPaneClients_Previews: PreviewProvider {
+    static var previews: some View {
+      VwrSettingsPaneClients()
+    }
+  }
+
+#endif

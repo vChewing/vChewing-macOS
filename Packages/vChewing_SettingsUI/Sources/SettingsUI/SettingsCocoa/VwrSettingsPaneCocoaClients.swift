@@ -417,7 +417,11 @@ extension SettingsPanesCocoa.Clients: NSTableViewDelegate, NSTableViewDataSource
 
 // MARK: - Preview.
 
-@available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 614, height: 768)) {
-  SettingsPanesCocoa.Clients()
-}
+// `#Preview` 是 SwiftUI 的巨集，展開需要 6.2 以上的巨集外掛（`@available` 擋不住展開）；
+// 5.10 側編不到它，故整段圈進 compiler condition。
+#if compiler(>=6.2)
+  @available(macOS 14.0, *)
+  #Preview(traits: .fixedLayout(width: 614, height: 768)) {
+    SettingsPanesCocoa.Clients()
+  }
+#endif

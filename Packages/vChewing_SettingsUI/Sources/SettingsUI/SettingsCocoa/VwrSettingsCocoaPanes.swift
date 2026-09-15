@@ -67,15 +67,20 @@ final class SettingsPreview: NSViewController {
   let panes = SettingsPanesCocoa()
 
   override func loadView() {
-    addChild(panes.ctlPageGeneral)
-    addChild(panes.ctlPageCandidates)
-    addChild(panes.ctlPageBehavior)
-    addChild(panes.ctlPageOutput)
-    addChild(panes.ctlPageDictionary)
-    addChild(panes.ctlPagePhrases)
-    addChild(panes.ctlPageCassette)
-    addChild(panes.ctlPageKeyboard)
-    addChild(panes.ctlPageDevZone)
+    // `addChild`（view controller containment）自 macOS 10.10 起才有，10.9 沒有對等 API。這些 pane 已由
+    // stored property `panes` 持有，故 10.9 分支逕為 no-op：留存與下方 `NSTabView` 的內容皆不受影響。
+    // （legacy 分支的唯一存在意義就是支援 10.9。）
+    if #available(macOS 10.10, *) {
+      addChild(panes.ctlPageGeneral)
+      addChild(panes.ctlPageCandidates)
+      addChild(panes.ctlPageBehavior)
+      addChild(panes.ctlPageOutput)
+      addChild(panes.ctlPageDictionary)
+      addChild(panes.ctlPagePhrases)
+      addChild(panes.ctlPageCassette)
+      addChild(panes.ctlPageKeyboard)
+      addChild(panes.ctlPageDevZone)
+    }
     view = NSTabView.build {
       NSTabView.TabPage(title: "GENERAL", view: panes.ctlPageGeneral.view)
       NSTabView.TabPage(title: "CANDIDATES", view: panes.ctlPageCandidates.view)
@@ -92,7 +97,11 @@ final class SettingsPreview: NSViewController {
   }
 }
 
-@available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 600, height: 768)) {
-  SettingsPreview()
-}
+// `#Preview` 是 SwiftUI 的巨集，展開需要 6.2 以上的巨集外掛（`@available` 擋不住展開）；
+// 5.10 側編不到它，故整段圈進 compiler condition。
+#if compiler(>=6.2)
+  @available(macOS 14.0, *)
+  #Preview(traits: .fixedLayout(width: 600, height: 768)) {
+    SettingsPreview()
+  }
+#endif

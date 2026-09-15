@@ -2,419 +2,426 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
-import AppKit
-import Combine
-import SwiftUI
+// 本檔為 SwiftUI 專屬（其中的 `fileChangeIndicator` 亦引用 `Shared_DarwinImpl` 內 6.2+ 專屬的
+// `PEReloadEventObserver`），legacy 倉庫無對位模組可繼承；依「SwiftUI 之任何內容不得裸露於 5.10
+// 可編的路徑上」整段圈進 compiler condition，<6.2 分支不提供替代實作。
+#if compiler(>=6.2)
 
-private let loc: String =
-  (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
+  import AppKit
+  import Combine
+  import SwiftUI
 
-// MARK: - VwrPhraseEditorUI
+  private let loc: String =
+    (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
 
-@available(macOS 14, *)
-public struct VwrPhraseEditorUI: View {
-  // MARK: Lifecycle
+  // MARK: - VwrPhraseEditorUI
 
-  // MARK: -
+  @available(macOS 14, *)
+  public struct VwrPhraseEditorUI: View {
+    // MARK: Lifecycle
 
-  public init(delegate theDelegate: PhraseEditorDelegate? = nil, window: NSWindow? = nil) {
-    _txtContent = .init(
-      get: { Self.txtContentStorage },
-      set: { newValue, _ in
-        Self.txtContentStorage.removeAll()
-        Self.txtContentStorage.append(newValue)
+    // MARK: -
+
+    public init(delegate theDelegate: PhraseEditorDelegate? = nil, window: NSWindow? = nil) {
+      _txtContent = .init(
+        get: { Self.txtContentStorage },
+        set: { newValue, _ in
+          Self.txtContentStorage.removeAll()
+          Self.txtContentStorage.append(newValue)
+        }
+      )
+      guard let theDelegate = theDelegate else { return }
+      defer {
+        delegate = theDelegate
+        self.window = window
       }
-    )
-    guard let theDelegate = theDelegate else { return }
-    defer {
-      delegate = theDelegate
-      self.window = window
     }
-  }
 
-  // MARK: Public
+    // MARK: Public
 
-  // MARK: - Main View.
+    // MARK: - Main View.
 
-  public var body: some View {
-    VStack(spacing: 4) {
-      LabeledContent {
-        Button("i18n:Common.MoreIntel".i18n.withEllipsis) {
-          guard let window = window else { return }
-          window.callAlert(
-            title: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n,
-            text: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.explain".i18n
-          )
-        }
-        .controlSize(.small)
-        .fixedSize()
-        .disabled(window == nil)
-      } label: {
-        Text("💡 " + "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n)
-          .multilineTextAlignment(.leading)
-          .font(.subheadline)
-          .frame(maxWidth: .infinity, alignment: .leading)
-      }
-      HStack {
-        Picker("", selection: $selInputMode.didChange { dropDownMenuDidChange() }) {
-          switch currentIMEInputMode {
-          case .imeModeCHS:
-            Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
-            Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
-          case .imeModeCHT:
-            Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
-            Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
-          case .imeModeNULL:
-            Text(Shared.InputMode.imeModeNULL.localizedDescription)
-              .tag(Shared.InputMode.imeModeNULL)
-            if loc.contains("Hans") {
-              Text(Shared.InputMode.imeModeCHS.localizedDescription)
-                .tag(Shared.InputMode.imeModeCHS)
-              Text(Shared.InputMode.imeModeCHT.localizedDescription)
-                .tag(Shared.InputMode.imeModeCHT)
-            } else {
-              Text(Shared.InputMode.imeModeCHT.localizedDescription)
-                .tag(Shared.InputMode.imeModeCHT)
-              Text(Shared.InputMode.imeModeCHS.localizedDescription)
-                .tag(Shared.InputMode.imeModeCHS)
-            }
-          }
-        }
-        .labelsHidden()
-        Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
-          Text(LXAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
-            LXAssembly.ReplacableUserDataType.thePhrases
-          )
-          Text(LXAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
-            LXAssembly.ReplacableUserDataType.theFilter
-          )
-          Text(LXAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
-            LXAssembly.ReplacableUserDataType.theReplacements
-          )
-          Text(LXAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
-            LXAssembly.ReplacableUserDataType.theAssociates
-          )
-          Text(LXAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
-            LXAssembly.ReplacableUserDataType.theSymbols
-          )
-        }
-        .labelsHidden()
-        Spacer()
-        Button("i18n:Common.Reload".i18n) {
-          asyncOnMain { update() }
-        }.disabled(selInputMode == .imeModeNULL || isLoading)
-        Button("i18n:Common.Consolidate".i18n) {
-          consolidate()
-        }.disabled(selInputMode == .imeModeNULL || isLoading)
-        Button("i18n:Common.Save".i18n) {
-          asyncOnMain { saveAndReload() }
-        }.keyboardShortcut("s", modifiers: [.command])
-          .disabled(delegate == nil)
-        Button("...") {
-          asyncOnMain {
-            saveAndReload()
-            callExternalAppToOpenPhraseFile()
-          }
-        }
-      }
-
-      GroupBox {
-        TextEditorEX(text: $txtContent)
-          .disabled(selInputMode == .imeModeNULL || isLoading)
-          .frame(minWidth: 320, minHeight: 240)
-          .onChange(of: fileChangeIndicator.id) { _ in
-            Task {
-              if autoReloadExternalModifications { update() }
-            }
-          }
-      }
-
+    public var body: some View {
       VStack(spacing: 4) {
-        if selUserDataType != .theAssociates {
-          HStack {
-            TextField(lblAddPhraseTag4, text: $txtAddPhraseField4)
-              .autocorrectionDisabled(true)
-          }
-        }
-        HStack {
-          TextField(lblAddPhraseTag1, text: $txtAddPhraseField1)
-            .autocorrectionDisabled(true)
-          TextField(lblAddPhraseTag2, text: $txtAddPhraseField2)
-            .autocorrectionDisabled(true)
-          if selUserDataType == .thePhrases {
-            TextField(
-              lblAddPhraseTag3,
-              text: $txtAddPhraseField3.didChange {
-                guard let weightVal = Double(txtAddPhraseField3) else { return }
-                if weightVal > 0 { txtAddPhraseField3 = "" }
-              }
-            )
-            .autocorrectionDisabled(true)
-            .help(PETerms.TooltipTexts.weightInputBox.localized)
-          }
-          Button("?") {
+        LabeledContent {
+          Button("i18n:Common.MoreIntel".i18n.withEllipsis) {
             guard let window = window else { return }
             window.callAlert(
-              title: "i18n:InfoMessage.YouMayFollow".i18n,
-              text: PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
+              title: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n,
+              text: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.explain".i18n
             )
-          }.disabled(window == nil)
-          Button(PETerms.AddPhrases.locAdd.localized.0) {
-            asyncOnMain { insertEntry() }
-          }.disabled(txtAddPhraseField1.isEmpty || txtAddPhraseField2.isEmpty)
-        }
-      }.disabled(selInputMode == Shared.InputMode.imeModeNULL || isLoading)
-      HStack {
-        Toggle(
-          LocalizedStringKey(
-            "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle"
-          ),
-          isOn: $selAutoReloadExternalModifications.didChange {
-            autoReloadExternalModifications = selAutoReloadExternalModifications
           }
-        )
-        .controlSize(.small)
-        Spacer()
+          .controlSize(.small)
+          .fixedSize()
+          .disabled(window == nil)
+        } label: {
+          Text("💡 " + "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n)
+            .multilineTextAlignment(.leading)
+            .font(.subheadline)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        HStack {
+          Picker("", selection: $selInputMode.didChange { dropDownMenuDidChange() }) {
+            switch currentIMEInputMode {
+            case .imeModeCHS:
+              Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
+              Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
+            case .imeModeCHT:
+              Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
+              Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
+            case .imeModeNULL:
+              Text(Shared.InputMode.imeModeNULL.localizedDescription)
+                .tag(Shared.InputMode.imeModeNULL)
+              if loc.contains("Hans") {
+                Text(Shared.InputMode.imeModeCHS.localizedDescription)
+                  .tag(Shared.InputMode.imeModeCHS)
+                Text(Shared.InputMode.imeModeCHT.localizedDescription)
+                  .tag(Shared.InputMode.imeModeCHT)
+              } else {
+                Text(Shared.InputMode.imeModeCHT.localizedDescription)
+                  .tag(Shared.InputMode.imeModeCHT)
+                Text(Shared.InputMode.imeModeCHS.localizedDescription)
+                  .tag(Shared.InputMode.imeModeCHS)
+              }
+            }
+          }
+          .labelsHidden()
+          Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
+            Text(LXAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
+              LXAssembly.ReplacableUserDataType.thePhrases
+            )
+            Text(LXAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
+              LXAssembly.ReplacableUserDataType.theFilter
+            )
+            Text(LXAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
+              LXAssembly.ReplacableUserDataType.theReplacements
+            )
+            Text(LXAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
+              LXAssembly.ReplacableUserDataType.theAssociates
+            )
+            Text(LXAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
+              LXAssembly.ReplacableUserDataType.theSymbols
+            )
+          }
+          .labelsHidden()
+          Spacer()
+          Button("i18n:Common.Reload".i18n) {
+            asyncOnMain { update() }
+          }.disabled(selInputMode == .imeModeNULL || isLoading)
+          Button("i18n:Common.Consolidate".i18n) {
+            consolidate()
+          }.disabled(selInputMode == .imeModeNULL || isLoading)
+          Button("i18n:Common.Save".i18n) {
+            asyncOnMain { saveAndReload() }
+          }.keyboardShortcut("s", modifiers: [.command])
+            .disabled(delegate == nil)
+          Button("...") {
+            asyncOnMain {
+              saveAndReload()
+              callExternalAppToOpenPhraseFile()
+            }
+          }
+        }
+
+        GroupBox {
+          TextEditorEX(text: $txtContent)
+            .disabled(selInputMode == .imeModeNULL || isLoading)
+            .frame(minWidth: 320, minHeight: 240)
+            .onChange(of: fileChangeIndicator.id) { _ in
+              Task {
+                if autoReloadExternalModifications { update() }
+              }
+            }
+        }
+
+        VStack(spacing: 4) {
+          if selUserDataType != .theAssociates {
+            HStack {
+              TextField(lblAddPhraseTag4, text: $txtAddPhraseField4)
+                .autocorrectionDisabled(true)
+            }
+          }
+          HStack {
+            TextField(lblAddPhraseTag1, text: $txtAddPhraseField1)
+              .autocorrectionDisabled(true)
+            TextField(lblAddPhraseTag2, text: $txtAddPhraseField2)
+              .autocorrectionDisabled(true)
+            if selUserDataType == .thePhrases {
+              TextField(
+                lblAddPhraseTag3,
+                text: $txtAddPhraseField3.didChange {
+                  guard let weightVal = Double(txtAddPhraseField3) else { return }
+                  if weightVal > 0 { txtAddPhraseField3 = "" }
+                }
+              )
+              .autocorrectionDisabled(true)
+              .help(PETerms.TooltipTexts.weightInputBox.localized)
+            }
+            Button("?") {
+              guard let window = window else { return }
+              window.callAlert(
+                title: "i18n:InfoMessage.YouMayFollow".i18n,
+                text: PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
+              )
+            }.disabled(window == nil)
+            Button(PETerms.AddPhrases.locAdd.localized.0) {
+              asyncOnMain { insertEntry() }
+            }.disabled(txtAddPhraseField1.isEmpty || txtAddPhraseField2.isEmpty)
+          }
+        }.disabled(selInputMode == Shared.InputMode.imeModeNULL || isLoading)
+        HStack {
+          Toggle(
+            LocalizedStringKey(
+              "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle"
+            ),
+            isOn: $selAutoReloadExternalModifications.didChange {
+              autoReloadExternalModifications = selAutoReloadExternalModifications
+            }
+          )
+          .controlSize(.small)
+          Spacer()
+        }
+      }.onDisappear {
+        selInputMode = .imeModeNULL
+        selUserDataType = .thePhrases
+        txtContent = "i18n:PhraseEditor.SelectModeFirst".i18n
+        isLoading = true
+        Self.txtContentStorage = ""
+      }.onAppear {
+        guard let delegate = delegate else { return }
+        selInputMode = delegate.currentInputMode
+        update()
       }
-    }.onDisappear {
-      selInputMode = .imeModeNULL
-      selUserDataType = .thePhrases
-      txtContent = "i18n:PhraseEditor.SelectModeFirst".i18n
-      isLoading = true
-      Self.txtContentStorage = ""
-    }.onAppear {
-      guard let delegate = delegate else { return }
-      selInputMode = delegate.currentInputMode
-      update()
     }
-  }
 
-  // MARK: Internal
+    // MARK: Internal
 
-  static var txtContentStorage: String = "i18n:PhraseEditor.SelectModeFirst".i18n
+    static var txtContentStorage: String = "i18n:PhraseEditor.SelectModeFirst".i18n
 
-  // MARK: Private
+    // MARK: Private
 
-  @Binding
-  private var txtContent: String
+    @Binding
+    private var txtContent: String
 
-  @State
-  private var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-  @State
-  private var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-  @State
-  private var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
-  @State
-  private var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-  @State
-  private var txtAddPhraseField1 = ""
-  @State
-  private var txtAddPhraseField2 = ""
-  @State
-  private var txtAddPhraseField3 = ""
-  @State
-  private var txtAddPhraseField4 = ""
-  @State
-  private var fileChangeIndicator = PEReloadEventObserver.shared
-  @State
-  private var selInputMode: Shared.InputMode = .imeModeNULL
-  @State
-  private var selUserDataType: LXAssembly.ReplacableUserDataType = .thePhrases
+    @State
+    private var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+    @State
+    private var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+    @State
+    private var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+    @State
+    private var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    @State
+    private var txtAddPhraseField1 = ""
+    @State
+    private var txtAddPhraseField2 = ""
+    @State
+    private var txtAddPhraseField3 = ""
+    @State
+    private var txtAddPhraseField4 = ""
+    @State
+    private var fileChangeIndicator = PEReloadEventObserver.shared
+    @State
+    private var selInputMode: Shared.InputMode = .imeModeNULL
+    @State
+    private var selUserDataType: LXAssembly.ReplacableUserDataType = .thePhrases
 
-  @AppStorage("PhraseEditorAutoReloadExternalModifications")
-  private var autoReloadExternalModifications: Bool = true
-  @State
-  private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
-    forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue
-  )
-  @State
-  private var isLoading = false
-  @State
-  private var textEditorTooltip = PETerms.TooltipTexts
-    .sampleDictionaryContent(for: .thePhrases)
-
-  private weak var window: NSWindow?
-
-  private var currentIMEInputMode: Shared.InputMode {
-    delegate?.currentInputMode ?? selInputMode
-  }
-
-  private var delegate: PhraseEditorDelegate? {
-    didSet {
-      guard let delegate = delegate else { return }
-      selInputMode = delegate.currentInputMode
-      update()
-    }
-  }
-
-  private func update() {
-    guard let delegate = delegate else { return }
-    updateLabels()
-    clearAllFields()
-    txtContent = "i18n:DictionaryStatus.Loading".i18n
-    isLoading = true
-    asyncOnMain {
-      txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
-      textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
-      isLoading = false
-    }
-  }
-
-  private func updateLabels() {
-    clearAllFields()
-    switch selUserDataType {
-    case .thePhrases:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-      lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    case .theFilter:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    case .theReplacements:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    case .theAssociates:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
-      lblAddPhraseTag2 = {
-        let result = PETerms.AddPhrases.locPhrase.localized.0
-        return (result == "Phrase") ? "Phrases" : result
-      }()
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = ""
-    case .theSymbols:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    }
-  }
-
-  private func insertEntry() {
-    txtAddPhraseField1.removeAll { "　 \t\n\r".contains($0) }
-    if selUserDataType != .theAssociates {
-      txtAddPhraseField2.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
-    }
-    txtAddPhraseField2.removeAll {
-      selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
-    }
-    txtAddPhraseField3.removeAll { !"0123456789.-".contains($0) }
-    txtAddPhraseField4.removeAll { "\n\r".contains($0) }
-    guard !txtAddPhraseField1.isEmpty, !txtAddPhraseField2.isEmpty else { return }
-    var arrResult: [String] = [txtAddPhraseField1, txtAddPhraseField2]
-    if let weightVal = Double(txtAddPhraseField3), weightVal < 0 {
-      arrResult.append(weightVal.description)
-    }
-    if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
-    var resultTaggable = arrResult.joined(separator: " ")
-    delegate?.tagOverrides(in: &resultTaggable, mode: selInputMode)
-    if let lastChar = txtContent.last, !"\n".contains(lastChar) {
-      resultTaggable.insert("\n", at: resultTaggable.startIndex)
-    }
-    txtContent.append(resultTaggable)
-    clearAllFields()
-  }
-
-  private func clearAllFields() {
-    txtAddPhraseField1 = ""
-    txtAddPhraseField2 = ""
-    txtAddPhraseField3 = ""
-    txtAddPhraseField4 = ""
-  }
-
-  private func dropDownMenuDidChange() {
-    update()
-  }
-
-  private func saveAndReload() {
-    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
-    let toSave = txtContent
-    txtContent = "i18n:DictionaryStatus.Loading".i18n
-    isLoading = true
-    let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
-    txtContent = newResult
-    isLoading = false
-  }
-
-  private func consolidate() {
-    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
-    asyncOnMain {
-      isLoading = true
-      delegate.consolidate(text: &txtContent, pragma: false) // 強制整理
-      if selUserDataType == .thePhrases {
-        delegate.tagOverrides(in: &txtContent, mode: selInputMode)
-      }
-      isLoading = false
-    }
-  }
-
-  private func callExternalAppToOpenPhraseFile() {
-    let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
-    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, using: app)
-  }
-}
-
-// MARK: - ContentView_Previews
-
-@available(macOS 14, *)
-struct ContentView_Previews: PreviewProvider {
-  static var previews: some View {
-    VwrPhraseEditorUI()
-  }
-}
-
-// MARK: - PETerms
-
-public enum PETerms {
-  public enum AddPhrases: String {
-    case locPhrase = "i18n:Common.Phrase"
-    case locReadingOrStroke = "i18n:Common.ReadingStroke"
-    case locWeight = "i18n:Common.Weight"
-    case locComment = "i18n:Common.Comment"
-    case locReplaceTo = "i18n:Common.ReplaceTo"
-    case locAdd = "i18n:Common.Add"
-    case locInitial = "i18n:Common.Initial"
-
-    // MARK: Public
-
-    public var localized: (String, String) {
-      let rawArray = rawValue.i18n.components(separatedBy: " ")
-      if rawArray.isEmpty { return ("N/A", "N/A") }
-      let val1: String = rawArray[0]
-      let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
-      return (val1, val2)
-    }
-  }
-
-  public enum TooltipTexts: String {
-    case weightInputBox = "i18n:PhraseEditor.WeightExplanation"
-
-    // MARK: Public
-
-    public var localized: String { rawValue.i18n }
-
-    public static func sampleDictionaryContent(
-      for type: LXAssembly
-        .ReplacableUserDataType
+    @AppStorage("PhraseEditorAutoReloadExternalModifications")
+    private var autoReloadExternalModifications: Bool = true
+    @State
+    private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
+      forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue
     )
-      -> String {
-      var result = ""
-      switch type {
-      case .thePhrases:
-        result =
-          "i18n:PhraseEditor.ExamplePhraseWithWeight".i18n + "\n\n"
-            + weightInputBox.localized
-      case .theFilter: result = "i18n:PhraseEditor.ExamplePhrase".i18n
-      case .theReplacements: result = "i18n:PhraseEditor.ExampleReplacement".i18n
-      case .theAssociates:
-        result = "i18n:PhraseEditor.ExampleAssociates".i18n
-      case .theSymbols: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+    @State
+    private var isLoading = false
+    @State
+    private var textEditorTooltip = PETerms.TooltipTexts
+      .sampleDictionaryContent(for: .thePhrases)
+
+    private weak var window: NSWindow?
+
+    private var currentIMEInputMode: Shared.InputMode {
+      delegate?.currentInputMode ?? selInputMode
+    }
+
+    private var delegate: PhraseEditorDelegate? {
+      didSet {
+        guard let delegate = delegate else { return }
+        selInputMode = delegate.currentInputMode
+        update()
       }
-      return result
+    }
+
+    private func update() {
+      guard let delegate = delegate else { return }
+      updateLabels()
+      clearAllFields()
+      txtContent = "i18n:DictionaryStatus.Loading".i18n
+      isLoading = true
+      asyncOnMain {
+        txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
+        textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
+        isLoading = false
+      }
+    }
+
+    private func updateLabels() {
+      clearAllFields()
+      switch selUserDataType {
+      case .thePhrases:
+        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+        lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+      case .theFilter:
+        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+        lblAddPhraseTag3 = ""
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+      case .theReplacements:
+        lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
+        lblAddPhraseTag3 = ""
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+      case .theAssociates:
+        lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
+        lblAddPhraseTag2 = {
+          let result = PETerms.AddPhrases.locPhrase.localized.0
+          return (result == "Phrase") ? "Phrases" : result
+        }()
+        lblAddPhraseTag3 = ""
+        lblAddPhraseTag4 = ""
+      case .theSymbols:
+        lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+        lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+        lblAddPhraseTag3 = ""
+        lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+      }
+    }
+
+    private func insertEntry() {
+      txtAddPhraseField1.removeAll { "　 \t\n\r".contains($0) }
+      if selUserDataType != .theAssociates {
+        txtAddPhraseField2.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
+      }
+      txtAddPhraseField2.removeAll {
+        selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
+      }
+      txtAddPhraseField3.removeAll { !"0123456789.-".contains($0) }
+      txtAddPhraseField4.removeAll { "\n\r".contains($0) }
+      guard !txtAddPhraseField1.isEmpty, !txtAddPhraseField2.isEmpty else { return }
+      var arrResult: [String] = [txtAddPhraseField1, txtAddPhraseField2]
+      if let weightVal = Double(txtAddPhraseField3), weightVal < 0 {
+        arrResult.append(weightVal.description)
+      }
+      if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
+      var resultTaggable = arrResult.joined(separator: " ")
+      delegate?.tagOverrides(in: &resultTaggable, mode: selInputMode)
+      if let lastChar = txtContent.last, !"\n".contains(lastChar) {
+        resultTaggable.insert("\n", at: resultTaggable.startIndex)
+      }
+      txtContent.append(resultTaggable)
+      clearAllFields()
+    }
+
+    private func clearAllFields() {
+      txtAddPhraseField1 = ""
+      txtAddPhraseField2 = ""
+      txtAddPhraseField3 = ""
+      txtAddPhraseField4 = ""
+    }
+
+    private func dropDownMenuDidChange() {
+      update()
+    }
+
+    private func saveAndReload() {
+      guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
+      let toSave = txtContent
+      txtContent = "i18n:DictionaryStatus.Loading".i18n
+      isLoading = true
+      let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
+      txtContent = newResult
+      isLoading = false
+    }
+
+    private func consolidate() {
+      guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
+      asyncOnMain {
+        isLoading = true
+        delegate.consolidate(text: &txtContent, pragma: false) // 強制整理
+        if selUserDataType == .thePhrases {
+          delegate.tagOverrides(in: &txtContent, mode: selInputMode)
+        }
+        isLoading = false
+      }
+    }
+
+    private func callExternalAppToOpenPhraseFile() {
+      let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
+      delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, using: app)
     }
   }
-}
+
+  // MARK: - ContentView_Previews
+
+  @available(macOS 14, *)
+  struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+      VwrPhraseEditorUI()
+    }
+  }
+
+  // MARK: - PETerms
+
+  public enum PETerms {
+    public enum AddPhrases: String {
+      case locPhrase = "i18n:Common.Phrase"
+      case locReadingOrStroke = "i18n:Common.ReadingStroke"
+      case locWeight = "i18n:Common.Weight"
+      case locComment = "i18n:Common.Comment"
+      case locReplaceTo = "i18n:Common.ReplaceTo"
+      case locAdd = "i18n:Common.Add"
+      case locInitial = "i18n:Common.Initial"
+
+      // MARK: Public
+
+      public var localized: (String, String) {
+        let rawArray = rawValue.i18n.components(separatedBy: " ")
+        if rawArray.isEmpty { return ("N/A", "N/A") }
+        let val1: String = rawArray[0]
+        let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
+        return (val1, val2)
+      }
+    }
+
+    public enum TooltipTexts: String {
+      case weightInputBox = "i18n:PhraseEditor.WeightExplanation"
+
+      // MARK: Public
+
+      public var localized: String { rawValue.i18n }
+
+      public static func sampleDictionaryContent(
+        for type: LXAssembly
+          .ReplacableUserDataType
+      )
+        -> String {
+        var result = ""
+        switch type {
+        case .thePhrases:
+          result =
+            "i18n:PhraseEditor.ExamplePhraseWithWeight".i18n + "\n\n"
+              + weightInputBox.localized
+        case .theFilter: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+        case .theReplacements: result = "i18n:PhraseEditor.ExampleReplacement".i18n
+        case .theAssociates:
+          result = "i18n:PhraseEditor.ExampleAssociates".i18n
+        case .theSymbols: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+        }
+        return result
+      }
+    }
+  }
+
+#endif

@@ -12,7 +12,10 @@ import Foundation
 /// （LXMgr、SessionUI、AppDelegate、InputSession 等）皆由宿主於啟動時
 /// 以 lambda-expression property assignment 的方式注入到 `SettingsUIHost.shared`。
 /// 未注入的屬性會保持無操作預設值，讓本套件可獨立於宿主被執行檔 bundle 除錯。
-@MainActor
+///
+/// 註：不在此標註 `@MainActor`（legacy 倉的同名檔案亦然）。6.2 以上側由 21 份 manifest 的
+/// `defaultIsolation(MainActor.self)` 提供同一隔離，語義不變；5.10 側無該設定，顯式標註只會讓
+/// 非隔離呼叫端（例如 `MainSputnik4IME.init()`）被 5.10 判為錯誤——那正是 legacy 不標的理由。
 public final class SettingsUIHost {
   // MARK: Lifecycle
 

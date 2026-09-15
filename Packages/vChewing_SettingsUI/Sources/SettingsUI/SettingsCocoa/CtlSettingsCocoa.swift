@@ -40,7 +40,9 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
     super.init(coder: coder)
   }
 
-  nonisolated deinit {
+  // `nonisolated deinit` 是 SE-0371（Swift 6.1）語法、5.10 拒收；此處為樸素寫法（`deinit` 本即 nonisolated、
+  // 6.2 側語義不變），且不觸及任何 MainActor 狀態，故毋須 `mainSync` 包裹。
+  deinit {
     #if DEBUG
       NSLog("[CtlSettingsCocoa] deinit called")
     #endif
@@ -148,11 +150,15 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
   private(set) lazy var searchField: NSSearchField = {
     let sf = NSSearchField()
     sf.translatesAutoresizingMaskIntoConstraints = false
-    sf.placeholderString = "i18n:Menu.SearchPreferences".i18n
-    sf.sendsWholeSearchString = false
-    sf.sendsSearchStringImmediately = true
+    // 這三支（連同 `maximumRecents`）皆自 macOS 10.10 起才有；10.9 退回 `NSSearchFieldCell` 的舊介面
+    // ——形制與 legacy 倉的 `CtlSettingsCocoa.swift` 相同。
     if #available(macOS 10.10, *) {
+      sf.placeholderString = "i18n:Menu.SearchPreferences".i18n
+      sf.sendsWholeSearchString = false
+      sf.sendsSearchStringImmediately = true
       sf.maximumRecents = 0
+    } else {
+      (sf.cell as? NSSearchFieldCell)?.placeholderString = "i18n:Menu.SearchPreferences".i18n
     }
     sf.target = self
     sf.action = #selector(searchFieldDidChange(_:))
@@ -250,8 +256,16 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
         guard let meta = userDef.metaData else { continue }
         let title = meta.shortTitle?.i18n ?? ""
         let desc = meta.description?.i18n ?? ""
-        guard title.localizedStandardContains(query) || desc.localizedStandardContains(query)
-        else { continue }
+        // `localizedStandardContains(_:)` 起於 macOS 10.11；10.10 走 `vChewing-OSX-Legacy` 同款的
+        // `range(of:options:)` 對位寫法（§5.1(g)），兩分支皆寫滿（§5.5 第 2 條）。
+        let match: Bool
+        if #unavailable(macOS 10.11) {
+          match = title.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+            || desc.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+        } else {
+          match = title.localizedStandardContains(query) || desc.localizedStandardContains(query)
+        }
+        guard match else { continue }
         currentSearchResults.append((title: title.isEmpty ? userDef.rawValue : title, tab: tab))
       }
     }
@@ -659,6 +673,11 @@ extension CtlSettingsCocoa: NSTableViewDelegate, NSTableViewDataSource {
     let rowView = NSView()
     let textField = NSLabelView()
     textField.translatesAutoresizingMaskIntoConstraints = false
+    // `secondaryLabelColor` 自 macOS 10.10 起才有；10.9 退回 `.gray`（與同檔上方 versionLabel 同形）。
+    let secondaryTextColor: NSColor = {
+      if #available(macOS 10.10, *) { return .secondaryLabelColor }
+      return .gray
+    }()
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.lineBreakMode = .byTruncatingTail
     let attrStr = NSMutableAttributedString(
@@ -670,7 +689,7 @@ extension CtlSettingsCocoa: NSTableViewDelegate, NSTableViewDataSource {
       attributes: [
         .paragraphStyle: paragraphStyle,
         .font: NSFont.systemFont(ofSize: 11),
-        .foregroundColor: NSColor.secondaryLabelColor,
+        .foregroundColor: secondaryTextColor,
       ]
     ))
     textField.attributedStringValue = attrStr
