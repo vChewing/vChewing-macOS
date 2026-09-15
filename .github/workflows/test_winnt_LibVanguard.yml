@@ -21,8 +21,12 @@ jobs:
         uses: compnerd/gha-setup-swift@main
         with:
           source: swift.org
-          swift-version: swift-6.2-release
-          swift-build: 6.2-RELEASE
+          # Swift 6.4+ is required: 6.2 / 6.3 are blocked by the manifests
+          # (`Package@swift-6.2.swift` / `Package@swift-6.3.swift`), cf. P216 §13.6.
+          # Note: the 6.4 series' swift.org identifiers carry the patch zero
+          # (`swift-6.4.0-release` / `6.4.0-RELEASE`), unlike the 6.2 / 6.3 series.
+          swift-version: swift-6.4.0-release
+          swift-build: 6.4.0-RELEASE
           # 可选：cache: true
 
       - name: Swift version + run tests (custom package-path)

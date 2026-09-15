@@ -14,6 +14,11 @@ jobs:
       GIT_SSL_NO_VERIFY: true
     steps:
       - uses: SwiftyLab/setup-swift@latest
+        with:
+          # Swift 6.4+ is required: 6.2 / 6.3 are blocked by the manifests
+          # (`Package@swift-6.2.swift` / `Package@swift-6.3.swift`), cf. P216 §13.6.
+          # Semantic-version pin: resolves to the latest 6.4.x release (6.4.0 as of writing).
+          swift-version: "6.4"
       - uses: actions/checkout@v1
       - name: Clean
         run: make spmClean

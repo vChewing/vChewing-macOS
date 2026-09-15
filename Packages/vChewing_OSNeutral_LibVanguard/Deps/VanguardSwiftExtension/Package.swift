@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.4
 import PackageDescription
 
 // SwiftPM 無法把 `#if` 寫進陣列字面量，故以頂層宣告分流。
