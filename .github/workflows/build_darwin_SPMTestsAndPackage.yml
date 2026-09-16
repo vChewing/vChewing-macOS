@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: test-macOS-SPMTestsAndPackage
-    runs-on: macos-26
+    runs-on: macos-27
     # NOTE: some external submodule hosting environments may exhibit intermittent
     # certificate verification problems on the runner. This workflow keeps a
     # temporary TLS verification override scoped to the checkout step only (not
