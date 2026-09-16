@@ -830,4 +830,42 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(verticalForcedHorizontal == "ai3\nmǒ", "實際得到：\(verticalForcedHorizontal)")
     testHandler.prefs.alwaysShowTooltipTextsHorizontally = false
   }
+
+  /// 驗證一般打字且輸入狀態為 empty 時，Shift+空格鍵之輸出寬度由偏好決定、且預設為全形。
+  @Test
+  func test219_InputHandler_ShiftSpaceEmptyStateWidth() throws {
+    let spaceEvent = KBEvent.KeyEventData(chars: " ", keyCode: KeyCode.kSpace.rawValue)
+    let shiftSpaceEvent = KBEvent.KeyEventData(
+      type: .keyDown,
+      flags: .shift,
+      chars: " ",
+      keyCode: KeyCode.kSpace.rawValue
+    )
+
+    // 不帶 Shift 的空格鍵：恆為半形，不受偏好影響。
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = true
+    testSession.switchState(.ofEmpty())
+    testClientProxy.clear()
+    _ = press(spaceEvent)
+    #expect(testClientProxy.toString() == " ")
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+
+    // 帶 Shift 的空格鍵：預設（偏好為 false）為全形。
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = false
+    testSession.switchState(.ofEmpty())
+    testClientProxy.clear()
+    _ = press(shiftSpaceEvent)
+    #expect(testClientProxy.toString() == "　")
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+
+    // 帶 Shift 的空格鍵：偏好為 true 時改為半形。
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = true
+    testSession.switchState(.ofEmpty())
+    testClientProxy.clear()
+    _ = press(shiftSpaceEvent)
+    #expect(testClientProxy.toString() == " ")
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = false
+  }
 }

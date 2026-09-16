@@ -526,10 +526,14 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "Shift+Delete のように入力緩衝列を消す";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "カーソルの後部の音読みを常に削除する";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+BackSpace:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※全候補入力モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※全候補入力モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。\n※この設定は候補陳列ウィンドウ内にのみ有効です。入力緩衝列が空の時の Shift+Space キーの幅は、上の「Shift+Space (入力緩衝列が空の時)」をご参照ください。";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0" = "Shift+Space で次のページ、Space で次の候補文字を";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1" = "Space で次のページ、Shift+Space で次の候補文字を";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.shortTitle" = "(Shift+)Space (入力候補):";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.description" = "入力緩衝列が空の時に Shift+Space キーで挿入される空白の幅を指定します。\n※この設定は通常の入力にのみ有効です。候補陳列ウィンドウ内の (Shift+)Space キーの挙動は、下の「(Shift+)Space (入力候補)」をご参照ください。\n※Shift を押さない Space キーは、この設定に関わらず常に半角空白を挿入します。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.0" = "全角空白を挿入";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.1" = "半角空白を挿入";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.shortTitle" = "Shift+Space (入力緩衝列が空の時):";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.description" = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.0" = "候補文字そのもの";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1" = "候補陳列ページ";

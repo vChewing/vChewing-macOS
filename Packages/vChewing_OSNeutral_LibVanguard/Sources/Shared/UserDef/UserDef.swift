@@ -65,6 +65,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior4CandidateWindow = "SpecifyShiftSpaceKeyBehavior4CandidateWindow"
+  case kSpecifyShiftSpaceKeyBehavior4EmptyState = "SpecifyShiftSpaceKeyBehavior4EmptyState"
   case kSpecifyCmdOptCtrlEnterBehavior = "SpecifyCmdOptCtrlEnterBehavior"
   case kReflectBPMFVSInCompositionBuffer = "ReflectBPMFVSInCompositionBuffer"
   case kAllowRescoringSingleKanjiCandidates = "AllowRescoringSingleKanjiCandidates"
@@ -487,6 +488,7 @@ extension UserDef {
     case .kSpecifyShiftBackSpaceKeyBehavior: return .integer(0)
     case .kSpecifyShiftTabKeyBehavior: return .bool(false)
     case .kSpecifyShiftSpaceKeyBehavior4CandidateWindow: return .bool(false)
+    case .kSpecifyShiftSpaceKeyBehavior4EmptyState: return .bool(false)
     case .kSpecifyCmdOptCtrlEnterBehavior: return .integer(0)
     case .kReflectBPMFVSInCompositionBuffer: return .bool(false)
     case .kAllowRescoringSingleKanjiCandidates: return .bool(false)
@@ -839,6 +841,14 @@ extension UserDef {
         options: [
           0: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0",
           1: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1",
+        ]
+      )
+    case .kSpecifyShiftSpaceKeyBehavior4EmptyState: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.shortTitle",
+        description: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.description",
+        options: [
+          0: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.0",
+          1: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.1",
         ]
       )
     case .kSpecifyCmdOptCtrlEnterBehavior: return .init(

@@ -42,6 +42,7 @@
         }
 
         Section {
+          UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.renderUI()
           UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.renderUI()
           UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.renderUI()
         }

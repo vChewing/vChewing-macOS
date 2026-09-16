@@ -106,7 +106,11 @@ extension InputHandlerProtocol {
         switch state.type {
         case .ofEmpty:
           if !input.isHoldingAny([.option, .control, .command]) {
-            session.switchState(State.ofCommitting(textToCommit: input.isShiftHeld ? "　" : " "))
+            // 一般打字且組字區為空時：不帶 Shift 的空格鍵恆插入半形空格；
+            // 帶 Shift 者之寬度由偏好決定（預設全形，與舊行為一致）。
+            let wantsHalfWidth = !input.isShiftHeld
+              || prefs.specifyShiftSpaceKeyBehavior4EmptyState
+            session.switchState(State.ofCommitting(textToCommit: wantsHalfWidth ? " " : "　"))
             return true
           }
         case .ofInputting:

@@ -97,6 +97,10 @@ extension SettingsPanesCocoa {
           )
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
+          UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
           UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabBehavior

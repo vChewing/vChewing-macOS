@@ -288,6 +288,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kSpecifyShiftSpaceKeyBehavior4CandidateWindow)
   public var specifyShiftSpaceKeyBehavior4CandidateWindow: Bool
 
+  @AppProperty(userDef: .kSpecifyShiftSpaceKeyBehavior4EmptyState)
+  public var specifyShiftSpaceKeyBehavior4EmptyState: Bool
+
   @AppProperty(userDef: .kSpecifyCmdOptCtrlEnterBehavior)
   public var specifyCmdOptCtrlEnterBehavior: Int
 

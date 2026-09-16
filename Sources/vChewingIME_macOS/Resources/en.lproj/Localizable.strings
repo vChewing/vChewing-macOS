@@ -526,10 +526,14 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "Clear the entire inline composition buffer like Shift+Delete";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "Always drop the previous reading";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+BackSpace:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "Choose the behavior of (Shift+)Space key with candidates.\nNote: In Per-Char Select Mode (SCPC), Space without Shift always revolves pages regardless of this setting.\nNote: When \"Use Space to confirm highlighted candidate in Per-Char Select Mode\" is enabled, it takes priority over this setting.";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "Choose the behavior of (Shift+)Space key with candidates.\nNote: In Per-Char Select Mode (SCPC), Space without Shift always revolves pages regardless of this setting.\nNote: When \"Use Space to confirm highlighted candidate in Per-Char Select Mode\" is enabled, it takes priority over this setting.\nNote: This setting only affects the candidate window; for the width of Shift+Space when the compositor is empty, see \"Shift+Space (Empty Compositor)\" above.";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0" = "Space to +revolve candidates, Shift+Space to +revolve pages";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1" = "Space to +revolve pages, Shift+Space to +revolve candidates";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.shortTitle" = "(Shift+)Space (Candidates):";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.description" = "Choose the width of the space character inserted by Shift+Space when the compositor is empty.\nNote: This setting only affects ordinary typing; for the (Shift+)Space behavior inside the candidate window, see \"(Shift+)Space (Candidates)\" below.\nNote: Space without Shift always inserts a half-width space, regardless of this setting.";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.0" = "Insert a full-width space";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.1" = "Insert a half-width space";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.shortTitle" = "Shift+Space (Empty Compositor):";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.description" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.0" = "for revolving candidates";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1" = "for revolving pages";
