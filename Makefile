@@ -131,7 +131,7 @@ LEGACY_X86_DIR ?= $(LEGACY_SCRATCH_ROOT)/x86_64-apple-macosx/$(LEGACY_CONFIG)
 LEGACY_ARM_DIR ?= $(LEGACY_SCRATCH_ROOT)/arm64-apple-macosx/$(LEGACY_CONFIG)
 LEGACY_PRODUCTS_DIR ?= $(LEGACY_X86_DIR)
 
-.PHONY: debugLegacy releaseLegacy cleanLegacy bundleLegacy lexiconLegacy
+.PHONY: debugLegacy releaseLegacy cleanLegacy bundleLegacy lexiconLegacy archiveLegacy
 
 # debug：單一 x86_64 slice。可動，但未最佳化、執行起來處處遲滯（辭典載入尤甚）——要試用請走
 # `releaseLegacy`。收尾自動組 bundle（config=debug）。
@@ -217,6 +217,39 @@ bundleLegacy: lexiconLegacy
 # 同名會讓 `make debugLegacy` 把詞典建置一起拖回 debug。
 lexiconLegacy:
 	@$(MAKE) --no-print-directory -C LegacyZone/LexiconBuildTrigger build510 collect
+
+# ── archiveLegacy ───────────────────────────────────────────────────
+#
+# Produces the legacy distro's `.xcarchive`, the artifact to hand to Xcode Organizer for Developer
+# ID signing and notarization — the modern distro's counterpart is `make archive`.  The archive
+# holds `vChewingInstallerLegacy.app` (which embeds the IME) under `Products/Applications/` plus
+# dSYMs for both executables, exactly the layout `BundleApps` writes on the modern side.
+#
+# It chains into `releaseLegacy` because an archive is a distribution artifact: a one-slice debug
+# archive would be both unoptimised and x86_64-only.  `BundleAppsLegacy` is then asked for
+# `--archive`, which writes the archive beside the bundles under `Build/Products/`; a command
+# plugin may only write inside the package directory, so the move into
+# `~/Library/Developer/Xcode/Archives/<date>/` — where Organizer lists archives — is done here, the
+# same way the modern `archive` target does it.  The archive is **moved**, not copied, so nothing
+# is left behind in `Build/Products/`.
+archiveLegacy: LEGACY_CONFIG := release
+archiveLegacy: releaseLegacy
+	@export LC_ALL=C; export DEVELOPER_DIR="$(LEGACY_XCODE)"; set -e; \
+	echo "Assembling the legacy .xcarchive from $(LEGACY_PRODUCTS_DIR)…"; \
+	"$(LEGACY_TOOLCHAIN)/usr/bin/swift" package \
+		--package-path . \
+		--scratch-path "$(LEGACY_SCRATCH_ROOT)" \
+		--allow-writing-to-package-directory bundle-apps-legacy \
+		-- --build-dir "$(LEGACY_PRODUCTS_DIR)" --sdk "$(LEGACY_SDK)" --archive; \
+	mkdir -p "$(ARCHIVE_DIR)"; \
+	for f in Build/Products/*.xcarchive; do \
+		if [ -d "$$f" ]; then \
+			dest="$(ARCHIVE_DIR)/$$(basename "$$f")"; \
+			rm -rf "$$dest"; \
+			mv "$$f" "$$dest"; \
+			echo "  ✓ Moved to $$dest"; \
+		fi; \
+	done
 
 cleanLegacy:
 	@rm -rf "$(LEGACY_SCRATCH_ROOT)" ./Build/Products/Legacy

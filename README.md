@@ -51,7 +51,7 @@
     - 另裝 toolchain 時，SDK 的世代搭配要對：Xcode 27 自帶的 macOS 27 SDK 內含只用得了 6.4 以上編譯器的 `.swiftinterface`，故不可拿 6.2／6.3 系 toolchain 去配它。
 - 請使用正式發行版 Xcode，且最小子版本號越高越好（因為 Bug 相對而言最少）。
     - 如果是某個大版本的 Xcode 的 Release Candidate 版本的話，我們可能會對此做相容性測試。
-- **（選用）建置 legacy 產物**：若需自行產生 macOS 10.9～10.10 的安裝包，另需 **Xcode 15**（或任何預設 macOS SDK ≤ 14.x 的 Xcode，理由見末條）＋ **`MacOSX13.3.sdk`** ＋ **Swift 5.10.1 open-source toolchain**，並以 `make debugLegacy`／`make releaseLegacy` 驅動。此路徑僅供本機使用、**不納入 CI**。
+- **（選用）建置 legacy 產物**：若需自行產生 macOS 10.9～10.10 的安裝包，另需 **Xcode 15**（或任何預設 macOS SDK ≤ 14.x 的 Xcode，理由見末條）＋ **`MacOSX13.3.sdk`** ＋ **Swift 5.10.1 open-source toolchain**，並以 `make debugLegacy`／`make releaseLegacy` 驅動（`make archiveLegacy` 另出 `.xcarchive`，供 Xcode 手動簽名公證）。此路徑僅供本機使用、**不納入 CI**。
     - 該 SDK **不是 Xcode 15 內建的**（Xcode 15 自帶的是 macOS 14 系），故本倉的 `LEGACY_SDK` 直接綁 **Command Line Tools 那份**：`/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk`（Xcode 15 內的同名目錄只是指過去的 symlink）。
     - **這份 SDK 的來歷**：內容是原廠 macOS 13.3 SDK（內部檔案時間戳 2023-03-29，即 Xcode 14.3 發行那批）。它**不是現行 CLT 提供的**——現行 CLT（本機為 27.0，2026-09-10 裝入）已把 macOS 11／12／13／14 的 legacy SDK 一律改成「移除包」（`CLTools_macOS_DevSDK_Remove_macOS13.pkg` 等），本機這份之頂層時間戳為 2026-05-27（當日並無任何 CLT 安裝記錄可查）。故在乾淨機器上請自行備妥：自 macOS 13.3 的 Command Line Tools（或自帶 13.x SDK 的 Xcode 14.3）解出後放進 CLT 的 `SDKs/`。
     - **但 Xcode 15 仍不可省**：本路徑的 build plugin 之編譯取的是「active developer dir 的預設 macOS SDK」，`--sdk` 到不了那裡，故仍須以一個「預設 SDK ≤ 14.x」的 Xcode 為 `DEVELOPER_DIR`（任何 ≤ 15.4 者皆等價）。

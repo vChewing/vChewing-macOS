@@ -27,6 +27,9 @@
 //   swift package --allow-writing-to-package-directory bundle-apps-legacy \
 //     -- --build-dir .build/.legacy-root/x86_64-apple-macosx/debug
 //   swift package --allow-writing-to-package-directory bundle-apps-legacy -- --xcode-root /Applications
+//   swift package --allow-writing-to-package-directory bundle-apps-legacy \
+//     -- --build-dir .build/.legacy-root/x86_64-apple-macosx/release \
+//     --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk --archive
 //
 // `--build-dir` matters here because the legacy build normally runs with a custom
 // `--scratch-path` (e.g. `.build/.legacy-root`), which moves its products away from the
@@ -47,6 +50,13 @@
 // build carries no lexicon dependency of its own (`Packages/vChewing_MainAssembly4Darwin/
 // Package@swift-5.10.swift` omits it), so those three files are produced out of band by that
 // throwaway package.
+//
+// `--archive` finally writes an `.xcarchive` of those bundles next to them under
+// `Build/Products/`, in the same shape `BundleApps` writes for the modern distro, so that the
+// legacy distro can be signed and notarized from Xcode Organizer like any other archive. The
+// archive is written inside the package directory and not straight into
+// `~/Library/Developer/Xcode/Archives/` because a command plugin may only write there; the move is
+// `make archiveLegacy`'s job, again the same division of labour as the modern path.
 
 import Foundation
 import PackagePlugin
@@ -61,6 +71,10 @@ struct BundleAppsLegacyPlugin: CommandPlugin {
     // toolchain that compiles this plugin exposes `Package.directory` instead.
     let packageDir = URL(fileURLWithPath: context.package.directory.string)
     let configName = arguments.contains("--debug") ? "debug" : "release"
+
+    // --archive: also write an `.xcarchive` of the assembled bundles under `Build/Products/`.
+    //   `make archiveLegacy` uses it and then moves the archive to the Xcode Archives folder.
+    let shouldArchive = arguments.contains("--archive")
 
     // --xcode-root <path>: where the Xcode bundles are installed.
     let searchRoot = URL(fileURLWithPath: value(of: "--xcode-root", in: arguments) ?? "/Applications")
@@ -198,7 +212,7 @@ struct BundleAppsLegacyPlugin: CommandPlugin {
     }
 
     // ── Step 8: Assemble the two legacy `.app` bundles ──────────────────
-    let appsDir = try assembleAppBundles(
+    let (appsDir, version) = try assembleAppBundles(
       packageDir: packageDir,
       buildDir: buildDir,
       executables: executablesByName,
@@ -206,7 +220,20 @@ struct BundleAppsLegacyPlugin: CommandPlugin {
       sdkPath: sdkPath
     )
 
-    // ── Step 9: Summary ─────────────────────────────────────────────────
+    // ── Step 9 (optional): Write the `.xcarchive` ───────────────────────
+    // `make archiveLegacy` moves it from `Build/Products/` into the Xcode Archives folder; the
+    // plugin cannot, since its write access stops at the package directory.
+    if shouldArchive {
+      print("📁 Writing the .xcarchive…")
+      let archiveURL = try assembleXcarchive(
+        packageDir: packageDir,
+        appsDir: appsDir,
+        version: version
+      )
+      print("  ✓ Archive created: \(archiveURL.path)")
+    }
+
+    // ── Step 10: Summary ────────────────────────────────────────────────
     print("")
     print("📋 Summary")
     for report in patchReports {
@@ -336,7 +363,8 @@ extension BundleAppsLegacyPlugin {
   ///
   /// The IME app is assembled first because the installer embeds it verbatim in its
   /// `Contents/Resources/` — the layout the legacy Xcode project produces.
-  @discardableResult
+  /// - Returns: The directory holding the two bundles, and the version they were stamped with
+  ///   (`--archive` reports that same pair in the archive's `Info.plist`).
   private func assembleAppBundles(
     packageDir: URL,
     buildDir: URL,
@@ -344,7 +372,7 @@ extension BundleAppsLegacyPlugin {
     copiedDylibs: [String: URL],
     sdkPath: String?
   ) throws
-    -> URL {
+    -> (appsDir: URL, version: (marketing: String, build: String)) {
     let fm = FileManager.default
     let outputDir = packageDir
       .appendingPathComponent("Build")
@@ -418,7 +446,7 @@ extension BundleAppsLegacyPlugin {
       additionalInfoPlistKeys: infoPlistKeys
     )
     print("  ✓ \(installerBundleName) assembled.")
-    return outputDir
+    return (outputDir, version)
   }
 
   /// Assembles the IME app: the executable, its own copy of the Swift runtime, the resources the
@@ -984,6 +1012,128 @@ extension BundleAppsLegacyPlugin {
     }
     arguments.append(target.path)
     try run("/usr/bin/codesign", arguments: arguments)
+  }
+}
+
+// MARK: - .xcarchive Assembly
+
+extension BundleAppsLegacyPlugin {
+  /// Assembles an `.xcarchive` of the two legacy bundles, in the layout `BundleApps` writes for the
+  /// modern distro so that Organizer reads both the same way:
+  ///
+  /// ```
+  /// Name.xcarchive/
+  ///   Info.plist
+  ///   Products/Applications/vChewingInstallerLegacy.app/
+  ///   dSYMs/
+  ///     vChewing.app.dSYM/
+  ///     vChewingInstallerLegacy.app.dSYM/
+  /// ```
+  ///
+  /// The installer goes under `Products/Applications/` because it is the artifact that carries the
+  /// IME — the IME rides inside its `Contents/Resources/` — so it is what a distributable archive is
+  /// built around; the modern side archives `vChewingInstaller.app` for the same reason. dSYMs are
+  /// emitted for both executables, so that a report naming either bundle can be symbolicated.
+  /// `SwiftSupport/` is deliberately absent: it exists for App Store uploads of apps that ship the
+  /// Swift runtime, while this archive is meant for Developer ID signing and notarization.
+  ///
+  /// The archive is written under `Build/Products/` and not straight into the Xcode Archives folder
+  /// because a command plugin may only write inside the package directory; `make archiveLegacy`
+  /// moves it from there.
+  private func assembleXcarchive(
+    packageDir: URL,
+    appsDir: URL,
+    version: (marketing: String, build: String)
+  ) throws
+    -> URL {
+    let fm = FileManager.default
+
+    // `vChewingInstallerLegacy-YYYY-M-D-HHMMhrs.xcarchive` — the shape `BundleApps` uses for the
+    // modern distro's `vChewingInstaller-…`, and the shape Organizer expects to find.
+    let now = Date()
+    let calendar = Calendar.current
+    let stamp = [
+      "\(calendar.component(.year, from: now))",
+      "\(calendar.component(.month, from: now))",
+      "\(calendar.component(.day, from: now))",
+      String(
+        format: "%02d%02d",
+        calendar.component(.hour, from: now),
+        calendar.component(.minute, from: now)
+      ),
+    ].joined(separator: "-")
+    let archiveDir = packageDir
+      .appendingPathComponent("Build")
+      .appendingPathComponent("Products")
+      .appendingPathComponent("\(installerExecutableName)-\(stamp)hrs.xcarchive")
+    try? fm.removeItem(at: archiveDir)
+    try fm.createDirectory(at: archiveDir, withIntermediateDirectories: true)
+
+    // ── Products/Applications/ ──
+    let productsApps = archiveDir
+      .appendingPathComponent("Products")
+      .appendingPathComponent("Applications")
+    try fm.createDirectory(at: productsApps, withIntermediateDirectories: true)
+    try fm.copyItem(
+      at: appsDir.appendingPathComponent(installerBundleName),
+      to: productsApps.appendingPathComponent(installerBundleName)
+    )
+
+    // ── dSYMs/ ──
+    // Moved, not copied, into the archive: `Build/Products/Legacy/` keeps the bundles themselves,
+    // and the debug maps the executables carry still point at the object files under `.build`.
+    let dSYMs = archiveDir.appendingPathComponent("dSYMs")
+    try fm.createDirectory(at: dSYMs, withIntermediateDirectories: true)
+    for name in executableNames {
+      let executable = appsDir
+        .appendingPathComponent("\(name).app")
+        .appendingPathComponent("Contents")
+        .appendingPathComponent("MacOS")
+        .appendingPathComponent(name)
+      try run("/usr/bin/xcrun", arguments: [
+        "dsymutil", executable.path,
+        "-o", dSYMs.appendingPathComponent("\(name).app.dSYM").path,
+      ])
+    }
+
+    // ── Info.plist ──
+    // `SigningIdentity` and `Team` are left empty on purpose: the bundles are only ad-hoc signed
+    // here, and the Developer ID identity is whatever the machine doing the export has.
+    let archiveInfo: [String: Any] = [
+      "ArchiveVersion": 2,
+      "CreationDate": now,
+      "Name": installerExecutableName,
+      "SchemeName": installerExecutableName,
+      "ApplicationProperties": [
+        "ApplicationPath": "Applications/\(installerBundleName)",
+        "Architectures": try detectArchitectures(
+          of: appsDir
+            .appendingPathComponent(installerBundleName)
+            .appendingPathComponent("Contents")
+            .appendingPathComponent("MacOS")
+            .appendingPathComponent(installerExecutableName)
+        ),
+        "CFBundleIdentifier": installerBundleIdentifier,
+        "CFBundleShortVersionString": version.marketing,
+        "CFBundleVersion": version.build,
+        "SigningIdentity": "",
+        "Team": "",
+      ] as [String: Any],
+    ]
+    let plistData = try PropertyListSerialization.data(
+      fromPropertyList: archiveInfo, format: .xml, options: 0
+    )
+    try plistData.write(to: archiveDir.appendingPathComponent("Info.plist"))
+
+    return archiveDir
+  }
+
+  /// The architecture names `lipo` reports for an executable — what a legacy archive has to record,
+  /// since `x86_64` and `arm64` come from two separate `swift build` runs that were `lipo`ed.
+  private func detectArchitectures(of executable: URL) throws -> [String] {
+    try runForStdout("/usr/bin/lipo", arguments: ["-archs", executable.path])
+      .split(separator: " ")
+      .map(String.init)
   }
 }
 
