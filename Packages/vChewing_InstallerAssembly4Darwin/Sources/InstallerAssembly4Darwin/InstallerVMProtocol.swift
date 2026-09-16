@@ -112,7 +112,12 @@ extension InstallerVMProtocol {
 
   func stopInstallRetryTimer() {
     if let timer = installRetryTimer {
-      timer.setEventHandler(handler: nil)
+      // 停用事件處理器**不可**傳 `nil`：Swift 5.0 的 back-deployment Dispatch shim（legacy
+      // `.app` 內建的那份）把 nil 原樣轉成 `dispatch_source_set_event_handler(source, NULL)`，
+      // 而 macOS 10.9 的 libdispatch 收到 NULL block 會直接 BUG 並 SIGILL——早先 installer 在
+      // 10.9 上「按安裝後數秒即崩潰」即此。改給一份空 block：語意等價（不再觸發任何安裝嘗試），
+      // 且 shim 與 libdispatch 兩邊都吃得下；計時器下一行即取消、物件隨後釋放，無殘留意義。
+      timer.setEventHandler {}
       timer.cancel()
       installRetryTimer = nil
     }
