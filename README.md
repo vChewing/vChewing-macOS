@@ -53,6 +53,8 @@
     - 如果是某個大版本的 Xcode 的 Release Candidate 版本的話，我們可能會對此做相容性測試。
 - **（選用）建置 legacy 產物**：若需自行產生 macOS 10.9～10.10 的安裝包，另需 **Xcode 15** ＋ **`MacOSX13.3.sdk`** ＋ **Swift 5.10.1 open-source toolchain**，並以 `make debugLegacy`／`make releaseLegacy` 驅動。此路徑僅供本機使用、**不納入 CI**。
     - 該 SDK **不是 Xcode 15 內建的**（Xcode 15 自帶的是 macOS 14 系），取得方式是安裝 **macOS 13.3 的 Command Line Tools**（`/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk`），再置入 Xcode 15 的平臺目錄。
+- **想在 macOS 27 之前的系統上以 Swift 6.4+ 編譯**（例如末代 Intel MacBook Pro 13-inch）：請注意，**「讓當前 shell 自動用上 Swift 6.4+ open-source toolchain」是您自己的責任**。官方推出的 **Swiftly** 是一條可行路徑，但它的 shell 環境配置相當繁瑣，且會把原本裝在系統根目錄的 FOSS toolchain 全部改成裝進您的 user-space——至少在 macOS 26 上這是能用的選擇。若您的電腦最高只能跑到 macOS 15，Swiftly 可能無法把 toolchain 裝進 user-space，此時只能以系統管理員權限、手動將官方發行的 toolchain `.dmg`／`.pkg` 安裝到系統根目錄；如此一來，您可能得按自身需求改動本倉的 `makefile`。這些瑣碎事務在當今是可以交給 LLM 打點的，但便利與風險並存，請自行斟酌。
+- **本倉庫不提供 `build640` 這類「鎖定 Swift 版本號」的建置入口**：Swift 每發一版就得回頭把所有 `makefile` 修一遍，得不償失。建置入口一律以「當前 shell 的 `swift`」為準。
 
 編譯出的成品對應系統需求：
 
