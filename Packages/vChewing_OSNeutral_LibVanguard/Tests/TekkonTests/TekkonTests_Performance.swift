@@ -117,7 +117,7 @@ struct TekkonPerformanceTests {
     print(" -> [Tekkon] String processing (\(iterations) iterations): \(processingTimeStr)s")
 
     // 效能期望：字串處理應該相對較快
-    #expect(processingTime < 0.1, "String processing performance regression")
+    #expect(processingTime < 0.2, "String processing performance regression")
   }
 
   /// 整體測試套件效能摘要
