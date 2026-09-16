@@ -540,11 +540,35 @@ extension InputHandlerProtocol {
   }
 
   var readingForDisplay: String {
+    let currentReading = inlineReadingForCompositionBuffer
+    guard !prefs.cassetteEnabled else { return currentReading }
+    return currentReading.isEmpty ? mixedAlphanumericalBuffer : currentReading
+  }
+
+  /// 游標最前方正在組裝的注音讀音預覽。供中英混打模式的 Tooltip 第二行使用。
+  ///
+  /// 呈現規則沿用 Tooltip 既有之讀音呈現（`IMEStateParsed.convertReadingForTooltip(_:)`）：
+  /// 注音以教科書式呈現（輕聲前置）；僅當「以漢語拼音顯示組字區讀音」偏好啟用、
+  /// 且該 Tooltip 以橫排呈現時，才改以漢語拼音教科書式標調呈現。
+  /// 為此，本值之來源固定為注拼槽的注音原字串（`isHanyuPinyin: false`）——該轉換函式
+  /// 本就以注音為輸入；若改餵組字區那套隨偏好變動的呈現，會把拼音誤當注音再轉一次。
+  /// 與 `readingForDisplay` 之差別：本值僅取注拼槽（或組筆區）自身的內容，
+  /// 不做「注拼槽為空時回退為混輸 ASCII 緩衝區」的處置。
+  var inlineReadingPreview: String {
+    // 磁帶模式之讀音鍵不是注音、拼音模式之顯示來自羅馬字緩衝：兩者皆沿用組字區呈現。
+    guard !prefs.cassetteEnabled, !composer.isPinyinMode else {
+      return inlineReadingForCompositionBuffer
+    }
+    return IMEStateParsed.convertReadingForTooltip(composer.getComposition(isHanyuPinyin: false))
+  }
+
+  /// 注拼槽（磁帶模式下為組筆區）當前內容之原始讀音，供組字區顯示使用。
+  /// 不含 Tooltip 之教科書式標調轉換。
+  private var inlineReadingForCompositionBuffer: String {
     if !prefs.cassetteEnabled {
-      let currentReading = composer.getInlineCompositionForDisplay(
+      return composer.getInlineCompositionForDisplay(
         isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer
       )
-      return currentReading.isEmpty ? mixedAlphanumericalBuffer : currentReading
     }
     if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
     return calligrapher.map(\.description).map {

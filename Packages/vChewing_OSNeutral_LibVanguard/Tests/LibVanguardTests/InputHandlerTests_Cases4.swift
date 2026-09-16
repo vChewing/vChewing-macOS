@@ -291,6 +291,34 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
   }
 
+  /// 中英混打模式下，Tooltip 第二行應顯示游標最前方正在組裝的注音讀音預覽：
+  /// 首行恆為 ASCII buffer 原文；注拼槽有內容時附加第二行讀音，為空時不附加該行。
+  @Test
+  func test_IH435_MixedTooltipInlineReadingPreview() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    defer { testHandler.clear() }
+
+    // 以單一注音鍵起頭：buffer 原本為空，故注拼槽必然承接該鍵。
+    typeSentence("a")
+    #expect(testHandler.mixedAlphanumericalBuffer == "a")
+
+    let tooltipWithReading = testHandler.generateStateOfInputting().tooltip
+    let lines = tooltipWithReading.components(separatedBy: "\n")
+    #expect(lines.count == 2, "注拼槽有內容時 Tooltip 應為兩行，實際得到：\(tooltipWithReading)")
+    #expect(lines.first == "a", "Tooltip 首行應為 ASCII buffer 原文，實際得到：\(tooltipWithReading)")
+    #expect(lines.last == "ㄇ", "Tooltip 次行應為注音讀音預覽，實際得到：\(tooltipWithReading)")
+
+    // 大寫字母前導不進注拼槽（見 IH403），故 Tooltip 應僅有 ASCII buffer 一行。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("This")
+    #expect(testHandler.mixedAlphanumericalBuffer == "This")
+    #expect(
+      testHandler.generateStateOfInputting().tooltip == "This",
+      "注拼槽為空時 Tooltip 不應附加讀音行"
+    )
+  }
+
   /// 中英連打時，若組字區已有中文，
   /// 應可依觸發鍵（Enter / Space）一次提交「中文 + ASCII」。
   @Test(arguments: [

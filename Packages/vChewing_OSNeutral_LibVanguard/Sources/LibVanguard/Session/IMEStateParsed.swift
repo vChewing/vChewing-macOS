@@ -259,6 +259,24 @@ extension IMEStateParsed {
 // MARK: - readingThreadForDisplay
 
 extension IMEStateParsed {
+  /// 依 Tooltip 既有之讀音呈現規則轉換單一讀音。
+  ///
+  /// 規則（與 `showTooltip(...)` 決定 Tooltip 排版方向的判準同源）：注音一律轉為教科書式
+  /// （輕聲前置）；僅當「以漢語拼音顯示組字區讀音」偏好啟用、且該 Tooltip 會以橫排呈現
+  /// （`alwaysShowTooltipTextsHorizontally` 或當前非直排輸入）時，才改以漢語拼音教科書式標調呈現。
+  /// 磁帶模式不做任何轉換（讀音鍵本身即為組筆序列）。
+  static func convertReadingForTooltip(_ neta: String) -> String {
+    let prefs = SessionHost.shared.prefs()
+    guard !prefs.cassetteEnabled else { return neta }
+    if prefs.showHanyuPinyinInCompositionBuffer,
+       prefs.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
+      var neta = Tekkon.restoreToneOneInPhona(target: neta)
+      neta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: neta)
+      return Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: neta)
+    }
+    return Tekkon.cnvPhonaToTextbookStyle(target: neta)
+  }
+
   public var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in state.data.markedReadings {
@@ -268,19 +286,7 @@ extension IMEStateParsed {
         continue
       }
       neta.components(separatedBy: "-").forEach { subNeta in
-        var subNeta = subNeta
-        if !SessionHost.shared.prefs().cassetteEnabled {
-          if SessionHost.shared.prefs().showHanyuPinyinInCompositionBuffer,
-             SessionHost.shared.prefs().alwaysShowTooltipTextsHorizontally
-             || !InputSession.isVerticalTyping {
-            subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
-            subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
-            subNeta = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: subNeta)
-          } else {
-            subNeta = Tekkon.cnvPhonaToTextbookStyle(target: subNeta)
-          }
-        }
-        arrOutput.append(subNeta)
+        arrOutput.append(Self.convertReadingForTooltip(subNeta))
       }
     }
     return arrOutput.joined(separator: "\u{A0}")

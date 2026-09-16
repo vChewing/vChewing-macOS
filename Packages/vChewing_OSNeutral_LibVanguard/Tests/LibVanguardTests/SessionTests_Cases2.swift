@@ -774,4 +774,60 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       "Tooltip color state should be normal or prompt for a new phrase"
     )
   }
+
+  /// 中英混打模式 Tooltip 第二行之讀音呈現，須沿用 Tooltip 既有規則：
+  /// 注音一律教科書式（輕聲前置）；僅當「以漢語拼音顯示組字區讀音」啟用、
+  /// 且該 Tooltip 以橫排呈現時才改為漢語拼音教科書式標調。
+  /// ※ 組字區自身仍維持原本之數字標調式拼音，兩者刻意不同（見既有 `readingThreadForDisplay`）。
+  @Test
+  func test218_InputHandler_MixedTooltipReadingPreviewStyle() throws {
+    let originalCurrent = InputSession.current
+    let originalMixed = testHandler.prefs.mixedAlphanumericalEnabled
+    let originalHanyuPinyin = testHandler.prefs.showHanyuPinyinInCompositionBuffer
+    let originalAlwaysHorizontal = testHandler.prefs.alwaysShowTooltipTextsHorizontally
+    let originalVertical = testSession.isVerticalTyping
+    defer {
+      InputSession.current = originalCurrent
+      testHandler.prefs.mixedAlphanumericalEnabled = originalMixed
+      testHandler.prefs.showHanyuPinyinInCompositionBuffer = originalHanyuPinyin
+      testHandler.prefs.alwaysShowTooltipTextsHorizontally = originalAlwaysHorizontal
+      testSession.isVerticalTyping = originalVertical
+      testHandler.clear()
+    }
+
+    InputSession.current = testSession
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = false
+    testSession.isVerticalTyping = false
+
+    // 直驅注拼槽至「ㄇㄛˇ」，避開混輸 auto-split 對鍵序之依賴。
+    var composer = testHandler.composer
+    composer.clear()
+    composer.receiveSequence("ai3", isRomaji: false)
+    #expect(composer.getComposition(isHanyuPinyin: false) == "ㄇㄛˇ")
+    testHandler.composer = composer
+    testHandler.mixedAlphanumericalBuffer = "ai3"
+
+    // 停用「以漢語拼音顯示組字區讀音」：第二行以教科書式注音呈現。
+    let bpmfPreview = testHandler.generateStateOfInputting().tooltip
+    #expect(bpmfPreview == "ai3\nㄇㄛˇ", "實際得到：\(bpmfPreview)")
+
+    // 啟用該偏好且為橫排：第二行改以漢語拼音教科書式標調呈現。
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    let pinyinPreview = testHandler.generateStateOfInputting().tooltip
+    #expect(pinyinPreview == "ai3\nmǒ", "實際得到：\(pinyinPreview)")
+    // 對照：組字區自身仍為數字標調式，可見 Tooltip 走的是自家既有規則。
+    #expect(composer.getComposition(isHanyuPinyin: true) == "mo3")
+
+    // 直排輸入且未強制橫排 Tooltip 時，退回教科書式注音。
+    testSession.isVerticalTyping = true
+    let verticalPreview = testHandler.generateStateOfInputting().tooltip
+    #expect(verticalPreview == "ai3\nㄇㄛˇ", "實際得到：\(verticalPreview)")
+
+    // 直排但強制 Tooltip 橫排時，仍以漢語拼音呈現。
+    testHandler.prefs.alwaysShowTooltipTextsHorizontally = true
+    let verticalForcedHorizontal = testHandler.generateStateOfInputting().tooltip
+    #expect(verticalForcedHorizontal == "ai3\nmǒ", "實際得到：\(verticalForcedHorizontal)")
+    testHandler.prefs.alwaysShowTooltipTextsHorizontally = false
+  }
 }

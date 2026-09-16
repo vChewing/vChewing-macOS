@@ -429,8 +429,13 @@ extension InputHandlerProtocol {
       result.marker = 0
     }
     /// 中英混打模式：以 Tooltip 顯示目前 ASCII buffer 的原始內容，方便使用者識別輸入狀態。
+    /// 第二行顯示游標最前方正在組裝的注音讀音預覽（注拼槽為空時不附加該行）；
+    /// 該讀音之呈現沿用 Tooltip 既有規則，故「以漢語拼音顯示組字區讀音」與直排與否一體適用。
     if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
-      result.tooltip = mixedAlphanumericalBuffer
+      let readingPreview = inlineReadingPreview
+      result.tooltip = readingPreview.isEmpty
+        ? mixedAlphanumericalBuffer
+        : mixedAlphanumericalBuffer + "\n" + readingPreview
       result.tooltipDuration = 0 // 設為 0 使 Tooltip 恆久顯示，直到混打模式結束。
     }
     /// 狂拼模式：預覽啟用時附加前方候選清單，使候選窗常駐顯示。
