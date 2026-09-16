@@ -751,7 +751,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 此測試防禦：ofMarking() 的 call site 在 LibVanguard 層（不連結 MainAssembly），
   /// 無法看到 generateTooltipForMarking()，因此 tooltip 須在 switchState 中產生。
   @Test
-  func test214_MarkingStateTooltipGeneratedInSwitchState() throws {
+  func test217_MarkingStateTooltipGeneratedInSwitchState() throws {
     _ = prepareBasicComposition(sequence: "dk ru4204el ")
     testSession.switchState(.ofAbortion())
     testClientProxy.clear()
