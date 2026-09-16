@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This handbook briefs AI coding assistants on the vChewing (唯音) macOS repository. Use only English or zh-Hant-TW for docs/comments/reviews; zh-Hans is allowed only in filename stems ending with -CHS.
+This handbook briefs AI coding assistants on the vChewing (唯音) macOS repository. Use only English or zh-Hant-TW for docs/comments/reviews; zh-Hans is allowed only in filename stems ending with -CHS, and there the required style is **zh-Hans-TW** — simplify the characters only and keep Taiwan vocabulary.
 
 ## 1. Project Snapshot
 
@@ -72,7 +72,7 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 
 ## 5. Development Guardrails
 
-- **Language**: Code comments, docs, and commit messages in English or zh-Hant. (zh-Hans only in files if filenamestem ends with `-CHS`.)
+- **Language**: Code comments, docs, and commit messages in English or zh-Hant. (zh-Hans only in files if filenamestem ends with `-CHS` — and there the style is **zh-Hans-TW**: character-level simplification only, Taiwan vocabulary preserved. `支援` stays `支援`, never `支持`; `記憶體` → `记忆体`, never `内存`; `硬碟` → `硬碟`, never `硬盘`. Rewording a `-CHS` file's vocabulary into Mainland usage is drift, not a fix.)
 - **UI**: AppKit by default — no Interface Builder nibs/storyboards, and AppKit windows are implemented with the AppKit Result Builder DSL (`vChewing_OSFrameworkImpl`). Exceptions: the SwiftUI settings surface (`vChewing_SettingsUI`, macOS 14+) and the SwiftUI installer app (`vChewing_InstallerAssembly4Darwin`). Keep UI work on the main actor.
 - **Preferences**: Extend `UserDef`, `PrefMgrProtocol`, and `PrefMgr` together. Avoid naked `UserDefaults.standard` access except in constrained scenarios.
 - **User data paths**: Avoid hard-coded user data paths except where necessary in package test targets.

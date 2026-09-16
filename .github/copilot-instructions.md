@@ -13,7 +13,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## General Guidelines
 
-- **Language restriction:** Use only English or zh-Hant-TW in all documentation, comments, and reviews. An exception is that `zh-Hans` is allowed in any file name stem ended with `-CHS`. Other exceptions may be given by the developer.
+- **Language restriction:** Use only English or zh-Hant-TW in all documentation, comments, and reviews. An exception is that `zh-Hans` is allowed in any file name stem ended with `-CHS`, where the required style is **zh-Hans-TW**: simplify the characters only and keep Taiwan vocabulary (e.g. `支援` stays `支援`, never `支持`). Other exceptions may be given by the developer.
 
 ## Project Context
 - Input method for macOS built with AppKit/IMKit in Swift, backed by statistic-based language models loaded into `./Packages/vChewing_OSNeutral_LibVanguard/Sources/LexiconAssembly` module.
