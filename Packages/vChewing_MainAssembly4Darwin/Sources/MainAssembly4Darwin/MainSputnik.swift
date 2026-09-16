@@ -77,6 +77,11 @@ public final class MainSputnik4IME {
           print(strDumpedPrefs)
         }
         return 0
+      case "--dump-prefs-json":
+        return Self.dumpPrefsAsJSON()
+      case "--import-prefs-json":
+        print("vChewing: `--import-prefs-json` needs a file path.")
+        return 1
       case "--dump-user-dict":
         LXAssembly.LXFacade.asyncLoadingUserData = false
         LXMgr.initUserLexicons()
@@ -115,40 +120,152 @@ public final class MainSputnik4IME {
       default: break
       }
       return 0
-    case 2:
-      switch cmdParameters.first?.lowercased() {
-      case "uninstall" where cmdParameters.last?.lowercased() == "--all":
-        Uninstaller.printUninstallCLIGuidance()
-        return 1
-      case "--import-kimo":
-        guard let path = cmdParameters.last else {
-          return 1
-        }
-        let url = URL(fileURLWithPath: path)
-        let maybeCount: (totalFound: Int, importedCount: Int)?
-        do {
-          maybeCount = try LXMgr.importYahooKeyKeyUserDictionary(url: url)
-        } catch {
-          print(error.localizedDescription)
-          return 1
-        }
-        let countResult: (totalFound: Int, importedCount: Int) = maybeCount ?? (0, 0)
-        let msg = String(
-          format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
-          countResult.totalFound.description,
-          countResult.importedCount.description
-        )
-        print("[Kimo Import] \(msg)")
-        return 0
-      case "--import-standalone-factory-lexicon":
-        guard let path = cmdParameters.last else { return 1 }
-        return Self.importStandaloneFactoryLexicon(from: path)
-      default: break
-      }
-      return 0
+    case 2: return Self.handleTwoArgVarArgs(Array(cmdParameters))
     default: return 0
     }
     return nil
+  }
+
+  /// 兩枚引數的 varargs 之處理。自 `handleVarArgs` 析出，以收斂其圈複雜度（SwiftLint 上限 20）。
+  private static func handleTwoArgVarArgs(_ cmdParameters: [String]) -> Int32 {
+    switch cmdParameters.first?.lowercased() {
+    case "uninstall" where cmdParameters.last?.lowercased() == "--all":
+      Uninstaller.printUninstallCLIGuidance()
+      return 1
+    case "--import-kimo":
+      guard let path = cmdParameters.last else {
+        return 1
+      }
+      let url = URL(fileURLWithPath: path)
+      let maybeCount: (totalFound: Int, importedCount: Int)?
+      do {
+        maybeCount = try LXMgr.importYahooKeyKeyUserDictionary(url: url)
+      } catch {
+        print(error.localizedDescription)
+        return 1
+      }
+      let countResult: (totalFound: Int, importedCount: Int) = maybeCount ?? (0, 0)
+      let msg = String(
+        format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
+        countResult.totalFound.description,
+        countResult.importedCount.description
+      )
+      print("[Kimo Import] \(msg)")
+      return 0
+    case "--import-prefs-json":
+      guard let path = cmdParameters.last else { return 1 }
+      return Self.importPrefsFromJSON(atPath: path)
+    case "--import-standalone-factory-lexicon":
+      guard let path = cmdParameters.last else { return 1 }
+      return Self.importStandaloneFactoryLexicon(from: path)
+    default: break
+    }
+    return 0
+  }
+
+  // MARK: - Preferences JSON Exchange
+
+  /// `--dump-prefs-json`：以**純 JSON** 印出可交換的偏好至標準輸出，故可直接 `> prefs.json`。
+  /// 與 `--dump-prefs`（帶註解的 `defaults write` 腳本）互為人／機兩用的對照，且與設定畫面
+  /// 「開發者分頁」之 JSON 匯出**同一套**（`UserDef.exportAsJSON()`，共用黑名單與值域驗證）。
+  private static func dumpPrefsAsJSON() -> Int32 {
+    guard let data = UserDef.exportAsJSON(),
+          let jsonString = String(data: data, encoding: .utf8) else {
+      print("vChewing: Failed to serialize the preferences into JSON.")
+      return 1
+    }
+    print(jsonString)
+    return 0
+  }
+
+  /// `--import-prefs-json <path>`：自 JSON 檔案匯入偏好設定。沙盒（本 app 帶
+  /// `com.apple.security.app-sandbox`）之下 container 以外的路徑讀不到，故與 `--import-kimo` 同款：
+  /// 先試直接讀，讀不到再以 `NSOpenPanel` 請用戶授權（`files.user-selected.read-write`）。
+  /// - Returns: 全部獲准寫入則回 0；有任何一筆被拒（未知鍵、黑名單鍵、值域不符）則回 1。
+  private static func importPrefsFromJSON(atPath path: String) -> Int32 {
+    let sourceURL = URL(fileURLWithPath: path)
+    if let data = try? Data(contentsOf: sourceURL) {
+      return applyPrefsJSON(data)
+    }
+    guard let authorizedURL = requestSandboxAccessToJSONFile(suggested: sourceURL) else { return 1 }
+    let accessing = authorizedURL.startAccessingSecurityScopedResource()
+    defer {
+      if accessing { authorizedURL.stopAccessingSecurityScopedResource() }
+    }
+    guard let data = try? Data(contentsOf: authorizedURL) else {
+      print("vChewing: Failed to read the JSON file at: \(authorizedURL.path)")
+      return 1
+    }
+    return applyPrefsJSON(data)
+  }
+
+  /// 把已讀入的偏好 JSON 套用進 `UserDefaults`，並印出逐筆結果。
+  /// - Returns: 無任何一筆被拒則回 0，否則回 1。
+  private static func applyPrefsJSON(_ data: Data) -> Int32 {
+    let importResult = UserDef.importFromJSON(data)
+    // 與設定畫面之匯入路徑同款收尾（本行程緊接著便 `exit`，故尚需自行把偏好寫回 cfprefsd）。
+    PrefMgr.shared.fixOddPreferencesCore()
+    UserDefaults.current.synchronize()
+    print(
+      String(
+        format: "i18n:DevZone.JSONPrefsExchange.ImportSummary:%d%d".i18n,
+        importResult.successes.count,
+        importResult.failures.count
+      )
+    )
+    importResult.failures.forEach { print("⚠ \($0.key): \($0.reason)") }
+    return importResult.failures.isEmpty ? 0 : 1
+  }
+
+  /// 彈出 `NSOpenPanel` 請用戶授權讀取 JSON 檔（`suggested` 用於預填面板之路徑與檔名）。
+  private static func requestSandboxAccessToJSONFile(suggested: URL) -> URL? {
+    // `NSOpenPanel` 必須在主執行緒。
+    guard Thread.isMainThread else {
+      var result: URL?
+      DispatchQueue.main.sync { result = requestSandboxAccessToJSONFile(suggested: suggested) }
+      return result
+    }
+
+    let app = NSApplication.shared
+    app.setActivationPolicy(.accessory)
+    app.activate(ignoringOtherApps: true)
+
+    let alert = NSAlert()
+    alert.messageText = "需要檔案存取授權"
+    alert.informativeText = """
+    vChewing 需要您授權才能讀取指定的偏好設定 JSON 檔案：
+
+    \(suggested.path)
+
+    點選「授權」後，請在接下來的檔案選取視窗中選擇該檔案。
+    """
+    alert.addButton(withTitle: "授權")
+    alert.addButton(withTitle: "取消")
+    alert.alertStyle = .informational
+    guard alert.runModal() == .alertFirstButtonReturn else {
+      print("vChewing: User cancelled permission request.")
+      return nil
+    }
+
+    let panel = NSOpenPanel()
+    panel.title = "選擇偏好設定 JSON 檔案以授權存取"
+    panel.message = "請選擇先前由 --dump-prefs-json 導出的 .json 檔案。"
+    panel.canChooseFiles = true
+    panel.canChooseDirectories = false
+    panel.allowsMultipleSelection = false
+    panel.canCreateDirectories = false
+    if #available(macOS 11.0, *) {
+      panel.allowedContentTypes = [.json]
+    } else {
+      panel.allowedFileTypes = ["json"]
+    }
+    panel.directoryURL = suggested.deletingLastPathComponent()
+    panel.nameFieldStringValue = suggested.lastPathComponent
+    guard panel.runModal() == .OK, let selectedURL = panel.url else {
+      print("vChewing: User cancelled file selection.")
+      return nil
+    }
+    return selectedURL
   }
 
   // MARK: - Standalone Factory Lexicon Import
