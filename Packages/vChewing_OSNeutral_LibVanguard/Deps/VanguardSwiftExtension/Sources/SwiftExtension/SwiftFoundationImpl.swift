@@ -390,11 +390,45 @@ extension String {
   }
 #endif
 
+// MARK: - Main-queue identity
+
+/// 呼叫端是否已在主佇列上（無論驅動該佇列者是否為主執行緒）。
+///
+/// 為何不能只看 `Thread.isMainThread`：在 swift-corelibs 平台（Linux／Windows）上，主佇列的工作可能由
+/// dispatch worker 執行——此時 `Thread.isMainThread` 為假，但該執行緒已持有主佇列之 drain 鎖；再對主佇列
+/// 下一次 `sync` 即構成遞迴 sync，libdispatch 視為用戶端錯誤而直接崩潰（`__DISPATCH_WAIT_FOR_QUEUE__`
+/// 之「`dispatch_sync called on queue already owned by current thread`」；Darwin 上編成 SIGTRAP、
+/// Linux／Windows 上編成 ud2＝SIGILL）。`getSpecific` 問的是「當前正在執行的佇列」而非執行緒身分，
+/// 故兩平台皆能正確命中；在 macOS 上兩者恆等價（主佇列跑在主執行緒），故該查詢幾乎不會被走到。
+///
+/// 兩點實作約束：一是本函式須為 `nonisolated`——Swift 6.2 以上側以 `-default-isolation MainActor`
+/// 編譯本檔，不標則本函式自身即成為 MainActor 隔離，反而無法自 `nonisolated` 的 `mainSync` 呼叫；
+/// 二是 `DispatchSpecificKey` 與其註冊動作須為函式內之區域型別之成員——置於檔案層級會被 `-default-isolation`
+/// 收歸 MainActor 隔離（`nonisolated(unsafe)` 可解，但 6.4 會對其發出「對 Sendable 常數為多餘」之
+/// 錯誤診斷），而區域型別不受檔案層級的預設隔離影響。
+///
+/// 本函式雖僅服務 `mainSync` 之判斷，仍刻意公開：`LXAssembly.withFileHandleQueueSync` 亦須在**進入
+/// `fileHandleQueue.sync` 之前**問同一件事（見該處 `- Note:`）——內層的 `mainSync` 問不出來，因為
+/// `fileHandleQueue.sync` 通常就地在呼叫端執行，屆時「當前佇列」已成了 `fileHandleQueue`。
+public nonisolated func isOnMainQueue() -> Bool {
+  enum MainQueueIdentity {
+    static let key = DispatchSpecificKey<UInt8>()
+    /// 註冊僅需一次；`static let` 之延遲初始化自帶執行緒安全。回傳 `Bool` 僅為避開
+    /// 「型別標註寫 `Void`」與「不標註而被推為 `()`」兩種噪音——此值本身無語意。
+    static let registration = {
+      DispatchQueue.main.setSpecific(key: key, value: 1)
+      return true
+    }()
+  }
+  _ = MainQueueIdentity.registration
+  return Thread.isMainThread || DispatchQueue.getSpecific(key: MainQueueIdentity.key) != nil
+}
+
 #if compiler(>=6.2)
   @discardableResult
   nonisolated public func mainSync<T>(execute work: @MainActor () throws -> T) rethrows -> T {
-    if Thread.isMainThread {
-      // safe: we are on the main thread, which is the MainActor executor
+    if isOnMainQueue() {
+      // safe: we are on the main queue, which is the MainActor executor
       return try withoutActuallyEscaping(work) { fn in
         typealias Erased = () throws -> T
         return try (unsafeBitCast(fn, to: Erased.self))()
@@ -405,7 +439,7 @@ extension String {
 #else
   @discardableResult
   public func mainSync<T>(execute work: () throws -> T) rethrows -> T {
-    if Thread.isMainThread {
+    if isOnMainQueue() {
       return try work()
     }
     return try DispatchQueue.main.sync(execute: work)

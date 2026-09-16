@@ -43,11 +43,25 @@ public enum LXAssembly {
   }()
 
   /// 經 fileHandleQueue 調度、於 MainActor 上就地執行閉包（同步、可重入）。
-  /// - Note: 呼叫方若已在 MainActor 上（本側所有呼叫方皆然）則直接執行——
-  ///   否則 `fileHandleQueue.sync` 會與 `mainSync` 互鎖。
+  /// - Note: 兩種情形一律就地執行、不進 `fileHandleQueue.sync`：
+  ///   ① 呼叫方已在 fileHandleQueue 上——再 sync 同一條序列佇列即為遞迴 sync；
+  ///   ② 呼叫方已在主佇列上——`sync` 之後的內層 `mainSync` 會與之互鎖。
+  /// - Important: ② 之判斷**不可用 `Thread.isMainThread`**，亦**不可推給內層的 `mainSync` 自查**。
+  ///   在 swift-corelibs 平台（Linux／Windows）上，主佇列的工作可能由 dispatch worker 執行——該執行緒
+  ///   `isMainThread` 為假，卻已持有主佇列之 drain 鎖；而 `fileHandleQueue.sync` 於未受競爭時**就地在
+  ///   呼叫端執行**（libdispatch 之 `_dispatch_sync_f_fast`），於是內層 `mainSync` 眼中「當前正在執行的
+  ///   佇列」已成了 fileHandleQueue——連 `DispatchQueue.getSpecific` 也問不出主佇列身分，遂對主佇列
+  ///   下一次 `sync`，libdispatch 判為用戶端錯誤而直接崩潰（Darwin 上 SIGTRAP、Linux／Windows 上
+  ///   ud2＝SIGILL）。故這一關必須把在主佇列上的呼叫方擋在外頭。實測證據：CI（linux／WinNT）之
+  ///   `LXAssociatesTests.testSaveDataRoundTrip` 之符號化堆疊為
+  ///   `testSaveDataRoundTrip` → `LXAssociates.saveData()` → `withFileHandleQueueSync` →
+  ///   `closure #1` → `mainSync` → `DispatchQueue.sync` → `__DISPATCH_WAIT_FOR_QUEUE__`。
   @discardableResult
   public static func withFileHandleQueueSync<T>(_ execute: () throws -> T) rethrows -> T {
-    if Thread.isMainThread { return try execute() }
+    if DispatchQueue.getSpecific(key: fileHandleQueueKey) == fileHandleQueueIdentifier {
+      return try execute()
+    }
+    if isOnMainQueue() { return try execute() }
     return try fileHandleQueue.sync { try mainSync { try execute() } }
   }
 
