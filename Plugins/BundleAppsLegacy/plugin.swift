@@ -1299,13 +1299,7 @@ private func legacyInfoPlistAdditionalKeys(sdkPath: String?) throws -> [String: 
     return String(major * 100 + minor * 10)
   }()
   let osBuild = try runForStdout("/usr/bin/sw_vers", arguments: ["-buildVersion"])
-  // The SDK's own platform holds the template: `…/MacOSX.platform/Info.plist` → `AdditionalInfo`.
-  let platformInfoURL = sdkDir
-    .deletingLastPathComponent() // …/MacOSX.platform/Developer/SDKs
-    .deletingLastPathComponent() // …/MacOSX.platform/Developer
-    .deletingLastPathComponent() // …/MacOSX.platform
-    .appendingPathComponent("Info.plist")
-  let platformInfo = try readPlist(at: platformInfoURL)
+  let platformInfo = try platformInfoPlist(forSDKAt: sdkDir)
   let template = platformInfo["AdditionalInfo"] as? [String: Any] ?? [:]
   // The build settings the template refers to, resolved here. `PLATFORM_PRODUCT_BUILD_VERSION` has
   // no source on this platform (it does not define one), so it resolves to empty — which is what
@@ -1334,6 +1328,29 @@ private func legacyInfoPlistAdditionalKeys(sdkPath: String?) throws -> [String: 
     result[key] = value
   }
   return result
+}
+
+/// The macOS platform's `Info.plist`, i.e. the one holding the `AdditionalInfo` template Xcode
+/// stamps products from.
+///
+/// When the SDK sits inside an Xcode, its platform is three levels up (`…/MacOSX.platform/…/SDKs`).
+/// A Command Line Tools SDK does not: it lives in a flat `…/CommandLineTools/SDKs/` directory with
+/// no platform around it, and there the active developer directory's platform is the one Xcode
+/// itself reads the template from. Kept as an error (not an empty dictionary) when neither can be
+/// read, so a mis-paired SDK never silently produces a bundle with no build-environment record.
+private func platformInfoPlist(forSDKAt sdkDir: URL) throws -> [String: Any] {
+  let besideSDK = sdkDir
+    .deletingLastPathComponent() // …/Developer/SDKs (Xcode) or …/CommandLineTools (CLT)
+    .deletingLastPathComponent() // …/Developer (Xcode) or …/Library (CLT)
+    .deletingLastPathComponent() // …/MacOSX.platform (Xcode) or …/Developer (CLT)
+    .appendingPathComponent("Info.plist")
+  if let dict = try? readPlist(at: besideSDK) { return dict }
+  if let active = try? runForStdout("/usr/bin/xcode-select", arguments: ["-p"]) {
+    let candidate = URL(fileURLWithPath: active.trimmingCharacters(in: .whitespacesAndNewlines))
+      .appendingPathComponent("Platforms/MacOSX.platform/Info.plist")
+    if let dict = try? readPlist(at: candidate) { return dict }
+  }
+  throw PluginError("Cannot read the macOS platform's Info.plist for the SDK at \(sdkDir.path).")
 }
 
 /// Reads a plist as a dictionary. Used for the toolchain's own metadata plists (`SDKSettings.plist`,

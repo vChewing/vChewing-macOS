@@ -96,7 +96,13 @@ LEGACY_TOOLCHAIN ?= $(firstword $(wildcard \
 	/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
 	$(HOME)/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
 	))
-LEGACY_SDK ?= /Applications/Xcode-15.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk
+# 13.3 SDK 之**真身是 Command Line Tools 那份**（Xcode 15 內的同名目錄只是指過去的 symlink），故綁 CLT：
+# 只要機器上備有這份 SDK，換 Xcode（或那份 Xcode 被搬走）都不影響本側之 targets 建置。SDK 內容＝Xcode 14.3
+# 期（2023-03-29 建置）的原廠 macOS 13.3 SDK；**現行 CLT 已不再隨附它**（其元件已改成移除包
+# `CLTools_macOS_DevSDK_Remove_macOS13.pkg`），故換機時得自行自舊 CLT／Xcode 14.3 取得後放進 CLT 的
+# `SDKs/`。另：`LEGACY_XCODE` 仍須為一個「預設 macOS SDK 夠舊」的 Xcode——build plugin 之編譯取的是
+# active developer dir 的預設 SDK，`--sdk` 到不了那裡（上開註解）；SDK 綁 CLT 並不會改變這一點。
+LEGACY_SDK ?= /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
 LEGACY_XCODE ?= /Applications/Xcode-15.app/Contents/Developer
 LEGACY_X86_TRIPLE ?= x86_64-apple-macosx10.9
 LEGACY_ARM_TRIPLE ?= arm64-apple-macosx11.0

@@ -104,7 +104,7 @@ import PackageDescription
       /// swift package --allow-writing-to-package-directory bundle-apps-legacy -- --debug
       /// swift package --allow-writing-to-package-directory bundle-apps-legacy \
       ///   -- --build-dir .build/.legacy-root/x86_64-apple-macosx/release \
-      ///      --sdk /Applications/Xcode-15.app/…/MacOSX13.3.sdk
+      ///      --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
       /// ```
       ///
       /// `--build-dir` is needed whenever the legacy build used a custom `--scratch-path`

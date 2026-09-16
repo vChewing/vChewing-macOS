@@ -14,7 +14,7 @@ lint:
 # 環境配對三項缺一不可：
 #
 # 1. **工具鏈**須為 Swift 5.10（`LEGACY_TOOLCHAIN`）：只有它會挑到本套件的 `Package@swift-5.10.swift`。
-# 2. **SDK** 須為 Xcode 15 之 `MacOSX13.3.sdk`（`LEGACY_SDK`）：Xcode 27 的 MacOSX27.0.sdk 對 5.10 的
+# 2. **SDK** 須為 Command Line Tools 之 `MacOSX13.3.sdk`（`LEGACY_SDK`）：Xcode 27 的 MacOSX27.0.sdk 對 5.10 的
 #    Clang importer 不可用，會炸出 312 個掩蓋式錯誤（`_c_standard_library_obsolete` 等），無一條指向病灶。
 # 3. **scratch path** 須與 6.2 以上側分離（`LEGACY_SCRATCH`）：5.10 的 SwiftPM 讀不懂新版
 #    `.build/workspace-state.json`（v7），共用即互踩。
@@ -32,7 +32,7 @@ LEGACY_TOOLCHAIN ?= $(firstword $(wildcard \
 	/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
 	$(HOME)/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
 	))
-LEGACY_SDK ?= /Applications/Xcode-15.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk
+LEGACY_SDK ?= /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
 LEGACY_TRIPLE ?= x86_64-apple-macosx10.9
 # scratch path 逐套件獨立（各套件自己的 .build/.legacy）：共用會令兩份 manifest 的產物互踩。
 LEGACY_SCRATCH ?= .build/.legacy

@@ -8,7 +8,7 @@
 # 封堵檔接下。以下目標即「把 5.10 那條路徑跑起來」所需的全部環境配對，三項缺一不可：
 #
 # 1. **工具鏈**：須為 Swift 5.10（`LEGACY_TOOLCHAIN`，預設 open-source 5.10.1）。
-# 2. **SDK**：須為 Xcode 15 之 SDK（`LEGACY_SDK`，預設其 MacOSX13.3.sdk）。Xcode 27 的
+# 2. **SDK**：須為 Command Line Tools 之 SDK（`LEGACY_SDK`，預設其 MacOSX13.3.sdk）。Xcode 27 的
 #    MacOSX27.0.sdk 對 5.10 的 Clang importer **不可用**——會炸在
 #    `module '_c_standard_library_obsolete' requires feature 'found_incompatible_headers__check_search_paths'`
 #    與 `unknown argument: '-target-arch-variant'`，且是 312 個錯誤的掩蓋式失敗，看不出真正原因。
@@ -37,7 +37,7 @@ LEGACY_TOOLCHAIN ?= $(firstword $(wildcard \
 	/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
 	$(HOME)/Library/Developer/Toolchains/swift-5.10.1-RELEASE.xctoolchain \
 	))
-LEGACY_SDK ?= /Applications/Xcode-15.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk
+LEGACY_SDK ?= /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
 LEGACY_SCRATCH ?= .build/.legacy
 LEGACY_SCRATCH_SWIFTEXTENSION ?= .build/.legacy-swiftExtension
 LEGACY_TRIPLE ?= x86_64-apple-macosx10.9
