@@ -43,10 +43,16 @@
 
 建置用系統需求：
 
-- **Xcode 26+ (macOS 15.6+ required)** 或單獨安裝的 **Swift 6.2 open-source toolchain** + **macOS 26 SDK**。
-    - 原因：Swift 6.2 成為必需版本（用於改進 concurrency 安全特性、SPM 6.2.4+ API 支援、CommandPlugin 改進等）。
+- **Swift 6.4 以上是硬性下限**。取得方式二選一：
+    - **Xcode 27+**（需 macOS 26.6 以上）；或
+    - **Xcode 26.x**（Intel Mac 能用的最後一代）＋ 另裝 **Swift 6.4+ open-source toolchain**。
+    - 注意：**Xcode 無法用另裝的 open-source toolchain 來解讀 Swift Package**——它的套件解析固定用自己內建的 toolchain。故在 Intel Mac（Xcode 上限 26.x、內建 Swift < 6.4）上，**本倉已無法再用 Xcode 建置**，只能以 SwiftPM 命令列（`make spmDebug`／`make release` 一類，配 6.4+ toolchain）建置；Apple silicon 不受影響。
+    - 原因：Swift 6.x **僅支援 6.4 以上**。6.2／6.3 已由倉庫內的封堵 manifest（`Package@swift-6.2.swift`／`Package@swift-6.3.swift`）**明文拒絕建置**：該兩版會對 default-isolated 的下游遵循上游協定一事強制索求明文 `@MainActor`（`#ConformanceIsolation`），本倉的依賴閉包在該兩版下不存在可用的產物形態。
+    - 另裝 toolchain 時，SDK 的世代搭配要對：Xcode 27 自帶的 macOS 27 SDK 內含只用得了 6.4 以上編譯器的 `.swiftinterface`，故不可拿 6.2／6.3 系 toolchain 去配它。
 - 請使用正式發行版 Xcode，且最小子版本號越高越好（因為 Bug 相對而言最少）。
     - 如果是某個大版本的 Xcode 的 Release Candidate 版本的話，我們可能會對此做相容性測試。
+- **（選用）建置 legacy 產物**：若需自行產生 macOS 10.9～10.10 的安裝包，另需 **Xcode 15** ＋ **`MacOSX13.3.sdk`** ＋ **Swift 5.10.1 open-source toolchain**，並以 `make debugLegacy`／`make releaseLegacy` 驅動。此路徑僅供本機使用、**不納入 CI**。
+    - 該 SDK **不是 Xcode 15 內建的**（Xcode 15 自帶的是 macOS 14 系），取得方式是安裝 **macOS 13.3 的 Command Line Tools**（`/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk`），再置入 Xcode 15 的平臺目錄。
 
 編譯出的成品對應系統需求：
 
