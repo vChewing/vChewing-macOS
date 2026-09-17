@@ -19,6 +19,11 @@ final class MockClientProxy: NSObject, SessionClientProxy {
   private(set) var committedText: String = ""
   private(set) var markedTexts: [String] = []
   private(set) var overriddenKeyboardLayouts: [String] = []
+  /// 客體被查詢過的行高量測座標（UTF-16，以內文組字區內容為準），依呼叫次序記錄。
+  private(set) var queriedU16CursorPositions: [UInt] = []
+  /// 行高量測回呼；未設定時一律回報零矩形（既有行為）。
+  /// 供需要依座標辨識錨點的測試提供可辨識之矩形。
+  var lineHeightRectProvider: ((_ u16CursorPos: UInt) -> CGRect)?
 
   func toString() -> String { committedText }
 
@@ -26,6 +31,7 @@ final class MockClientProxy: NSObject, SessionClientProxy {
     committedText = ""
     markedTexts.removeAll()
     overriddenKeyboardLayouts.removeAll()
+    queriedU16CursorPositions.removeAll()
   }
 
   func hasClient() -> Bool { true }
@@ -53,7 +59,10 @@ final class MockClientProxy: NSObject, SessionClientProxy {
   )
     -> [AnyHashable: Any]? { nil }
 
-  func clientLineHeightRect(forU16CursorPos _: UInt) -> CGRect { .zeroValue }
+  func clientLineHeightRect(forU16CursorPos u16CursorPos: UInt) -> CGRect {
+    queriedU16CursorPositions.append(u16CursorPos)
+    return lineHeightRectProvider?(u16CursorPos) ?? .zeroValue
+  }
 }
 
 // MARK: - MockSessionUI

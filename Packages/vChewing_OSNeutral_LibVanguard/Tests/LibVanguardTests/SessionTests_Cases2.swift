@@ -868,4 +868,109 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
 
     testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = false
   }
+
+  /// 中英混打模式下，內文 Tooltip 須錨在「未完成讀音（此際即 ASCII 緩衝區）後方之游標
+  /// 位置」上——與選字窗之錨定（`u16MarkedRange.lowerBound`）同源，故能跟著該位置
+  /// 同步移動自身的位置；而非恆錨在組字區最前方（既有行為）。
+  ///
+  /// 該位置另存於 `IMEState`：`.ofInputting` 狀態的 `marker` 會被 `getMitigatedState(_:)`
+  /// 拉平至 `cursor`，故此測試同時釘死「marker 已拉平、錨點資訊仍在」之狀態形制。
+  @Test
+  func test220_MixedAlnumTooltipAnchorsAtCursorPosBehindReading() throws {
+    let tooltipUI = MockTooltipUI()
+    let originalTooltipUI = testUI.tooltipUI
+    let originalMixed = testHandler.prefs.mixedAlphanumericalEnabled
+    defer {
+      testUI.tooltipUI = originalTooltipUI
+      testHandler.prefs.mixedAlphanumericalEnabled = originalMixed
+      testClientProxy.lineHeightRectProvider = nil
+      testClientProxy.clear()
+      testHandler.clear()
+    }
+    testUI.tooltipUI = tooltipUI
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    // 逐分量斷言錨點（`CGPoint` 於跨平台環境不一定遵從 `Equatable`）。
+    func expectAnchor(_ expectedX: CGFloat, _ expectedY: CGFloat, _ label: String) {
+      #expect(
+        tooltipUI.shownPoint?.x == expectedX && tooltipUI.shownPoint?.y == expectedY,
+        "\(label)：實際得到：\(String(describing: tooltipUI.shownPoint))"
+      )
+    }
+    // 以座標自身作為行高矩形之 x 值（×10）與 y 值（100）：錨在哪個座標一目了然。
+    // 如此亦與既有錨定（客體未提供量測值時的零矩形，x = 0、y = 0）可資區別。
+    testClientProxy.lineHeightRectProvider = { u16CursorPos in
+      CGRect(
+        origin: CGPoint(x: CGFloat(u16CursorPos) * 10, y: 100),
+        size: CGSize(width: 10, height: 20)
+      )
+    }
+
+    resetToAbortionAndClear()
+
+    // 先組出中文「你」（注音 ㄋㄧˇ），再鍵入大寫 ASCII「T」
+    // （大寫不進注拼槽，故組字區顯示的就是該 ASCII 原文）。
+    typeSentenceOrCandidates("su3")
+    #expect(testSession.state.displayedText == "你", "實際得到：\(testSession.state.displayedText)")
+    typeSentenceOrCandidates("T")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.displayedText == "你T", "實際得到：\(testSession.state.displayedText)")
+
+    // 未完成讀音（ASCII 緩衝區）後方之游標位置 = 1（緊隨「你」之後）；marker 已被拉平至 cursor。
+    #expect(testSession.state.data.cursorPosRightBehindTheUnfinishedReading == 1)
+    #expect(testSession.state.data.u16CursorPosRightBehindTheUnfinishedReading == 1)
+    #expect(
+      testSession.state.marker == testSession.state.cursor,
+      "`.ofInputting` 狀態之 marker 應已被拉平至 cursor，故該起點須另存一份"
+    )
+
+    // 錨點：該位置（u16 = 1）之矩形原點為 (10, 100)；若仍錨在組字區最前方則會得到 (0, 0)。
+    #expect(tooltipUI.shownTooltip == "T", "實際得到：\(String(describing: tooltipUI.shownTooltip))")
+    expectAnchor(10, 100, "混輸 Tooltip 應錨在未完成讀音後方之游標位置上")
+    #expect(
+      testClientProxy.queriedU16CursorPositions.contains(1),
+      "應以混輸起點（u16 = 1）向客體量測行高矩形；實查座標：\(testClientProxy.queriedU16CursorPositions)"
+    )
+
+    // 對照組一：未完成讀音自組字區最前方起算時（空組字區），錨點 = 座標 0 之矩形。
+    tooltipUI.hide()
+    resetToAbortionAndClear()
+    typeSentenceOrCandidates("T")
+    #expect(testSession.state.data.u16CursorPosRightBehindTheUnfinishedReading == 0)
+    expectAnchor(0, 100, "未完成讀音自組字區最前方起算時應錨在座標 0")
+
+    // 對照組二：非輸入狀態（標記狀態）之 Tooltip 仍錨在既有錨定（組字區最前方之矩形）
+    // ——該類狀態不由 `generateStateOfInputting()` 生成，故不帶「未完成讀音後方之游標位置」。
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    _ = prepareBasicComposition(sequence: "wu40j4qi4 ")
+    press(.shiftLeftEvent)
+    #expect(testSession.state.type == .ofMarking)
+    #expect(
+      testSession.state.data.u16CursorPosRightBehindTheUnfinishedReading == nil,
+      "標記狀態不應承載該游標位置"
+    )
+    expectAnchor(0, 0, "非輸入狀態應沿用既有錨定")
+
+    // 對照組三：輸入狀態之未完成讀音為空時，該值繼承當前輸入游標位置，錨點隨之落在
+    // 該游標位置上（而非組字區最前方）——此乃「輸入狀態一律賦值」之行為面。
+    resetToAbortionAndClear()
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄋㄧˇ") }
+    testSession.switchState(testHandler.generateStateOfInputting())
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.displayedText == "你", "實際得到：\(testSession.state.displayedText)")
+    #expect(
+      testSession.state.data.cursorPosRightBehindTheUnfinishedReading == testSession.state.cursor,
+      "未完成讀音為空時應繼承當前輸入游標位置"
+    )
+    // 該狀態之 Tooltip 本為空（不開窗），故直接注入一段文案以驗證錨定路徑。
+    var stateWithTooltip = testHandler.generateStateOfInputting()
+    stateWithTooltip.tooltip = "injected"
+    let anchorU16Pos = stateWithTooltip.data.u16CursorPosRightBehindTheUnfinishedReading ?? -1
+    #expect(anchorU16Pos == 1, "繼承所得之 UTF-16 座標應為 1；實際得到：\(anchorU16Pos)")
+    testSession.switchState(stateWithTooltip)
+    #expect(tooltipUI.shownTooltip == "injected")
+    expectAnchor(
+      CGFloat(anchorU16Pos) * 10, 100,
+      "未完成讀音為空時應錨在當前輸入游標位置上"
+    )
+  }
 }
