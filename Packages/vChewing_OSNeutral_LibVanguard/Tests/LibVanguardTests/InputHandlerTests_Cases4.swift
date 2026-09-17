@@ -261,6 +261,47 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
   }
 
+  /// 中英混打模式下，Option+BkSp 應一次清空整個混輸 ASCII 緩衝區
+  /// （即「尚待辨識的英文 buffer」的全部內容），而非僅刪除最末字元。
+  /// 不帶 Option 的 BkSp 維持既有之單字元刪除；組字區已組好的中文不受波及。
+  @Test
+  func test_IH436_MixedOptionBackspaceClearsWholeBuffer() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    // 路徑一：組字區為空、緩衝區有內容——Option+BkSp 清空整段並退回空狀態。
+    typeSentence("abc")
+    #expect(testHandler.mixedAlphanumericalBuffer == "abc")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.optionBackspaceEvent.asEvent))
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "Option+BkSp 應一次清空整個混輸緩衝區")
+    #expect(testHandler.composer.isEmpty, "緩衝區清空後注拼槽應同步清空")
+    #expect(testSession.state.type == .ofEmpty)
+
+    // 路徑二（對照組）：不帶 Option 的 BkSp 僅刪除最末字元。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("abc")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.backspaceEvent.asEvent))
+    #expect(testHandler.mixedAlphanumericalBuffer == "ab", "一般 BkSp 仍僅刪除最末字元")
+
+    // 路徑三：組字區已有中文——只清緩衝區，中文照留、狀態續為 inputting。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    let testKanjiData = """
+    ㄧㄡ 優 -1
+    """
+    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
+    defer { cleanup(); testHandler.clear() }
+    typeSentence("u. gr")
+    #expect(testHandler.mixedAlphanumericalBuffer == "gr")
+    #expect(testHandler.assembler.actualKeys == ["ㄧㄡ"])
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.optionBackspaceEvent.asEvent))
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "Option+BkSp 應一次清空整個混輸緩衝區")
+    #expect(testHandler.assembler.actualKeys == ["ㄧㄡ"], "組字區中文不得被 Option+BkSp 波及")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testHandler.committableDisplayText(sansReading: true) == "優")
+    #expect(testHandler.generateStateOfInputting().tooltip.isEmpty, "緩衝區清空後混輸 Tooltip 應一併消失")
+  }
+
   /// 測試中英混打模式下，Space 鍵應走注音提交路徑而非 commit ASCII 讀音字串。
   /// 驗證修正前的 bug：「ㄐㄧ 」(Dachen: r+u+Space) 會直接 commit "ㄐㄧ " 純讀音字串。
   /// 修正後：Space 按下時若 composer 有注音內容，應交由 BPMFFullMatchTypewriter 處理，

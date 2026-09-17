@@ -918,7 +918,14 @@ extension InputHandlerProtocol {
     }
 
     if currentTypingMethod == .vChewingFactory, !mixedAlphanumericalBuffer.isEmpty {
-      mixedAlphanumericalBuffer = mixedAlphanumericalBuffer.dropLast().description
+      // 混輸 ASCII 緩衝區的內容皆屬「尚待辨識」（尚未定案為英文抑或注音）：
+      // 不帶 Option 者僅刪除最末字元；帶 Option 者（Option+BkSp）一次清空整段內容——
+      // 此與內碼／數字模式之 Option+BkSp 語義（清空整個緩衝區）對齊。
+      if input.commonKeyModifierFlags == .option {
+        mixedAlphanumericalBuffer.removeAll()
+      } else {
+        mixedAlphanumericalBuffer = mixedAlphanumericalBuffer.dropLast().description
+      }
       syncComposerWithMixedAlphanumericalBuffer()
       switch isConsideredEmptyForNow {
       case false: session.switchState(generateStateOfInputting())
