@@ -983,4 +983,53 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       "未完成讀音為空時應錨在當前輸入游標位置上"
     )
   }
+
+  /// 安全強化組字區（`clientMitigationLevel >= 2`）下，`getMitigatedState(_:)` 不會把
+  /// `.ofInputting` 狀態的 `marker` 拉平至 `cursor`，故既有之不變量成立：
+  /// 「未完成讀音後方之游標位置」＝`marker`，且 marked range 恰為該讀音所占之區段。
+  /// 浮動組字窗（PCB）即依此二者繪製——`update(using:)` 以 `state.u16MarkedRange` 決定
+  /// 標記區域的底色、以 `state.u16Cursor` 擺放閃爍游標；故 PCB 內「整段 reading 皆顯示為
+  /// marked range」乃此狀態形制之直接結果。
+  @Test
+  func test221_HardenedBufferKeepsMarkerEqualToCursorPosBehindReading() throws {
+    let originalHardened = testHandler.prefs.securityHardenedCompositionBuffer
+    let originalMixed = testHandler.prefs.mixedAlphanumericalEnabled
+    defer {
+      testHandler.prefs.securityHardenedCompositionBuffer = originalHardened
+      testHandler.prefs.mixedAlphanumericalEnabled = originalMixed
+      testHandler.clear()
+    }
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    testHandler.prefs.securityHardenedCompositionBuffer = true
+    #expect(testSession.clientMitigationLevel >= 2, "偏好設定後應進入 PCB 路徑")
+
+    resetToAbortionAndClear()
+    // 先讓組字區有「你」（讀音 ㄋㄧˇ 固化進組字器），再開始組新讀音「ㄋ」（注音鍵 s）。
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄋㄧˇ") }
+    typeSentenceOrCandidates("s")
+    var state = testSession.state
+    #expect(state.type == .ofInputting)
+    #expect(state.displayedText == "你ㄋ", "實際得到：\(state.displayedText)")
+
+    let anchor = state.data.cursorPosRightBehindTheUnfinishedReading
+    #expect(anchor == 1, "實際得到：\(String(describing: anchor))")
+    #expect(
+      state.marker == anchor,
+      "安全強化組字區下 marker 不應被拉平：marker \(state.marker)／anchor \(String(describing: anchor))"
+    )
+    #expect(state.markedRange == 1 ..< 2, "marked range 應恰為該讀音所占之區段")
+    #expect(state.u16MarkedRange.lowerBound == state.data.u16CursorPosRightBehindTheUnfinishedReading)
+    // 閃爍游標（PCB 之 `currentCaretIndex`）位於 marked range 之終點，而非該欄位本身。
+    #expect(state.u16Cursor == state.u16MarkedRange.upperBound)
+
+    // 對照：一般客體（`clientMitigationLevel < 2`）下 marker 會被拉平至 cursor，
+    // 故 marked range 為空、且與該欄位不再同值（除非未完成讀音為空）。
+    testHandler.prefs.securityHardenedCompositionBuffer = false
+    #expect(testSession.clientMitigationLevel < 2)
+    testSession.switchState(testHandler.generateStateOfInputting())
+    state = testSession.state
+    #expect(state.marker == state.cursor, "一般客體下 marker 應被拉平至 cursor")
+    #expect(state.markedRange.isEmpty)
+    #expect(state.data.cursorPosRightBehindTheUnfinishedReading == 1)
+  }
 }
