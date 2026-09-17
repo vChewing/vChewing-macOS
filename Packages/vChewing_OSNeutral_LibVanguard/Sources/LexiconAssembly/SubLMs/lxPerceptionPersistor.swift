@@ -13,6 +13,11 @@ extension LXAssembly {
   /// JSON 快照、追加式 WAL 日誌、CRC32 去重與日誌壓縮。
   ///
   /// `LXPerceptor` 專注觀測邏輯；本類別專注 I/O。
+  ///
+  /// **取鎖紀律**：本類別的鎖恆為「葉鎖」——取用期間不得呼叫任何回呼
+  /// （`dataProvider`／`mapProvider`／`keyValidator`／`loadCallback`／`replayApplicator`）。
+  /// 這些回呼會回頭取 `LXPerceptor` 的鎖，而 `LXPerceptor` 又會在持鎖狀態下呼叫本類別的
+  /// `markKeyForUpsert(_:)`／`markKeyForRemoval(_:)`；一處嵌套即成取鎖順序倒置的永久死鎖。
   public final class PerceptionPersistor {
     // MARK: Lifecycle
 
@@ -30,6 +35,16 @@ extension LXAssembly {
 
     /// 記錄最近一次快照的雜湊值（hex string），以避免重複寫入。
     var previouslySavedHash: String
+
+    /// 僅供測試：本類別的鎖目前是否被取用。
+    ///
+    /// 取自 `NSLock.try()`——同一執行緒在持鎖狀態下重入取鎖時亦回 `false`，故可用以斷言
+    /// 「回呼一律在鎖外執行」這條取鎖紀律（見本類別的取鎖紀律說明）。
+    var isLockHeld: Bool {
+      let acquired = lock.try()
+      if acquired { lock.unlock() }
+      return !acquired
+    }
 
     // MARK: Private
 
@@ -163,9 +178,19 @@ extension LXAssembly.PerceptionPersistor {
       return
     }
 
-    let records: [JournalRecord] = lock.withLock {
-      preparePendingJournalRecords(mapProvider: mapProvider, keyValidator: keyValidator)
+    // 回到鎖外才跑回呼：`mapProvider`／`keyValidator` 會取 `LXPerceptor` 的鎖，
+    // 若在鎖內呼叫即與 `LXPerceptor` 的持鎖路徑構成取鎖順序倒置。
+    let pending = pendingKeys()
+    guard !pending.needsFullSnapshot else {
+      vCLMLog("POM Skip: No pending journal entries to flush.")
+      return
     }
+
+    let records: [JournalRecord] = preparePendingJournalRecords(
+      pending,
+      mapProvider: mapProvider,
+      keyValidator: keyValidator
+    )
     guard !records.isEmpty else {
       vCLMLog("POM Skip: No pending journal entries to flush.")
       return
@@ -180,7 +205,7 @@ extension LXAssembly.PerceptionPersistor {
         journalEntriesSinceLastCompaction += records.count
       }
 
-      if lock.withLock({ shouldCompactJournal(for: fileURL) }) {
+      if shouldCompactJournal(for: fileURL) {
         try writeFullSnapshot(dataProvider: dataProvider, to: fileURL, force: false)
       }
     } catch {
@@ -268,23 +293,41 @@ extension LXAssembly.PerceptionPersistor {
 // MARK: - Journal Internals
 
 extension LXAssembly.PerceptionPersistor {
+  /// 待寫入日誌的鍵值快照。取用時只碰本類別的狀態，故可在鎖內組出、帶出鎖外使用。
+  private struct PendingKeys {
+    var upserts: [String]
+    var removals: [String]
+    var needsFullSnapshot: Bool
+  }
+
+  /// 於鎖內取出待處理鍵值的排序快照。回呼一律在鎖外跑，見本類別的取鎖紀律。
+  private func pendingKeys() -> PendingKeys {
+    lock.withLock {
+      .init(
+        upserts: pendingUpsertKeys.sorted(),
+        removals: pendingRemovedKeys.sorted(),
+        needsFullSnapshot: needsFullSnapshot
+      )
+    }
+  }
+
   /// 建立待寫入日誌的記錄列表。
+  ///
+  /// 呼叫時**不得**持有本類別的鎖：`mapProvider`／`keyValidator` 會回呼進 `LXPerceptor` 並取其鎖。
   private func preparePendingJournalRecords(
+    _ pending: PendingKeys,
     mapProvider: () -> [String: LXAssembly.LXPerceptor.KeyPerceptionPair],
     keyValidator: (String) -> Bool
   )
     -> [JournalRecord] {
-    if needsFullSnapshot { return [] }
     var results: [JournalRecord] = []
-    let removalKeys = pendingRemovedKeys.sorted()
-    let upsertKeys = pendingUpsertKeys.sorted()
     let map = mapProvider()
 
-    for key in removalKeys {
+    for key in pending.removals {
       results.append(.init(operation: .removeKey, key: key, pair: nil))
     }
 
-    for key in upsertKeys {
+    for key in pending.upserts {
       guard let pair = map[key] else { continue }
       guard keyValidator(pair.key) else { continue }
       results.append(.init(operation: .upsert, key: key, pair: pair))
@@ -335,13 +378,13 @@ extension LXAssembly.PerceptionPersistor {
     return String(format: "%08x", checksum)
   }
 
-  /// 判斷是否需要以新快照壓縮日誌。
+  /// 判斷是否需要以新快照壓縮日誌。呼叫時**不得**持有本類別的鎖（內部會做檔案 I/O）。
   private func shouldCompactJournal(for baseURL: URL) -> Bool {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: journalURL.path) else { return false }
 
-    if journalEntriesSinceLastCompaction >= Self.journalCompactionEntryThreshold {
+    if lock.withLock({ journalEntriesSinceLastCompaction }) >= Self.journalCompactionEntryThreshold {
       return true
     }
 

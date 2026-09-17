@@ -549,7 +549,8 @@ extension LXMgr {
             )
             return targetModes.map(\.lexicon)
           }
-          // Perform disk I/O on this background queue – avoids blocking MainActor.
+          // POM 落盤改在主執行緒執行（非主執行緒只負責調度）：磁碟 I/O 因此不再有第二條執行緒
+          // 與主執行緒互搶 POM 的鎖；本佇列僅負責 debounce 計時。
           asyncOnMain {
             targetLexicons.forEach {
               $0.savePOMData()
