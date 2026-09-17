@@ -287,8 +287,13 @@ public struct IMEStateData {
   /// 用語遵循護摩引擎之術語體系：與文字輸入方向相反的方向為「後方」（Rear）。
   /// 凡由 `generateStateOfInputting()` 生成之 `.ofInputting` 狀態一律帶有本值，故消費端
   /// （如 Tooltip 之錨定）無須分辨「有無未完成讀音」。
-  /// 該狀態的 `marker` 會被 `getMitigatedState(_:)` 拉平至 `cursor`
-  /// （IMK 要求 selectionRange 之長度為 0），故本值須另存一份、不受該處置影響。
+  /// 本值係「拉平前之 `marker`」（＝未完成讀音之插入處），不能用 `min(cursor, marker)`
+  /// （即 `markedRange` 之起點）代勞：`getMitigatedState(_:)` 於 `clientMitigationLevel < 2`
+  /// 時會把 `.ofInputting` 狀態的 `marker` 拉平至 `cursor`（IMK 要求 selectionRange 之長度
+  /// 為 0），而 `switchState()` 所存下者即拉平後之狀態（`state = next`），故該際
+  /// `min(cursor, marker)` 退化為 `cursor`——未完成讀音之末端；該讀音之插入處遂唯本值承載。
+  /// 級別 ≥ 2 時不拉平（該際兩者同值），惟彼時客體之內文組字區僅剩佔位字元、座標量測本
+  /// 無從進行，故本值之主要用場仍在級別 < 2 之客體。
   public var cursorPosRightBehindTheUnfinishedReading: Int?
 
   public var highlightedCandidateIndex: Int? {

@@ -85,8 +85,16 @@ extension SessionProtocol {
   ///
   /// 輸入狀態（`.ofInputting`）一律帶有「未完成讀音後方之游標位置」
   /// （`cursorPosRightBehindTheUnfinishedReading`——未完成讀音為空時其值即當前輸入游標
-  /// 位置），故一律以該位置量測行高矩形——與選字窗之錨定（`u16MarkedRange.lowerBound`／
-  /// `u16Cursor`）同源，Tooltip 因此得以跟隨該位置同步移動自身的位置。
+  /// 位置），故一律以該位置量測行高矩形，Tooltip 因此得以跟隨該位置同步移動自身的位置。
+  /// 其與選字窗之錨定語義同源（所求皆為「未完成讀音所占區段之起點」）而取值路徑不同、
+  /// 數值未必相同：選字窗之錨定值經 `SessionProtocol.u16Cursor` 取得——
+  /// `prefs.useDynamicCandidateWindowOrigin` 啟用時取 `state.u16MarkedRange.lowerBound`，
+  /// 關閉時（預設）對候選容器改取 `state.u16Cursor`（狀態所載之輸入游標位置）、其餘仍取前者。
+  /// 本值則徑取狀態所另存之拉平前標記位置，故不能以 `min(u16Cursor, u16Marker)`（即
+  /// `state.u16MarkedRange.lowerBound`）代勞：`getMitigatedState(_:)` 於
+  /// `clientMitigationLevel < 2` 時已把 `.ofInputting` 狀態之 `marker` 拉平至 `cursor`
+  /// （連帶 `u16MarkedRange` 成為空區段），該際該式之值即未完成讀音之末端而非其插入處
+  /// ——唯獨本值仍承載該插入處。
   /// 其餘狀態（標記、選字、關聯詞、符號表）一律沿用既有錨定（組字區最前方之矩形）；
   /// 該呼叫亦兼具縱排輸入之判定作用，故無論走哪一條路徑都必須先呼叫之。
   private func tooltipAnchorRect() -> CGRect {

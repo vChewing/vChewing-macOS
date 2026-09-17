@@ -432,6 +432,9 @@ extension InputHandlerProtocol {
     /// 未完成讀音（組字區內顯示的那段讀音）非空時，該值即其插入處（該讀音自該處起向前展開）；
     /// 讀音為空時，直接繼承當前輸入游標位置——如此一來，本值於輸入狀態恆有定義，
     /// 消費端（如 Tooltip 之錨定）無須再分辨「有無未完成讀音」。
+    /// 該插入處亦即上文的 `cursorSansReading`（先前已寫入 `result.marker`）；之所以須另行留存，
+    /// 是因為 Session 端之 `getMitigatedState(_:)` 於 `clientMitigationLevel < 2` 時會把
+    /// 狀態之 `marker` 拉平至 `cursor`（IMK 要求 selectionRange 之長度為 0）。
     result.data.cursorPosRightBehindTheUnfinishedReading = reading.isEmpty
       ? result.cursor
       : cursorSansReading
