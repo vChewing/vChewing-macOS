@@ -51,12 +51,8 @@ extension SessionProtocol {
     }
     let uniqueCandidateTargets = Array(Set(candidateTargets.filter { !$0.isEmpty }))
 
-    // 更新組字器內的單元圖資料。
-    // 註：如果已經排除的內容是該讀音下唯一的記錄的話，
-    // 則該內容的節點會繼續殘留在組字區內，只是無法再重新輸入了。
-    _ = inputHandler.updateUnigramData()
-
-    // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
+    // 因為上述操作要等語言模組資料重載完成才會生效（除非遞交組字區），
+    // 所以先暫時塞入臨時資料記錄，令當前組字器立刻用得上剛寫入的內容。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
     inputHandler.currentLM.insertTemporaryData(
       unigram: .init(
@@ -66,6 +62,14 @@ extension SessionProtocol {
       ),
       isFiltering: addToFilter
     )
+
+    // 更新組字器內的單元圖資料。
+    // 註：如果已經排除的內容是該讀音下唯一的記錄的話，
+    // 則該內容的節點會繼續殘留在組字區內，只是無法再重新輸入了。
+    // 次序不得顛倒：該更新會清空組字器的查詢快取、並就地重查所有既有節點，
+    // 臨時資料記錄必須先入庫，否則本次重查的結果不含剛寫入的詞、也就無從立刻生效。
+    _ = inputHandler.updateUnigramData()
+
     // 將清詞（bleach）延遲至 asyncOnMain 執行，避免同步 JSON encode + disk write 阻塞 main thread。
     let bleachTargets = uniqueCandidateTargets
     let bleachHeadReadings = headReading

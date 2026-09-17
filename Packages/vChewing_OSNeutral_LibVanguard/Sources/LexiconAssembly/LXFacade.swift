@@ -350,12 +350,19 @@ extension LXAssembly {
     }
 
     public func loadUserPhrasesData(path: String, filterPath: String?, async: Bool? = nil) {
-      // 無論新檔案是否可讀，都必須先清除舊資料，防止舊目錄內容殘留。
-      lxUserPhrases.clear()
-      lxFiltered.clear()
-      unigramLRUCache.removeAll(keepingCapacity: true)
-
       let shouldAsync = async ?? Self.asyncLoadingUserData
+
+      // 舊資料的清除時機：同步載入者逕行清除；非同步載入者延後——成功時由 `replaceData` 全量取代
+      // （臨時資料亦於該處一併清除），失敗時由失敗回呼清除。
+      // 之所以不在非同步路徑的此處逕行清除：那會造出「舊資料已清空、新資料尚未讀入」的空窗期，
+      // 而就地加詞的組字器熱重載（見 `InputHandler.updateUnigramData()`）若落入該空窗期，
+      // 就會把組字器重建成既沒有使用者詞語、也沒有臨時資料的狀態——就地加詞於是無從立即生效。
+      // 另：只清除「本次將重新載入」的資料來源：`filterPath` 為 nil 時不得動 `lxFiltered`。
+      if !shouldAsync {
+        lxUserPhrases.clear()
+        if filterPath != nil { lxFiltered.clear() }
+      }
+      unigramLRUCache.removeAll(keepingCapacity: true)
 
       func loadMain() {
         if FileManager.default.isReadableFile(atPath: path) {
@@ -369,15 +376,24 @@ extension LXAssembly {
         loadMain()
       } else {
         LXAssembly.readFileContentAsync(
-          path: path, shouldConsolidate: lxUserPhrases.allowConsolidation
-        ) { [weak self] content in
-          guard let self else { return }
-          LXAssembly.withFileHandleQueueSync {
-            self.lxUserPhrases.replaceData(textData: content)
+          path: path,
+          shouldConsolidate: lxUserPhrases.allowConsolidation,
+          completion: { [weak self] content in
+            guard let self else { return }
+            LXAssembly.withFileHandleQueueSync {
+              self.lxUserPhrases.replaceData(textData: content)
+            }
+            self.lxUserPhrases.filePath = path
+            // 新資料已就位：即時令查詢快取失效，避免空窗期內產生的條目殘留。
+            self.unigramLRUCache.removeAll(keepingCapacity: true)
+            vCLMLog("lxUserPhrases: \(self.lxUserPhrases.count) entries of data loaded from: \(path)")
+          },
+          onFailure: { [weak self] in
+            // 與同步路徑同語義：新檔案不可讀時，不保留舊資料。
+            self?.lxUserPhrases.clear()
+            self?.unigramLRUCache.removeAll(keepingCapacity: true)
           }
-          self.lxUserPhrases.filePath = path
-          vCLMLog("lxUserPhrases: \(self.lxUserPhrases.count) entries of data loaded from: \(path)")
-        }
+        )
       }
       guard let filterPath = filterPath else { return }
       func loadFilter() {
@@ -392,15 +408,23 @@ extension LXAssembly {
         loadFilter()
       } else {
         LXAssembly.readFileContentAsync(
-          path: filterPath, shouldConsolidate: lxFiltered.allowConsolidation
-        ) { [weak self] content in
-          guard let self else { return }
-          LXAssembly.withFileHandleQueueSync {
-            self.lxFiltered.replaceData(textData: content)
+          path: filterPath,
+          shouldConsolidate: lxFiltered.allowConsolidation,
+          completion: { [weak self] content in
+            guard let self else { return }
+            LXAssembly.withFileHandleQueueSync {
+              self.lxFiltered.replaceData(textData: content)
+            }
+            self.lxFiltered.filePath = filterPath
+            // 新資料已就位：即時令查詢快取失效，避免空窗期內產生的條目殘留。
+            self.unigramLRUCache.removeAll(keepingCapacity: true)
+            vCLMLog("lxFiltered: \(self.lxFiltered.count) entries of data loaded from: \(filterPath)")
+          },
+          onFailure: { [weak self] in
+            self?.lxFiltered.clear()
+            self?.unigramLRUCache.removeAll(keepingCapacity: true)
           }
-          self.lxFiltered.filePath = filterPath
-          vCLMLog("lxFiltered: \(self.lxFiltered.count) entries of data loaded from: \(filterPath)")
-        }
+        )
       }
     }
 
@@ -524,9 +548,10 @@ extension LXAssembly {
           ? lxFiltered.temporaryMap[keyChain, default: []].append(unigram)
           : lxUserPhrases.temporaryMap[keyChain, default: []].append(unigram)
       // LRU cache 必須在暫時資料變更時失效，否則後續查詢會返回過時結果。
-      // 注意：cache key 已包含 partiallyMatch 標記，需同時清除兩種變體。
-      unigramLRUCache.removeValue(forKey: "\(keyChain)\tPM0")
-      unigramLRUCache.removeValue(forKey: "\(keyChain)\tPM1")
+      // 逕行全量失效：查詢快取除 `keyChain\tPM0`／`PM1` 兩種變體之外，
+      // 替代讀音路徑另有以完整鍵陣列雜湊值定址的條目（`ALT\t…`），無法以 keyChain 枚舉；
+      // 臨時資料變更屬人肉操作頻率，全面作廢的代價可忽略。
+      unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
     /// 該函式主要供單元測試所用。

@@ -74,6 +74,7 @@ public enum LXAssembly {
 
   /// 經 fileHandleQueue 調度讀取檔案內容（含可選的 consolidation），
   /// 完成後在 MainActor 上回呼結果。不阻塞呼叫方（通常是 MainActor）。
+  /// 讀檔失敗時只印日誌；若有提供 `onFailure`，則同樣在 MainActor 上回呼之。
   ///
   /// 本 API 以 compiler flag 分隔為兩套寫法，係因 closure 參數的 actor 標註兩側互斥：
   ///
@@ -87,7 +88,8 @@ public enum LXAssembly {
     public static func readFileContentAsync(
       path: String,
       shouldConsolidate: Bool,
-      completion: @MainActor @escaping @Sendable (String) -> ()
+      completion: @MainActor @escaping @Sendable (String) -> (),
+      onFailure: (@MainActor @Sendable () -> ())? = nil
     ) {
       fileHandleQueue.async {
         mainSync {
@@ -100,6 +102,7 @@ public enum LXAssembly {
             asyncOnMain { completion(rawStrData) }
           } catch {
             vCLMLog("readFileContentAsync failed at: \(path). Details: \(error)")
+            if let onFailure { asyncOnMain { onFailure() } }
           }
         }
       }
@@ -108,7 +111,8 @@ public enum LXAssembly {
     public static func readFileContentAsync(
       path: String,
       shouldConsolidate: Bool,
-      completion: @escaping @Sendable (String) -> ()
+      completion: @escaping @Sendable (String) -> (),
+      onFailure: (@Sendable () -> ())? = nil
     ) {
       fileHandleQueue.async {
         mainSync {
@@ -121,6 +125,7 @@ public enum LXAssembly {
             asyncOnMain { completion(rawStrData) }
           } catch {
             vCLMLog("readFileContentAsync failed at: \(path). Details: \(error)")
+            if let onFailure { asyncOnMain { onFailure() } }
           }
         }
       }

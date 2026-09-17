@@ -326,4 +326,69 @@ struct LXFacadeTests {
     let exactAfterPartial = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: false)
     #expect(!exactAfterPartial.map(\.current).contains("年終"))
   }
+
+  /// 臨時資料插入（就地加詞的即時生效機制）必須使**所有**查詢快取失效，
+  /// 含替代讀音路徑以完整鍵陣列雜湊值定址、無法以 keyChain 枚舉的條目。
+  ///
+  /// 否則：同一讀音若在插入之前已被查過一次，插入後的熱重載會拿到過時結果——
+  /// 就地加詞便無法在當前組字器內生效。
+  @Test
+  func testTemporaryDataInsertionInvalidatesAllQueryCaches() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+    let singleReading: [Homa.PossibleKey] = [.singleKey("ㄋㄧㄢˊ"), .singleKey("ㄓㄨㄥ")]
+    let alternativeReading: [Homa.PossibleKey] = [
+      .multipleKeys(["ㄋㄧㄢˊ", "ㄋㄧㄢˇ"]), .singleKey("ㄓㄨㄥ"),
+    ]
+    // 先各查一輪，把兩種查詢路徑的快取條目都坐實。
+    for keyArray in [singleReading, alternativeReading] {
+      let before = instance.unigramsFor(keyArray: keyArray, partiallyMatch: false).map(\.current)
+      #expect(!before.contains("花枝丸"))
+    }
+
+    instance.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], value: "花枝丸", score: 0),
+      isFiltering: false
+    )
+
+    for keyArray in [singleReading, alternativeReading] {
+      let after = instance.unigramsFor(keyArray: keyArray, partiallyMatch: false).map(\.current)
+      #expect(after.contains("花枝丸"), "插入臨時資料後，既有快取一律失效、查詢應立刻含新詞。")
+    }
+  }
+
+  /// 非同步重載不得在新資料就緒之前清空既有資料：
+  /// 「舊資料已清空、新資料尚未讀入」的空窗期若被就地加詞觸發的組字器熱重載撞上，
+  /// 組字器就會被重建成既沒有使用者詞語、也沒有臨時資料的狀態。
+  /// 另：`filterPath` 為 nil 時不得動 `lxFiltered`（本次不重新載入濾除表）。
+  @Test
+  func testAsyncUserPhrasesReloadKeepsStoreUntilReplacementLands() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+    instance.lxUserPhrases.replaceData(textData: "花枝丸 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0\n")
+    instance.lxFiltered.replaceData(textData: "年終 ㄋㄧㄢˊ-ㄓㄨㄥ\n")
+    let fetched = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], partiallyMatch: false)
+      .map(\.current)
+    #expect(fetched.contains("花枝丸"))
+    #expect(!fetched.contains("年終"), "前提：濾除表已攔下「年終」")
+
+    // 非同步重載（目標檔案不存在）：空窗期內既有的片語與濾除表都必須留著。
+    instance.loadUserPhrasesData(path: "/nonexistent-vchewing-p226", filterPath: nil, async: true)
+    let duringWindow = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], partiallyMatch: false)
+      .map(\.current)
+    #expect(duringWindow.contains("花枝丸"), "非同步重載的空窗期內，舊資料不應被提前清空。")
+    #expect(!duringWindow.contains("年終"), "`filterPath` 為 nil 時，濾除表不應被清空。")
+
+    // 同步載入（目標檔案不存在）：依既有語義不保留舊資料。
+    instance.loadUserPhrasesData(path: "/nonexistent-vchewing-p226", filterPath: nil, async: false)
+    let afterSyncLoad = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], partiallyMatch: false)
+      .map(\.current)
+    #expect(!afterSyncLoad.contains("花枝丸"), "同步載入時，新檔案不可讀即不保留舊資料。")
+  }
 }
