@@ -279,6 +279,18 @@ public struct IMEStateData {
   /// 當為 nil 時，退回至 displayTextSegments（即後者亦為原始資料）。
   public var rawDisplayTextSegments: [String]?
 
+  /// 游標位置：恰在「未完成的讀音」的後方——亦即該讀音於內文組字區內之插入處的索引。
+  ///
+  /// 「未完成的讀音」指尚未固化的讀音：注拼槽內正在組裝的讀音，或混輸模式下尚待辨識的
+  /// ASCII 緩衝區。該讀音以「讀音」的身分插進組字區，故其起始處即本值（讀音本身佔
+  /// [本值, 本值＋讀音長度)）；未完成讀音為空時，本值直接繼承當前輸入游標位置。
+  /// 用語遵循護摩引擎之術語體系：與文字輸入方向相反的方向為「後方」（Rear）。
+  /// 凡由 `generateStateOfInputting()` 生成之 `.ofInputting` 狀態一律帶有本值，故消費端
+  /// （如 Tooltip 之錨定）無須分辨「有無未完成讀音」。
+  /// 該狀態的 `marker` 會被 `getMitigatedState(_:)` 拉平至 `cursor`
+  /// （IMK 要求 selectionRange 之長度為 0），故本值須另存一份、不受該處置影響。
+  public var cursorPosRightBehindTheUnfinishedReading: Int?
+
   public var highlightedCandidateIndex: Int? {
     didSet {
       guard let newValue = highlightedCandidateIndex else { return }
@@ -352,6 +364,13 @@ extension IMEStateData {
 
   public var u16MarkedRange: Range<Int> {
     min(u16Cursor, u16Marker) ..< max(u16Cursor, u16Marker)
+  }
+
+  /// 「未完成讀音後方之游標位置」的 UTF-16 座標（唯讀）。未記錄該位置時為 nil。
+  public var u16CursorPosRightBehindTheUnfinishedReading: Int? {
+    guard let cursorPosRightBehindTheUnfinishedReading else { return nil }
+    let upperBound = max(0, min(cursorPosRightBehindTheUnfinishedReading, displayedText.count))
+    return displayedText.map(\.description)[0 ..< upperBound].joined().utf16.count
   }
 
   public var isMarkedLengthValid: Bool {
