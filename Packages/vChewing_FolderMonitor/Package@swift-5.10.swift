@@ -32,12 +32,16 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../vChewing_OSNeutral_LibVanguard"),
+    // 與 `Package.swift` 對位。本側之 `VanguardSwiftExtension` 是 static 產物，靜態鏈接本即帶得過去、
+    // 無「dynamic 產品不傳導其動態依賴」之缺口，故此宣告僅為兩份 manifest 之依賴拓樸一致。
+    .package(path: "../vChewing_OSNeutral_LibVanguard/Deps/VanguardSwiftExtension"),
   ],
   targets: [
     .target(
       name: "FolderMonitor",
       dependencies: [
         .product(name: "Vanguard", package: "vChewing_OSNeutral_LibVanguard"),
+        .product(name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"),
       ]
     ),
   ],
