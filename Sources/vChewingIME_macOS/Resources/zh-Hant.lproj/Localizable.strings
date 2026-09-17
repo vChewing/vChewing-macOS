@@ -540,6 +540,8 @@
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.shortTitle" = "(Shift+)Tab:";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "啟用後，原廠辭典將不再供應假名音節資料。若您在使用中英混輸回退時覺得假名候選干擾體驗，可考慮開啟這個選項。";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "停用原廠假名音節資料";
+"i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.description" = "啟用後，以聲調鍵覆寫游標身後的漢字的音調時，將不再顯示內文提示。若您覺得該提示干擾工作心流，可考慮開啟這個選項。";
+"i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.shortTitle" = "停用「已覆寫游標身後的漢字的音調」內文提示";
 "i18n:UserDef.kSymbolInputEnabled.shortTitle" = "啟用包括少許繪文字在內的符號輸入支援";
 "i18n:UserDef.kTogglingAlphanumericalModeWithLShift.shortTitle" = "允許使用左側的 Shift 鍵切換英數輸入模式";
 "i18n:UserDef.kTogglingAlphanumericalModeWithRShift.shortTitle" = "允許使用右側的 Shift 鍵切換英數輸入模式";

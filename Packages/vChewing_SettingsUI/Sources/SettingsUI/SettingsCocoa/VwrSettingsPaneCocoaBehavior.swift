@@ -135,6 +135,10 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )
+          UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
           UserDef.kAcceptLeadingIntonations.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabBehavior

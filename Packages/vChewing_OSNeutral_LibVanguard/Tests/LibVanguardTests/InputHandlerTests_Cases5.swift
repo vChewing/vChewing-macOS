@@ -138,4 +138,53 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 驗證朗讀內容為注音（實際覆寫後的讀音）
     #expect(narrator.lastNarratedText?.contains("ㄋㄧ") == true)
   }
+
+  // MARK: D) 後置聲調覆寫的內文提示抑制
+
+  @Test
+  func test_IH511_RearIntonationOverrideTooltipSuppression() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+
+    // 插入臨時語料：原始讀音與覆寫目標讀音皆需存在。
+    testHandler.currentLM.insertTemporaryData(
+      unigram: Homa.Gram(keyArray: ["ㄋㄧˇ"], value: "你測", score: -1.0),
+      isFiltering: false
+    )
+    testHandler.currentLM.insertTemporaryData(
+      unigram: Homa.Gram(keyArray: ["ㄋㄧˋ"], value: "逆測", score: -1.0),
+      isFiltering: false
+    )
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
+
+    /// 重置組字器、回到「已組好一個字、注拼槽已空」的狀態。
+    func prepareOverrideScenario() {
+      testHandler.clear()
+      testHandler.composer.ensureParser(arrange: .ofHanyuPinyin)
+      typeSentence("ni3")
+      #expect(testHandler.assembler.actualKeys.last?.contains("ㄋㄧ") == true)
+    }
+
+    // 預設（偏好關閉）：覆寫成功時，既有的內文提示照常顯示。
+    prepareOverrideScenario()
+    typeSentence("4")
+    #expect(
+      testSession.state.tooltip == "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
+    )
+    #expect(testSession.state.tooltipDuration == 2)
+
+    // 偏好開啟：覆寫照常生效，但不再附加該內文提示。
+    testHandler.prefs.suppressTooltipForIntonationKeyOverrideEvents = true
+    defer { testHandler.prefs.suppressTooltipForIntonationKeyOverrideEvents = false }
+
+    prepareOverrideScenario()
+    let readingBeforeOverride = testHandler.assembler.actualKeys.last
+    typeSentence("4")
+    #expect(testHandler.assembler.actualKeys.last != readingBeforeOverride)
+    #expect(testSession.state.tooltip.isEmpty)
+  }
 }

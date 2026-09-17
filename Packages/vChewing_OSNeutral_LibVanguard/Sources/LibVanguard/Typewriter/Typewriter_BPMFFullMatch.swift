@@ -523,9 +523,12 @@ extension BPMFFullMatchTypewriter {
       }
       var refreshedState = handler.generateStateOfInputting()
       refreshedState.textToCommit = textToCommit
-      refreshedState.tooltip = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
-      refreshedState.tooltipDuration = 2
-      refreshedState.data.tooltipColorState = .normal
+      // 是否顯示「已覆寫游標身後的漢字的音調」提示由偏好決定；抑制時不留殘餘的提示與其色彩狀態。
+      if !handler.prefs.suppressTooltipForIntonationKeyOverrideEvents {
+        refreshedState.tooltip = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
+        refreshedState.tooltipDuration = 2
+        refreshedState.data.tooltipColorState = .normal
+      }
       session.switchState(refreshedState)
       return true
     case .noLexiconRecord:

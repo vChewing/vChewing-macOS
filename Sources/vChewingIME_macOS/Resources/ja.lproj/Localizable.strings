@@ -540,6 +540,8 @@
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.shortTitle" = "(Shift+)Tab:";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "このスイッチをオンにすると、内蔵辞書は仮名音節データを供給しなくなります。中英混在入力フォールバック中に仮名候補が邪魔だと感じる場合は、この設定を有効にしてください。";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "内蔵辞書の仮名音節データを無効化";
+"i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.description" = "このスイッチをオンにすると、音調キーで後ろ側の漢字の音調を書き直した時にツールチップが表示されなくなります。入力中にツールチップが邪魔だと感じる場合は、この設定を有効にしてください。";
+"i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.shortTitle" = "後ろ側の漢字の音調を書き直した時のツールチップを表示しない";
 "i18n:UserDef.kSymbolInputEnabled.shortTitle" = "僅かなる絵文字も含む符号入力サポートを起用";
 "i18n:UserDef.kTogglingAlphanumericalModeWithLShift.shortTitle" = "左側の Shift キーで英数入力モードの切り替え";
 "i18n:UserDef.kTogglingAlphanumericalModeWithRShift.shortTitle" = "右側の Shift キーで英数入力モードの切り替え";

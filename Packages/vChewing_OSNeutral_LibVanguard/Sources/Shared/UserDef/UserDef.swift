@@ -62,6 +62,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
   case kAcceptLeadingIntonations = "AcceptLeadingIntonations"
   case kSpecifyIntonationKeyBehavior = "SpecifyIntonationKeyBehavior"
+  case kSuppressTooltipForIntonationKeyOverrideEvents = "SuppressTooltipForIntonationKeyOverrideEvents"
   case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior4CandidateWindow = "SpecifyShiftSpaceKeyBehavior4CandidateWindow"
@@ -485,6 +486,7 @@ extension UserDef {
     case .kEscToCleanInputBuffer: return .bool(true)
     case .kAcceptLeadingIntonations: return .bool(true)
     case .kSpecifyIntonationKeyBehavior: return .integer(0)
+    case .kSuppressTooltipForIntonationKeyOverrideEvents: return .bool(false)
     case .kSpecifyShiftBackSpaceKeyBehavior: return .integer(0)
     case .kSpecifyShiftTabKeyBehavior: return .bool(false)
     case .kSpecifyShiftSpaceKeyBehavior4CandidateWindow: return .bool(false)
@@ -817,6 +819,11 @@ extension UserDef {
           1: "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1",
           2: "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2",
         ]
+      )
+    case .kSuppressTooltipForIntonationKeyOverrideEvents: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.shortTitle",
+        description: "i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.description"
       )
     case .kSpecifyShiftBackSpaceKeyBehavior: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle",

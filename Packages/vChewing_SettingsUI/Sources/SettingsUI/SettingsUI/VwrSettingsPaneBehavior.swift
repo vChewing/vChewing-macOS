@@ -70,6 +70,7 @@
 
         Section {
           UserDef.kSpecifyIntonationKeyBehavior.renderUI()
+          UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.renderUI()
           UserDef.kAcceptLeadingIntonations.renderUI()
         }
 

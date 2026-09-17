@@ -96,6 +96,7 @@ public protocol PrefMgrProtocol {
   var escToCleanInputBuffer: Bool { get set }
   var acceptLeadingIntonations: Bool { get set }
   var specifyIntonationKeyBehavior: Int { get set }
+  var suppressTooltipForIntonationKeyOverrideEvents: Bool { get set }
   var specifyShiftBackSpaceKeyBehavior: Int { get set }
   var specifyShiftTabKeyBehavior: Bool { get set }
   var specifyShiftSpaceKeyBehavior4CandidateWindow: Bool { get set }

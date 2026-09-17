@@ -540,6 +540,8 @@
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.shortTitle" = "(Shift+)Tab:";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "By turning this toggle ON, the factory lexicon will stop supplying the data of Kana Syllables. Some people may want to turn this on to avoid disruptive experiences while using mixed Chinese-English typing fallback.";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "Suppress factory kana syllable data";
+"i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.description" = "By turning this toggle ON, the IME will no longer show the tooltip when an intonation key overrides the tone of the previous reading in the compositor. Some people may want to turn this on to avoid disruptive experiences while typing.";
+"i18n:UserDef.kSuppressTooltipForIntonationKeyOverrideEvents.shortTitle" = "Suppress the tooltip when overriding the previous reading's tone";
 "i18n:UserDef.kSymbolInputEnabled.shortTitle" = "Enable symbol input support (incl. certain emoji symbols)";
 "i18n:UserDef.kTogglingAlphanumericalModeWithLShift.shortTitle" = "Toggle alphanumerical mode with Left-Shift";
 "i18n:UserDef.kTogglingAlphanumericalModeWithRShift.shortTitle" = "Toggle alphanumerical mode with Right-Shift";

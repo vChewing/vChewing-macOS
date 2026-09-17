@@ -279,6 +279,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kSpecifyIntonationKeyBehavior)
   public var specifyIntonationKeyBehavior: Int
 
+  @AppProperty(userDef: .kSuppressTooltipForIntonationKeyOverrideEvents)
+  public var suppressTooltipForIntonationKeyOverrideEvents: Bool
+
   @AppProperty(userDef: .kSpecifyShiftBackSpaceKeyBehavior)
   public var specifyShiftBackSpaceKeyBehavior: Int
 
