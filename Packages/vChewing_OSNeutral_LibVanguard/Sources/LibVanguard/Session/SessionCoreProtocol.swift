@@ -109,13 +109,20 @@ extension SessionCoreProtocol {
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       showTooltip(nil)
     }
+    // 先讓客體收到本狀態的內文組字區內容，再擺放各面板：
+    // Tooltip 與選字窗之錨定皆以「客體對其內文組字區某座標所量得的行高矩形」為準
+    // （`attributesForCharacterIndex:lineHeightRectangle:`，索引係相對於內文組字區）。
+    // 若搶在 `updateCompositionBufferDisplay()` 之前量測，客體的內文組字區還是上一個
+    // 狀態的內容——此時傳入本狀態的索引即屬越界，客體將無從量得而回報無效值
+    // （`clientLineHeightRectForU16CursorPos:` 對無效值會逐位遞減探測，遂一律退回至
+    // 前一個字元之座標）；症狀即為「面板擺在應有位置後方隔著一個字元的距離」。
+    updateCompositionBufferDisplay()
+    toggleCandidateUIVisibility(state.isCandidateContainer)
     showTooltip(
       state.tooltip,
       colorState: state.data.tooltipColorState,
       duration: state.tooltipDuration
     )
-    toggleCandidateUIVisibility(state.isCandidateContainer)
-    updateCompositionBufferDisplay()
   }
 
   // MARK: resetInputHandler

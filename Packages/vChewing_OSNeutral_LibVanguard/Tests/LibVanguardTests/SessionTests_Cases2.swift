@@ -930,6 +930,16 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       testClientProxy.queriedU16CursorPositions.contains(1),
       "應以混輸起點（u16 = 1）向客體量測行高矩形；實查座標：\(testClientProxy.queriedU16CursorPositions)"
     )
+    // 次序：錨點之座標量測必須發生在客體收到本狀態之組字區內容之後。
+    // 否則客體的內文組字區還是上一個狀態的內容，本狀態的索引對其即屬越界
+    // （`clientLineHeightRectForU16CursorPos:` 對越界值會逐位遞減探測），錨點遂落在前者。
+    let markedSetupIdx = testClientProxy.calls.lastIndex(of: .markedTextSetup("你T"))
+    let anchorQueryIdx = testClientProxy.calls.lastIndex(of: .lineHeightQuery(1))
+    #expect(markedSetupIdx != nil && anchorQueryIdx != nil)
+    #expect(
+      (markedSetupIdx ?? 0) < (anchorQueryIdx ?? 0),
+      "座標量測須晚於組字區內容落地；實查呼叫序列：\(testClientProxy.calls)"
+    )
 
     // 對照組一：未完成讀音自組字區最前方起算時（空組字區），錨點 = 座標 0 之矩形。
     tooltipUI.hide()

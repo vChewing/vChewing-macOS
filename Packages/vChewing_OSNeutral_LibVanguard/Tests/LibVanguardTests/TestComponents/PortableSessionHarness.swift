@@ -16,9 +16,16 @@ import SwiftExtension
 /// 必須繼承 `NSObject`，因為 `SessionProtocol.performServerActivation()` 的快速路徑
 /// 會以 `NSObject` 身分比對 client proxy 的記憶體位址。
 final class MockClientProxy: NSObject, SessionClientProxy {
+  /// 客體側被呼叫過的紀錄（依時序），用於斷言「組字區內容先於座標量測落地」之類的次序。
+  enum Call: Equatable {
+    case markedTextSetup(String)
+    case lineHeightQuery(UInt)
+  }
+
   private(set) var committedText: String = ""
   private(set) var markedTexts: [String] = []
   private(set) var overriddenKeyboardLayouts: [String] = []
+  private(set) var calls: [Call] = []
   /// 客體被查詢過的行高量測座標（UTF-16，以內文組字區內容為準），依呼叫次序記錄。
   private(set) var queriedU16CursorPositions: [UInt] = []
   /// 行高量測回呼；未設定時一律回報零矩形（既有行為）。
@@ -31,6 +38,7 @@ final class MockClientProxy: NSObject, SessionClientProxy {
     committedText = ""
     markedTexts.removeAll()
     overriddenKeyboardLayouts.removeAll()
+    calls.removeAll()
     queriedU16CursorPositions.removeAll()
   }
 
@@ -42,6 +50,7 @@ final class MockClientProxy: NSObject, SessionClientProxy {
 
   func clientMarkedTextSetup(with text: NSAttributedString, selectionRange _: NSRange, replacementRange _: NSRange) {
     markedTexts.append(text.string)
+    calls.append(.markedTextSetup(text.string))
   }
 
   func clientBundleIdentifier() -> String? {
@@ -61,6 +70,7 @@ final class MockClientProxy: NSObject, SessionClientProxy {
 
   func clientLineHeightRect(forU16CursorPos u16CursorPos: UInt) -> CGRect {
     queriedU16CursorPositions.append(u16CursorPos)
+    calls.append(.lineHeightQuery(u16CursorPos))
     return lineHeightRectProvider?(u16CursorPos) ?? .zeroValue
   }
 }
