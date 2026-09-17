@@ -9,19 +9,16 @@ on:
 jobs:
   build:
     name: test-macOS-SPMTestsAndPackage
-    runs-on: macos-27
+    # Swift 6.4+ is required: 6.2 / 6.3 are blocked by the manifests
+    # (`Package@swift-6.2.swift` / `Package@swift-6.3.swift`). Xcode 27.0 is the
+    # first Xcode shipping Swift 6.4 (P216 §13.6). Older Xcode (26.6) ships 6.3.3.
+    runs-on: xcode-27
     # NOTE: some external submodule hosting environments may exhibit intermittent
     # certificate verification problems on the runner. This workflow keeps a
     # temporary TLS verification override scoped to the checkout step only (not
     # to the entire job) to avoid broader security impact while keeping the CI
     # resilient. See the checkout step for the override.
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1.7.0
-        with:
-          # Swift 6.4+ is required: 6.2 / 6.3 are blocked by the manifests
-          # (`Package@swift-6.2.swift` / `Package@swift-6.3.swift`). Xcode 27.0 is the
-          # first Xcode shipping Swift 6.4 (P216 §13.6). Older Xcode (26.6) ships 6.3.3.
-          xcode-version: "27.0"
       - uses: actions/checkout@v4
         env:
           # Limit TLS verification override to this step only. Do NOT enable this
