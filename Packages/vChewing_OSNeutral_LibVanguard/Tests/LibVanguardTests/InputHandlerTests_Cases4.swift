@@ -302,6 +302,83 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.generateStateOfInputting().tooltip.isEmpty, "緩衝區清空後混輸 Tooltip 應一併消失")
   }
 
+  /// 「未完成讀音後方之游標位置」必須隨狀態一併承載，且凡由 `generateStateOfInputting()`
+  /// 生成之輸入狀態皆一律賦值——未完成讀音為空時其值即當前輸入游標位置。
+  /// `.ofInputting` 狀態的 `marker` 會被 `getMitigatedState(_:)` 拉平至 `cursor`
+  /// （IMK 要求 selectionRange 之長度為 0），故該位置資訊於 Session 層無從回收。
+  /// Tooltip 之錨定即以此值為準，詳見 Session 層測試。
+  @Test
+  func test_IH437_CursorPosBehindUnfinishedReadingCarriedInState() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    // 路徑一：混輸、組字區無中文——未完成讀音自組字區最前方起算。
+    typeSentence("abc")
+    #expect(testHandler.mixedAlphanumericalBuffer == "abc")
+    var state = testHandler.generateStateOfInputting()
+    #expect(state.data.cursorPosRightBehindTheUnfinishedReading == 0)
+    #expect(state.data.u16CursorPosRightBehindTheUnfinishedReading == 0)
+
+    // 路徑二：混輸、組字區已有中文——未完成讀音接在該中文之後（而非組字區最前方）。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    let chanZiData = """
+    ㄧㄡ 優 -1
+    """
+    let cleanup = injectTemporaryGrams(testHandler, chanZiData)
+    defer { cleanup(); testHandler.clear() }
+    typeSentence("u. gr")
+    #expect(testHandler.mixedAlphanumericalBuffer == "gr")
+    state = testHandler.generateStateOfInputting()
+    #expect(testHandler.committableDisplayText(sansReading: true) == "優")
+    #expect(state.data.cursorPosRightBehindTheUnfinishedReading == 1)
+    #expect(state.data.u16CursorPosRightBehindTheUnfinishedReading == 1)
+
+    // 路徑三：混輸、高萬字（單一 Character、兩個 UTF-16 單位）在前時，座標須以 UTF-16 計。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    let emojiData = """
+    ㄧㄡ 💩 -1
+    """
+    let cleanupEmoji = injectTemporaryGrams(testHandler, emojiData)
+    defer { cleanupEmoji(); testHandler.clear() }
+    typeSentence("u. gr")
+    #expect(testHandler.mixedAlphanumericalBuffer == "gr")
+    state = testHandler.generateStateOfInputting()
+    #expect(state.data.cursorPosRightBehindTheUnfinishedReading == 1)
+    #expect(
+      state.data.u16CursorPosRightBehindTheUnfinishedReading == 2,
+      "高萬字的 UTF-16 座標須為 2；實際得到：\(String(describing: state.data.u16CursorPosRightBehindTheUnfinishedReading))"
+    )
+
+    // 路徑四：混輸緩衝區清空後，該值改為繼承當前輸入游標位置（不再為 nil）。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.optionBackspaceEvent.asEvent))
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    state = testHandler.generateStateOfInputting()
+    #expect(
+      state.data.cursorPosRightBehindTheUnfinishedReading == state.cursor,
+      "未完成讀音為空時應繼承當前輸入游標位置；實際得到：\(String(describing: state.data.cursorPosRightBehindTheUnfinishedReading))／cursor \(state.cursor)"
+    )
+    #expect(
+      state.data.u16CursorPosRightBehindTheUnfinishedReading == state.u16Cursor,
+      "UTF-16 對位者應等於該狀態之 u16Cursor"
+    )
+
+    // 路徑五：非混輸（偏好關）之一般組字狀態亦一律賦值——未完成讀音為空時繼承游標。
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("su3 ")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    state = testHandler.generateStateOfInputting()
+    #expect(state.type == .ofInputting, "實際得到：\(state.type.rawValue)")
+    #expect(
+      state.data.cursorPosRightBehindTheUnfinishedReading == state.cursor,
+      "非混輸之組字狀態亦應一律賦值；實際得到：\(String(describing: state.data.cursorPosRightBehindTheUnfinishedReading))／cursor \(state.cursor)"
+    )
+    #expect(state.data.u16CursorPosRightBehindTheUnfinishedReading == state.u16Cursor)
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+  }
+
   /// 測試中英混打模式下，Space 鍵應走注音提交路徑而非 commit ASCII 讀音字串。
   /// 驗證修正前的 bug：「ㄐㄧ 」(Dachen: r+u+Space) 會直接 commit "ㄐㄧ " 純讀音字串。
   /// 修正後：Space 按下時若 composer 有注音內容，應交由 BPMFFullMatchTypewriter 處理，

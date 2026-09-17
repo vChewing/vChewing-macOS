@@ -30,8 +30,13 @@ extension SessionProtocol {
   }
 
   public func lineHeightRect(zeroCursor: Bool = false) -> CGRect {
+    lineHeightRect(atU16Pos: zeroCursor ? 0 : u16Cursor)
+  }
+
+  /// 以指定的 UTF-16 座標向客體查詢行高矩形（座標以內文組字區內容為準）。
+  public func lineHeightRect(atU16Pos u16Pos: Int) -> CGRect {
     if let ctl = clientProxy {
-      return ctl.clientLineHeightRect(forU16CursorPos: zeroCursor ? 0 : UInt(u16Cursor))
+      return ctl.clientLineHeightRect(forU16CursorPos: UInt(max(0, u16Pos)))
     }
     return .seniorTheBeast
   }
@@ -54,7 +59,7 @@ extension SessionProtocol {
       return
     }
     guard clientProxy?.hasClient() == true else { return }
-    let lineHeightRect = updateVerticalTypingStatus()
+    let lineHeightRect = tooltipAnchorRect()
     var finalOrigin: CGPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0 // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
@@ -74,6 +79,29 @@ extension SessionProtocol {
       tooltip: tooltip, at: finalOrigin, bottomOutOfScreenAdjustmentHeight: delta,
       direction: tooltipContentDirection, duration: duration
     )
+  }
+
+  /// Tooltip 之錨定矩形。
+  ///
+  /// 輸入狀態（`.ofInputting`）一律帶有「未完成讀音後方之游標位置」
+  /// （`cursorPosRightBehindTheUnfinishedReading`——未完成讀音為空時其值即當前輸入游標
+  /// 位置），故一律以該位置量測行高矩形——與選字窗之錨定（`u16MarkedRange.lowerBound`／
+  /// `u16Cursor`）同源，Tooltip 因此得以跟隨該位置同步移動自身的位置。
+  /// 其餘狀態（標記、選字、關聯詞、符號表）一律沿用既有錨定（組字區最前方之矩形）；
+  /// 該呼叫亦兼具縱排輸入之判定作用，故無論走哪一條路徑都必須先呼叫之。
+  private func tooltipAnchorRect() -> CGRect {
+    let rectAtCompositionHead = updateVerticalTypingStatus()
+    guard let anchoringPos = state.data.u16CursorPosRightBehindTheUnfinishedReading else {
+      return rectAtCompositionHead
+    }
+    let rectAtAnchoringPos = lineHeightRect(atU16Pos: anchoringPos)
+    // 客體未對該座標提供有效量測值時（`CGRectNull`，或與客體量測之既有慣例同源的「原點為零」）
+    // 退回既有錨定，以免視窗被丟到無限遠或螢幕角落去。
+    guard rectAtAnchoringPos.origin.x.isFinite,
+          rectAtAnchoringPos.origin.y.isFinite,
+          rectAtAnchoringPos.origin.x != 0 || rectAtAnchoringPos.origin.y != 0
+    else { return rectAtCompositionHead }
+    return rectAtAnchoringPos
   }
 
   private func showCandidates() {

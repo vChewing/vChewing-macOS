@@ -428,6 +428,13 @@ extension InputHandlerProtocol {
       result.cursor = 0
       result.marker = 0
     }
+    /// 未完成讀音後方之游標位置：凡生成 `.ofInputting` 狀態皆賦值。
+    /// 未完成讀音（組字區內顯示的那段讀音）非空時，該值即其插入處（該讀音自該處起向前展開）；
+    /// 讀音為空時，直接繼承當前輸入游標位置——如此一來，本值於輸入狀態恆有定義，
+    /// 消費端（如 Tooltip 之錨定）無須再分辨「有無未完成讀音」。
+    result.data.cursorPosRightBehindTheUnfinishedReading = reading.isEmpty
+      ? result.cursor
+      : cursorSansReading
     /// 中英混打模式：以 Tooltip 顯示目前 ASCII buffer 的原始內容，方便使用者識別輸入狀態。
     /// 第二行顯示游標最前方正在組裝的注音讀音預覽（注拼槽為空時不附加該行）；
     /// 該讀音之呈現沿用 Tooltip 既有規則，故「以漢語拼音顯示組字區讀音」與直排與否一體適用。
