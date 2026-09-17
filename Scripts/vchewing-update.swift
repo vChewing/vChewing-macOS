@@ -371,6 +371,45 @@ func isLegacyByMacOSDeployment(_ pbxPath: String) -> Bool {
   return false
 }
 
+/// 檢查版本資訊是否確實寫入專案檔案（Xcode 專案 + 兩份 plist）。
+/// 只要有任何一處與期望值不符（或根本沒寫入），就回傳 false。
+func versionStampIsLanded(version: String, build: String) -> Bool {
+  guard let pbxPath = locatePbxproj(at: repoPath),
+        let pbxContent = try? String(contentsOfFile: pbxPath, encoding: .utf8)
+  else { return false }
+
+  let expectations = [
+    (#"MARKETING_VERSION = ([0-9]+\.[0-9]+\.[0-9]+);"#, version),
+    (#"CURRENT_PROJECT_VERSION = ([0-9]+);"#, build),
+  ]
+  for (pattern, expected) in expectations {
+    guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return false }
+    let matches = regex.matches(
+      in: pbxContent,
+      options: [],
+      range: NSRange(pbxContent.startIndex..., in: pbxContent)
+    )
+    // 專案內的每一處出現都必須符合期望值，有任何一處不符即視為未完成。
+    if matches.isEmpty { return false }
+    for match in matches {
+      guard let range = Range(match.range(at: 1), in: pbxContent),
+            String(pbxContent[range]) == expected
+      else { return false }
+    }
+  }
+
+  for plistRelPath in ["Update-Info.plist", "Release-Version.plist"] {
+    let plistPath = repoPath + "/" + plistRelPath
+    guard FileManager.default.fileExists(atPath: plistPath) else { continue }
+    guard let plist = NSDictionary(contentsOfFile: plistPath),
+          (plist["CFBundleShortVersionString"] as? String) == version,
+          (plist["CFBundleVersion"] as? String) == build
+    else { return false }
+  }
+
+  return true
+}
+
 var useProjectVersion = false
 var currentVer = highestTag
 var currentBuild = "0"
@@ -433,15 +472,34 @@ let buildNum = major * 1_000 + minor * 100 + patch * 10
 print("Computed build number: \(buildNum)")
 
 // 5) 執行 BuildVersionSpecifier.swift
+// 注意：該腳本不能用 shebang 直接跑（`#!/usr/bin/env swift`）：本腳本自己可能就是由 PATH 上的
+// swiftly 代理啟動的，而它會把 `SWIFTLY_PROXY_IN_PROGRESS` 留在環境變數內給子行程。子行程再次
+// 命中同一個代理時，代理會直接以「Circular swiftly proxy invocation」中止，版本號於是完全沒被
+// 寫入，但後續的 commit 與 tag 仍照做（tag 因而定在舊版本狀態）。故改用 `/usr/bin/swift` 明確
+// 指定解譯器，且以下一律檢查每個步驟的執行結果。
 if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swift") {
   print("Running BuildVersionSpecifier.swift \(base) \(buildNum)")
   if dryRun {
     print("dry-run: skipping BuildVersionSpecifier")
   } else {
-    _ = Shell.run(
-      "chmod +x ./BuildVersionSpecifier.swift && ./BuildVersionSpecifier.swift \(base) \(buildNum)",
+    let bumpResult = Shell.runExec(
+      "/usr/bin/swift",
+      args: ["./BuildVersionSpecifier.swift", base, "\(buildNum)"],
       cwd: repoPath
     )
+    if bumpResult.status != 0 {
+      print(
+        "Error: BuildVersionSpecifier.swift exited with status \(bumpResult.status): \(bumpResult.output)"
+      )
+      exit(6)
+    }
+
+    // 版本號沒真的寫進專案檔案的話，之後的 commit 與 tag 只會定在舊版本狀態。
+    guard versionStampIsLanded(version: base, build: "\(buildNum)") else {
+      print("Error: Version stamp \(base) (build \(buildNum)) did not land; aborting before commit & tag.")
+      exit(6)
+    }
+
     // commit 版本變更 - 確保沒有遺留的子模組改動
     let smCheck = Shell.run(
       "git submodule status --recursive | sed -n '1,200p'",
@@ -457,11 +515,48 @@ if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swi
       )
       exit(5)
     }
-    _ = Shell.run(
-      "git add -A && git commit -m \"[VersionUp] \(base) GM Build \(buildNum).\"",
+    let versionUpMsg = "[VersionUp] \(base) GM Build \(buildNum)."
+    // 專案內其他未提交的變更都會被 `git add -A` 一起收進版本提交，故先提醒。
+    let versionedRelPaths = [
+      "vChewing.xcodeproj/project.pbxproj", "Update-Info.plist", "Release-Version.plist",
+    ]
+    let otherDirty = Shell.runExec(
+      "/usr/bin/git",
+      args: ["status", "--porcelain"],
+      cwd: repoPath,
+      trim: false
+    )
+    .output.split(separator: "\n")
+    .map { String($0.dropFirst(3)) }
+    .filter { !$0.isEmpty && !versionedRelPaths.contains($0) }
+    if !otherDirty.isEmpty {
+      print(
+        "Warning: These unrelated uncommitted files will also enter the version commit: \(otherDirty)"
+      )
+    }
+    let addResult = Shell.runExec("/usr/bin/git", args: ["add", "-A"], cwd: repoPath)
+    if addResult.status != 0 {
+      print("Error: 'git add -A' failed: \(addResult.output)")
+      exit(7)
+    }
+    let commitResult = Shell.runExec(
+      "/usr/bin/git",
+      args: ["commit", "-m", versionUpMsg],
       cwd: repoPath
     )
-    print("Committed [VersionUp] \(base) GM Build \(buildNum).")
+    let headSubject = Shell.runExec(
+      "/usr/bin/git",
+      args: ["log", "-1", "--pretty=format:%s"],
+      cwd: repoPath
+    ).output
+    guard commitResult.status == 0, headSubject == versionUpMsg else {
+      let gitSaid = commitResult.output.isEmpty ? "(git reported no output)" : commitResult.output
+      print(
+        "Error: Failed to create the version commit (git status \(commitResult.status)): \(gitSaid)"
+      )
+      exit(7)
+    }
+    print("Committed \(versionUpMsg)")
   }
 } else {
   print("BuildVersionSpecifier.swift not found at repo root: skipping version bump.")
@@ -472,7 +567,11 @@ if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swi
 if dryRun {
   print("dry-run: skipping tag creation for \(newTag)")
 } else {
-  _ = Shell.runExec("/usr/bin/git", args: ["tag", "-f", newTag], cwd: repoPath)
+  let tagResult = Shell.runExec("/usr/bin/git", args: ["tag", "-f", newTag], cwd: repoPath)
+  if tagResult.status != 0 {
+    print("Error: Failed to create tag \(newTag): \(tagResult.output)")
+    exit(8)
+  }
   print("Tag \(newTag) created/updated.")
 }
 
@@ -500,13 +599,24 @@ if FileManager.default.fileExists(atPath: repoPath + "/\(updateInfoPath)") {
       parentHash =
         Shell.runExec("/usr/bin/git", args: ["rev-parse", "HEAD~1"], cwd: repoPath).output
     }
-    _ = Shell.runExec(
+    let revertResult = Shell.runExec(
       "/usr/bin/git",
       args: ["checkout", parentHash, "--", updateInfoPath],
       cwd: repoPath
     )
-    _ = Shell.runExec("/usr/bin/git", args: ["add", updateInfoPath], cwd: repoPath)
-    _ = Shell.runExec("/usr/bin/git", args: ["commit", "-m", "[SUPPRESSOR]"], cwd: repoPath)
+    let suppressAdd = Shell.runExec("/usr/bin/git", args: ["add", updateInfoPath], cwd: repoPath)
+    let suppressCommit = Shell.runExec(
+      "/usr/bin/git",
+      args: ["commit", "-m", "[SUPPRESSOR]"],
+      cwd: repoPath
+    )
+    if revertResult.status != 0 || suppressAdd.status != 0 || suppressCommit.status != 0 {
+      print("Error: Failed to commit [SUPPRESSOR] (tag \(newTag) is already created).")
+      print("  Revert: \(revertResult.output)")
+      print("  Add: \(suppressAdd.output)")
+      print("  Commit: \(suppressCommit.output)")
+      exit(9)
+    }
     print("Committed [SUPPRESSOR]")
   }
 } else {
