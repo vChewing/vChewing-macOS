@@ -19,6 +19,10 @@ private let mapHanyuPinyinToPhonabets: LengthSortedDictionary = {
 extension String {
   mutating func convertToPhonabets(newToneOne: String = "") {
     if isEmpty || contains("_") || !isNotPureAlphanumerical { return }
+    // 純注音字串（含以半形減號 `-` 作分隔者）不含任何半形英數，而 432 個拼音 pattern 全部由半形英數
+    // 組成，故一個都命中不了——唯獨尾端的空格替換仍可能生效。除該情形外一律早退，
+    // 免得對每個 key 空跑 432 次 `replacingOccurrences`（實測：243.5 µs/key）。
+    guard containsHalfWidthAlphanumerical || (newToneOne != " " && contains(" ")) else { return }
     let lengths = mapHanyuPinyinToPhonabets.keys.sorted().reversed()
     lengths.forEach { length in
       mapHanyuPinyinToPhonabets[length]?.forEach { key, value in
@@ -39,6 +43,19 @@ extension String {
       return true
     }
     return !x.isEmpty
+  }
+}
+
+/// 偵測字串是否含有半形英數（A–Z／a–z／0–9）內容
+extension String {
+  fileprivate var containsHalfWidthAlphanumerical: Bool {
+    unicodeScalars.contains { scalar in
+      let value = scalar.value
+      if value >= 48, value <= 57 { return true }
+      if value >= 65, value <= 90 { return true }
+      if value >= 97, value <= 122 { return true }
+      return false
+    }
   }
 }
 

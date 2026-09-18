@@ -122,6 +122,49 @@ struct LXCoreEXTests {
     #expect(ke == ["顆"])
   }
 
+  /// 手術（Phase 230）：`convertToPhonabets()` 對純注音字串（含以半形減號作分隔者）早退。
+  /// 本測釘死「早退不改變結果」——拼音轉換與空格替換皆須照舊生效。
+  @Test
+  func testConvertToPhonabetsFastPathParity() throws {
+    // 純注音（含半形減號分隔）：早退，結果不變。
+    var pureBopomofo = "ㄅㄚ-ㄕ"
+    pureBopomofo.convertToPhonabets()
+    #expect(pureBopomofo == "ㄅㄚ-ㄕ")
+
+    // 拼音（含半形減號分隔）：照舊轉換。
+    var pinyinWithDash = "ba-shi"
+    pinyinWithDash.convertToPhonabets()
+    #expect(pinyinWithDash == "ㄅㄚ-ㄕ")
+
+    var pinyinWithTone = "shi4-jie4"
+    pinyinWithTone.convertToPhonabets()
+    #expect(pinyinWithTone == "ㄕˋ-ㄐㄧㄝˋ")
+
+    // 純英數：第一道守衛照舊擋下（不轉換）——早退守衛不得放行這類字串。
+    var pureAlnumToned = "shi4jie4"
+    pureAlnumToned.convertToPhonabets()
+    #expect(pureAlnumToned == "shi4jie4")
+
+    var pureAlnum = "ba"
+    pureAlnum.convertToPhonabets()
+    #expect(pureAlnum == "ba")
+
+    // 空格替換：newToneOne 為空時刪除空格。
+    var spacedPinyin = "ba shi"
+    spacedPinyin.convertToPhonabets()
+    #expect(spacedPinyin == "ㄅㄚㄕ")
+
+    // 空格替換：newToneOne 非空時替換——即使字串為純注音亦須生效。
+    var spacedBopomofo = "ㄅㄚ ㄕ"
+    spacedBopomofo.convertToPhonabets(newToneOne: "-")
+    #expect(spacedBopomofo == "ㄅㄚ-ㄕ")
+
+    // 下劃線鍵（如 NumPad）：照舊早退。
+    var underscored = "_NumPad_1"
+    underscored.convertToPhonabets()
+    #expect(underscored == "_NumPad_1")
+  }
+
   @Test
   func testPrefixMatchingDeduplicatesOverlappingMainAndTemporaryKeys() throws {
     var lxTest = LXAssembly.LXCoreEX(
