@@ -125,13 +125,13 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
       thePool.attributedStringHeader(for: currentCell).draw(
         at:
         .init(
-          x: currentCell.visualOrigin.x + 2 * padding,
+          x: currentCell.visualOrigin.x + 2 * padding + currentCell.headerDrawXOffset,
           y: currentCell.visualOrigin.y + ceil(currentCell.visualDimension.height * 0.2)
         )
       )
       thePool.attributedStringPhrase(for: currentCell, isMatrix: false).draw(
         at: .init(
-          x: currentCell.visualOrigin.x + 2 * padding + ceil(currentCell.size * 0.6),
+          x: currentCell.visualOrigin.x + 2 * padding + currentCell.phraseDrawXOffset,
           y: currentCell.visualOrigin.y + padding
         )
       )

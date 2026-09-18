@@ -266,6 +266,217 @@ struct TDK4AppKitTests {
     )
   }
 
+  // MARK: - 選字鍵標籤之顯示區域
+
+  /// 迴歸鎖定：選字鍵標籤之顯示區域必須是**正方形**（邊長＝該標籤自身之行高），
+  /// 不得隨字級而變成「窄高」形；候選字詞自該正方形右緣起排，且該區域之增寬
+  /// 不得使候選字詞超出該格。
+  @Test
+  func testCandidateKeyLabelDisplayAreaIsSquare() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    for size in [12, 16, 24, 40, 96, 196] {
+      PrefMgr.shared.candidateListTextSize = size
+      let pool = TDK4AppKit.CandidatePool4AppKit(
+        candidates: [(keyArray: [""], value: "我"), (keyArray: [""], value: "好")],
+        lines: 1, isExpanded: true, selectionKeys: "12", layout: .horizontal
+      )
+      pool.updateMetrics()
+      let cell = pool.candidateLines[0][1]
+      let keyFont = cell.selectionKeyFont()
+      let keyLineHeight = ceil(keyFont.ascender + abs(keyFont.descender) + keyFont.leading)
+      #expect(
+        cell.keyLabelBoxSide == keyLineHeight,
+        "字級 \(size)：標籤顯示區域之邊長應等於標籤自身行高"
+      )
+      #expect(
+        cell.phraseDrawXOffset == cell.keyLabelBoxSide,
+        "字級 \(size)：候選字詞應自正方形區域右緣起排"
+      )
+      // （標籤之「光學居中」由 `testCandidateKeyLabelInkIsCenteredInItsBox` 專責鎖定：
+      //   該處斷言位移不取整、且以墨跡盒之中點對齊區域中點。）
+      let phraseWidth = cell.makeAttributedStringPhrase(isMatrix: false).size().width
+      #expect(
+        2 * pool.padding + cell.phraseDrawXOffset + phraseWidth <= cell.visualDimension.width,
+        "字級 \(size)：標籤區域不得將候選字詞擠出該格"
+      )
+    }
+  }
+
+  /// 迴歸鎖定：橫排多行（matrix）模式下，cell 寬度改由 `cellWidthMultiplied` 覆寫，
+  /// 故「標籤盒 ＋ 候選字詞」之約束不在該路徑上；該路徑之最小格寬本就遠寬於兩者之和，
+  /// 此處逐字級鎖住這個不變式（避免日後調整 matrix 最小寬度時擠到標籤或字詞）。
+  @Test
+  func testKeyLabelFitsInsideHorizontalMatrixCells() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    for size in [12, 16, 24, 40, 96, 196] {
+      PrefMgr.shared.candidateListTextSize = size
+      let pool = TDK4AppKit.CandidatePool4AppKit(
+        candidates: [(keyArray: [""], value: "我"), (keyArray: [""], value: "好")],
+        lines: 4, isExpanded: true, selectionKeys: "12", layout: .horizontal
+      )
+      pool.updateMetrics()
+      let cell = pool.candidateLines[0][1]
+      let phraseWidth = cell.makeAttributedStringPhrase(isMatrix: false).size().width
+      #expect(
+        2 * pool.padding + cell.phraseDrawXOffset + phraseWidth <= cell.visualDimension.width,
+        "字級 \(size)：橫排多行格內應同時容得下標籤盒與候選字詞"
+      )
+    }
+  }
+
+  /// 迴歸鎖定：標籤之**墨跡**應光學居中於其正方形區域（兩側留白相等）。
+  /// 舊制以 `ceil` 取整居中、位移恆偏正向，肉眼可見「偏 center-trailing」（實測留白差可達 1.8 點）。
+  @Test
+  func testCandidateKeyLabelInkIsCenteredInItsBox() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    for size in [24, 40, 96] {
+      PrefMgr.shared.candidateListTextSize = size
+      let pool = TDK4AppKit.CandidatePool4AppKit(
+        candidates: [(keyArray: [""], value: "我"), (keyArray: [""], value: "好"), (keyArray: [""], value: "的")],
+        lines: 1, isExpanded: true, selectionKeys: "123456", layout: .horizontal
+      )
+      pool.updateMetrics()
+      let cell = pool.candidateLines[0][2] // 非高亮格
+
+      // 不取整：位移須令墨跡盒之中點落在區域中點上（取整即会留下單側偏差）。
+      let inkMidX = cell.keyLabelInkBounds.isEmpty
+        ? cell.makeAttributedStringHeader().size().width / 2
+        : cell.keyLabelInkBounds.midX
+      let idealOffset = cell.keyLabelBoxSide / 2 - inkMidX
+      #expect(
+        abs(cell.headerDrawXOffset - idealOffset) < 0.001,
+        "字級 \(size)：標籤橫向位移必須恰好置中（不得取整）"
+      )
+
+      // 繪製實查（可繪製時）：兩側留白差 ≤ 1 點。
+      let view = TDK4AppKit.VwrCandidateTDK4AppKit(thePool: pool)
+      view.frame = CGRect(origin: .zero, size: view.fittingSize)
+      guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds),
+            let data = rep.bitmapData else { continue }
+      view.cacheDisplay(in: view.bounds, to: rep)
+      let scale = CGFloat(rep.pixelsWide) / view.bounds.width
+      let bytesPerRow = rep.bytesPerRow
+      let samplesPerPixel = rep.samplesPerPixel
+      let bgRow = min(rep.pixelsHigh - 1, rep.pixelsHigh / 2) * bytesPerRow
+      let bg = (CGFloat(data[bgRow]), CGFloat(data[bgRow + 1]), CGFloat(data[bgRow + 2]))
+      let boxMinX = (cell.visualOrigin.x + 2 * pool.padding) * scale
+      let boxMaxX = boxMinX + cell.keyLabelBoxSide * scale
+      let boxMinY = (cell.visualOrigin.y + cell.headerDrawYOffset) * scale
+      let boxMaxY = boxMinY + cell.keyLabelBoxSide * scale
+      var minX = Int.max, maxX = Int.min
+      for y in Int(boxMinY) ..< max(Int(boxMinY) + 1, Int(boxMaxY.rounded(.up))) {
+        for x in Int(boxMinX) ..< max(Int(boxMinX) + 1, Int(boxMaxX.rounded(.up))) {
+          let offset = y * bytesPerRow + x * samplesPerPixel
+          let delta = abs(CGFloat(data[offset]) - bg.0) + abs(CGFloat(data[offset + 1]) - bg.1)
+            + abs(CGFloat(data[offset + 2]) - bg.2)
+          if delta > 120 { minX = min(minX, x); maxX = max(maxX, x) }
+        }
+      }
+      guard minX <= maxX else { continue }
+      let leading = (CGFloat(minX) - boxMinX) / scale
+      let trailing = (boxMaxX - CGFloat(maxX + 1)) / scale
+      #expect(
+        abs(leading - trailing) <= 1.0,
+        "字級 \(size)：標籤兩側留白應相等（實測 leading \(leading)／trailing \(trailing)）"
+      )
+    }
+  }
+
+  // MARK: - GSI 捲動模式之頂部 pane
+
+  /// 迴歸鎖定：GSI 捲動模式必須繪出頂部 pane（未完成讀音）——
+  /// 視窗高度需恰為其讀出「pane 高 ＋ padding」之空間，且該 pane 確實被繪製。
+  @Test
+  func testGSIScrollModeShowsTopPane() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+    PrefMgr.shared.candidateListTextSize = 20
+
+    func makeView(paneText: String?)
+      -> (view: GSI4AppKit.VwrCandidateGSI4AppKit, pool: TDK4AppKit.CandidatePool4AppKit) {
+      let pool = TDK4AppKit.CandidatePool4AppKit(
+        candidates: (0 ..< 40).map { (keyArray: ["", ""], value: "字\($0)") },
+        lines: 4, isExpanded: true, selectionKeys: "123456", layout: .horizontal
+      )
+      pool.unfinishedReadingResult = paneText
+      pool.updateMetrics()
+      pool.computeCandidateOnlySize()
+      let view = GSI4AppKit.VwrCandidateGSI4AppKit(thePool: pool)
+      view.rendersInScrollMode = true
+      return (view, pool)
+    }
+
+    let without = makeView(paneText: nil)
+    let with = makeView(paneText: "ban")
+    let paneDimension = with.pool.attributedDescriptionUnfinishedReading
+      .getBoundingDimension(forceFallback: true)
+    let expectedShift = ceil(paneDimension.height) + with.pool.padding
+    #expect(paneDimension.height > 0, "前置條件：pane 應有高度")
+    // 幾何（不依賴繪製）：pane 之下移量、以及其讀出之空間。
+    #expect(with.view.topPaneShift == expectedShift, "頂部 pane 之下移量應為「pane 高 ＋ padding」")
+    #expect(without.view.topPaneShift == 0, "未提供未完成讀音時不應有下移量")
+    #expect(
+      with.view.fittingSize.height - without.view.fittingSize.height == expectedShift,
+      "捲動模式下視窗高度應為頂部 pane 讓出「pane 高 ＋ padding」"
+    )
+    #expect(
+      with.view.fittingSize.width >= paneDimension.width + with.pool.originDelta * 2,
+      "視窗寬度應足以容納頂部 pane"
+    )
+    // 捲動軌道：頂端隨 pane 下移，底端仍應貼齊候選區下緣（不得因 pane 而變短）。
+    if with.pool.maxScrollOffset > 0 {
+      let track = with.view.scrollerTrackRect(candidateAreaSize: with.pool.pageCandidateSize)
+      let expectedBottom = with.pool.originDelta + expectedShift + with.pool.pageCandidateSize.height
+      #expect(
+        abs(track.maxY - expectedBottom) < 0.001,
+        "捲動軌道底端應貼齊候選區下緣（實測 \(track.maxY) vs \(expectedBottom)）"
+      )
+    }
+
+    // 繪製實查（可繪製時）：pane 所在之頂帶應有墨跡；未提供 pane 時，首行候選字應恰好上移一個 paneShift。
+    // 若環境無法離屏繪製（`bitmapImageRepForCachingDisplay` 落空），上述幾何斷言仍為有效鎖；
+    // 此處不斷言，以免在無 WindowServer 之環境下誤紅。
+    func firstInkRow(_ source: (view: GSI4AppKit.VwrCandidateGSI4AppKit, pool: TDK4AppKit.CandidatePool4AppKit))
+      -> Int? {
+      let view = source.view
+      view.frame = CGRect(origin: .zero, size: view.fittingSize)
+      guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds),
+            let data = rep.bitmapData else { return nil }
+      view.cacheDisplay(in: view.bounds, to: rep)
+      let bytesPerRow = rep.bytesPerRow
+      let samplesPerPixel = rep.samplesPerPixel
+      let sampleRow = min(rep.pixelsHigh - 1, rep.pixelsHigh / 2)
+      let bgOffset = sampleRow * bytesPerRow
+      let bg = (CGFloat(data[bgOffset]), CGFloat(data[bgOffset + 1]), CGFloat(data[bgOffset + 2]))
+      for y in 0 ..< rep.pixelsHigh {
+        for x in 0 ..< rep.pixelsWide {
+          let offset = y * bytesPerRow + x * samplesPerPixel
+          let delta = abs(CGFloat(data[offset]) - bg.0) + abs(CGFloat(data[offset + 1]) - bg.1)
+            + abs(CGFloat(data[offset + 2]) - bg.2)
+          if delta > 120 { return y }
+        }
+      }
+      return nil
+    }
+
+    if let firstRowWithPane = firstInkRow(with), let firstRowWithoutPane = firstInkRow(without) {
+      #expect(
+        firstRowWithPane > firstRowWithoutPane,
+        "提供未完成讀音時，首行候選字應下移（pane 佔其上方）"
+      )
+      #expect(
+        Double(firstRowWithPane - firstRowWithoutPane) <= expectedShift + 1,
+        "該下移量不得超過「pane 高 ＋ padding」（實測 \(firstRowWithPane - firstRowWithoutPane) vs \(expectedShift)）"
+      )
+    }
+  }
+
   /// 驗證：computeCandidateOnlySize 能正確計算全部候選行的完整尺寸。
   @Test
   func testGSIComputeCandidateOnlySize() throws {

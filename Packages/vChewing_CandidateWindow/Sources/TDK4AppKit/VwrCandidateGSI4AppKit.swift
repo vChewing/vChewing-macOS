@@ -80,6 +80,7 @@ extension GSI4AppKit {
 
     private var cachedClipPath: NSBezierPath?
     private var lastClipPageSize: CGSize = .zero
+    private var lastClipOrigin: CGPoint = .zero
 
     private var cachedScrollerTrackPath: NSBezierPath?
     private var lastTrackCandidateSize: CGSize = .zero
@@ -108,9 +109,29 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
     let extraHeight = (hasScroller && !isVerticalScroller) ? scrollerThickness : 0
     let pad = thePool.originDelta
     return CGSize(
-      width: pad + max(page.width + extraWidth, bottom.width) + pad,
-      height: pad + page.height + extraHeight + bottom.height
+      width: pad + max(page.width + extraWidth, bottom.width, topPaneDimension.width) + pad,
+      height: pad + topPaneShift + page.height + extraHeight + bottom.height
     )
+  }
+
+  // MARK: - 頂部 pane（未完成讀音）之幾何
+
+  /// 頂部 pane（unfinished reading）之尺寸；空字串時為零、pane 隱藏。
+  /// 該 pane 不參與捲動：它像底部欄位那樣固定在視埠上緣。
+  private var topPaneDimension: CGSize {
+    let strPane = thePool.attributedDescriptionUnfinishedReading
+    guard rendersInScrollMode, !strPane.string.isEmpty else { return .zero }
+    let rawDim = strPane.getBoundingDimension(forceFallback: true)
+    return CGSize(width: ceil(rawDim.width), height: ceil(rawDim.height))
+  }
+
+  /// 頂部 pane 佔據的高度（含其下緣 padding）；0 表示無 pane。
+  /// 候選區（clip 矩形、繪製偏移、scroller 軌道、底部欄位、滑鼠命中）一律靠此值下移。
+  /// 對內開放（而非 private）以便測試直接斷言捲動模式之幾何。
+  var topPaneShift: CGFloat {
+    let dimension = topPaneDimension
+    guard dimension.height > 0 else { return 0 }
+    return dimension.height + thePool.padding
   }
 
   static var candidateListBackground: NSColor {
@@ -167,25 +188,28 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
     guard let ctx = NSGraphicsContext.current else { return }
     let pageHeight = thePool.pageCandidateSize.height
     let pageSize = thePool.pageCandidateSize
-    let clipOrigin = CGPoint(x: thePool.originDelta, y: thePool.originDelta)
+    // 頂部 pane（未完成讀音）固定在視埠上緣，不隨捲動移動；候選區自其下緣起算。
+    let clipOrigin = CGPoint(x: thePool.originDelta, y: thePool.originDelta + topPaneShift)
 
     // Compute draw offsets once (replaces NSAffineTransform).
     let drawOffsetX: CGFloat
     let drawOffsetY: CGFloat
     if thePool.isHorizontal {
       drawOffsetX = thePool.originDelta
-      drawOffsetY = thePool.originDelta - thePool.scrollOffset
+      drawOffsetY = thePool.originDelta + topPaneShift - thePool.scrollOffset
     } else {
       drawOffsetX = thePool.originDelta - thePool.scrollOffset
-      drawOffsetY = thePool.originDelta
+      drawOffsetY = thePool.originDelta + topPaneShift
     }
 
     ctx.saveGraphicsState()
 
-    // Cached clip path.
-    if cachedClipPath == nil || lastClipPageSize != pageSize {
-      cachedClipPath = NSBezierPath(rect: CGRect(origin: clipOrigin, size: pageSize))
+    // Cached clip path（快取鍵含原點：頂部 pane 之出現／消失會平移裁切矩形）。
+    let clipRect = CGRect(origin: clipOrigin, size: pageSize)
+    if cachedClipPath == nil || lastClipPageSize != pageSize || lastClipOrigin != clipOrigin {
+      cachedClipPath = NSBezierPath(rect: clipRect)
       lastClipPageSize = pageSize
+      lastClipOrigin = clipOrigin
     }
     cachedClipPath?.setClip()
 
@@ -232,7 +256,7 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         for cell in line {
           thePool.attributedStringHeader(for: cell).draw(
             at: CGPoint(
-              x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
+              x: cell.visualOrigin.x + 2 * padding + cell.headerDrawXOffset + drawOffsetX,
               y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
             )
           )
@@ -255,7 +279,7 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         for cell in line {
           thePool.attributedStringHeader(for: cell).draw(
             at: CGPoint(
-              x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
+              x: cell.visualOrigin.x + 2 * padding + cell.headerDrawXOffset + drawOffsetX,
               y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
             )
           )
@@ -270,13 +294,20 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
     }
     ctx.restoreGraphicsState()
 
+    // 頂部 pane（未完成讀音）：位於候選區之上、不隨捲動移動。
+    if topPaneShift > 0 {
+      thePool.attributedDescriptionUnfinishedReading.draw(
+        at: CGPoint(x: thePool.originDelta, y: thePool.originDelta)
+      )
+    }
+
     // Draw scroller (only spans the candidate area, not bottom fields).
     if thePool.maxScrollOffset > 0 {
       drawScroller(candidateAreaSize: pageSize)
     }
 
     let scrollerGap: CGFloat = (thePool.maxScrollOffset > 0 && !isVerticalScroller) ? scrollerThickness : 0
-    drawBottomFields(topY: thePool.originDelta + pageHeight + scrollerGap)
+    drawBottomFields(topY: thePool.originDelta + topPaneShift + pageHeight + scrollerGap)
   }
 
   // MARK: - Normal Mode Drawing (same as TDK)
@@ -306,7 +337,7 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
       }
       thePool.attributedStringHeader(for: currentCell).draw(
         at: .init(
-          x: currentCell.visualOrigin.x + 2 * padding,
+          x: currentCell.visualOrigin.x + 2 * padding + currentCell.headerDrawXOffset,
           y: currentCell.visualOrigin.y + currentCell.headerDrawYOffset
         )
       )
@@ -400,18 +431,21 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
 
   private var isVerticalScroller: Bool { thePool.isHorizontal }
 
-  private func scrollerTrackRect(candidateAreaSize: CGSize) -> CGRect {
+  /// 對內開放（而非 private）以便測試直接斷言捲動模式之軌道幾何。
+  func scrollerTrackRect(candidateAreaSize: CGSize) -> CGRect {
     if isVerticalScroller {
       let x = thePool.originDelta + candidateAreaSize.width + scrollerPadding
-      let topPadding = thePool.windowRadius
+      // 軌道自頂部 pane 之下緣起算、而至候選區下緣：故 y 隨 paneShift 下移，
+      // 高度則與 pane 無關（＝候選區高 − 上緣圓角留白）——否則軌道會短掉一個 paneShift。
+      let topPadding = thePool.windowRadius + topPaneShift
       return CGRect(
         x: x,
         y: topPadding,
         width: scrollerThickness,
-        height: candidateAreaSize.height - (topPadding - thePool.originDelta)
+        height: candidateAreaSize.height - (thePool.windowRadius - thePool.originDelta)
       )
     } else {
-      let y = thePool.originDelta + candidateAreaSize.height
+      let y = thePool.originDelta + topPaneShift + candidateAreaSize.height
       return CGRect(x: thePool.originDelta, y: y, width: candidateAreaSize.width, height: scrollerThickness)
     }
   }
@@ -477,6 +511,7 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
     clickPoint.y = bounds.height - clickPoint.y
     guard bounds.contains(clickPoint) else { return nil }
     if rendersInScrollMode {
+      clickPoint.y -= topPaneShift
       if thePool.isHorizontal {
         clickPoint.y += thePool.scrollOffset
       } else {
@@ -498,13 +533,13 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         let viewY: CGFloat
         if thePool.isHorizontal {
           viewX = thePool.originDelta + theCell.visualOrigin.x
-          viewY = thePool.originDelta + theCell.visualOrigin.y - thePool.scrollOffset
+          viewY = thePool.originDelta + topPaneShift + theCell.visualOrigin.y - thePool.scrollOffset
         } else {
           viewX = thePool.originDelta + theCell.visualOrigin.x - thePool.scrollOffset
-          viewY = thePool.originDelta + theCell.visualOrigin.y
+          viewY = thePool.originDelta + topPaneShift + theCell.visualOrigin.y
         }
         let viewport = CGRect(
-          origin: CGPoint(x: thePool.originDelta, y: thePool.originDelta),
+          origin: CGPoint(x: thePool.originDelta, y: thePool.originDelta + topPaneShift),
           size: thePool.pageCandidateSize
         )
         let cellRect = CGRect(origin: CGPoint(x: viewX, y: viewY), size: theCell.visualDimension)

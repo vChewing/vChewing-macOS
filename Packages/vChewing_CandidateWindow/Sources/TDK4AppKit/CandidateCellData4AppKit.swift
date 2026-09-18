@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 import AppKit
+import CoreText
 import Shared
 
 // MARK: - TDK4AppKit.CandidateCellData4AppKit
@@ -77,6 +78,7 @@ extension TDK4AppKit {
 
     /// Pre-computed offsets to avoid per-frame ceil() in draw loops.
     var headerDrawYOffset: CGFloat = 0
+    var headerDrawXOffset: CGFloat = 0
     var phraseDrawXOffset: CGFloat = 0
 
     var locale = ""
@@ -98,6 +100,35 @@ extension TDK4AppKit {
     var size: Double { Self.unifiedSize }
     var fontSizeCandidate: Double { size }
     var fontSizeKey: Double { max(ceil(fontSizeCandidate * 0.6), 11) }
+
+    /// 選字鍵標籤之顯示區域：正方形，邊長取其自身之行高。
+    /// 該標籤的呈現盒本質上是「窄高」形（寬＝字寬、高＝行高）；若顯示區域只給到字寬那麼窄，
+    /// 則候選字字級越大、這個窄高的落差越顯眼。故一律以行高為邊長、給出正方形區域，
+    /// 候選字詞自該正方形之右緣起排、標籤水平居中於其內。
+    var keyLabelBoxSide: CGFloat {
+      let keyFont = selectionKeyFont()
+      return ceil(keyFont.ascender + abs(keyFont.descender) + keyFont.leading)
+    }
+
+    /// 標籤字串之墨跡盒（相對其繪製原點；`.useGlyphPathBounds` 即字形路徑之實墨，
+    /// 非 advance 盒——兩者不可混用，`[.useGlyphPathBounds, .useOpticalBounds]` 會回傳後者）。
+    var keyLabelInkBounds: CGRect {
+      let line = CTLineCreateWithAttributedString(makeAttributedStringHeader())
+      return CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
+    }
+
+    /// 標籤於其正方形區域內之橫向偏移：以**墨跡盒之中點**對齊區域中點。
+    /// 該值**不取整**：區域邊長（行高）與墨跡寬皆為分數，取整（無論 `ceil` 或 `rounded`）
+    /// 都會造成至多 ±1 點之兩側留白落差——舊制之 `ceil` 更是恆偏一側（實測落差可達 1.8 點，
+    /// 在十餘點寬的區域上肉眼可見「偏 center-trailing」）。文字以分數座標繪製本就正常。
+    /// 墨跡盒為空（如選字鍵為空白）時退回按 advance 居中。
+    var keyLabelHorizontalCenteringOffset: CGFloat {
+      let inkBounds = keyLabelInkBounds
+      let inkCenterX = inkBounds.isEmpty
+        ? makeAttributedStringHeader().size().width / 2
+        : inkBounds.midX
+      return keyLabelBoxSide / 2 - inkCenterX
+    }
 
     var fontColorCandidate: NSColor {
       isHighlighted ? Self.menuHighlightedTextColor : Self.plainTextColor
@@ -247,10 +278,17 @@ extension TDK4AppKit {
       }
       cellDimension.width = ceil(cellDimension.width)
       cellDimension.height = Self.unifiedTextHeight + 2 * padding
+      // 選字鍵標籤之正方形區域與候選字詞必須同時放得進該格：
+      // 標籤區域自 2 × padding 起算、候選字詞緊隨其右緣，故內容寬度 = 標籤盒 ＋ 候選字詞。
+      // （既有算式在極大字級下本就容不下「標籤 ＋ 字詞」，此處一併收緊。）
+      let keyAndPhraseWidth = keyLabelBoxSide
+        + makeAttributedStringPhrase(isMatrix: false).size().width
+      cellDimension.width = max(cellDimension.width, keyAndPhraseWidth + 2 * padding)
       visualDimension = cellDimension
       visualOrigin = currentOrigin
       headerDrawYOffset = ceil(cellDimension.height * 0.2)
-      phraseDrawXOffset = ceil(size * 0.6)
+      headerDrawXOffset = keyLabelHorizontalCenteringOffset
+      phraseDrawXOffset = keyLabelBoxSide
     }
 
     // MARK: - Fonts and NSColors.
