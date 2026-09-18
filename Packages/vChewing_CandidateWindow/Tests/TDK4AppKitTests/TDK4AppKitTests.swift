@@ -224,6 +224,48 @@ struct TDK4AppKitTests {
 
   // MARK: - GSI 捲動模型測試
 
+  /// 迴歸鎖定：橫向排版的行步進（`lineStep`，即捲動模式視口的高度單位）必須跟隨偏好中的
+  /// 候選字字級，而非任何建池時或行程初期的字級快照。範本 cell（`shitCell`）的 `textDimension`
+  /// 只在該靜態成員初次初始化時定影一次，故行步進若自該處取值，行程存活期間更動字級便不會
+  /// 反映在視口最大高度上——這正是「橫向排版縱向展頁時的最大高度不隨字級遞增」之病灶
+  /// （縱向排版量的是實際排版寬度，故不受此影響）。
+  @Test
+  func testGSILineStepFollowsCandidateFontSize() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    // 先在環境字級下定影範本 cell，再放大字級建池——模擬「使用者於 IME 行程存活期間調大候選字字級」。
+    _ = TDK4AppKit.CandidatePool4AppKit.shitCell.textDimension
+    PrefMgr.shared.candidateListTextSize = baselineSize + 24
+
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+
+    let expectedLineHeight =
+      CGFloat(TDK4AppKit.CandidateCellData4AppKit.unifiedTextHeight) + 2 * pool.padding
+    #expect(pool.lineStep == expectedLineHeight, "行步進應等於當前字級下的實際行高")
+    #expect(
+      pool.pageCandidateSize.height == expectedLineHeight * CGFloat(pool.maxLinesPerPage),
+      "捲動視口高度應隨字級遞增（每頁 \(pool.maxLinesPerPage) 行）"
+    )
+    // 行步進必須與實際排版出的行距一致（第二行原點 y 減去第一行原點 y）。
+    #expect(
+      pool.lineStep
+        == pool.candidateLines[1][0].visualOrigin.y - pool.candidateLines[0][0].visualOrigin.y,
+      "行步進應與實際排版行距一致"
+    )
+    // 捲至末行時，內容底端應恰好貼齊視口底端。
+    pool.scrollToMakeLineVisible(pool.candidateLines.count - 1)
+    #expect(
+      abs(pool.scrollOffset - (pool.candidateOnlySize.height - pool.pageCandidateSize.height))
+        < 0.001,
+      "捲至末行的偏移量應等於內容高度與視口高度之差"
+    )
+  }
+
   /// 驗證：computeCandidateOnlySize 能正確計算全部候選行的完整尺寸。
   @Test
   func testGSIComputeCandidateOnlySize() throws {

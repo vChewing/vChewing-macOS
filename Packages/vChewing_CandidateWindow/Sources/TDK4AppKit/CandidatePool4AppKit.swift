@@ -117,12 +117,17 @@ extension TDK4AppKit {
     // MARK: - 動態變數
 
     let padding: CGFloat = 2
-    let cellTextHeight = CandidatePool4AppKit.shitCell.textDimension.height
 
     let originDelta: CGFloat = {
       if #unavailable(macOS 26.0) { return 3 }
       return 2
     }()
+
+    /// 候選字 cell 的文字高度（跟隨偏好中的候選字字級即時浮動）。
+    /// 不得自範本 cell（`shitCell`）取值：範本 cell 的 `textDimension` 只在該靜態成員初次
+    /// 初始化時定影一次，行程存活期間更動字級不會更新它，一旦快照化即會讓行步進（連帶
+    /// 捲動模式的視口高度）停在舊字級。
+    var cellTextHeight: CGFloat { CandidateCellData4AppKit.unifiedTextHeight }
 
     /// 橫向還是縱向排列。
     var isHorizontal: Bool { layout == .horizontal }
