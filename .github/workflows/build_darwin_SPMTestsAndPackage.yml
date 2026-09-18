@@ -56,6 +56,7 @@ jobs:
           packages=(
             './Packages/vChewing_MainAssembly4Darwin'
             './Packages/vChewing_OSNeutral_LibVanguard'
+            './Packages/vChewing_CandidateWindow'
             './Packages/vChewing_Hotenka'
             './Packages/vChewing_OSFrameworkImpl'
             './Packages/vChewing_SettingsUI'
