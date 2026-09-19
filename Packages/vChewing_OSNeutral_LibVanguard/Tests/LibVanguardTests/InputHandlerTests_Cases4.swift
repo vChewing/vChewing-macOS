@@ -1694,4 +1694,117 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "\(label): Enter should commit ASCII '192.168.100.1', got \(testSession.recentCommissions.joined())"
     )
   }
+
+  // MARK: - 亂序鍵入之 ASCII 判定（引擎層槽序檢定）
+
+  /// 純英文字母緩衝若「不可能是一個依注音槽序鍵入的讀音」（鍵序亂序），
+  /// 以 Space 確認時應留在 ASCII 路徑，不得被注音吸收為單一音節。
+  /// 判準之權威為引擎層之槽序檢定；同一組鍵位若依槽序鍵入（見 IH439）則仍走注音路徑
+  /// ——兩者對照即為本判準之界線。
+  @Test(arguments: ["ls", "ln", "lc", "mv"])
+  func test_IH438_MixedOutOfSlotOrderASCIITokenStaysASCII(_ token: String) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    defer { testHandler.clear() }
+
+    typeSentence(token)
+    #expect(testHandler.mixedAlphanumericalBuffer == token, "\(token): buffer before Space")
+    #expect(
+      testHandler.committableDisplayText(sansReading: true).isEmpty,
+      "\(token): should compose nothing before Space"
+    )
+
+    typeSentence(" ")
+
+    #expect(
+      testSession.recentCommissions.joined() == "\(token) ",
+      "\(token): Space should commit ASCII, got \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "\(token): buffer after Space")
+    #expect(
+      testHandler.committableDisplayText(sansReading: true).isEmpty,
+      "\(token): should compose nothing after Space"
+    )
+  }
+
+  /// 對照組：同樣為兩鍵的純英文字母，但依槽序鍵入者仍應走注音路徑。
+  @Test
+  func test_IH439_MixedInSlotOrderTwoLetterTokenStaysPhonetic() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄏㄠ 蒿 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("cl")
+    #expect(testHandler.mixedAlphanumericalBuffer == "cl", "buffer before Space")
+
+    typeSentence(" ")
+
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "should stay phonetic, got \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.committableDisplayText(sansReading: true) == "蒿",
+      "got \(testHandler.committableDisplayText(sansReading: true))"
+    )
+  }
+
+  /// 動態注音排列之合法編碼本即跳鍵改寫槽值（大千26 之 `qquu`＝ㄅㄚ：首擊為ㄆ、次擊覆寫為ㄅ；
+  /// 倚天26 之 `ge`＝ㄐㄧ：鍵 `g` 先寫ㄓ、鍵 `e` 再觸發糾正為ㄐ），
+  /// 故不得以「鍵數 == 佔用槽數」判其非單一音節——否則整段會被誤當成 ASCII 而滯留於緩衝。
+  /// 本測項斷言該類編碼被注拼槽吸收，與辭典內容無涉。
+  @Test(arguments: [
+    (id: "IH440A", parser: KeyboardParser.ofDachen26, keys: "qquu", expectedReading: "ㄅㄚ"),
+    (id: "IH440B", parser: KeyboardParser.ofETen26, keys: "ge", expectedReading: "ㄐㄧ"),
+  ])
+  func test_IH440_MixedDynamicLayoutMultiWriteKeysStayPhonetic(
+    _ scenario: (id: String, parser: KeyboardParser, keys: String, expectedReading: String)
+  ) throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.keyboardParser = scenario.parser.rawValue
+    testHandler.ensureKeyboardParser()
+    defer { testHandler.clear() }
+
+    typeSentence(scenario.keys)
+
+    #expect(
+      testHandler.composer.value == scenario.expectedReading,
+      "\(scenario.id): composer should hold \(scenario.expectedReading), got \(testHandler.composer.value)"
+    )
+    #expect(
+      testHandler.assembler.isEmpty,
+      "\(scenario.id): nothing should be inserted yet, got \(testHandler.assembler.actualKeys)"
+    )
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "\(scenario.id): expected no commission, got \(testSession.recentCommissions)"
+    )
+  }
+
+  /// 「冗餘鍵」在混打語境下是「ASCII 前綴 + 注音後綴」之分界證據，不得放行：
+  /// 前綴 `ai`（＝ㄇㄛ）之後多按一鍵，即應切分為 `ai` + 尾段讀音。
+  /// 此即引擎層槽序檢定容忍「同值重寫」、而混打語境不可容忍之處。
+  /// 即使 `ㄇㄛˊ` 本身確為辭典條目（此處以高分之臨時條目強化之），仍應切分。
+  @Test
+  func test_IH441_MixedRedundantKeyDemarcatesASCIISuffix() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄇㄛˊ 模 -999")
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("aii6")
+
+    #expect(
+      testSession.recentCommissions.joined() == "ai",
+      "prefix should be committed, got \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys.last == "ㄛˊ",
+      "got \(testHandler.assembler.actualKeys)"
+    )
+  }
 }

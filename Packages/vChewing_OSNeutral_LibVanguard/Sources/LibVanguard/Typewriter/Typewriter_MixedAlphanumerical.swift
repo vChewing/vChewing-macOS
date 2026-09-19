@@ -83,7 +83,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         return occupiedSlots >= 2 && hasUnigrams
       }()
       // 當 buffer 完全是合法注音按鍵且無大寫字母，且整段長度不超過單一音節鍵位上限，
-      // 且 composer 內容可發音，則整段視為單一注音，優先走 BPMF 全匹配路徑。
+      // 且整段為「依槽序鍵入之讀音」，則整段視為單一注音，優先走 BPMF 全匹配路徑。
       // 這防止 auto-split 將純注音序列（如 "1u," = ㄅㄧㄝ）誤拆為
       // ASCII 前綴 + 注音後綴（如 "1u" + ㄝ），導致音節被撕裂。
       let bufferIsSingleSyllablePhonetic: Bool = {
@@ -95,14 +95,19 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
           handler.composer.inputValidityCheck(charStr: $0.description)
         }
         guard isFullyParserCovered else { return false }
-        // dachen26 碼長不定（4 或 5），暫時不啟用此檢查。
-        guard handler.composer.parser != .ofDachen26 else { return false }
+        // 動態注音排列之合法編碼本即跨鍵改寫槽值（大千26 之 "qquu"＝ㄅㄚ 為 4 鍵 2 槽），
+        // 「鍵數 == 佔用槽數」對之恆不成立，故過往須對大千26 整條停用本檢查；
+        // 改委由引擎層之槽序檢定後，即無須再分排列處理。
+        if handler.composer.parser.isDynamic {
+          return handler.composer.isSequentiallyTypedRawKeyOrder(buffer)
+        }
         var trialComposer = handler.composer
         trialComposer.clear()
         trialComposer.receiveSequence(buffer, isRomaji: false)
         guard trialComposer.isPronounceable else { return false }
-        // 對於非 dachen26 排列，檢查鍵位數量與 composer 內有效 slot 數量是否一致。
-        // 若一致，表示無 destructive overwrite，整段為單一音節。
+        // 靜態注音排列：一鍵一槽之前提成立，「鍵數 == 佔用槽數」即「無冗餘鍵」。
+        // 此式比引擎層之槽序檢定略嚴（另含同鍵之重寫），而該嚴格度在混打語境下是必要的
+        // ——冗餘鍵正是「ASCII 前綴 + 注音後綴」之分界證據。
         let occupiedSlotCount = [
           trialComposer.consonant.value,
           trialComposer.semivowel.value,
@@ -360,19 +365,22 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
           trialComposer.vowel.value,
           trialComposer.intonation.value,
         ].filter { !$0.isEmpty }.count
-        let hasNoDestructiveOverwrite = fullInput.count == occupiedSlotCount
+        // 「整段是否為單一讀音」之判準：
+        // - 動態注音排列之合法編碼本即跨鍵改寫槽值（大千26 之 "qquu"＝ㄅㄚ 為 4 鍵 2 槽），
+        //   「鍵數 == 佔用槽數」對之恆不成立，故改委由引擎層之槽序檢定。
+        // - 靜態注音排列維持「鍵數 == 佔用槽數」：該式即「無冗餘鍵」，而冗餘鍵在混打語境下
+        //   是「ASCII 前綴 + 注音後綴」之分界證據（如 "ai" + "i6"），不得放行。
+        let fullInputIsSingleReading = handler.composer.parser.isDynamic
+          ? handler.composer.isSequentiallyTypedRawKeyOrder(fullInput)
+          : fullInput.count == occupiedSlotCount
 
         if trialComposer.hasIntonation() {
           if let readingKey = trialComposer.phonabetKeyForQuery(
             pronounceableOnly: true
           ), handler.currentLM.lxQuerier.hasGrams(for: [readingKey]) {
-            // 當 fullInput 超過單一注音音節的最大鍵位數時，trialComposer 只能保留
-            // 最後一個音節，前面的鍵位會被無聲覆寫。此時應優先讓 auto-split 處理，
-            // 避免將「ASCII 前綴 + 注音後綴」的 mixed 輸入誤吞為單一音節。
-            // 同樣地，若鍵位數與實際佔用槽數不一致（destructive overwrite），
-            // 也表示前面的 ASCII 前綴被 composer 誤吸收了，應交給 auto-split 處理。
-            if fullInput.count <= maxSingleSyllableKeyCount,
-               hasNoDestructiveOverwrite {
+            // 整段可發音且詞庫有命中時，僅在整段確為單一讀音時才予以吸收；
+            // 否則表示前面的 ASCII 前綴被 composer 誤收了，應交給 auto-split 處理。
+            if fullInputIsSingleReading {
               handler.composer = trialComposer
               guard !input.isInvalid, (try? handler.assembler.insertKey(readingKey)) != nil else {
                 errorCallback("3CF278C9-B: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
@@ -391,13 +399,10 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
               return true
             }
           }
-          // 整段可發音但詞庫查無結果時，若整段為單一音節（無 destructive overwrite），
-          // 保留 composer 狀態、不嘗試 auto-split，避免純注音序列被誤拆。
+          // 整段可發音但詞庫查無結果時，若整段為單一讀音，保留 composer 狀態、
+          // 不嘗試 auto-split，避免純注音序列被誤拆。
           // 反之則讓 auto-split 有機會拆出「ASCII 前綴 + 注音後綴」以支援 hello你好 類型混輸。
-          // 修正：即使無 destructive overwrite，若詞庫查無結果，仍應讓 auto-split 嘗試拆分，
-          // 以避免 mixed 輸入中的假合法組合（如 aiu3 → ㄇㄧㄛˇ）被誤保留。
-          if hasNoDestructiveOverwrite,
-             handler.composer.parser != .ofDachen26,
+          if fullInputIsSingleReading,
              let readingKey = trialComposer.phonabetKeyForQuery(pronounceableOnly: true),
              handler.currentLM.lxQuerier.hasGrams(for: [readingKey]) {
             handler.composer = trialComposer
@@ -405,7 +410,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
             session.switchState(handler.generateStateOfInputting())
             return true
           }
-        } else if hasNoDestructiveOverwrite,
+        } else if fullInputIsSingleReading,
                   let readingKey = trialComposer.phonabetKeyForQuery(pronounceableOnly: false),
                   handler.currentLM.lxQuerier.hasGrams(for: [readingKey]) {
           handler.composer = trialComposer
@@ -769,12 +774,21 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     text.range(of: "^[A-Za-z]{3,}[A-Za-z0-9]*$", options: .regularExpression) != nil
   }
 
+  /// 判斷純英文字母之輸入是否應改走 ASCII 路徑（而非被注音吸收）。
+  ///
+  /// 證據有兩項，任一成立即可：
+  /// 一、**鍵序無以成讀音**——該序列不是一個依注音槽序鍵入之讀音（亂序、覆寫修正、無以發音）；
+  ///     權威為引擎層之 `isSequentiallyTypedRawKeyOrder`，對長度 ≥ 2 者即生效。
+  /// 二、**冗餘鍵**——鍵數多於其所佔用之槽數（如 "tod" 之 3 鍵僅佔 2 槽）。此項預設「一鍵一槽」，
+  ///     僅靜態注音排列適用：動態排列之合法編碼本即跨鍵改寫槽值，計數無意義。
+  /// - Parameter minimumOverwriteCount: 證據二所需之冗餘鍵次數下限。
   private func shouldPreferASCIIWordPath(fullInput: String, minimumOverwriteCount: Int = 2) -> Bool {
-    guard fullInput.count >= 3,
-          fullInput.range(of: "^[A-Za-z]+$", options: .regularExpression) != nil
-    else {
+    guard fullInput.range(of: "^[A-Za-z]+$", options: .regularExpression) != nil else {
       return false
     }
+    if isNotSequentiallyTypedReading(fullInput) { return true }
+    guard fullInput.count >= 3 else { return false }
+    guard !handler.composer.parser.isDynamic, !handler.composer.isPinyinMode else { return false }
 
     var trialComposer = handler.composer
     trialComposer.clear()
@@ -791,6 +805,19 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     }
 
     return destructiveOverwriteCount >= minimumOverwriteCount
+  }
+
+  /// 判斷純英文字母之緩衝是否「不可能是一個依注音槽序鍵入之讀音」。
+  ///
+  /// 此為英文意圖之證據，與「冗餘鍵」互不相干：此者證「鍵序無以成讀音」，彼者證「鍵數多於槽數」。
+  /// 權威為 Tekkon 引擎層之 `isSequentiallyTypedRawKeyOrder`——其對動態排列以「最終值首見鍵序」
+  /// 為準（故大千26 之 "qquu" 不被誤列），對靜態排列則另禁「以另一鍵改寫既有槽值」。
+  /// 僅對「全為 ASCII 英文字母且長度 ≥ 2」者成立，其餘情形一律回 false。
+  private func isNotSequentiallyTypedReading(_ text: String) -> Bool {
+    guard text.count >= 2,
+          text.range(of: "^[A-Za-z]+$", options: .regularExpression) != nil
+    else { return false }
+    return !handler.composer.isSequentiallyTypedRawKeyOrder(text)
   }
 
   private func composerSlotValues(of composer: Tekkon.Composer) -> [String] {
