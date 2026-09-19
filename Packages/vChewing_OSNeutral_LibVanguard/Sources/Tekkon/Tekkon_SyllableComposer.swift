@@ -469,6 +469,88 @@ extension Tekkon {
       return !intonation.isEmpty && vowel.isEmpty && semivowel.isEmpty && consonant.isEmpty
     }
 
+    /// 檢證：傳入的按鍵序列是否為「按正確順序鍵入之合理讀音」。
+    ///
+    /// 以本注拼槽當前之注音排列解讀輸入，逐鍵重播進一份影子注拼槽，並觀察聲、介、韻、調
+    /// 四槽的填值歷程。合格條件共五項：
+    /// 一、每個字元皆為當前排列之合法按鍵、且於重播時被接受；
+    /// 二、重播結束後組成之讀音可唸（`isPronounceable`）；
+    /// 三、最終仍填著之各槽，其「最終值」首度出現之鍵序，須隨聲→介→韻→調之槽序單調不減；
+    /// 四、重播期間若曾鍵入聲調，該聲調不得於最終狀態失落；
+    /// 五、於靜態注音排列、且非 `suffixOnly` 時，不得以另一鍵改寫既有之槽值（即不接受「按錯再按對」之覆寫修正）。
+    ///
+    /// 條件三以「各槽最終值之首度出現鍵序」為準、不強求每一次寫入皆單調：動態注音排列
+    /// （大千26 等）之合法編碼本即會對同一槽先後寫入不同值（例如「qquu」＝ㄅㄚ：首擊為ㄆ、
+    /// 次擊覆寫為ㄅ），逐寫單調會誤殺此類合法輸入。同理，同值之重複寫入不留下可觀測之變化，
+    /// 亦不影響判定。條件五僅禁「以**另一鍵**改寫既有非空槽值」之修正行為；同鍵之重寫（含
+    /// 動態排列自身編碼所必需者）與本就不可觀測之同值重寫皆不在禁止之列。
+    ///
+    /// 本函式僅為引擎層之結構檢定；讀音是否真實存在於辭典，屬 Lexicon 之權責、不在檢定範圍。
+    /// - Parameters:
+    ///   - input: 傳入的按鍵序列（如大千排列之「cl」、漢語拼音之「suan3」）。
+    ///   - suffixOnly: 傳入 true 時放寬條件五（容忍覆寫修正），供「只檢定尾段（後綴）」之呼叫端使用。
+    ///     條件五本就僅適用於靜態注音排列（一鍵一注音者）；動態排列與拼音排列皆不在其限。
+    /// - Returns: 是否符合上述條件。
+    public func isSequentiallyTypedRawKeyOrder(
+      _ input: some StringProtocol,
+      suffixOnly: Bool = false
+    )
+      -> Bool {
+      var shadow = self
+      shadow.clear()
+      // 槽序由本函式自行觀測，故不啟用引擎自帶之 CSVT 順序強制。
+      shadow.enforceCSVTOrdering = false
+      // 各槽之「值 → 該值首度出現之鍵序」。
+      var firstSeenBySlot: [[String: Int]] = .init(repeating: [:], count: 4)
+      var previousValues: [String] = .init(repeating: "", count: 4)
+      // 各槽現值之寫入者（鍵面字元）；供條件五判定「是否以另一鍵改寫」。
+      var lastWritingKeyBySlot: [String?] = .init(repeating: nil, count: 4)
+      // 條件五僅於靜態注音排列、且非 suffixOnly 模式下生效：動態排列之合法編碼本即由引擎
+      // 跳鍵改寫槽值（如倚天26 之「ge」＝ㄐㄧ：鍵「g」先寫ㄓ、鍵「e」再觸發糾正為ㄐ），
+      // 拼音排列之組音區亦本就逐鍵清除重建——該二類情形下「以另一鍵覆寫修正」無以定義。
+      let enforcesNoOverwriteCorrection = !suffixOnly && !parser.isDynamic && !parser.isPinyin
+      var toneEverTyped = false
+      var keyOrder = 0
+      for scalar in input.unicodeScalars {
+        let theKey = String(scalar)
+        guard shadow.inputValidityCheck(charStr: theKey) else { return false }
+        guard shadow.receiveKey(fromScalar: scalar) else { return false }
+        let currentValues: [String] = [
+          shadow.consonant.value, shadow.semivowel.value, shadow.vowel.value, shadow.intonation.value,
+        ]
+        for slotIndex in currentValues.indices {
+          let value = currentValues[slotIndex]
+          guard value != previousValues[slotIndex] else { continue }
+          if enforcesNoOverwriteCorrection,
+             !value.isEmpty,
+             !previousValues[slotIndex].isEmpty,
+             let previousWriter = lastWritingKeyBySlot[slotIndex],
+             previousWriter != theKey { return false }
+          lastWritingKeyBySlot[slotIndex] = value.isEmpty ? nil : theKey
+          guard !value.isEmpty else { continue }
+          if firstSeenBySlot[slotIndex][value] == nil {
+            firstSeenBySlot[slotIndex][value] = keyOrder
+          }
+        }
+        previousValues = currentValues
+        toneEverTyped = toneEverTyped || !shadow.intonation.isEmpty
+        keyOrder += 1
+      }
+      guard shadow.isPronounceable else { return false }
+      guard !toneEverTyped || !shadow.intonation.isEmpty else { return false }
+      var latestFirstSeen = -1
+      let finalValues: [String] = [
+        shadow.consonant.value, shadow.semivowel.value, shadow.vowel.value, shadow.intonation.value,
+      ]
+      for (slotIndex, value) in finalValues.enumerated() {
+        guard !value.isEmpty else { continue }
+        guard let firstSeen = firstSeenBySlot[slotIndex][value] else { return false }
+        guard firstSeen >= latestFirstSeen else { return false }
+        latestFirstSeen = firstSeen
+      }
+      return true
+    }
+
     // 設定該 Composer 處於何種鍵盤排列分析模式。
     /// - Parameters:
     ///   - arrange: 給該注拼槽指定注音排列。
