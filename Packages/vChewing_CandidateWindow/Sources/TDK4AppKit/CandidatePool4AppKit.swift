@@ -51,6 +51,15 @@ extension TDK4AppKit {
         layout: layout,
         locale: locale
       )
+      // 外觀設定寄存於池內；此處同步模組層之現行值並起監視系統外觀變更。
+      TDK4AppKit.CandidateAppearance.current = candidateAppearance
+      startObservingSystemAppearance()
+    }
+
+    deinit {
+      if let systemAppearanceObserver {
+        DistributedNotificationCenter.default().removeObserver(systemAppearanceObserver)
+      }
     }
 
     // MARK: Internal
@@ -250,6 +259,30 @@ extension TDK4AppKit {
     // MARK: - GSI Scroll Operations
 
     /// 以 pixel 為單位捲動（touchpad 慣性）。
+    /// 選字窗之外觀（**jailed** 於本模組：不經偏好設定、亦無設定介面）。
+    /// `.auto`（預設）跟隨系統——`macOS 10.13` 及以前一律解析為淺色；
+    /// 系統外觀變更時會自動清掉依外觀而異之屬性字串快取（顏色已烤進字串），
+    /// 故下一次重繪即反映新外觀。
+    var candidateAppearance: TDK4AppKit.CandidateAppearance = .auto {
+      didSet {
+        guard oldValue != candidateAppearance else { return }
+        // cell 之靜態色（`absoluteTextColor` 等）以模組層之現行值解析；此處同步之。
+        TDK4AppKit.CandidateAppearance.current = candidateAppearance
+        invalidateAppearanceDependentStringCaches()
+      }
+    }
+
+    /// 現行外觀設定解析出之明暗狀態。
+    var isDarkModeResolved: Bool { candidateAppearance.isDarkModeResolved }
+
+    /// 清空依外觀而異之屬性字串快取。
+    /// 外觀覆寫變更後必須呼叫：文字色／底色已烤進屬性字串，
+    /// 快取若不清，下一次重繪會沿用舊外觀之字串。
+    func invalidateAppearanceDependentStringCaches() {
+      headerCache.removeAll()
+      phraseCache.removeAll()
+    }
+
     func scrollByPixels(_ delta: CGFloat) {
       scrollOffset += delta
       clampScrollOffset()
@@ -368,6 +401,23 @@ extension TDK4AppKit {
 
     private var recordedLineRangeForCurrentPage: Range<Int>?
     private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
+
+    /// 系統外觀變更之觀察者（`candidateAppearance` 為 `.auto` 時尤須清快取）。
+    /// 觀察者令牌。`deinit` 為 nonisolated，故以 `nonisolated(unsafe)` 標記
+    /// （僅用來解除註册，不侜他用）。
+    nonisolated(unsafe) private var systemAppearanceObserver: NSObjectProtocol?
+
+    private func startObservingSystemAppearance() {
+      guard systemAppearanceObserver == nil else { return }
+      let token = DistributedNotificationCenter.default().addObserver(
+        forName: .init("AppleInterfaceThemeChangedNotification"), object: nil, queue: .main
+      ) { [weak self] _ in
+        asyncOnMain {
+          self?.invalidateAppearanceDependentStringCaches()
+        }
+      }
+      systemAppearanceObserver = token
+    }
 
     private func clampScrollOffset() {
       scrollOffset = max(0, min(scrollOffset, maxScrollOffset))
@@ -1517,7 +1567,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
 extension TDK4AppKit.CandidatePool4AppKit {
   fileprivate func makePositionCounterBadgeCell() -> RoundedBadgeTextAttachmentCell {
     let positionCounterColorBG =
-      NSApplication.isDarkMode
+      TDK4AppKit.CandidateAppearance.isDarkModeResolved
         ? NSColor(white: 0.215, alpha: 0.7)
         : NSColor(white: 0.9, alpha: 0.7)
     let positionCounterColorText = CandidateCellData4AppKit.plainTextColor

@@ -85,9 +85,10 @@ extension GSI4AppKit {
     private var cachedScrollerTrackPath: NSBezierPath?
     private var lastTrackCandidateSize: CGSize = .zero
 
-    /// Cached highlight line background color (avoids per-frame NSColor alloc).
-    private lazy var cachedHighlightedLineBgColor: NSColor =
-      CandidateCellData4AppKit.plainTextColor.withAlphaComponent(0.05)
+    /// 高亮行底色快取（避免每幀配置 NSColor）；以明暗狀態為鍵，
+    /// 系統外觀變更後不得沿用舊色。
+    private var cachedHighlightedLineBgColor: NSColor?
+    private var cachedHighlightedLineBgColorIsDark: Bool?
 
     private let prefs = PrefMgr.sharedSansDidSetOps
   }
@@ -137,11 +138,11 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
   static var candidateListBackground: NSColor {
     let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
     let darkBackground = NSColor(red: 0.13, green: 0.13, blue: 0.14, alpha: 1.00)
-    return NSApplication.isDarkMode ? darkBackground : brightBackground
+    return TDK4AppKit.CandidateAppearance.isDarkModeResolved ? darkBackground : brightBackground
   }
 
   override func draw(_: CGRect) {
-    let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
+    let alphaRatio = TDK4AppKit.CandidateAppearance.isDarkModeResolved ? 0.75 : 1
     var themeColor: NSColor?
     if let delegate = controller?.delegate as? CtlCandidateDelegate,
        var hsba = delegate.clientAccentColor {
@@ -499,7 +500,12 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
 
   private func lineBackground(isCurrentLine: Bool, isMatrix: Bool) -> NSColor {
     guard isCurrentLine, isMatrix else { return .clear }
-    return cachedHighlightedLineBgColor
+    let isDark = thePool.isDarkModeResolved
+    if cachedHighlightedLineBgColor == nil || cachedHighlightedLineBgColorIsDark != isDark {
+      cachedHighlightedLineBgColor = CandidateCellData4AppKit.plainTextColor.withAlphaComponent(0.05)
+      cachedHighlightedLineBgColorIsDark = isDark
+    }
+    return cachedHighlightedLineBgColor ?? .clear
   }
 }
 

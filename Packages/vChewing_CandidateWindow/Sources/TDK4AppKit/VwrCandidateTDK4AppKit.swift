@@ -74,12 +74,12 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
   static var candidateListBackground: NSColor {
     let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
     let darkBackground = NSColor(red: 0.13, green: 0.13, blue: 0.14, alpha: 1.00)
-    return NSApplication.isDarkMode ? darkBackground : brightBackground
+    return TDK4AppKit.CandidateAppearance.isDarkModeResolved ? darkBackground : brightBackground
   }
 
   override func draw(_: CGRect) {
     let sizesCalculated = thePool.metrics
-    let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
+    let alphaRatio = TDK4AppKit.CandidateAppearance.isDarkModeResolved ? 0.75 : 1
     var themeColor: NSColor?
     if let delegate = controller?.delegate as? CtlCandidateDelegate,
        var hsba = delegate.clientAccentColor {

@@ -76,6 +76,19 @@ extension GSI4AppKit {
 
     public var currentLayout: UILayoutOrientation = .horizontal
 
+    /// 選字窗之外觀覆寫（**jailed**：不經偏好設定、亦無設定介面）。
+    /// `.auto`（預設）跟隨系統；`macOS 10.13` 及以前一律解析為淺色。
+    /// 變更後會清除依外觀而異之屬性字串快取、覆寫視窗（含視覺效果視圖）之 `appearance` 並重繪。
+    public var appearanceOverride: TDK4AppKit.CandidateAppearance {
+      get { Self.thePool.candidateAppearance }
+      set {
+        guard newValue != Self.thePool.candidateAppearance else { return }
+        Self.thePool.candidateAppearance = newValue
+        window?.appearance = newValue.nsAppearance
+        updateDisplay()
+      }
+    }
+
     public weak var delegate: CtlCandidateDelegate? {
       didSet {
         guard let delegate = delegate else { return }

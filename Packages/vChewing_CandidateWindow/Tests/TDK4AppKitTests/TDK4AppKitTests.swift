@@ -8,6 +8,8 @@ import Testing
 
 @testable import TDK4AppKit
 
+// MARK: - TDK4AppKitTests
+
 @Suite(.serialized)
 struct TDK4AppKitTests {
   let variableCandidatesINMU: [CandidateInState] = [
@@ -333,7 +335,11 @@ struct TDK4AppKitTests {
   @Test
   func testCandidateKeyLabelInkIsCenteredInItsBox() throws {
     let baselineSize = PrefMgr.shared.candidateListTextSize
-    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+    let baselineAppearance = TDK4AppKit.CandidateAppearance.current
+    defer {
+      PrefMgr.shared.candidateListTextSize = baselineSize
+      TDK4AppKit.CandidateAppearance.current = baselineAppearance
+    }
 
     for size in [24, 40, 96] {
       PrefMgr.shared.candidateListTextSize = size
@@ -354,38 +360,79 @@ struct TDK4AppKitTests {
         "字級 \(size)：標籤橫向位移必須恰好置中（不得取整）"
       )
 
-      // 繪製實查（可繪製時）：兩側留白差 ≤ 1 點。
-      let view = TDK4AppKit.VwrCandidateTDK4AppKit(thePool: pool)
-      view.frame = CGRect(origin: .zero, size: view.fittingSize)
-      guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds),
-            let data = rep.bitmapData else { continue }
-      view.cacheDisplay(in: view.bounds, to: rep)
-      let scale = CGFloat(rep.pixelsWide) / view.bounds.width
-      let bytesPerRow = rep.bytesPerRow
-      let samplesPerPixel = rep.samplesPerPixel
-      let bgRow = min(rep.pixelsHigh - 1, rep.pixelsHigh / 2) * bytesPerRow
-      let bg = (CGFloat(data[bgRow]), CGFloat(data[bgRow + 1]), CGFloat(data[bgRow + 2]))
-      let boxMinX = (cell.visualOrigin.x + 2 * pool.padding) * scale
-      let boxMaxX = boxMinX + cell.keyLabelBoxSide * scale
-      let boxMinY = (cell.visualOrigin.y + cell.headerDrawYOffset) * scale
-      let boxMaxY = boxMinY + cell.keyLabelBoxSide * scale
-      var minX = Int.max, maxX = Int.min
-      for y in Int(boxMinY) ..< max(Int(boxMinY) + 1, Int(boxMaxY.rounded(.up))) {
-        for x in Int(boxMinX) ..< max(Int(boxMinX) + 1, Int(boxMaxX.rounded(.up))) {
-          let offset = y * bytesPerRow + x * samplesPerPixel
-          let delta = abs(CGFloat(data[offset]) - bg.0) + abs(CGFloat(data[offset + 1]) - bg.1)
-            + abs(CGFloat(data[offset + 2]) - bg.2)
-          if delta > 120 { minX = min(minX, x); maxX = max(maxX, x) }
+      // 繪製實查（可繪製時）：兩側留白差 ≤ 1 點。強制兩種外觀各跑一次，
+      // 以免斷言結果隨環境（runner 之系統外觀）而異。
+      for appearance in [TDK4AppKit.CandidateAppearance.light, .dark] {
+        TDK4AppKit.CandidateAppearance.current = appearance
+        guard let scan = OffscreenInkScan(view: TDK4AppKit.VwrCandidateTDK4AppKit(thePool: pool)) else {
+          continue
         }
+        let scale = scan.scale
+        let boxMinX = (cell.visualOrigin.x + 2 * pool.padding) * scale
+        let boxMaxX = boxMinX + cell.keyLabelBoxSide * scale
+        let boxMinY = (cell.visualOrigin.y + cell.headerDrawYOffset) * scale
+        let boxMaxY = boxMinY + cell.keyLabelBoxSide * scale
+        guard let box = scan.inkBox(
+          xRange: Int(boxMinX) ..< Int(boxMaxX.rounded(.up)),
+          yRange: Int(boxMinY) ..< Int(boxMaxY.rounded(.up))
+        ) else { continue }
+        let leading = (CGFloat(box.minX) - boxMinX) / scale
+        let trailing = (boxMaxX - CGFloat(box.maxX + 1)) / scale
+        #expect(
+          abs(leading - trailing) <= 1.0,
+          "字級 \(size)／外觀 \(appearance)：標籤兩側留白應相等（實測 leading \(leading)／trailing \(trailing)）"
+        )
       }
-      guard minX <= maxX else { continue }
-      let leading = (CGFloat(minX) - boxMinX) / scale
-      let trailing = (boxMaxX - CGFloat(maxX + 1)) / scale
-      #expect(
-        abs(leading - trailing) <= 1.0,
-        "字級 \(size)：標籤兩側留白應相等（實測 leading \(leading)／trailing \(trailing)）"
-      )
     }
+  }
+
+  /// 驗證：選字窗之外觀覆寫（jailed 於本模組）——rawValue 語義、解析結果、
+  /// 以及各處顏色確實隨之切換；`auto` 跟隨系統、`light`／`dark` 各自強制。
+  @Test
+  func testCandidateAppearanceOverride() throws {
+    typealias Appearance = TDK4AppKit.CandidateAppearance
+    let previous = Appearance.current
+    defer { Appearance.current = previous }
+
+    #expect(Appearance.auto.rawValue == 0)
+    #expect(Appearance.light.rawValue == 1)
+    #expect(Appearance.dark.rawValue == -1)
+    #expect(Appearance.light.isDarkModeResolved == false)
+    #expect(Appearance.dark.isDarkModeResolved == true)
+    #expect(Appearance.auto.nsAppearance == nil, "auto 不應覆寫 NSAppearance")
+    #expect(Appearance.light.nsAppearance?.name == .aqua)
+    #expect(Appearance.dark.nsAppearance?.name == .darkAqua)
+
+    // `auto` 於本機（>= macOS 10.14）跟隨系統；`macOS 10.13` 及以前一律解析為淺色（見實作之註）。
+    Appearance.current = .auto
+    #expect(Appearance.isDarkModeResolved == NSApplication.isDarkMode)
+
+    // 屬性寄存在 pool 內，且會同步至模組層（供 cell 之靜態色解析）。
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: [(keyArray: [""], value: "我")], lines: 1, isExpanded: true,
+      selectionKeys: "1", layout: .horizontal
+    )
+    #expect(pool.candidateAppearance == .auto, "池之預設外觀應為 auto")
+    pool.candidateAppearance = .dark
+    #expect(pool.isDarkModeResolved == true)
+    #expect(Appearance.current == .dark, "池內設定應同步至模組層")
+    #expect(TDK4AppKit.CandidateCellData4AppKit.absoluteTextColor == .white)
+    pool.candidateAppearance = .light
+    #expect(pool.isDarkModeResolved == false)
+    #expect(TDK4AppKit.CandidateCellData4AppKit.absoluteTextColor == .black)
+
+    Appearance.current = .dark
+    #expect(TDK4AppKit.CandidateCellData4AppKit.absoluteTextColor == .white)
+    let darkListBackground = TDK4AppKit.VwrCandidateTDK4AppKit.candidateListBackground
+    let darkListBackgroundGSI = GSI4AppKit.VwrCandidateGSI4AppKit.candidateListBackground
+
+    Appearance.current = .light
+    #expect(TDK4AppKit.CandidateCellData4AppKit.absoluteTextColor == .black)
+    let lightListBackground = TDK4AppKit.VwrCandidateTDK4AppKit.candidateListBackground
+    let lightListBackgroundGSI = GSI4AppKit.VwrCandidateGSI4AppKit.candidateListBackground
+
+    #expect(darkListBackground != lightListBackground, "TDK 視圖底應隨外觀覆寫切換")
+    #expect(darkListBackgroundGSI != lightListBackgroundGSI, "GSI 視圖底應隨外觀覆寫切換")
   }
 
   // MARK: - GSI 捲動模式之頂部 pane
@@ -395,7 +442,11 @@ struct TDK4AppKitTests {
   @Test
   func testGSIScrollModeShowsTopPane() throws {
     let baselineSize = PrefMgr.shared.candidateListTextSize
-    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+    let baselineAppearance = TDK4AppKit.CandidateAppearance.current
+    defer {
+      PrefMgr.shared.candidateListTextSize = baselineSize
+      TDK4AppKit.CandidateAppearance.current = baselineAppearance
+    }
     PrefMgr.shared.candidateListTextSize = 20
 
     func makeView(paneText: String?)
@@ -439,41 +490,46 @@ struct TDK4AppKitTests {
       )
     }
 
-    // 繪製實查（可繪製時）：pane 所在之頂帶應有墨跡；未提供 pane 時，首行候選字應恰好上移一個 paneShift。
-    // 若環境無法離屏繪製（`bitmapImageRepForCachingDisplay` 落空），上述幾何斷言仍為有效鎖；
-    // 此處不斷言，以免在無 WindowServer 之環境下誤紅。
-    func firstInkRow(_ source: (view: GSI4AppKit.VwrCandidateGSI4AppKit, pool: TDK4AppKit.CandidatePool4AppKit))
-      -> Int? {
-      let view = source.view
-      view.frame = CGRect(origin: .zero, size: view.fittingSize)
-      guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds),
-            let data = rep.bitmapData else { return nil }
-      view.cacheDisplay(in: view.bounds, to: rep)
-      let bytesPerRow = rep.bytesPerRow
-      let samplesPerPixel = rep.samplesPerPixel
-      let sampleRow = min(rep.pixelsHigh - 1, rep.pixelsHigh / 2)
-      let bgOffset = sampleRow * bytesPerRow
-      let bg = (CGFloat(data[bgOffset]), CGFloat(data[bgOffset + 1]), CGFloat(data[bgOffset + 2]))
-      for y in 0 ..< rep.pixelsHigh {
-        for x in 0 ..< rep.pixelsWide {
-          let offset = y * bytesPerRow + x * samplesPerPixel
-          let delta = abs(CGFloat(data[offset]) - bg.0) + abs(CGFloat(data[offset + 1]) - bg.1)
-            + abs(CGFloat(data[offset + 2]) - bg.2)
-          if delta > 120 { return y }
-        }
+    // 繪製實查（可繪製時）：以點陣圖掃描證明 pane 確實被畫出——
+    // 其所在之頂帶內有墨跡（非空白），且該帶之墨跡橫向範圍遠窄於「未提供 pane」時
+    // （後者之頂帶裝的是整行候選字，故橫向墨跡幾乎滿版面）。
+    // 繪製之裁決性查核：以「同一版面、僅換 pane 文字」之兩張圖互比——
+    // 兩者之 pane 高度（＝下移量）與候選內容完全相同，故任何差異只可能來自 pane 之字形。
+    let withAlt = makeView(paneText: "xyz")
+    let altPaneDimension = withAlt.pool.attributedDescriptionUnfinishedReading
+      .getBoundingDimension(forceFallback: true)
+    #expect(
+      ceil(altPaneDimension.height) == ceil(paneDimension.height),
+      "前置條件：兩組 pane 文字之高度須相同（否則候選區位移量不同）"
+    )
+    for appearance in [TDK4AppKit.CandidateAppearance.light, .dark] {
+      with.pool.candidateAppearance = appearance
+      without.pool.candidateAppearance = appearance
+      withAlt.pool.candidateAppearance = appearance
+      let paneBand = 0 ..< max(1, Int(expectedShift))
+      guard let paneScan = OffscreenInkScan(view: with.view),
+            let altScan = OffscreenInkScan(view: withAlt.view) else { continue }
+      #expect(
+        paneScan.inkedColumnCount(rows: paneBand) > 0,
+        "提供未完成讀音時，頂部 pane 應被繪出（其列帶內應有墨跡）"
+      )
+      let paneWidth = max(paneDimension.width, altPaneDimension.width)
+      if let diff = paneScan.pixelDifference(comparedTo: altScan, rows: paneBand) {
+        #expect(
+          diff.count > 20,
+          "頂部 pane 之文字應被繪出：外觀 \(appearance) 換掉其文字後差異像素僅 \(diff.count)"
+        )
+        #expect(
+          Double(diff.minX) >= (with.pool.originDelta * paneScan.scale) - 2,
+          "差異應自 pane 之左緣起（外觀 \(appearance) 實測 minX \(diff.minX)）"
+        )
+        #expect(
+          Double(diff.maxX) <= (with.pool.originDelta + paneWidth + 8) * paneScan.scale,
+          "差異應止於 pane 之右緣（外觀 \(appearance) 實測 maxX \(diff.maxX)）"
+        )
+      } else {
+        Issue.record("外觀 \(appearance)：兩張僅 pane 文字不同之圖竟完全相同")
       }
-      return nil
-    }
-
-    if let firstRowWithPane = firstInkRow(with), let firstRowWithoutPane = firstInkRow(without) {
-      #expect(
-        firstRowWithPane > firstRowWithoutPane,
-        "提供未完成讀音時，首行候選字應下移（pane 佔其上方）"
-      )
-      #expect(
-        Double(firstRowWithPane - firstRowWithoutPane) <= expectedShift + 1,
-        "該下移量不得超過「pane 高 ＋ padding」（實測 \(firstRowWithPane - firstRowWithoutPane) vs \(expectedShift)）"
-      )
     }
   }
 
@@ -813,5 +869,128 @@ struct TDK4AppKitTests {
     pool.updateReadingDisambiguation()
     // 任一讀音 cell 以 "_" 開頭 → 整段不顯示。
     #expect(pool.readingDisambiguationResult == nil)
+  }
+}
+
+// MARK: - OffscreenInkScan
+
+/// 離屏渲染之墨跡偵測。**刻意不使用 `bitmapData` 之原始位元組**：
+/// 其通道序隨環境（系統外觀、繪圖驅動）而異——曾令 CI 之偵測把第 0 列誤判為墨跡
+/// （實測 `firstRowWithPane` 與 `firstRowWithoutPane` 皆為 0，本地卻正常）。
+/// 本掃描器一律以 `colorAt(x:y:)` 取值（與通道序無關），先除以 alpha 還原非預乘值，
+/// 再以整張圖最常見之亮度為底色——深色／淺色模式皆適用。
+struct OffscreenInkScan {
+  // MARK: Lifecycle
+
+  init?(view: NSView) {
+    view.frame = CGRect(origin: .zero, size: view.fittingSize)
+    let pointSize = view.bounds.size
+    guard pointSize.width >= 1, pointSize.height >= 1,
+          let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return nil }
+    view.cacheDisplay(in: view.bounds, to: rep)
+    self.rep = rep
+    self.scale = CGFloat(rep.pixelsWide) / pointSize.width
+    var histogram: [Int: Int] = [:]
+    for y in stride(from: 0, to: rep.pixelsHigh, by: 3) {
+      for x in stride(from: 0, to: rep.pixelsWide, by: 3) {
+        guard let lum = Self.luminance(rep: rep, x: x, y: y) else { continue }
+        histogram[Int(lum * 100), default: 0] += 1
+      }
+    }
+    guard let mode = histogram.max(by: { $0.value < $1.value }) else { return nil }
+    self.background = CGFloat(mode.key) / 100
+  }
+
+  // MARK: Internal
+
+  /// 點陣圖像素 ÷ 視圖點之比例（Retina backing scale）。
+  let scale: CGFloat
+
+  /// 指定列帶內有墨跡之像素行數（取樣步進 2 像素）。
+  func inkedColumnCount(rows: Range<Int>) -> Int {
+    let clampedRows = max(0, rows.lowerBound) ..< min(rep.pixelsHigh, rows.upperBound)
+    guard !clampedRows.isEmpty else { return 0 }
+    var count = 0
+    for x in stride(from: 0, to: rep.pixelsWide, by: 2) {
+      for y in clampedRows where isInk(x: x, y: y) {
+        count += 1
+        break
+      }
+    }
+    return count
+  }
+
+  /// 指定矩形內之墨跡範圍（像素座標）。
+
+  /// 與另一張同尺寸之掃描逐像素比對，取差異之像素數與橫向範圍。
+  /// （用來証明「某區域的內容確實因某要素而改變」：差異之橫向範圍即該要素之所在。）
+  func pixelDifference(
+    comparedTo other: Self, rows: Range<Int>
+  )
+    -> (count: Int, minX: Int, maxX: Int)? {
+    let clampedRows = max(0, rows.lowerBound) ..< min(rep.pixelsHigh, other.rep.pixelsHigh, rows.upperBound)
+    guard !clampedRows.isEmpty else { return nil }
+    var count = 0, minX = Int.max, maxX = Int.min
+    for y in clampedRows {
+      for x in 0 ..< min(rep.pixelsWide, other.rep.pixelsWide) {
+        let lhs = Self.colorComponents(rep: rep, x: x, y: y)
+        let rhs = Self.colorComponents(rep: other.rep, x: x, y: y)
+        guard let lhs, let rhs else {
+          // 兩邊皆透明（如圓角外之裁切區）視為相同；僅單邊透明方算差異。
+          if (lhs == nil) != (rhs == nil) {
+            count += 1
+            minX = min(minX, x); maxX = max(maxX, x)
+          }
+          continue
+        }
+        let delta = abs(lhs.0 - rhs.0) + abs(lhs.1 - rhs.1) + abs(lhs.2 - rhs.2)
+        if delta > 0.25 {
+          count += 1
+          minX = min(minX, x); maxX = max(maxX, x)
+        }
+      }
+    }
+    return count > 0 ? (count, minX, maxX) : nil
+  }
+
+  func inkBox(xRange: Range<Int>, yRange: Range<Int>)
+    -> (minX: Int, maxX: Int, minY: Int, maxY: Int)? {
+    var minX = Int.max, maxX = Int.min, minY = Int.max, maxY = Int.min
+    for y in max(0, yRange.lowerBound) ..< min(rep.pixelsHigh, yRange.upperBound) {
+      for x in max(0, xRange.lowerBound) ..< min(rep.pixelsWide, xRange.upperBound) {
+        guard isInk(x: x, y: y) else { continue }
+        minX = min(minX, x); maxX = max(maxX, x)
+        minY = min(minY, y); maxY = max(maxY, y)
+      }
+    }
+    return minX <= maxX ? (minX, maxX, minY, maxY) : nil
+  }
+
+  // MARK: Private
+
+  private let rep: NSBitmapImageRep
+  private let background: CGFloat
+
+  private static func colorComponents(rep: NSBitmapImageRep, x: Int, y: Int)
+    -> (CGFloat, CGFloat, CGFloat)? {
+    guard x >= 0, y >= 0, x < rep.pixelsWide, y < rep.pixelsHigh,
+          let color = rep.colorAt(x: x, y: y), color.alphaComponent > 0.5 else { return nil }
+    let alpha = max(color.alphaComponent, 0.0001)
+    return (color.redComponent / alpha, color.greenComponent / alpha, color.blueComponent / alpha)
+  }
+
+  private static func luminance(rep: NSBitmapImageRep, x: Int, y: Int) -> CGFloat? {
+    guard x >= 0, y >= 0, x < rep.pixelsWide, y < rep.pixelsHigh,
+          let color = rep.colorAt(x: x, y: y), color.alphaComponent > 0.5 else { return nil }
+    let alpha = max(color.alphaComponent, 0.0001)
+    return (
+      0.2126 * color.redComponent + 0.7152 * color.greenComponent
+        + 0.0722 * color.blueComponent
+    ) / alpha
+  }
+
+  private func isInk(x: Int, y: Int) -> Bool {
+    guard let lum = Self.luminance(rep: rep, x: x, y: y) else { return false }
+    return abs(lum - background) > 0.25
   }
 }

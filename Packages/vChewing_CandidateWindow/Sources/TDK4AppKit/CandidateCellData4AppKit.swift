@@ -53,7 +53,9 @@ extension TDK4AppKit {
     static var unifiedCharDimension: Double { ceil(unifiedSize * 1.0125 + 7) }
     static var unifiedTextHeight: Double { ceil(unifiedSize * 19 / 16) }
     static var plainTextColor: NSColor { absoluteTextColor.withAlphaComponent(0.85) }
-    static var absoluteTextColor: NSColor { NSApplication.isDarkMode ? .white : .black }
+    static var absoluteTextColor: NSColor {
+      TDK4AppKit.CandidateAppearance.isDarkModeResolved ? .white : .black
+    }
 
     static var menuHighlightedTextColor: NSColor {
       if #available(macOS 10.14, *) {
