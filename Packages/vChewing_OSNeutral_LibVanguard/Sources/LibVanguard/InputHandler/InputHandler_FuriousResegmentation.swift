@@ -34,7 +34,7 @@ public struct FuriousResegmentationCandidate {
 /// 序列（選取時 drop trail＋insert 音節桶＋trail 更新）；`weight` 為該候選的
 /// 查詢分數（copilot 窗候選排序用）。
 /// 因暫存於 `InputHandlerProtocol`（public）的屬性而需為 public 型別。
-public struct FuriousCoSegmentedOffer {
+public struct FuriousCoSegmentedOffer: Sendable, Equatable {
   let keyArray: [String]
   let value: String
   let blobs: [String]
@@ -73,8 +73,9 @@ extension InputHandlerProtocol {
   ///
   /// 任何使用者顯式干涉（選字、輪替、游標離開組字區最前端、手動確認讀音等）
   /// 之後都必須讓 trail 失效，否則重切分可能動到使用者確認過的內容。
+  /// **本函式為 trail 之唯一清除出口**（`FuriousTypingConfig.resetTrail()`）。
   func invalidateFuriousTrail() {
-    furiousTrail.removeAll()
+    furiousConfig.resetTrail()
   }
 
   /// 從 trail 尾端移除給定數量的拼音字母 blob。

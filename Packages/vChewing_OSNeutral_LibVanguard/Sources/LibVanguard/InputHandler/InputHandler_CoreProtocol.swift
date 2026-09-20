@@ -47,10 +47,7 @@ public protocol InputHandlerProtocol: AnyObject {
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var mixedAlnumConfig: MixedAlnumConfig { get set } // 中英混打模式之執行期狀態
-  var furiousTrail: [String] { get set } // 狂拼模式：自動 chop／空格固化提交鍵對應的拼音字母 blob trail
-  var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
-  var furiousCoSegmentedOffers: [FuriousCoSegmentedOffer] { get set
-  } // 狂拼 copilot 窗聯合重切（P164）的替代切分 offers（furiousTypingFrontCandidates 生成時刷新）
+  var furiousConfig: FuriousTypingConfig { get set } // 狂拼模式之執行期狀態
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
 }
@@ -62,6 +59,24 @@ extension InputHandlerProtocol {
   public var mixedAlphanumericalBuffer: String {
     get { mixedAlnumConfig.buffer }
     set { mixedAlnumConfig.buffer = newValue }
+  }
+
+  /// 狂拼 trail（`furiousConfig` 之薄存取器；維持既有呼叫端不變）。
+  public var furiousTrail: [String] {
+    get { furiousConfig.trail }
+    set { furiousConfig.trail = newValue }
+  }
+
+  /// 狂拼 copilot 窗高亮候選（`furiousConfig` 之薄存取器；當拍消費）。
+  public var furiousHighlightOverride: CandidateInState? {
+    get { furiousConfig.highlightOverride }
+    set { furiousConfig.highlightOverride = newValue }
+  }
+
+  /// 狂拼 copilot 窗聯合重切 offers（`furiousConfig` 之薄存取器；生成時刷新）。
+  public var furiousCoSegmentedOffers: [FuriousCoSegmentedOffer] {
+    get { furiousConfig.coSegmentedOffers }
+    set { furiousConfig.coSegmentedOffers = newValue }
   }
 }
 
@@ -227,7 +242,7 @@ extension InputHandlerProtocol {
     currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
-    invalidateFuriousTrail() // 狀態重置：狂拼 trail 一併失效。
+    furiousConfig.resetAll() // 狀態重置：狂拼之整批執行期狀態（trail＋當拍狀態）一併失效。
   }
 
   /// 解除中英混打之「閂滯於英打」狀態。

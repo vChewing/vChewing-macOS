@@ -2085,4 +2085,39 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "閂滯時小鍵盤應遞交半形 ASCII，實際得到 `\(testSession.recentCommissions.joined())`"
     )
   }
+
+  /// 狂拼執行期狀態之複位粒度：`clear()`（狀態重置）清整批；`invalidateFuriousTrail()`（顯式干涉）只清 trail。
+  ///
+  /// 前者防「上一輪殘留之高亮／重切 offers 跨過重置邊界、被下一輪當成當拍狀態消費」；
+  /// 後者則須保留當拍尚在消費週期內之高亮與 offers（否則 copilot 窗之預覽與聯合重切會失效）。
+  @Test
+  func test_IH449_FuriousConfigResetGranularity() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+    defer { testHandler.clear() }
+
+    let perPassOffer = FuriousCoSegmentedOffer(
+      keyArray: ["ㄈㄢ", "ㄍㄢ"],
+      value: "反感",
+      blobs: ["fan", "gan"],
+      weight: 1.0
+    )
+
+    func seedPerPassState() {
+      testHandler.furiousConfig.trail = ["fan", "gan"]
+      testHandler.furiousHighlightOverride = (["ㄈㄢ"], "反")
+      testHandler.furiousConfig.coSegmentedOffers = [perPassOffer]
+    }
+
+    seedPerPassState()
+    testHandler.invalidateFuriousTrail()
+    #expect(testHandler.furiousConfig.trail.isEmpty, "顯式干涉應清空 trail")
+    #expect(testHandler.furiousHighlightOverride?.value == "反", "顯式干涉不應清當拍高亮")
+    #expect(testHandler.furiousConfig.coSegmentedOffers.count == 1, "顯式干涉不應清當拍重切 offers")
+
+    testHandler.clear()
+    #expect(
+      testHandler.furiousConfig == FuriousTypingConfig(),
+      "`clear()` 應將狂拼之整批執行期狀態複位（trail＋當拍狀態）"
+    )
+  }
 }
