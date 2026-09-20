@@ -487,8 +487,8 @@
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "Show Unicode codepoint metadata in candidate window";
 "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle" = "Show Hanyu-Pinyin in the inline composition buffer";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "When enabled, vChewing shows the current typing mode as a transient inline hint right after it starts serving an input client — for example when you switch back to vChewing or toggle back to Chinese with Caps Lock. The hint automatically fades out after a few seconds. Note that some client apps report the location of the text input area even when they are not actually receiving any text input, which may cause the hint to appear at an unexpected location.";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "Show the current typing mode as an inline hint upon connecting to an input client";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "When enabled, vChewing shows the current typing mode as a transient floating hint right after it starts serving an input client — for example when you switch back to vChewing or toggle back to Chinese with Caps Lock. The hint automatically fades out after 0.7 seconds. Note that some client apps report the location of the text input area even when they are not actually receiving any text input, which may cause the hint to appear at an unexpected location.";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "Show the current typing mode as a floating hint upon connecting to an input client";
 "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle" = "Show notifications when toggling Caps Lock";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ This may let you feel harder to quickly identify the current ASCII mode ON/OFF status.";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.shortTitle" = "Show notifications when toggling ASCII mode by hitting Eisu";

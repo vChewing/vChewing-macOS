@@ -487,8 +487,8 @@
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "候補陳列ウィンドウで Unicode のコードポイント情報を示す";
 "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "有効にすると、vChewing が入力クライアントへのサービスを開始した直後（vChewing に切り替えたときや、Caps Lock で中国語モードに戻したときなど）に、現在の入力モードが一時的なインラインヒントで表示されます。ヒントは数秒後に自動的に消えます。ただし、一部のクライアントアプリは、文字入力を受け付けていないにもかかわらずテキスト入力エリアの位置を報告することがあり、ヒントが意図しない場所に表示される可能性があります。";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "入力クライアント接続時に現在の入力モードをインラインヒントで表示";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "有効にすると、vChewing が入力クライアントへのサービスを開始した直後（vChewing に切り替えたときや、Caps Lock で中国語モードに戻したときなど）に、現在の入力モードが一時的なフローティングヒントで表示されます。ヒントは 0.7 秒後に自動的に消えます。ただし、一部のクライアントアプリは、文字入力を受け付けていないにもかかわらずテキスト入力エリアの位置を報告することがあり、ヒントが意図しない場所に表示される可能性があります。";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "入力クライアント接続時に現在の入力モードをフローティングヒントで表示";
 "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle" = "Caps Lock でASCII入力モード切り替えの時に吹出通知メッセージを";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ これをONにすると、ASCII モードの点滅状態をすばやく確認することが難しくなる恐れです。";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.shortTitle" = "JIS英数キーでASCII入力モード切り替えの時に吹出通知メッセージを";

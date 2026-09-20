@@ -22,13 +22,13 @@
 "i18n:Installer.FatalError" = "安裝錯誤";
 "i18n:installer.HP_AND_DONATION" = "🏠 主頁・捐款";
 "i18n:Installer.InputMethodMayNotBeFullyEnabled" = "輸入法已經安裝好，但可能沒有完全啟用。請從「系統偏好設定」 > 「鍵盤」 > 「輸入方式」分頁加入輸入法。";
-"i18n:Installer.OldVersionStillInUse" = "舊版本未能及時從系統中釋放，安裝未完成。請登出或重新開機後再執行一次安裝程式。";
 "i18n:Installer.InstallationSuccessful" = "安裝成功";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "唯音輸入法安裝程式";
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音安裝程式";
 "i18n:Installer.InstallFailed" = "安裝失敗";
 "i18n:Installer.LegacyInstallerNotice" = "當前的安裝包所安裝的版本是針對 macOS 10.9 特供的版本，或許也可以在 macOS 10.10 至 macOS 12 Montery 這幾個版本的系統內使用。而主流版本則針對最新的幾版 macOS 開發。";
 "i18n:installer.LICENSE_TITLE" = "木蘭寬鬆授權條款第 2 版 (MulanPSL-2.0 License):";
+"i18n:Installer.OldVersionStillInUse" = "舊版本未能及時從系統中釋放，安裝未完成。請登出或重新開機後再執行一次安裝程式。";
 "i18n:Installer.PleaseUseMainstreamReleases" = "請就您目前的系統版本使用本產品的主流發行版。";
 "i18n:Installer.QuitInstallation" = "退出安裝程式";
 "i18n:Installer.ReadyToUse" = "唯音輸入法安裝成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";

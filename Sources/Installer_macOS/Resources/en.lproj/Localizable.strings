@@ -22,13 +22,13 @@
 "i18n:Installer.FatalError" = "Fatal Error";
 "i18n:installer.HP_AND_DONATION" = "🏠 Donation";
 "i18n:Installer.InputMethodMayNotBeFullyEnabled" = "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.";
-"i18n:Installer.OldVersionStillInUse" = "The old version could not be released by the system in time, so the installation was not completed. Please log out or reboot, then run the installer again.";
 "i18n:Installer.InstallationSuccessful" = "Installation Successful";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "vChewing Installer";
 "i18n:installer.INSTALLER_APP_TITLE" = "vChewing Installer";
 "i18n:Installer.InstallFailed" = "Install Failed";
 "i18n:Installer.LegacyInstallerNotice" = "The current installer only installs version suitable for macOS 10.9 Mavericks, and it theoreotically works with macOS 10.10 Yosemite - macOS 12 Monterey. Meanwhile, the mainstream releases is made available for most recent macOS release.";
 "i18n:installer.LICENSE_TITLE" = "MulanPSL-2.0 License:";
+"i18n:Installer.OldVersionStillInUse" = "The old version could not be released by the system in time, so the installation was not completed. Please log out or reboot, then run the installer again.";
 "i18n:Installer.PleaseUseMainstreamReleases" = "Please use mainstream releases for the current system version.";
 "i18n:Installer.QuitInstallation" = "Quit Installation";
 "i18n:Installer.ReadyToUse" = "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account.";

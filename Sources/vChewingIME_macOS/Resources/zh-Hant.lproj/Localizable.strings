@@ -487,8 +487,8 @@
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在選字窗內顯示當前候選字的萬國碼碼位";
 "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle" = "拼音並擊（組字區內顯示漢語拼音）";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "勾選後，每次唯音開始服務某個輸入客體（例如切換到唯音輸入法、或以 Caps Lock 切回中文模式）時，會以內文提示顯示目前使用的打字模式。該提示會在數秒後自動消失。不過，有些客體軟體在沒有接收文字輸入時也會謊報文字輸入區的位置，使提示可能出現在非預期的位置。";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "在剛剛對接輸入客體時，以內文提示提醒當前的打字模式";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "勾選後，每次唯音開始服務某個輸入客體（例如切換到唯音輸入法、或以 Caps Lock 切回中文模式）時，會以浮動提示顯示目前使用的打字模式。該提示會在 0.7 秒後自動消失。不過，有些客體軟體在沒有接收文字輸入時也會謊報文字輸入區的位置，使提示可能出現在非預期的位置。";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "在剛剛對接輸入客體時，以浮動提示提醒當前的打字模式";
 "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ 這可能會讓您難以快速識別目前的 ASCII 模式開/關狀態。";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.shortTitle" = "以 JIS 英數鍵切換輸入法/中英模式時顯示通知";
