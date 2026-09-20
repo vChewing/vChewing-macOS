@@ -46,13 +46,23 @@ public protocol InputHandlerProtocol: AnyObject {
 
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
-  var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
+  var mixedAlnumConfig: MixedAlnumConfig { get set } // 中英混打模式之執行期狀態
   var furiousTrail: [String] { get set } // 狂拼模式：自動 chop／空格固化提交鍵對應的拼音字母 blob trail
   var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
   var furiousCoSegmentedOffers: [FuriousCoSegmentedOffer] { get set
   } // 狂拼 copilot 窗聯合重切（P164）的替代切分 offers（furiousTypingFrontCandidates 生成時刷新）
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
+}
+
+// MARK: - InputHandlerProtocol 便利存取器
+
+extension InputHandlerProtocol {
+  /// 混輸暫存 ASCII 緩衝區（`mixedAlnumConfig` 之薄存取器；維持既有呼叫端不變）。
+  public var mixedAlphanumericalBuffer: String {
+    get { mixedAlnumConfig.buffer }
+    set { mixedAlnumConfig.buffer = newValue }
+  }
 }
 
 // MARK: - KeyDropContext
@@ -210,11 +220,39 @@ extension InputHandlerProtocol {
 
   public func clear() {
     clearComposerAndCalligrapher()
+    // 閂滯旗標不隨 `clear()` 清除：`switchState(.ofCommitting)` 亦會呼叫本函式，
+    // 而閂滯於英打時每一顆 ASCII 按鍵都即刻遞交、也就都會走一次 `clear()`。
+    // 閂滯之解除一律走 `releaseLatchedAlnumState(announce:)`。
     assembler.clear()
     currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
     invalidateFuriousTrail() // 狀態重置：狂拼 trail 一併失效。
+  }
+
+  /// 解除中英混打之「閂滯於英打」狀態。
+  ///
+  /// - Parameter announce: 是否以 StatusUI 提示告知使用者。
+  ///   靜默解除（會話邊界、`resetInputHandler()`、`isASCIIMode` 之切換）不提示；
+  ///   使用者之明確解除鍵（Enter／BkSp／Delete／Esc／Option+BkSp）則提示。
+  public func releaseLatchedAlnumState(announce: Bool) {
+    guard mixedAlnumConfig.isLatchedToAlnum else { return }
+    // 以 `resetAll()` 收斂：本函式即「閂滯之解除」之唯一出口，故「解除」＝「連緩衝一併重設」。
+    // 閂滯態下緩衝區恆空（每顆可列印 ASCII 皆即刻遞交、不進緩衝），故此處無行為變化。
+    mixedAlnumConfig.resetAll()
+    guard announce, let session else { return }
+    // 提示改由 StatusUI 承載（`SessionCoreProtocol.showStatusHint`），不走 state：
+    // ① `.ofCommitting` 之 tooltip 錨定不可靠（其錨點為組字區最前方之矩形，而遞交後無以量得）；
+    // ② `generateStateOfInputting(guarded:)` 於空內容時會塞入一顆空白字元、且狀態恆為
+    //    `.ofInputting`——如此則 inline preedit 非空（殘留一顆空白），且隨後的 BkSp／Delete／Esc
+    //    會落進各函式之 `.ofInputting` 護欄而被攔截（因閂滯已解除、不再走閂滯分支）；
+    // ③ `.ofEmpty` 之 tooltip 雖無上述二問題，但會被緊接的按鍵事件之 `switchState` 一併換掉，
+    //    連續打字時提示遂不可見。
+    // StatusUI 與 state 脫鉤：本函式不觸碰 state，故解除後之狀態型別與攔截語意皆不受影響。
+    session.showStatusHint(
+      "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateReleased".i18n,
+      duration: 1.5
+    )
   }
 
   public func removeBackupCursor() {
@@ -426,7 +464,8 @@ extension InputHandlerProtocol {
   public func clearComposerAndCalligrapher() {
     calligrapher.removeAll()
     composer.clear()
-    mixedAlphanumericalBuffer.removeAll()
+    // 僅重設內容：閂滯旗標之生命週期與緩衝區不同（見 `MixedAlnumConfig` 之註解）。
+    mixedAlnumConfig.resetContent()
     strCodePointBuffer.removeAll()
   }
 

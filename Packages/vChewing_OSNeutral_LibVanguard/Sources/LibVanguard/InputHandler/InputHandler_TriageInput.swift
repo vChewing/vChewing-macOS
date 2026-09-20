@@ -159,8 +159,10 @@ extension InputHandlerProtocol {
           }
           // 中英混打模式：Space 按鍵交由 MixedAlphanumericalTypewriter 處理，
           // 避免直接進入組字區送字邏輯而將讀音字串以原文 commit。
+          // 閂滯於英打時緩衝區恆空，故須另以閂滯旗標為前提——否則該鍵會繞道至
+          // 一般組字區送字邏輯（而非即刻遞交半形空格）。
           if currentTypingMethod == .vChewingFactory, prefs.mixedAlphanumericalEnabled,
-             !mixedAlphanumericalBuffer.isEmpty {
+             !mixedAlphanumericalBuffer.isEmpty || mixedAlnumConfig.isLatchedToAlnum {
             if let result = MixedAlphanumericalTypewriter(self).handle(input) {
               return result
             }

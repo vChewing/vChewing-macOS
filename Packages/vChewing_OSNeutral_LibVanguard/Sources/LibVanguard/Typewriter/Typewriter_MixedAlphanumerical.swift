@@ -4,6 +4,52 @@
 
 import Foundation
 
+// MARK: - MixedAlnumConfig
+
+/// 中英混打（MixedAlnum）模式專用的執行期狀態容器。
+///
+/// 將該模式所需的暫存狀態收斂成單一值型別，其後由 `InputHandlerProtocol` 以單一屬性持有，
+/// 各欄位再以薄存取器對外（比照 `Homa.Assembler.config` 之做法）。
+///
+/// - Important: **本型別提供兩個復位粒度，不可混用**：
+///   - `resetContent()`：僅重設「內容」類狀態。**每次遞交都會經過此路徑**
+///     （`switchState(.ofCommitting)` 會連帶呼叫 `InputHandlerProtocol.clear()`），
+///     故**不得**在該處清除閂滯旗標，否則「每鍵即刻遞交」會在第一顆鍵就自我解除。
+///   - `resetAll()`：連同閂滯旗標一併重設。**由 `InputHandlerProtocol.releaseLatchedAlnumState(announce:)`
+///     呼叫**——該函式即「閂滯之解除」之唯一出口：使用者之明確解除鍵與會話邊界
+///     （`resetInputHandler()`、`performServerActivation()`）皆經此。
+public struct MixedAlnumConfig: Sendable, Equatable {
+  // MARK: Lifecycle
+
+  public init(buffer: String = "", isLatchedToAlnum: Bool = false) {
+    self.buffer = buffer
+    self.isLatchedToAlnum = isLatchedToAlnum
+  }
+
+  // MARK: Public
+
+  /// 混輸暫存 ASCII 緩衝區（尚待辨識為英文抑或注音之內容）。
+  public var buffer: String = ""
+
+  /// 是否已「閂滯於英打」。
+  ///
+  /// 為真時，該模式下每一顆可列印 ASCII 按鍵皆即刻遞交、不進緩衝區。
+  /// 僅在中英混打模式與英數閂滯開關皆啟用時才可能為真。
+  public var isLatchedToAlnum: Bool = false
+
+  /// 僅重設內容類狀態（緩衝區）。**不觸碰閂滯旗標。**
+  public mutating func resetContent() {
+    buffer.removeAll()
+  }
+
+  /// 重設全部狀態（含閂滯旗標）。
+  /// 唯一呼叫點為 `InputHandlerProtocol.releaseLatchedAlnumState(announce:)`。
+  public mutating func resetAll() {
+    resetContent()
+    isLatchedToAlnum = false
+  }
+}
+
 // MARK: - MixedAlphanumericalTypewriter
 
 @frozen
@@ -25,6 +71,11 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       typewriter.isToneOverrideEnabled = { false }
       typewriter.isLeadingIntonationAccepted = { false }
       return typewriter.handle(input)
+    }
+    // 閂滯於英打時：可列印 ASCII 一律即刻遞交，不進緩衝、亦不經任何判定管線。
+    // 本分支置於中文標點查詢之前，故 `matchesCJKPunctuation` 在此狀態下不會被求值。
+    if handler.mixedAlnumConfig.isLatchedToAlnum {
+      return handleLatchedAlnumInput(input, session: session)
     }
     // 波浪符號鍵（symbol menu physical key）應交還上層分診流程處理。
     // mixed mode 若此時已有可提交內容，先提交全部內容，再放行按鍵事件。
@@ -305,6 +356,12 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
 
     let fullInput = handler.mixedAlphanumericalBuffer + inputText
 
+    // 英數閂滯之上鎖點：該段不可能是一個依槽序鍵入的讀音，即判定為英文意圖並上鎖。
+    // 上鎖後其後每一顆可列印 ASCII 皆即刻遞交（見 `handle` 開頭之分支）。
+    if isLatchedAlnumStateEnabled, isNotSequentiallyTypedReading(fullInput) {
+      return commitLatchedAlnum(fullInput, session: session)
+    }
+
     // 決定處理順序：長後綴優先 auto-split，短後綴優先整段注音。
     // 這可正確區分 aijo6（ai + jo6，後綴 3 碼）與 xu.6（整段 ㄌㄧㄡˊ，後綴 2 碼）。
     let longSuffixCandidate = bestAutoSplitCandidate(
@@ -455,6 +512,12 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     case .ofETen26: 5 // 僅一例：`ㄍㄧㄠˊ → vezf`。
     default: 4 // 其餘所有注音排列，無論動態還是靜態排列，最大碼長均為 4。
     }
+  }
+
+  /// 英數閂滯開關是否生效（須中英混打模式與閂滯開關兩者皆啟用）。
+  private var isLatchedAlnumStateEnabled: Bool {
+    handler.prefs.mixedAlphanumericalEnabled
+      && handler.prefs.enableLatchedAlnumStateInMixedAlnumMode
   }
 
   @inline(__always)
@@ -869,6 +932,45 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
     return literalASCII
+  }
+
+  /// 閂滯於英打時之按鍵處置：可列印 ASCII 一律即刻遞交；其餘交還既有流程。
+  ///
+  /// 回傳 `nil` 表示本函式不處理該按鍵（例如非 ASCII、或帶 Option 之替換字符），
+  /// 交由 `handle(_:)` 之後續流程處置（如 `resolveLiteralASCIIMainAreaText`）。
+  private func handleLatchedAlnumInput(
+    _ input: some InputSignalProtocol,
+    session: Session
+  )
+    -> Bool? {
+    let visibleText = resolveVisibleInputText(input)
+    let scalars = visibleText.unicodeScalars
+    guard scalars.count == 1,
+          let scalar = scalars.first,
+          scalar.isASCII,
+          (0x20 ... 0x7E).contains(scalar.value)
+    else { return nil }
+    let pendingText = handler.committableDisplayText(sansReading: true) + visibleText
+    handler.composer.clear()
+    handler.mixedAlnumConfig.resetContent()
+    session.switchState(State.ofCommitting(textToCommit: pendingText))
+    return true
+  }
+
+  /// 將當前狀態上鎖為「閂滯於英打」，並即刻遞交當前整段 ASCII 內容。
+  private func commitLatchedAlnum(_ fullInput: String, session: Session) -> Bool {
+    let pendingText = handler.committableDisplayText(sansReading: true) + fullInput
+    handler.composer.clear()
+    handler.mixedAlnumConfig.resetContent()
+    handler.mixedAlnumConfig.isLatchedToAlnum = true
+    session.switchState(State.ofCommitting(textToCommit: pendingText))
+    // 上鎖提示改由 StatusUI 承載（不經 state）：以內文提示（空狀態＋tooltip）承載者會被緊接著的
+    // 按鍵事件之 switchState 一併換掉，連續打字時看不到；且空狀態之 tooltip 亦非穩定之提示載體。
+    session.showStatusHint(
+      "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateEntered".i18n,
+      duration: 1.5
+    )
+    return true
   }
 
   private func commitLiteralASCIIImmediately(_ text: String, session: Session) -> Bool {

@@ -1807,4 +1807,282 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "got \(testHandler.assembler.actualKeys)"
     )
   }
+
+  // MARK: - 英數閂滯狀態（MixedAlnum latched alnum state）
+
+  /// 中英混打模式與英數閂滯開關皆啟用之 handler。
+  ///
+  /// - Parameter statusUI: 若給定，則連帶一個裝有該替身之 `ui` 一併注入 Session，供觀察
+  ///   閂滯 On／Off 之 StatusUI 提示。不給定時一切照舊（Session 之 `ui` 仍為 nil），
+  ///   故其餘既有個案之行為不受影響。
+  fileprivate func prepareLatchedMixedModeHandler(
+    statusUI: MockTooltipUI? = nil
+  )
+    throws -> (handler: MockInputHandler, session: MockSession) {
+    let result = try prepareMixedModeHandler()
+    result.handler.prefs.enableLatchedAlnumStateInMixedAlnumMode = true
+    if let statusUI {
+      let ui = MockSessionUI()
+      ui.statusUI = statusUI
+      result.session.ui = ui
+    }
+    return result
+  }
+
+  private static let latchedReleaseTooltip = "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateReleased".i18n
+  private static let latchedEnteredTooltip = "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateEntered".i18n
+
+  /// 閂滯之上鎖與逐鍵即刻遞交：`ls` 之鍵序不可能是一個依槽序鍵入的讀音，
+  /// 故第二鍵即應上鎖、並將整段即刻遞交；其後每一顆 ASCII 皆即刻遞交。
+  @Test
+  func test_IH442_LatchedAlnumLatchesAndCommitsPerKey() throws {
+    let statusUI = MockTooltipUI()
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler(statusUI: statusUI)
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    #expect(!testHandler.mixedAlnumConfig.isLatchedToAlnum)
+
+    typeSentence("ls")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum, "`ls` 應觸發英數閂滯之上鎖")
+    #expect(testSession.recentCommissions.joined() == "ls", "上鎖時應即刻遞交整段")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    // 上鎖提示由 StatusUI 承載（不經 state）：提示另立視窗，故不會被緊接著的按鍵事件衝走。
+    #expect(statusUI.showCount == 1, "上鎖當下應以 StatusUI 發一次提示，實際 \(statusUI.showCount) 次")
+    #expect(
+      statusUI.shownTooltip == Self.latchedEnteredTooltip,
+      "上鎖提示文字應為 Entered 鍵，實際得到 `\(statusUI.shownTooltip ?? "nil")`"
+    )
+    #expect(
+      statusUI.shownDuration == 1.5,
+      "上鎖提示時長應為 1.5 秒，實際得到 \(statusUI.shownDuration ?? -1)"
+    )
+    #expect(statusUI.syncCount == 1, "顯示提示前應同步一次 accent／locale，實際 \(statusUI.syncCount) 次")
+    // 錨點＝打字列行高矩形之左上角頂點（MockSession 之 updateVerticalTypingStatus 恆回 seniorTheBeast）。
+    // 逐分量比對（CGPoint 之 Equatable 由 Swift/SDK 側的 CoreGraphics overlay 提供，此處不倚賴之）。
+    let anchor = testSession.updateVerticalTypingStatus()
+    #expect(
+      statusUI.shownPoint?.x == anchor.origin.x
+        && statusUI.shownPoint?.y == anchor.origin.y + anchor.size.height,
+      "提示錨點應為行高矩形之左上角頂點，實際得到 \(String(describing: statusUI.shownPoint))"
+    )
+    #expect(
+      testSession.state.tooltip.isEmpty,
+      "提示不得再由 state 承載，實際得到 `\(testSession.state.tooltip)`"
+    )
+    #expect(testSession.state.type == .ofEmpty, "上鎖後 inline preedit 恆空")
+
+    typeSentence("-la")
+    #expect(testSession.recentCommissions.joined() == "ls-la", "其後每一顆按鍵應即刻遞交")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(statusUI.showCount == 1, "其後之按鍵不得再發提示，實際 \(statusUI.showCount) 次")
+  }
+
+  /// 兩開關之四態：閂滯開關僅在母開關亦啟用時才有作用；母開關關閉時，
+  /// 閂滯開關之開與關必須產生**完全一致**之結果（本 phase 之首要不變式）。
+  @Test
+  func test_IH443_LatchedAlnumInertUnlessBothSwitchesOn() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    func run(mixedOn: Bool, latchedOn: Bool) -> (commissions: String, displayed: String, latched: Bool) {
+      testHandler.clear()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      testSession.recentCommissions.removeAll()
+      testHandler.prefs.mixedAlphanumericalEnabled = mixedOn
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = latchedOn
+      typeSentence("ls ")
+      return (
+        testSession.recentCommissions.joined(),
+        testSession.state.displayedText,
+        testHandler.mixedAlnumConfig.isLatchedToAlnum
+      )
+    }
+
+    let offOff = run(mixedOn: false, latchedOn: false)
+    let offOn = run(mixedOn: false, latchedOn: true)
+    #expect(
+      offOff.commissions == offOn.commissions && offOff.displayed == offOn.displayed,
+      "母開關關閉時，閂滯開關必須完全無作用"
+    )
+    #expect(!offOff.latched, "母開關關閉時不得上鎖")
+    #expect(!offOn.latched, "母開關關閉時不得上鎖")
+
+    let onOff = run(mixedOn: true, latchedOn: false)
+    let onOn = run(mixedOn: true, latchedOn: true)
+    #expect(onOff.commissions == "ls ", "閂滯關閉時應維持既有的 Auto 行為")
+    #expect(onOn.commissions == "ls ", "閂滯開啟時上鎖＋即刻遞交之總結果應相同")
+    #expect(!onOff.latched, "閂滯關閉時不得上鎖")
+    #expect(onOn.latched, "閂滯開啟且判定落定時應上鎖")
+  }
+
+  /// 四個解除鍵之攔截語意：Enter 解除後放行；BkSp／Delete／Esc 解除且攔截；
+  /// Option+BkSp 解除、不攔截。四者皆以 StatusUI 提示告知已解除。
+  @Test(arguments: ["enter", "backspace", "delete", "escape", "optionBackspace"])
+  func test_IH444_LatchedAlnumReleaseKeys(_ keyID: String) throws {
+    let statusUI = MockTooltipUI()
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler(statusUI: statusUI)
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("ls")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum, "\(keyID): 前置之上鎖未成立")
+    testSession.recentCommissions.removeAll()
+    // 上鎖當下亦發 StatusUI 提示；此處只關心解除之提示，故先記下基準次數。
+    let showCountAfterLatch = statusUI.showCount
+    #expect(showCountAfterLatch == 1, "\(keyID): 前置之上鎖提示未發，實際 \(showCountAfterLatch) 次")
+
+    let (event, expectedIntercept): (KBEvent, Bool) = switch keyID {
+    case "enter": (KBEvent.KeyEventData.dataEnterReturn.asEvent, false)
+    case "backspace": (KBEvent.KeyEventData.backspaceEvent.asEvent, true)
+    case "delete": (KBEvent.KeyEventData.deleteForwardEvent.asEvent, true)
+    case "escape": (KBEvent.KeyEventData.escapeEvent.asEvent, true)
+    default: (KBEvent.KeyEventData.optionBackspaceEvent.asEvent, false)
+    }
+
+    let intercepted = testHandler.triageInput(event: event)
+
+    #expect(!testHandler.mixedAlnumConfig.isLatchedToAlnum, "\(keyID): 應解除閂滯")
+    #expect(intercepted == expectedIntercept, "\(keyID): 攔截語意不符")
+    // 解除提示亦由 StatusUI 承載（不經 state）：與上鎖提示同載體，不受按鍵事件影響。
+    #expect(
+      statusUI.showCount == showCountAfterLatch + 1,
+      "\(keyID): 解除當下應以 StatusUI 發一次提示，實際 \(statusUI.showCount) 次"
+    )
+    #expect(
+      statusUI.shownTooltip == Self.latchedReleaseTooltip,
+      "\(keyID): 解除提示文字應為 Released 鍵，實際得到 `\(statusUI.shownTooltip ?? "nil")`"
+    )
+    #expect(
+      statusUI.shownDuration == 1.5,
+      "\(keyID): 解除提示時長應為 1.5 秒，實際得到 \(statusUI.shownDuration ?? -1)"
+    )
+    #expect(
+      testSession.state.tooltip.isEmpty,
+      "\(keyID): 提示不得再由 state 承載，實際得到 `\(testSession.state.tooltip)`"
+    )
+    #expect(
+      testSession.state.type == .ofEmpty,
+      "\(keyID): 解除後 inline preedit 恆空（不得存在 .ofInputting）"
+    )
+    #expect(testSession.recentCommissions.isEmpty, "\(keyID): 解除不應遞交任何內容")
+    // 解除後不得再落回「輸入中」語意：內文組字區為空，故其後的 BkSp 必須放行給客體，
+    // 否則使用者會在客體端按不出刪除。
+    let afterRelease = testHandler.triageInput(event: KBEvent.KeyEventData.backspaceEvent.asEvent)
+    #expect(!afterRelease, "\(keyID): 解除後之 BkSp 不應再被攔截")
+    #expect(!testHandler.mixedAlnumConfig.isLatchedToAlnum, "\(keyID): 解除後不得自動重新上鎖")
+    #expect(
+      statusUI.showCount == showCountAfterLatch + 1,
+      "\(keyID): 解除後之按鍵不得再發提示，實際 \(statusUI.showCount) 次"
+    )
+  }
+
+  /// 閂滯於英打時，標點鍵應作半形 ASCII 即刻遞交（規則置於中文標點查詢之前）。
+  @Test
+  func test_IH445_LatchedAlnumCommitsASCIIPunctuation() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("ls")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum)
+    testSession.recentCommissions.removeAll()
+
+    typeSentence(",")
+    #expect(
+      testSession.recentCommissions.joined() == ",",
+      "閂滯時 `,` 應作半形 ASCII 遞交，而非注音 ㄝ或中文標點；實際得到 `\(testSession.recentCommissions.joined())`"
+    )
+
+    typeSentence(".;-")
+    #expect(testSession.recentCommissions.joined() == ",.;-")
+  }
+
+  /// `resetInputHandler()` 觸發之解除一律靜默（不發內文提示）。
+  @Test
+  func test_IH446_LatchedAlnumReleasedSilentlyByResetInputHandler() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("ls")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum)
+
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(!testHandler.mixedAlnumConfig.isLatchedToAlnum, "重設應解除閂滯")
+    #expect(
+      testSession.state.tooltip != Self.latchedReleaseTooltip,
+      "靜默解除不得發內文提示，實際得到 `\(testSession.state.tooltip)`"
+    )
+  }
+
+  /// 固化一個**已知之行為後果**：閂滯一旦上鎖，其後的中文讀音鍵亦會被當 ASCII 遞交。
+  ///
+  /// 此係「上鎖點＝`isNotSequentiallyTypedReading`」與「閂滯態下一切可列印 ASCII 即刻遞交」
+  /// 兩者之交集（`hel` 之第三鍵以另一鍵覆寫韻母槽，故於第三鍵即上鎖）。
+  /// **此為已知取捨**（事主原話：「複寫修正的優先級本來就該低於英文判定」）；
+  /// 若日後調整上鎖條件，本測項須一併修訂。
+  @Test
+  func test_IH447_LatchedAlnumLatchPreemptsSubsequentMixedInput() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("hel")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum, "`hel` 應觸發上鎖")
+    #expect(testSession.recentCommissions.joined() == "hel")
+
+    typeSentence("losu3")
+    #expect(
+      testSession.recentCommissions.joined() == "hellosu3",
+      "上鎖後其後按鍵一律作 ASCII 遞交（含本應為注音之按鍵）"
+    )
+  }
+
+  /// 閂滯於英打時，小鍵盤之字元鍵應直接遞交**半形** ASCII，不受 `numPadCharInputBehavior` 影響。
+  @Test
+  func test_IH448_LatchedAlnumCommitsHalfWidthNumPadASCII() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    defer {
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.prefs.numPadCharInputBehavior = 0
+      testHandler.clear()
+    }
+
+    typeSentence("ls")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum)
+    testSession.recentCommissions.removeAll()
+
+    let keypadSeven = KBEvent.KeyEventData(
+      type: .keyDown,
+      flags: .numericPad,
+      chars: "7",
+      charsSansModifiers: "7",
+      keyCode: 89
+    )
+
+    // 行為值 1 為「全形」；閂滯態下仍須遞交半形。
+    testHandler.prefs.numPadCharInputBehavior = 1
+    let intercepted = testHandler.triageInput(event: keypadSeven.asEvent)
+
+    #expect(intercepted, "小鍵盤字元鍵應被輸入法處理")
+    #expect(
+      testSession.recentCommissions.joined() == "7",
+      "閂滯時小鍵盤應遞交半形 ASCII，實際得到 `\(testSession.recentCommissions.joined())`"
+    )
+  }
 }

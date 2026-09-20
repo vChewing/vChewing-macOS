@@ -138,6 +138,10 @@ extension SessionCoreProtocol {
   ) {
     if flushCaches { trieCacheFlushHandler?() }
     guard let inputHandler else { return }
+    // 閂滯態不越出輸入會話之邊界：本函式為「輸入調度模組重設」之共同入口
+    // （繁簡切換、`commitComposition()`、輸入法關閉、`performServerDeactivation()` 等皆經此），
+    // 故一律靜默解除。
+    inputHandler.releaseLatchedAlnumState(announce: false)
     guard commitExisting else {
       switchState(.ofEmpty())
       return

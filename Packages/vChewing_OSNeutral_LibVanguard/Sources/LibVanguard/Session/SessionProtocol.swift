@@ -303,6 +303,9 @@ extension SessionProtocol {
     }
 
     this.state = .ofEmpty()
+    // 閂滯態不越出當前打字會話之 context：本函式不呼 `resetInputHandler()`，
+    // 故須在此獨立重設（靜默）。
+    this.inputHandler?.releaseLatchedAlnumState(announce: false)
     this.isActivated = true // 登記啟用狀態。
     this.setKeyLayout()
 
@@ -366,6 +369,55 @@ extension SessionProtocol {
         bottomOutOfScreenAdjustmentHeight: heightDelta,
         direction: .horizontal,
         duration: 0.7
+      )
+    }
+  }
+}
+
+// MARK: - StatusUI 一過性提示（IME 層入口）
+
+/// 此法置於 `SessionCoreProtocol` 之擴充，而非 `SessionProtocol` 之擴充：IME 層
+/// （`InputHandlerProtocol`、`TypewriterProtocol` 之 `Handler.Session`）僅見得
+/// `SessionCoreProtocol`，故提示之入口須落在後者方能在該等泛型語境直接呼叫。
+/// 預設實作由本擴充提供，既有與新增之 conformer 皆無須實作（不破壞既有 conformer）。
+extension SessionCoreProtocol {
+  /// 以 StatusUI（`ui?.statusUI`）顯示一則一過性狀態提示，作法逐項同
+  /// `maybeShowModeDescriptionHintUponActivation()`：同步 accent／locale、以打字列行高矩形
+  /// 為錨點（PCB 顯示時抬升避讓），並延後至主執行緒下一拍顯示。
+  ///
+  /// 與打字模式提示之唯一差別在於**不把提示記錄於 state**：本函式不動 `state`，故不產生
+  /// `.ofInputting`（先前之 bug 正是以 `generateStateOfInputting(guarded: true)` 承載提示、
+  /// 令狀態恆為 `.ofInputting`，解除閂滯後 BkSp／Delete／Esc 仍被攔截）；亦不產生
+  /// `.ofEmpty`＋tooltip 之「提示態」——該態會被緊接著的按鍵事件之 `switchState` 連帶換掉，
+  /// 連續打字時提示遂不可見。StatusUI 另立視窗、與 state 脫鉤，故不受按鍵事件影響。
+  ///
+  /// 座標與文案在入隊前算妥，closure 不捕獲 `self`。
+  /// - Parameters:
+  ///   - text: 提示文字（呼叫端已 i18n 者）。
+  ///   - duration: 提示滯留秒數。
+  public func showStatusHint(_ text: String, duration: Double) {
+    guard let statusUI = ui?.statusUI else { return }
+    // 顯示前依客體 accent 同步外觀（文字色／實色背景；StatusUI 實作、tooltip 為 no-op）。
+    statusUI.sync(accent: clientAccentColor, locale: localeForFontFallbacks)
+    // IMK 的 lineHeightRectangle 為螢幕座標（原點在左下角），故左上角頂點＝origin.y＋height；
+    // statusUI 會將此點視為其視窗左下角。
+    let lineHeightRect = updateVerticalTypingStatus()
+    // 若浮動組字窗（PCB）正在顯示，將給定點上抬至 PCB 頂端之上、避免提示與 PCB 重疊。
+    var topLeftY = lineHeightRect.origin.y + lineHeightRect.size.height
+    if let pcb = ui?.pcb, pcb.isShown, let pcbFrame = pcb.frame {
+      topLeftY = max(topLeftY, pcbFrame.origin.y + pcbFrame.size.height)
+    }
+    let topLeftPoint = CGPoint(
+      x: lineHeightRect.origin.x, y: topLeftY
+    )
+    let heightDelta = lineHeightRect.size.height + 4.0
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+      statusUI.show(
+        tooltip: text,
+        at: topLeftPoint,
+        bottomOutOfScreenAdjustmentHeight: heightDelta,
+        direction: .horizontal,
+        duration: duration
       )
     }
   }

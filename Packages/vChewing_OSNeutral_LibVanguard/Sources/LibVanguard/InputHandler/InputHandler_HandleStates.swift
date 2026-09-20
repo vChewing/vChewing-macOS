@@ -865,6 +865,13 @@ extension InputHandlerProtocol {
   )
     -> Bool {
     guard let session = session else { return false }
+    // 閂滯於英打時：Enter 為解除鍵。
+    // 解除後放行：此刻緩衝恆空、無物可遞交，若攔截則使用者在終端機情境下會喫不到換行。
+    // 本分支須置於 `.ofInputting` 護欄之前——閂滯態之 state 恆為 `.ofEmpty`。
+    if mixedAlnumConfig.isLatchedToAlnum {
+      releaseLatchedAlnumState(announce: true)
+      return false
+    }
     let state = session.state
 
     // Special handling for roman numerals mode with buffer content
@@ -921,6 +928,14 @@ extension InputHandlerProtocol {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleBackSpace(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
+    // 閂滯於英打時：BkSp 與 Option+BkSp 皆為解除鍵。
+    // Option+BkSp **不攔截**（其語意為清空整段，放行讓客體自行處理）；其餘 BkSp **攔截**。
+    // 本分支須置於 `.ofInputting` 護欄之前——閂滯態之 state 恆為 `.ofEmpty`。
+    if mixedAlnumConfig.isLatchedToAlnum {
+      let isOptionHeld = input.commonKeyModifierFlags == .option
+      releaseLatchedAlnumState(announce: true)
+      return !isOptionHeld
+    }
     let state = session.state
     guard state.type == .ofInputting else {
       currentTypingMethod = .vChewingFactory
@@ -1076,6 +1091,12 @@ extension InputHandlerProtocol {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleDelete(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
+    // 閂滯於英打時：Delete 為解除鍵，且**攔截**（放行會令客體刪字，與「不刪字只解除」相悖）。
+    // 本分支須置於 `.ofInputting` 護欄之前——閂滯態之 state 恆為 `.ofEmpty`。
+    if mixedAlnumConfig.isLatchedToAlnum {
+      releaseLatchedAlnumState(announce: true)
+      return true
+    }
     let state = session.state
 
     guard currentTypingMethod == .vChewingFactory else {
@@ -1193,6 +1214,12 @@ extension InputHandlerProtocol {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleEsc() -> Bool {
     guard let session = session else { return false }
+    // 閂滯於英打時：Esc 為解除鍵，且**攔截**（與既有 `escToCleanInputBuffer` 之攔截慣例同向）。
+    // 本分支須置於 `.ofInputting` 護欄之前——閂滯態之 state 恆為 `.ofEmpty`。
+    if mixedAlnumConfig.isLatchedToAlnum {
+      releaseLatchedAlnumState(announce: true)
+      return true
+    }
     let state = session.state
 
     guard currentTypingMethod == .vChewingFactory else {
@@ -1747,6 +1774,16 @@ extension InputHandlerProtocol {
     let inputText = input.text
     guard inputText.count == 1, input.isASCII else { return false }
     guard KeyCode(rawValue: input.keyCode) == nil else { return false } // 排除功能鍵。
+    // 閂滯於英打時：小鍵盤之字元鍵一律直接遞交其**半形 ASCII** 字元，
+    // 不受 `numPadCharInputBehavior` 影響——與「閂滯態下一切可列印 ASCII 即刻遞交」同源。
+    if mixedAlnumConfig.isLatchedToAlnum {
+      let halfWidthChar = inputText.applyingTransformFW2HW(reverse: false)
+      guard halfWidthChar.range(of: "^[ -~]$", options: .regularExpression) != nil else {
+        return false
+      }
+      session.switchState(State.ofCommitting(textToCommit: halfWidthChar))
+      return true
+    }
     let behaviorValue = prefs.numPadCharInputBehavior
     let fullWidthResult = behaviorValue % 2 != 0 // 能被二整除的都是半形。
     triagePrefs: switch (behaviorValue, isConsideredEmptyForNow) {

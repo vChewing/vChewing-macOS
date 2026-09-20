@@ -274,6 +274,8 @@
 "i18n:StateOfInputting.Tooltip.CharsReadingsMismatch" = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "i18n:StateOfInputting.Tooltip.HoldShiftChooseAssociates" = "⇧を押しながら関連文節候補を選択。";
 "i18n:StateOfInputting.Tooltip.IntonationMarkInstruction" = "音調記号。ENTER で送り出す。\nSPACE で入力緩衝列に挿入。";
+"i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateEntered" = "英数のラッチ状態に入りました。";
+"i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateReleased" = "英数のラッチ状態を解除しました。";
 "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden" = "後ろ側の漢字の音調を書き直しました。";
 "i18n:StateOfInputting.Tooltip.QuickCandidates" = "早速候補";
 "i18n:StateOfInputting.Tooltip.RebootWarning" = "⚠︎ これで唯音入力アプリを再起動。";
@@ -398,6 +400,8 @@
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "候補ウィンドウの移動/サイズ変更にアニメーションを適用";
+"i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.description" = "この項目は「中英混在入力のフォールバックを有効化」がオンの場合にのみ機能し、既定ではオフです。\n- オンにすると：中英混在モードの英数内容に対する判定結果がラッチされます。英文と判定された時点で、その区切りは直ちにコミットされ、判定結果が固定されます。以降、打鍵した印字可能な ASCII 文字は一文字ずつ直ちにクライアントへコミットされ、解除キーを押すまで入力法内に蓄積されません。これにより「英文をまとめて一気に入力する」体験が英数入力モードに近くなり、逐次確認が不要になります。\n- 解除キー：Enter（解除後に通過させます。傍受しません）、BackSpace、Delete、Esc、Option+BackSpace。ラッチの開始時と解除時に、それぞれ約 1.5 秒のフローティング通知が表示されます（組字バッファを占有しないため、連続打鍵中でも見えます）。ご注意：BackSpace・Delete・Esc はラッチを解除するだけであって、文字を送信も削除もしません。先に打った英数内容はすでにコミット済みで、入力法側から取り消せないためです。つまりこれらのキーで「今打った英文を撤回」することはできません。\n- ラッチを解除しないキー：スペースキー（ラッチ中は半角スペースを即座にコミットします）、Tab キーと方向キー（組字バッファが空のとき、これらのキーはそのままクライアントへ通過します）。\n- 次の場合はラッチが自動的に解除されます（通知は出ません）：英数モードの切替（Shift キー・CapsLock キー・JIS 英数キー）、別の入力クライアントへの切替、入力法の再有効化。\n- ご注意：この項目は唯音を英数入力モードに切り替えるものではありません。唯音は中文入力モードのままで、中英混在の判定結果が固定されるだけです。また、ラッチは英文にのみ作用し、「中文にラッチされる」状態は存在しません。判定が確定するまでの最初の数打鍵は、従来どおり打鍵ごとの判定になります。「判定結果が固定される」違いをはっきり感じられない場合は、オフのままを推奨します。";
+"i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.shortTitle" = "中英混在モードで英数のラッチ状態を有効化";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "単漢字候補の陳列順番を倚天中国語DOS順に強制する";
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.description" = "有効にすると、全候補入力モード（SCPC）では常に候補陳列ウィンドウが１つ行で表示されます。";

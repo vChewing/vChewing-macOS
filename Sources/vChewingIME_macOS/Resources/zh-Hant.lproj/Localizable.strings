@@ -274,6 +274,8 @@
 "i18n:StateOfInputting.Tooltip.CharsReadingsMismatch" = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "i18n:StateOfInputting.Tooltip.HoldShiftChooseAssociates" = "摁住⇧以選取關聯詞語。";
 "i18n:StateOfInputting.Tooltip.IntonationMarkInstruction" = "聲調符號。敲 Enter 以遞交。\n敲空格鍵以插入組字區。";
+"i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateEntered" = "已進入英數閂滯狀態。";
+"i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateReleased" = "已解除英數閂滯狀態。";
 "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden" = "已覆寫游標身後的漢字的音調。";
 "i18n:StateOfInputting.Tooltip.QuickCandidates" = "快速候選";
 "i18n:StateOfInputting.Tooltip.RebootWarning" = "⚠︎ 這將重啟唯音輸入法。";
@@ -398,6 +400,8 @@
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "針對被管理的客體，在標記模式下禁用分段式粗型下劃線";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端點選字游標位置";
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "選字窗移動/變更大小時啟用動畫效果";
+"i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.description" = "本選項僅在「啟用中英混合輸入回退」已開啟時才有作用，且預設為關閉。\n- 啟用後：中英混打模式對英數內容的判定結果會被「閂滯」住：一旦判定落定為英文，該段即立刻遞交並固定判定結果，其後敲出的每一顆可列印 ASCII 字元都會立刻遞交給當前的輸入客體，不再累積在輸入法內等待確認，直到您按下解除鍵為止；這讓「一次打一整串英文」的體驗接近英數輸入模式，而不需逐段確認。\n- 解除鍵：Enter（解除後放行，不作攔截）、BackSpace、Delete、Esc、Option+BackSpace；進入與解除閂滯時各會顯示一則約一秒半的浮動提示（不佔用內文組字區，故連續打字時仍看得見）。請特別留意：BackSpace、Delete 與 Esc 只會解除閂滯，並不會送出或刪除任何字元——先前的英數內容早已遞交出去，輸入法無從回收，故這些鍵並不能「撤銷」您剛打的英文。\n- 不會解除閂滯的按鍵：鍵盤空白鍵（閂滯於英打時會即刻遞交一個半形空格）、Tab 鍵與方向鍵（組字緩衝區為空時會直接放行給輸入客體）。\n- 以下情形會自動解除閂滯、不另發提示：切換中英數模式（Shift 鍵、CapsLock 鍵、或 JIS 英數鍵）、切換到另一個輸入客體、或輸入法被重新啟用。\n- 請注意：本選項並不是把唯音切換成英數模式——唯音仍處於中文打字模式，只是中英混打的判定結果被固定住了而已。另外，「閂滯」只作用於英文，不存在「閂滯於中文」的狀態；而在判定落定之前的最初幾顆按鍵，仍會走原有的逐鍵判定。若您感受不到「判定結果被固定」所帶來的差別，建議維持關閉本選項。";
+"i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.shortTitle" = "啟用中英混打模式的英數閂滯狀態";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "對所有單漢字候選字強制施加倚天中文DOS系統排序";
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.description" = "啟用後，逐字選字模式（SCPC）將始終使用單行選字窗佈局。";
