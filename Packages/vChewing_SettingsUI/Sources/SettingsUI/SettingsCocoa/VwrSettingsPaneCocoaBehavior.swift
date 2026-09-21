@@ -69,16 +69,20 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )
+          UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
           UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )
-          // 為何此處**不**作「母關則子禁用」（而 SwiftUI 側有作）：
-          // AppKit 不像 SwiftUI 那樣有 Observation-based 的 enabling／disabling，
-          // 要做就得另掛 UserDefaults 的變更觀察、再遞迴走訪子列之 NSView 樹設 isEnabled——
-          // 為單一選項引入一套機制並不划算；且非法態（母關子開）在程式端已被合取吸收
-          // （`isLatchedAlnumStateEnabled`＝兩開關之 AND），故其為純外觀問題。
-          // 所需之前提已寫進該選項之 description（「需先啟用上方選項」），兩側面板皆適用。
+          // 為何此處（與 SwiftUI 側）皆**不**作 UI 層的「連動停用」：
+          // 非法態（母選項關閉而子選項仍開）在程式端已被合取吸收
+          // （`isLatchedAlnumStateEnabled`＝兩開關之 AND；新選項亦只在中英混打模式內被求值），
+          // 故其為純外觀問題；所需之前提已寫進該選項之 description（「需先啟用上方選項」）。
+          // 又：AppKit 不像 SwiftUI 那樣有 Observation-based 的 enabling／disabling——
+          // 真要做就得另掛 UserDefaults 的變更觀察，再遞迴走訪子列之 NSView 樹設 isEnabled。
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
           UserDef.kSpaceKeyBehaviorAgainstICB.renderCocoa(

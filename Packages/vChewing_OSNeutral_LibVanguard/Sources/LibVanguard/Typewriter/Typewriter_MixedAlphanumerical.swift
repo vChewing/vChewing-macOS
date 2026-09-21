@@ -147,18 +147,21 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         }
         guard isFullyParserCovered else { return false }
         // 動態注音排列之合法編碼本即跨鍵改寫槽值（大千26 之 "qquu"＝ㄅㄚ 為 4 鍵 2 槽），
-        // 「鍵數 == 佔用槽數」對之恆不成立，故過往須對大千26 整條停用本檢查；
-        // 改委由引擎層之槽序檢定後，即無須再分排列處理。
+        // 「鍵數 == 佔用槽數」對之恆不成立。啟用槽序檢定時，動態排列一律委由引擎層判定；
+        // 停用（舊制）時則退回計數式——動態排列之中僅大千26 因碼長不定而整條停用本檢查。
         if handler.composer.parser.isDynamic {
-          return handler.composer.isSequentiallyTypedRawKeyOrder(buffer)
+          if judgeReadingsBySequentialRawKeyOrder {
+            return handler.composer.isSequentiallyTypedRawKeyOrder(buffer)
+          }
+          guard handler.composer.parser != .ofDachen26 else { return false }
         }
         var trialComposer = handler.composer
         trialComposer.clear()
         trialComposer.receiveSequence(buffer, isRomaji: false)
         guard trialComposer.isPronounceable else { return false }
-        // 靜態注音排列：一鍵一槽之前提成立，「鍵數 == 佔用槽數」即「無冗餘鍵」。
-        // 此式比引擎層之槽序檢定略嚴（另含同鍵之重寫），而該嚴格度在混打語境下是必要的
-        // ——冗餘鍵正是「ASCII 前綴 + 注音後綴」之分界證據。
+        // 「鍵數 == 佔用槽數」即「無冗餘鍵」：靜態注音排列之一鍵一槽前提成立；停用槽序檢定時，
+        // 動態排列（大千26 除外）亦回到此式。此式比引擎層之槽序檢定略嚴（另含同鍵之重寫），
+        // 而該嚴格度在混打語境下是必要的——冗餘鍵正是「ASCII 前綴 + 注音後綴」之分界證據。
         let occupiedSlotCount = [
           trialComposer.consonant.value,
           trialComposer.semivowel.value,
@@ -424,12 +427,18 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         ].filter { !$0.isEmpty }.count
         // 「整段是否為單一讀音」之判準：
         // - 動態注音排列之合法編碼本即跨鍵改寫槽值（大千26 之 "qquu"＝ㄅㄚ 為 4 鍵 2 槽），
-        //   「鍵數 == 佔用槽數」對之恆不成立，故改委由引擎層之槽序檢定。
-        // - 靜態注音排列維持「鍵數 == 佔用槽數」：該式即「無冗餘鍵」，而冗餘鍵在混打語境下
+        //   「鍵數 == 佔用槽數」對之恆不成立，故啟用槽序檢定時委由引擎層判定。
+        // - 靜態注音排列恆維持「鍵數 == 佔用槽數」：該式即「無冗餘鍵」，而冗餘鍵在混打語境下
         //   是「ASCII 前綴 + 注音後綴」之分界證據（如 "ai" + "i6"），不得放行。
-        let fullInputIsSingleReading = handler.composer.parser.isDynamic
-          ? handler.composer.isSequentiallyTypedRawKeyOrder(fullInput)
-          : fullInput.count == occupiedSlotCount
+        // - 停用槽序檢定（舊制）時，動態排列一併退回「鍵數 == 佔用槽數」。
+        //   該式之值域恆 ≤ 4（單一讀音最多四槽），故本處無須如上方 buffer 檢查另設大千26 之豁免：
+        //   大千26 之跨鍵改寫編碼（`qquu`）本即無法通過該式。
+        let fullInputIsSingleReading: Bool = {
+          guard judgeReadingsBySequentialRawKeyOrder, handler.composer.parser.isDynamic else {
+            return fullInput.count == occupiedSlotCount
+          }
+          return handler.composer.isSequentiallyTypedRawKeyOrder(fullInput)
+        }()
 
         if trialComposer.hasIntonation() {
           if let readingKey = trialComposer.phonabetKeyForQuery(
@@ -518,6 +527,16 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   private var isLatchedAlnumStateEnabled: Bool {
     handler.prefs.mixedAlphanumericalEnabled
       && handler.prefs.enableLatchedAlnumStateInMixedAlnumMode
+  }
+
+  /// 「整段緩衝是否為一個依槽序鍵入之讀音」之判準是否委由引擎層
+  /// （`isSequentiallyTypedRawKeyOrder`）。
+  ///
+  /// 停用時退回舊制：動態注音排列不再委由引擎層判定（大千26 之相關檢定整條停用、
+  /// 其餘動態排列改採「鍵數 == 佔用槽數」），且 `shouldPreferASCIIWordPath` 之
+  /// 第一項證據（鍵序無以成讀音）一併失效。
+  private var judgeReadingsBySequentialRawKeyOrder: Bool {
+    handler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder
   }
 
   @inline(__always)
@@ -842,17 +861,22 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   /// 證據有兩項，任一成立即可：
   /// 一、**鍵序無以成讀音**——該序列不是一個依注音槽序鍵入之讀音（亂序、覆寫修正、無以發音）；
   ///     權威為引擎層之 `isSequentiallyTypedRawKeyOrder`，對長度 ≥ 2 者即生效。
+  ///     此項可經偏好 `MixedAlnumJudgeReadingsBySequentialRawKeyOrder` 停用（停用時本函式僅剩證據二）。
   /// 二、**冗餘鍵**——鍵數多於其所佔用之槽數（如 "tod" 之 3 鍵僅佔 2 槽）。此項預設「一鍵一槽」，
-  ///     僅靜態注音排列適用：動態排列之合法編碼本即跨鍵改寫槽值，計數無意義。
+  ///     僅靜態注音排列適用：動態排列之合法編碼本即跨鍵改寫槽值，計數無意義
+  ///     （停用槽序檢定者，此項之適用範圍亦回到舊制）。
   /// - Parameter minimumOverwriteCount: 證據二所需之冗餘鍵次數下限。
   private func shouldPreferASCIIWordPath(fullInput: String, minimumOverwriteCount: Int = 2) -> Bool {
     guard fullInput.range(of: "^[A-Za-z]+$", options: .regularExpression) != nil else {
       return false
     }
-    if isNotSequentiallyTypedReading(fullInput) { return true }
+    if judgeReadingsBySequentialRawKeyOrder {
+      // 證據一：鍵序無以成讀音。
+      if isNotSequentiallyTypedReading(fullInput) { return true }
+      // 證據二預設「一鍵一槽」，僅靜態注音排列適用。
+      guard !handler.composer.parser.isDynamic, !handler.composer.isPinyinMode else { return false }
+    }
     guard fullInput.count >= 3 else { return false }
-    guard !handler.composer.parser.isDynamic, !handler.composer.isPinyinMode else { return false }
-
     var trialComposer = handler.composer
     trialComposer.clear()
     var destructiveOverwriteCount = 0

@@ -12,8 +12,6 @@
 
   @available(macOS 14, *)
   public struct VwrSettingsPaneBehavior: View {
-    // MARK: Public
-
     // MARK: - Main View
 
     public var body: some View {
@@ -31,9 +29,10 @@
 
         Section {
           UserDef.kMixedAlphanumericalEnabled.renderUI()
-          // 母關則子禁用：該子選項僅在中英混打模式啟用時才有作用（程式端亦作合取吸收）。
+          // 該二子選項僅在中英混打模式啟用時才有作用；母選項關閉時，其在程式端已被合取吸收，
+          // 故不另作 UI 層的「連動停用」（Cocoa 側亦同）。
+          UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.renderUI()
           UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.renderUI()
-            .disabled(!mixedAlphanumericalEnabled)
         }
 
         Section {
@@ -109,13 +108,6 @@
           maxHeight: CtlSettingsUI.contentMaxHeight
         )
     }
-
-    // MARK: Private
-
-    // MARK: - AppStorage Variables（僅保留需在 View 條件中讀取的屬性）
-
-    @AppStorage(wrappedValue: false, UserDef.kMixedAlphanumericalEnabled.rawValue)
-    private var mixedAlphanumericalEnabled: Bool
   }
 
   // MARK: - VwrSettingsPaneBehavior_Previews

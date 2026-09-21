@@ -51,6 +51,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kSpaceKeyBehaviorAgainstICB = "SpaceKeyBehaviorAgainstICB"
   case kCassetteEnabled = "CassetteEnabled"
   case kMixedAlphanumericalEnabled = "MixedAlphanumericalEnabled"
+  case kMixedAlnumJudgeReadingsBySequentialRawKeyOrder = "MixedAlnumJudgeReadingsBySequentialRawKeyOrder"
   case kEnableLatchedAlnumStateInMixedAlnumMode = "EnableLatchedAlnumStateInMixedAlnumMode"
   case kFuriousTypingEnabled = "FuriousTypingEnabled"
   case kCNS11643Enabled = "CNS11643Enabled"
@@ -476,6 +477,7 @@ extension UserDef {
     case .kSpaceKeyBehaviorAgainstICB: return .integer(1)
     case .kCassetteEnabled: return .bool(false)
     case .kMixedAlphanumericalEnabled: return .bool(false)
+    case .kMixedAlnumJudgeReadingsBySequentialRawKeyOrder: return .bool(true)
     case .kEnableLatchedAlnumStateInMixedAlnumMode: return .bool(false)
     case .kFuriousTypingEnabled: return .bool(true)
     case .kCNS11643Enabled: return .bool(false)
@@ -767,6 +769,11 @@ extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle",
         description: "i18n:UserDef.kMixedAlphanumericalEnabled.description"
+      )
+    case .kMixedAlnumJudgeReadingsBySequentialRawKeyOrder: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.shortTitle",
+        description: "i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.description"
       )
     case .kEnableLatchedAlnumStateInMixedAlnumMode: return .init(
         userDef: self,

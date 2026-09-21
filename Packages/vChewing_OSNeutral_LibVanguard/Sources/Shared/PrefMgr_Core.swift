@@ -343,6 +343,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kMixedAlphanumericalEnabled)
   public var mixedAlphanumericalEnabled: Bool
 
+  @AppProperty(userDef: .kMixedAlnumJudgeReadingsBySequentialRawKeyOrder)
+  public var mixedAlnumJudgeReadingsBySequentialRawKeyOrder: Bool
+
   @AppProperty(userDef: .kEnableLatchedAlnumStateInMixedAlnumMode)
   public var enableLatchedAlnumStateInMixedAlnumMode: Bool
 

@@ -438,6 +438,8 @@
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "两个绘文字（更宽）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "横向多列选字窗最低单元宽度:";
+"i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.description" = "该选项决定中英混打模式如何判定「整段输入是否为一个读音」，需先启用上方的「启用中英混合输入回退」才有作用；本选项默认启用。\n- 启用时：判准为「依槽序键入之原始按键序」。动态注音排列（大千26、倚天26、许氏、星光、刘氏等）的合法编码本即跨键改写槽值（如大千26 之 `qquu`＝ㄅㄚ），故委由注拼引擎判定该段是否为一个打得出来的读音；静态注音排列则维持「键数 == 占用槽数」之计数式，其中冗余键即「ASCII 前缀 ＋ 注音后缀」之分界。\n- 停用后（回到旧制之判定），后果有二：①纯英文字母之短令牌（如 `ls`／`ln`／`lc`／`mv`）不再被视为英文意图，而会重新被当作注音吸收（于空格键确认时组出该读音之候选字，而非递交 `ls `）。②动态注音排列不再委由引擎层判定——大千26 因码长不定而不适用该检定，故其合法多写编码不再被吸收为单一读音（`qquu` 这类内容会留在 ASCII 缓冲、于按下空格键时以 `qquu ` 递交）；其余动态排列改以「键数 == 占用槽数」判定（倚天26 之 `ge`＝ㄐㄧ 仍如常）。\n- 若您希望在中英混打时维持声韵并击等「不需要严格按照顺序敲注音」的特性的话，请停用本选项；否则请维持启用。";
+"i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.shortTitle" = "依槽序键入判定读音";
 "i18n:UserDef.kMixedAlphanumericalEnabled.description" = "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将当前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。";
 "i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle" = "启用中英混合输入回退";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定数字小键盘的输入行为。";

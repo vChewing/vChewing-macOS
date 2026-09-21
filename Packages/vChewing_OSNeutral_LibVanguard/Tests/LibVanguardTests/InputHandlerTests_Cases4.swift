@@ -2120,4 +2120,134 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "`clear()` 應將狂拼之整批執行期狀態複位（trail＋當拍狀態）"
     )
   }
+
+  // MARK: - 槽序檢定之偏好開關（MixedAlnumJudgeReadingsBySequentialRawKeyOrder）
+
+  /// 該偏好之預設值為 true；且預設狀態下之行為與 IH438 所釘者一致（亂序 token 走 ASCII 路徑）。
+  @Test
+  func test_IH450_MixedSequentialOrderJudgeDefaultsOn() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    defer { testHandler.clear() }
+
+    #expect(
+      (UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.dataType.defaultValue as? Bool) == true,
+      "該偏好之預設值應為 true"
+    )
+    #expect(
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder,
+      "未經使用者改動時，執行期讀值應為 true"
+    )
+
+    typeSentence("ls ")
+    #expect(
+      testSession.recentCommissions.joined() == "ls ",
+      "預設（啟用槽序檢定）狀態下 `ls` 應作 ASCII 遞交，實際得到 \(testSession.recentCommissions)"
+    )
+  }
+
+  /// 停用槽序檢定後，兩字母亂序 token 不再被視為英文意圖（與 IH438 為對照組）：
+  /// 該段回到「鍵數 == 佔用槽數」之計數式判準，即被吸收為單一讀音、而非遞交 ASCII。
+  @Test(arguments: [
+    (token: "ls", reading: "ㄋㄠ", kanji: "腦"),
+    (token: "ln", reading: "ㄙㄠ", kanji: "艘"),
+    (token: "lc", reading: "ㄏㄠ", kanji: "蒿"),
+    (token: "mv", reading: "ㄒㄩ", kanji: "須"),
+  ])
+  func test_IH451_MixedOutOfSlotOrderTokenStaysPhoneticWhenJudgeDisabled(
+    _ scenario: (token: String, reading: String, kanji: String)
+  ) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "\(scenario.reading) \(scenario.kanji) -1")
+    testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = false
+    defer {
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = true
+      cleanup()
+      testHandler.clear()
+    }
+
+    typeSentence(scenario.token)
+    #expect(
+      testHandler.mixedAlphanumericalBuffer == scenario.token,
+      "\(scenario.token): Space 之前 buffer 應為 `\(scenario.token)`"
+    )
+
+    typeSentence(" ")
+
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "\(scenario.token): 停用槽序檢定後應被吸收為讀音，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys.last == scenario.reading,
+      "\(scenario.token): 應插入讀音 `\(scenario.reading)`，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(
+      testHandler.committableDisplayText(sansReading: true) == scenario.kanji,
+      "\(scenario.token): 組字區應為 `\(scenario.kanji)`，實際得到 `\(testHandler.committableDisplayText(sansReading: true))`"
+    )
+  }
+
+  /// 停用槽序檢定後之動態排列行為（與 IH440 為對照組）：
+  /// ①大千26 之 `qquu`（跨鍵改寫槽值之合法編碼）不再被吸收為單一讀音——舊制對大千26
+  ///   整條停用該檢定，故該段滯留於 ASCII 緩衝、於按下空白鍵時以 `qquu ` 遞交；
+  /// ②倚天26 之 `ge`（ㄐㄧ）不受影響——舊制之豁免僅及大千26，其餘動態排列本就採
+  ///   「鍵數 == 佔用槽數」判定（`ge` 為 2 鍵 2 槽，故仍成立）。
+  @Test
+  func test_IH452_MixedDynamicLayoutMultiWriteKeysWhenJudgeDisabled() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = false
+    defer {
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = true
+      testHandler.clear()
+    }
+
+    testHandler.prefs.keyboardParser = KeyboardParser.ofDachen26.rawValue
+    testHandler.ensureKeyboardParser()
+    typeSentence("qquu")
+    #expect(testHandler.mixedAlphanumericalBuffer == "qquu", "大千26：Space 之前 buffer 應為 `qquu`")
+    typeSentence(" ")
+    #expect(
+      testSession.recentCommissions.joined() == "qquu ",
+      "大千26：停用槽序檢定後應以 ASCII 遞交，實際得到 \(testSession.recentCommissions)"
+    )
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testSession.recentCommissions.removeAll()
+
+    testHandler.prefs.keyboardParser = KeyboardParser.ofETen26.rawValue
+    testHandler.ensureKeyboardParser()
+    typeSentence("ge")
+    #expect(
+      testHandler.composer.value == "ㄐㄧ",
+      "倚天26：`ge` 應仍在注拼槽內，實際得到 `\(testHandler.composer.value)`"
+    )
+    #expect(testSession.recentCommissions.isEmpty, "倚天26：不得遞交任何內容")
+  }
+
+  /// 閂滯之上鎖點係以引擎層槽序檢定為定義，不受本開關影響：
+  /// 停用槽序檢定者，閂滯仍於 `ls` 之第二鍵上鎖、並將整段即刻遞交。
+  @Test
+  func test_IH453_LatchedAlnumLatchPointUnaffectedBySequentialOrderJudgeSwitch() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = false
+    defer {
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = true
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("ls")
+    #expect(
+      testHandler.mixedAlnumConfig.isLatchedToAlnum,
+      "停用槽序檢定不得影響閂滯之上鎖點（該點之定義即為引擎層槽序檢定）"
+    )
+    #expect(testSession.recentCommissions.joined() == "ls", "上鎖時應即刻遞交整段")
+  }
 }
