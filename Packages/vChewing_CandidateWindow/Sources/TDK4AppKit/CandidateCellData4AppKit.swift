@@ -280,12 +280,16 @@ extension TDK4AppKit {
       }
       cellDimension.width = ceil(cellDimension.width)
       cellDimension.height = Self.unifiedTextHeight + 2 * padding
-      // 選字鍵標籤之正方形區域與候選字詞必須同時放得進該格：
-      // 標籤區域自 2 × padding 起算、候選字詞緊隨其右緣，故內容寬度 = 標籤盒 ＋ 候選字詞。
+      // 標籤之顯示區域自「標籤字級」（＝舊制之顯示區域寬度）擴為「標籤行高」之正方形後，
+      // 標籤右緣、連帶緊隨其右緣的候選字詞，一齊右移了兩者之差；該差須由該格之總寬度一併
+      // 吸收（補償），否則被吃掉的是尾端內距、候選字詞會貼齊該格右緣。
+      cellDimension.width += keyLabelBoxSide - fontSizeKey
+      // 選字鍵標籤之正方形區域與候選字詞必須同時放得進該格，且尾端一側亦得留足內距：
+      // 內容自 2 × padding 起算、依序為標籤盒與候選字詞，尾端另留 4 × padding（經實機目視定案）。
       // （既有算式在極大字級下本就容不下「標籤 ＋ 字詞」，此處一併收緊。）
       let keyAndPhraseWidth = keyLabelBoxSide
         + makeAttributedStringPhrase(isMatrix: false).size().width
-      cellDimension.width = max(cellDimension.width, keyAndPhraseWidth + 2 * padding)
+      cellDimension.width = max(cellDimension.width, keyAndPhraseWidth + 6 * padding)
       visualDimension = cellDimension
       visualOrigin = currentOrigin
       headerDrawYOffset = ceil(cellDimension.height * 0.2)

@@ -306,6 +306,50 @@ struct TDK4AppKitTests {
     }
   }
 
+  /// 迴歸鎖定：選字鍵標籤之顯示區域自「標籤字級」擴為「標籤行高」之正方形後，
+  /// 標籤右緣、連帶緊隨其右緣的候選字詞一齊右移；該擴大量須由該格之總寬度一併吸收（補償），
+  /// 且候選字詞之尾端內距須留足 4 × padding（實機目視定案之額度）——否則字詞會貼齊該格右緣。
+  @Test
+  func testCandidateCellWidthCompensatesKeyLabelBoxGrowth() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    let candidates: [CandidateInState] = [
+      (keyArray: [""], value: "我"),
+      (keyArray: [""], value: "淺草"),
+      (keyArray: [""], value: "二十四歲是學生"),
+      (keyArray: [""], value: "hello"),
+    ]
+
+    for size in [12, 16, 24, 40, 96, 196] {
+      PrefMgr.shared.candidateListTextSize = size
+      let pool = TDK4AppKit.CandidatePool4AppKit(
+        candidates: candidates,
+        lines: 1, isExpanded: true, selectionKeys: "123456", layout: .horizontal
+      )
+      pool.updateMetrics()
+      for cell in pool.candidateLines.flatMap({ $0 }) where cell.visualDimension.width > 0 {
+        let padding = pool.padding
+        // 補償：標籤盒相對「舊制之顯示區域寬度」（＝標籤字級）之擴大量，須見於該格之總寬度；
+        // 否則被吃掉的是尾端內距。
+        let keyLabelBoxGrowth = cell.keyLabelBoxSide - cell.fontSizeKey
+        #expect(
+          cell.visualDimension.width >= cell.textDimension.width + 4 * padding + keyLabelBoxGrowth,
+          "字級 \(size)／\(cell.displayedText)：該格寬度須一併吸收標籤盒之擴大量"
+        )
+        // 尾端內距：內容自 2 × padding（前端內距）起算、經標籤盒而至候選字詞，其後須留 4 × padding
+        // （該額度經實機目視定案——2 × padding 不足以擺脫「字詞貼齊該格右緣」之觀感）。
+        let phraseWidth = cell.makeAttributedStringPhrase(isMatrix: false).size().width
+        let trailing = cell.visualDimension.width
+          - (2 * padding + cell.phraseDrawXOffset + phraseWidth)
+        #expect(
+          trailing >= 4 * padding,
+          "字級 \(size)／\(cell.displayedText)：尾端內距 \(trailing) 小於 4 × padding"
+        )
+      }
+    }
+  }
+
   /// 迴歸鎖定：橫排多行（matrix）模式下，cell 寬度改由 `cellWidthMultiplied` 覆寫，
   /// 故「標籤盒 ＋ 候選字詞」之約束不在該路徑上；該路徑之最小格寬本就遠寬於兩者之和，
   /// 此處逐字級鎖住這個不變式（避免日後調整 matrix 最小寬度時擠到標籤或字詞）。
