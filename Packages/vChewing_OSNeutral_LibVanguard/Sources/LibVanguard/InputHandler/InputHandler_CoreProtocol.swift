@@ -634,7 +634,8 @@ extension InputHandlerProtocol {
     let cursorToCheck = givenCursor ?? assembler.cursor
     // prefs.useRearCursorMode 為 0 (false) 時（macOS 注音選字），最後方的游標位置不合邏輯。
     // prefs.useRearCursorMode 為 1 (true) 時（微軟新注音選字），最前方的游標位置不合邏輯。
-    // 註：cursor == 0 的時候為最後方。方法遵循 `assembler.isCursorAtAssemblerEdge(` 的實作。
+    // 註（沿文字書寫方向）：cursor == 0 為最後方（後端）、cursor == length 為最前方（前端）；行文有歧義時可改稱「後方盡頭」「前方盡頭」。
+    // 方法遵循 `assembler.isCursorAtAssemblerEdge(` 的實作（`.front` ⇔ `cursor == length`、`.rear` ⇔ `cursor == 0`）。
     switch prefs.useRearCursorMode {
     case false where cursorToCheck == 0: return true
     case true where cursorToCheck == assembler.length: return true

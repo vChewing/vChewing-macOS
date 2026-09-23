@@ -521,7 +521,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    // 情境 A：後置游標模式，游標位於後端邊緣
+    // 情境 A：後置游標模式，游標位於最前端（frontest edge；cursor == length；對後置模式而言為無效邊緣、預期被糾正）。
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     testHandler.prefs.useRearCursorMode = true
@@ -533,6 +533,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.assembler.cursor == testHandler.assembler.length,
       "cursor: \(testHandler.assembler.cursor), length: \(testHandler.assembler.length)"
     )
+    #expect(testHandler.isInvalidEdgeCursorSituation())
     // `actualNodeCursorPosition` 應指向最後一個節點索引
     #expect(testHandler.actualNodeCursorPosition == max(testHandler.assembler.length - 1, 0))
     // 直接產生候選狀態以避免 MockSession 的額外狀態變化
@@ -558,7 +559,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 確認選字沒有崩潰且組字結果非空
     #expect(!(testHandler.assembler.assembledSentence.map(\.value)).joined().isEmpty)
 
-    // 情境 B：前置游標模式，游標位於前端邊緣
+    // 情境 B：前置游標模式，游標位於最後端（cursor == 0；對前置模式而言為無效邊緣、預期被糾正）。
     testHandler.clear()
     testHandler.prefs.useRearCursorMode = false
     testSession.resetInputHandler(forceComposerCleanup: true)
@@ -566,6 +567,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
     testHandler.assembler.cursor = 0
     #expect(testHandler.assembler.cursor == 0)
+    #expect(testHandler.isInvalidEdgeCursorSituation())
     testSession.switchState(testHandler.generateStateOfCandidates())
     testSession.candidatePairSelectionConfirmed(at: 0)
     #expect(!(testHandler.assembler.assembledSentence.map(\.value)).joined().isEmpty)
