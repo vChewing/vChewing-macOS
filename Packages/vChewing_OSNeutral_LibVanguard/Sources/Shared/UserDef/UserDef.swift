@@ -569,9 +569,15 @@ extension UserDef {
     case .kCandidateNarrationToggleType: 0 ... 2
     case .kCandidateStateJKHLBehavior: 0 ... 2
     case .kPreferredRevolverForceLevel: 0 ... 2
-    case .kSpecifiedNotifyUIColorScheme: 0 ... 2
-    case .kForceCassetteChineseConversion: 0 ... 2
-    case .kNumPadCharInputBehavior: 0 ... 2
+    // 通知飄窗配色：-1 為淺色、0 為不指定、1 為深色（選項與 `metaData.options` 一致）。
+    // 不得寫成 `0 ... 2`：那會把 -1 夾成 0、令「淺色模式」失效。
+    case .kSpecifiedNotifyUIColorScheme: -1 ... 1
+    // 繁簡轉換：0 不轉換、1 全轉換、2 僅轉簡、3 僅轉繁。
+    // 不得寫成 `0 ... 2`：那會令選項 3（僅轉繁）於匯入時被拒、於和解時被夾成 2。
+    case .kForceCassetteChineseConversion: 0 ... 3
+    // 數字小鍵盤：0…5 皆有實際行為（見 `InputHandler_HandleStates.swift` 之 `triagePrefs`）。
+    // 不得寫成 `0 ... 2`：那會令選項 3／4／5 於匯入時被拒、於和解時被夾成 2。
+    case .kNumPadCharInputBehavior: 0 ... 5
     case .kSpaceKeyBehaviorAgainstICB: 0 ... 2
     case .kCandidateListTextSize: 12 ... 196
     case .kPopupCompositionBufferTextSize: 18 ... 40
