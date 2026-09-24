@@ -250,8 +250,10 @@ extension LXAssembly {
         if FileManager.default.isReadableFile(atPath: path) {
           Self.lxCassette.clear()
           Self.lxCassette.open(path)
+          Self.cassetteGeneration &+= 1
           vCLMLog("lxCassette: \(Self.lxCassette.count) entries of data loaded from: \(path)")
         } else {
+          // 載入失敗時磁帶內容未變，故不動世代計數器（非同步路徑亦同此語義）。
           vCLMLog("lxCassette: File access failure: \(path)")
         }
       }
@@ -272,6 +274,7 @@ extension LXAssembly {
             let count = newCassette.count
             asyncOnMain {
               Self.lxCassette = newCassette
+              Self.cassetteGeneration &+= 1
               vCLMLog("lxCassette: \(count) entries of data loaded from: \(path)")
             }
           }
@@ -284,6 +287,7 @@ extension LXAssembly {
     public static func resetSharedResources(restoreAsyncLoadingStrategy: Bool = true) {
       disconnectFactoryDictionary()
       lxCassette = LXCassette()
+      cassetteGeneration &+= 1
       lxPlainBopomofo = LXPlainBopomofo()
       guard restoreAsyncLoadingStrategy else { return }
       asyncLoadingUserData = !UserDefaults.pendingUnitTests
@@ -445,6 +449,8 @@ extension LXAssembly {
     public func loadUserSymbolData(path: String) {
       // 無論新檔案是否可讀，都必須先清除舊資料。
       lxUserSymbols.clear()
+      // LRU cache 必須在符號資料變更時失效，否則後續查詢會返回過時結果。
+      unigramLRUCache.removeAll(keepingCapacity: true)
 
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
@@ -464,6 +470,7 @@ extension LXAssembly {
           LXAssembly.withFileHandleQueueSync {
             self.lxUserSymbols.replaceData(textData: content)
           }
+          self.unigramLRUCache.removeAll(keepingCapacity: true)
           self.lxUserSymbols.filePath = path
           vCLMLog("lxUserSymbol: \(self.lxUserSymbols.count) entries of data loaded from: \(path)")
         }
@@ -602,6 +609,10 @@ extension LXAssembly {
         lxUserSymbols.replaceData(textData: rawText)
         if save { lxUserSymbols.saveData() }
       }
+      // LRU cache 必須在熱置換之後失效，否則後續查詢會返回置換前的結果。
+      // 逕行全量失效：五個目標之中僅 `.thePhrases` 與 `.theSymbols` 會餵入 `unigramsFor`，
+      // 但逐項列舉一旦日後新增目標即會漏掉，且熱置換屬人肉操作頻率、全量作廢的代價可忽略。
+      unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
     // MARK: Internal
@@ -627,6 +638,12 @@ extension LXAssembly {
     /// 漸退記憶（POM）世代計數器：每次記憶內容變更（記憶／清除／漂白／載入）時遞增。
     /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保 POM 更新後查詢即反映新記憶。
     static var pomGeneration: Int = 0
+
+    /// 磁帶資料世代計數器：每次磁帶資料被載入、取代或清空時遞增。
+    /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保磁帶資料更新後查詢即反映新內容。
+    /// 磁帶資料為靜態、而查詢快取為**逐實例**，靜態端無法逐一通知既有實例，
+    /// 故只能經由世代計數器（而非直接 `removeAll`）令各實例的舊快取自動作廢。
+    static var cassetteGeneration: Int = 0
 
     static var factoryTrie: VanguardTrie.TextMapTrie? {
       didSet {
@@ -834,12 +851,7 @@ extension LXAssembly {
       let asciiSpace = " "
       if flatKeyArray == [asciiSpace] { return [.init(keyArray: flatKeyArray, value: asciiSpace)] }
       // 檢查 LRU 快取
-      var hasher = Hasher()
-      hasher.combine(config)
-      hasher.combine(Self.factoryGeneration)
-      hasher.combine(Self.pomGeneration)
-      hasher.combine(gramSupplyHub.generation)
-      let fingerprint = hasher.finalize()
+      let fingerprint = currentGramCacheFingerprint
       if fingerprint != unigramCacheFingerprint {
         unigramLRUCache.removeAll(keepingCapacity: true)
         unigramCacheFingerprint = fingerprint
@@ -1189,6 +1201,21 @@ extension LXAssembly {
 
     private let prefs = PrefMgr.sharedSansDidSetOps
 
+    /// 檢索快取（`unigramLRUCache`；其內容為 gram——含 POM 供應之 bigram／trigram——
+    /// 故不以 unigram 名之）的世代指紋。**此為「哪些資料異動會令快取失效」的單一真源**：
+    /// 任何會改變 `unigramsFor` 結果的狀態都必須併入此算式，否則舊查詢結果會殘留。
+    /// 之所以收斂為單一處：本算式原先在 `unigramsFor` 與 `unigramsForWithAlternatives`
+    /// 各抄一份，兩份一旦漂移即會出現「同一份資料、兩條查詢路徑對快取是否有效看法不一」。
+    private var currentGramCacheFingerprint: Int {
+      var hasher = Hasher()
+      hasher.combine(config)
+      hasher.combine(Self.factoryGeneration)
+      hasher.combine(Self.pomGeneration)
+      hasher.combine(Self.cassetteGeneration)
+      hasher.combine(gramSupplyHub.generation)
+      return hasher.finalize()
+    }
+
     /// 計算給定 PossibleKey 陣列的笛卡爾積展開總數（飽和計算、超過預算即早停）。
     private static func cartesianProductBudget(_ keyArray: [Homa.PossibleKey]) -> Int {
       var product = 1
@@ -1230,12 +1257,7 @@ extension LXAssembly {
       let noEmptyKey = !flatKeyArray.isEmpty && flatKeyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
       // 檢查 LRU 快取
-      var hasher = Hasher()
-      hasher.combine(config)
-      hasher.combine(Self.factoryGeneration)
-      hasher.combine(Self.pomGeneration)
-      hasher.combine(gramSupplyHub.generation)
-      let fingerprint = hasher.finalize()
+      let fingerprint = currentGramCacheFingerprint
       if fingerprint != unigramCacheFingerprint {
         unigramLRUCache.removeAll(keepingCapacity: true)
         unigramCacheFingerprint = fingerprint
