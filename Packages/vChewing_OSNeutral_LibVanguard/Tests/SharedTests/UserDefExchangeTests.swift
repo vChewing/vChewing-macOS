@@ -227,4 +227,51 @@ final class UserDefExchangeTests {
     #expect(UserDefaults.current.object(forKey: UserDef.kUseRearCursorMode.rawValue) == nil)
     #expect(UserDefaults.current.object(forKey: UserDef.kUseHorizontalCandidateList.rawValue) == nil)
   }
+
+  /// 不變式：**凡 `metaData.options` 宣告之選項值，逐鍵驗證皆須接受**。
+  ///
+  /// 動機（2026-09-24，Phase 241 施工時查得之既有缺陷）：三條鍵之 `options` 曾超出
+  /// `validNumeralValueRange`（`kSpecifiedNotifyUIColorScheme` 之 -1、
+  /// `kForceCassetteChineseConversion` 之 3、`kNumPadCharInputBehavior` 之 3／4／5），
+  /// 而 `validateAndApply` 對整數一律以該值域把關 ⇒ **連 app 自己匯出的偏好包都會被拒**
+  /// （使用者於介面內選了那些選項、匯出後再匯入即失敗）。本測試即以「選項 ⊆ 值域」為不變式，
+  /// 使日後新增選項而忘了放寬值域時當場轉紅。
+  @Test
+  func testEveryDeclaredOptionIsAcceptedByValidator() {
+    var checked = 0
+    for userDef in UserDef.allCases {
+      guard let options = userDef.metaData?.options, !options.isEmpty else { continue }
+      for value in options.keys.sorted() {
+        let outcome = UserDef.diffAgainstCurrent([userDef.rawValue: value])
+        #expect(
+          outcome.result.failures.isEmpty,
+          "「\(userDef)」之選項 \(value) 竟被逐鍵驗證拒絕：\(outcome.result.failures)"
+        )
+        checked += 1
+      }
+    }
+    #expect(checked >= 40, "受檢之選項數過少：\(checked)")
+  }
+
+  /// 三條曾與值域不一致之鍵，其值域之現行定版（絆線：日後動值域即會轉紅、須複查本註）。
+  @Test
+  func testFormerlyMismatchedRanges() {
+    #expect(UserDef.kSpecifiedNotifyUIColorScheme.validNumeralValueRange == -1 ... 1)
+    #expect(UserDef.kForceCassetteChineseConversion.validNumeralValueRange == 0 ... 3)
+    #expect(UserDef.kNumPadCharInputBehavior.validNumeralValueRange == 0 ... 5)
+    // 逐鍵驗證亦須接受其值域之兩端。
+    for (userDef, range) in [
+      (UserDef.kSpecifiedNotifyUIColorScheme, -1 ... 1),
+      (UserDef.kForceCassetteChineseConversion, 0 ... 3),
+      (UserDef.kNumPadCharInputBehavior, 0 ... 5),
+    ] {
+      for value in [range.lowerBound, range.upperBound] {
+        let outcome = UserDef.diffAgainstCurrent([userDef.rawValue: value])
+        #expect(outcome.result.failures.isEmpty, "「\(userDef)」之 \(value) 被拒")
+      }
+      let outside = range.upperBound + 1
+      let rejected = UserDef.diffAgainstCurrent([userDef.rawValue: outside])
+      #expect(rejected.result.failures.count == 1, "「\(userDef)」之 \(outside) 竟被接受")
+    }
+  }
 }

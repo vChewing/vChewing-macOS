@@ -30,6 +30,9 @@ struct VCSharedCLI {
       convertBareKeys(paths: subargs)
     case "convert-bare-keys-in-source":
       convertBareKeysInSource(paths: subargs)
+    case "dump-userdef-metadata":
+      // stdout 只承載純 JSON；退出碼由該動詞自理（見 VCSharedCLI_UserDefMetadata.swift）。
+      exit(dumpUserDefMetadata(arguments: subargs))
     default:
       print("Unknown subcommand: \(subcommand)")
       printUsage()
@@ -47,6 +50,7 @@ struct VCSharedCLI {
     print("  swift run vChewingSharedCLI list-pending-userdef")
     print("  swift run vChewingSharedCLI convert-bare-keys <paths-to-.strings-files>")
     print("  swift run vChewingSharedCLI convert-bare-keys-in-source <paths-to-.swift-files>")
+    print("  swift run vChewingSharedCLI dump-userdef-metadata [<locale>=<path-to-.strings>]... [--strict]")
   }
 
   // MARK: - Escape helpers
