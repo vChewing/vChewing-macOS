@@ -108,6 +108,14 @@ extension SettingsPanesCocoa {
             )
             NSView()
           }
+          NSStackView.build(.horizontal) {
+            NSButton(
+              "i18n:Settings.ImportConfigFromClipboard.ButtonTitle".i18n,
+              target: self,
+              action: #selector(beginClipboardImport(_:))
+            )
+            NSView()
+          }
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }
@@ -179,6 +187,36 @@ extension SettingsPanesCocoa {
               text: "i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage".i18n
             )
           }
+        }
+      }
+    }
+
+    @IBAction
+    func beginClipboardImport(_ sender: NSButton) {
+      asyncOnMain {
+        let window = CtlSettingsCocoa.shared?.window
+        let preparation = PrefsExchange.prepare(
+          fromClipboardString: NSPasteboard.general.string(forType: .string)
+        )
+        let alert = NSAlert()
+        alert.messageText = preparation.alertTitle
+        alert.informativeText = preparation.alertMessage
+        switch preparation {
+        case let .confirmApplying(_, payload, _, _):
+          alert.addButton(withTitle: "i18n:Settings.ImportConfigFromClipboard.Confirm.ButtonApply".i18n)
+          alert.addButton(withTitle: "i18n:Common.Cancel".i18n)
+          alert.beginSheetModal(at: window) { response in
+            // 取消即完全不寫入：載荷之套用一概留待「套用」鈕。
+            guard response == .alertFirstButtonReturn else { return }
+            PrefsExchange.applyPayload(payload)
+            window.callAlert(
+              title: "i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertTitle".i18n,
+              text: "i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertMessage".i18n
+            )
+          }
+        default:
+          alert.addButton(withTitle: "i18n:Common.OK".i18n)
+          alert.beginSheetModal(at: window)
         }
       }
     }

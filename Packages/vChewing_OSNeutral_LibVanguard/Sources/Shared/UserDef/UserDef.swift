@@ -6,6 +6,12 @@ import Foundation
 
 // MARK: - UserDef
 
+/// 偏好鍵之命名紀律：
+/// - `rawValue` 即 `UserDefaults` 之鍵，一經發佈即不可更名。
+/// - **不得以 ASCII 雙底線 `__` 開頭**：該前綴保留給偏好交換格式之中介鍵
+///   （`__UserDefMeta`），而匯入端對根層所有 `__` 起頭之鍵一律**無條件摘除**
+///   ——故以 `__` 開頭之偏好鍵會永遠無法匯入。
+/// - 單底線 `_` 不在此限：`_DebugMode` 等即為既有的合法鍵。
 public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   // MARK: - Cases.
 
@@ -207,6 +213,22 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     public var failures: [(key: String, reason: String)] = []
   }
 
+  // MARK: - Preference Exchange Format
+
+  /// 交換格式之中介辭典（`__UserDefMeta`）之內容。未知成員收於 `extras`。
+  public struct ExchangeMeta: Sendable {
+    public var title: String?
+    public var description: String?
+    public var extras: [String: String] = [:]
+    /// 清洗中介辭典時所產生之警告（不使整包失敗）。
+    public var warnings: [String] = []
+  }
+
+  /// 偏好交換格式所保留之根層鍵前綴。
+  public static let jsonExchangeReservedKeyPrefix = "__"
+  /// 偏好交換格式之中介辭典之根層鍵。
+  public static let jsonExchangeMetaKey = "__UserDefMeta"
+
   // MARK: - JSON Export / Import
 
   /// 不應匯出 / 匯入的 UserDef 黑名單。
@@ -243,6 +265,8 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     var dict = [String: Any]()
     for userDef in Self.allCases {
       guard !jsonExchangeBlacklist.contains(userDef) else { continue }
+      // 命名紀律：`__` 前綴保留給交換格式之中介鍵，故永不輸出。
+      guard !userDef.rawValue.hasPrefix(jsonExchangeReservedKeyPrefix) else { continue }
       guard let value = UserDefaults.current.object(forKey: userDef.rawValue) else { continue }
       dict[userDef.rawValue] = value
     }
@@ -254,15 +278,9 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     return try? JSONSerialization.data(withJSONObject: dict, options: options)
   }
 
-  /// 從 JSON Data 匯入 UserDefaults 偏好設定，回傳匯入結果。
-  public static func importFromJSON(_ data: Data) -> ImportResult {
+  /// 自既有之扁平字典逐鍵驗證並寫入——由現行 `importFromJSON` 之迴圈原封不動抽出。
+  public static func importFromDictionary(_ dict: [String: Any]) -> ImportResult {
     var result = ImportResult()
-    guard let jsonObj = try? JSONSerialization.jsonObject(with: data),
-          let dict = jsonObj as? [String: Any]
-    else {
-      result.failures.append((key: "(root)", reason: "Invalid JSON format"))
-      return result
-    }
     for (key, value) in dict {
       guard let userDef = Self(rawValue: key) else {
         result.failures.append((key: key, reason: "Unknown key"))
@@ -281,65 +299,205 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     return result
   }
 
+  /// 從 JSON Data 匯入 UserDefaults 偏好設定，回傳匯入結果。
+  public static func importFromJSON(_ data: Data) -> ImportResult {
+    guard let jsonObj = try? JSONSerialization.jsonObject(with: data),
+          let dict = jsonObj as? [String: Any]
+    else {
+      var result = ImportResult()
+      result.failures.append((key: "(root)", reason: "Invalid JSON format"))
+      return result
+    }
+    return importFromDictionary(dict)
+  }
+
+  /// 交換格式之完整入口：解碼 → 摘除 `__UserDefMeta` → 逐鍵驗證。
+  public static func importFromExchangeJSON(
+    _ data: Data
+  )
+    -> (meta: ExchangeMeta?, result: ImportResult) {
+    guard let jsonObj = try? JSONSerialization.jsonObject(with: data),
+          let dict = jsonObj as? [String: Any]
+    else {
+      var result = ImportResult()
+      result.failures.append((key: "(root)", reason: "Invalid JSON format"))
+      return (nil, result)
+    }
+    let destructured = destructureExchange(dict)
+    return (destructured.meta, importFromDictionary(destructured.payload))
+  }
+
+  /// 差異計算：僅回傳「會被實際寫入、且寫入後之值與當前值不同」之鍵（依 rawValue 升冪）。
+  /// 此為純查詢，不寫入 `UserDefaults`。
+  public static func diffAgainstCurrent(
+    _ dict: [String: Any]
+  )
+    -> (changed: [Self], result: ImportResult) {
+    var changed = Set<Self>()
+    var result = ImportResult()
+    for (key, value) in dict {
+      guard let userDef = Self(rawValue: key) else {
+        result.failures.append((key: key, reason: "Unknown key"))
+        continue
+      }
+      guard !jsonExchangeBlacklist.contains(userDef) else {
+        result.failures.append((key: key, reason: "Blacklisted key"))
+        continue
+      }
+      switch validatedValue(userDef: userDef, value: value) {
+      case let .success(normalized):
+        result.successes.append(key)
+        if normalized != currentNormalizedValue(userDef: userDef) {
+          changed.insert(userDef)
+        }
+      case let .failure(failure):
+        result.failures.append((key: key, reason: failure.reason))
+      }
+    }
+    return (changed.sorted { $0.rawValue < $1.rawValue }, result)
+  }
+
+  /// 自交換格式之根物件摘出 `__UserDefMeta`，回傳「中介辭典」與「已摘除之其餘內容」。
+  /// 摘除之判準為「鍵以 `__` 起頭」，故形狀異常者亦不會落進逐鍵驗證。
+  public static func destructureExchange(
+    _ root: [String: Any]
+  )
+    -> (meta: ExchangeMeta?, payload: [String: Any]) {
+    var payload = [String: Any]()
+    for (key, value) in root where !key.hasPrefix(jsonExchangeReservedKeyPrefix) {
+      payload[key] = value
+    }
+    guard let rawMeta = root[jsonExchangeMetaKey] else { return (nil, payload) }
+    guard let dict = rawMeta as? [String: Any] else {
+      var meta = ExchangeMeta()
+      meta.warnings.append("`\(jsonExchangeMetaKey)` 不是辭典，已逕行摘除。")
+      return (meta, payload)
+    }
+    var meta = ExchangeMeta()
+    for (key, value) in dict {
+      guard let rawString = value as? String else { continue }
+      let sanitized = sanitizedExchangeString(rawString)
+      if sanitized.wasTruncated {
+        meta.warnings.append("成員 `\(key)` 超出 \(exchangeStringLengthLimit) 字元上限，已截斷。")
+      }
+      switch key {
+      case "title": meta.title = sanitized.value
+      case "description": meta.description = sanitized.value
+      default: meta.extras[key] = sanitized.value
+      }
+    }
+    return (meta, payload)
+  }
+
   // MARK: Private
+
+  /// 已驗證值之歸一化表示法。差異判定與寫入皆以之為單一表示法，俾免跨表示法之偽陽性差異。
+  private enum NormalizedValue: Equatable {
+    case bool(Bool)
+    case int(Int)
+    case double(Double)
+    case string(String)
+    case strings([String])
+    case dictionary([String: Bool])
+  }
+
+  /// 驗證失敗之原因。`String` 並非 `Error`，故以輕量包裝承載。
+  private struct ValidationFailure: Error {
+    let reason: String
+  }
+
+  /// 交換格式字串成員之長度上限（超出即截斷並記一筆警告）。
+  private static let exchangeStringLengthLimit = 512
+
+  /// 清洗交換格式之字串成員：先濾除所有 Unicode 控制字元，再截斷至長度上限。
+  /// - Returns: 清洗後之字串、以及「是否確實發生截斷」。
+  private static func sanitizedExchangeString(
+    _ raw: String
+  )
+    -> (value: String, wasTruncated: Bool) {
+    var cleaned = String()
+    for scalar in raw.unicodeScalars where !CharacterSet.controlCharacters.contains(scalar) {
+      cleaned.unicodeScalars.append(scalar)
+    }
+    guard cleaned.count > exchangeStringLengthLimit else { return (cleaned, false) }
+    return (String(cleaned.prefix(exchangeStringLengthLimit)), true)
+  }
 
   /// 驗證單一偏好值是否合理，合理則寫入 UserDefaults。
   /// - Returns: 若驗證失敗則回傳失敗原因；成功則回傳 nil。
   private static func validateAndApply(userDef: Self, value: Any) -> String? {
+    switch validatedValue(userDef: userDef, value: value) {
+    case let .success(normalized):
+      apply(normalized, forKey: userDef.rawValue)
+      return nil
+    case let .failure(failure):
+      return failure.reason
+    }
+  }
+
+  /// 驗證單一偏好值，成功時回傳歸一化之值（不寫入 `UserDefaults`）。
+  /// 接受條件與 `validateAndApply` 完全一致——兩者共用此單一驗證路徑。
+  private static func validatedValue(
+    userDef: Self,
+    value: Any
+  )
+    -> Result<NormalizedValue, ValidationFailure> {
     switch userDef.dataType {
     case .bool:
       // JSON 數字 0/1 也可視為 Bool。
       if let v = value as? Bool {
-        UserDefaults.current.set(v, forKey: userDef.rawValue)
-        return nil
+        return .success(.bool(v))
       } else if let v = value as? Int, (0 ... 1).contains(v) {
-        UserDefaults.current.set(v == 1, forKey: userDef.rawValue)
-        return nil
+        return .success(.bool(v == 1))
       }
-      return "Expected Bool"
+      return .failure(.init(reason: "Expected Bool"))
 
     case .integer:
       guard let v = value as? Int else {
         // 嘗試從 Double 取整數（JSON 數字皆為 Double）。
         if let d = value as? Double, d == d.rounded() {
           let intVal = Int(d)
-          if let reason = validateIntRange(userDef: userDef, value: intVal) { return reason }
-          UserDefaults.current.set(intVal, forKey: userDef.rawValue)
-          return nil
+          if let reason = validateIntRange(userDef: userDef, value: intVal) {
+            return .failure(.init(reason: reason))
+          }
+          return .success(.int(intVal))
         }
-        return "Expected Int"
+        return .failure(.init(reason: "Expected Int"))
       }
-      if let reason = validateIntRange(userDef: userDef, value: v) { return reason }
-      UserDefaults.current.set(v, forKey: userDef.rawValue)
-      return nil
+      if let reason = validateIntRange(userDef: userDef, value: v) {
+        return .failure(.init(reason: reason))
+      }
+      return .success(.int(v))
 
     case .double:
       guard let v = value as? Double ?? (value as? Int).map(Double.init) else {
-        return "Expected Double"
+        return .failure(.init(reason: "Expected Double"))
       }
-      if let reason = validateDoubleRange(userDef: userDef, value: v) { return reason }
-      UserDefaults.current.set(v, forKey: userDef.rawValue)
-      return nil
+      if let reason = validateDoubleRange(userDef: userDef, value: v) {
+        return .failure(.init(reason: reason))
+      }
+      return .success(.double(v))
 
     case .string:
-      guard let v = value as? String else { return "Expected String" }
-      if let reason = validateString(userDef: userDef, value: v) { return reason }
-      UserDefaults.current.set(v, forKey: userDef.rawValue)
-      return nil
+      guard let v = value as? String else { return .failure(.init(reason: "Expected String")) }
+      if let reason = validateString(userDef: userDef, value: v) {
+        return .failure(.init(reason: reason))
+      }
+      return .success(.string(v))
 
     case .arrayOfStrings:
       guard let v = value as? [String] else {
         // 也接受 [Any]，但需要每個元素都是 String。
         if let arr = value as? [Any] {
           let strings = arr.compactMap { $0 as? String }
-          guard strings.count == arr.count else { return "Expected Array of Strings" }
-          UserDefaults.current.set(strings, forKey: userDef.rawValue)
-          return nil
+          guard strings.count == arr.count else {
+            return .failure(.init(reason: "Expected Array of Strings"))
+          }
+          return .success(.strings(strings))
         }
-        return "Expected Array of Strings"
+        return .failure(.init(reason: "Expected Array of Strings"))
       }
-      UserDefaults.current.set(v, forKey: userDef.rawValue)
-      return nil
+      return .success(.strings(v))
 
     case .dictionary:
       guard let v = value as? [String: Bool] else {
@@ -347,17 +505,41 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
         if let rawDict = value as? [String: Any] {
           var converted = [String: Bool]()
           for (k, val) in rawDict {
-            if let b = val as? Bool { converted[k] = b } else if let i = val as? Int,
-                                                                 (0 ... 1).contains(i) { converted[k] = i == 1 }
-            else { return "Expected Dictionary<String, Bool>" }
+            if let b = val as? Bool {
+              converted[k] = b
+            } else if let i = val as? Int, (0 ... 1).contains(i) {
+              converted[k] = i == 1
+            } else {
+              return .failure(.init(reason: "Expected Dictionary<String, Bool>"))
+            }
           }
-          UserDefaults.current.set(converted, forKey: userDef.rawValue)
-          return nil
+          return .success(.dictionary(converted))
         }
-        return "Expected Dictionary<String, Bool>"
+        return .failure(.init(reason: "Expected Dictionary<String, Bool>"))
       }
-      UserDefaults.current.set(v, forKey: userDef.rawValue)
-      return nil
+      return .success(.dictionary(v))
+    }
+  }
+
+  /// 把當前值歸一化以資比較：該鍵不存在時以 `dataType` 之預設值代之。
+  private static func currentNormalizedValue(userDef: Self) -> NormalizedValue? {
+    let currentValue = UserDefaults.current.object(forKey: userDef.rawValue)
+      ?? userDef.dataType.defaultValue
+    switch validatedValue(userDef: userDef, value: currentValue) {
+    case let .success(normalized): return normalized
+    case .failure: return nil
+    }
+  }
+
+  /// 將歸一化之值寫入 `UserDefaults`。
+  private static func apply(_ normalized: NormalizedValue, forKey key: String) {
+    switch normalized {
+    case let .bool(v): UserDefaults.current.set(v, forKey: key)
+    case let .int(v): UserDefaults.current.set(v, forKey: key)
+    case let .double(v): UserDefaults.current.set(v, forKey: key)
+    case let .string(v): UserDefaults.current.set(v, forKey: key)
+    case let .strings(v): UserDefaults.current.set(v, forKey: key)
+    case let .dictionary(v): UserDefaults.current.set(v, forKey: key)
     }
   }
 }

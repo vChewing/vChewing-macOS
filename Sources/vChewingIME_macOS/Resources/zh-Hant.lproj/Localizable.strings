@@ -7,6 +7,8 @@
 "i18n:aboutWindow.LICENSE_TITLE" = "木蘭寬鬆授權條款第 2 版 (MulanPSL-2.0 License):";
 "i18n:aboutWindow.OK_BUTTON" = "確定";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "網站";
+"i18n:AssistantConfig.Meta.NoDescription" = "這套配置未附說明。";
+"i18n:AssistantConfig.Meta.Unspecified" = "未具名的配置";
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "無法將已挪作他用的按鍵設為選字鍵。";
 "i18n:candidateServiceMenu.selectorResponse.failed" = "請求失敗\nSelector 指令匹配失敗、或無結果可用。";
 "i18n:candidateServiceMenu.selectorResponse.succeeded" = "成功取得結果\n已將結果寫入剪貼簿。";
@@ -247,6 +249,17 @@
 "i18n:Settings.DisableShiftToggleAlphanumerical" = "徹底禁止使用 Shift 鍵切換英數模式";
 "i18n:Settings.EnableExperimentalSwiftUITypesetting" = "使用 Swift UI 介面排版方法";
 "i18n:Settings.FollowOSSettings" = "依系統設定";
+"i18n:Settings.ImportConfigFromClipboard.ButtonTitle" = "點此從剪貼簿匯入（由配置助手生成的）配置資料";
+"i18n:Settings.ImportConfigFromClipboard.ClipboardEmpty.AlertMessage" = "剪貼簿內沒有文字內容，無法匯入配置資料。";
+"i18n:Settings.ImportConfigFromClipboard.ClipboardEmpty.AlertTitle" = "剪貼簿是空的";
+"i18n:Settings.ImportConfigFromClipboard.Confirm.ButtonApply" = "套用";
+"i18n:Settings.ImportConfigFromClipboard.FailedToParse.AlertMessage" = "剪貼簿中的內容不是有效的配置資料，應為由配置助手生成的 JSON 內容。";
+"i18n:Settings.ImportConfigFromClipboard.FailedToParse.AlertTitle" = "無法讀取配置資料";
+"i18n:Settings.ImportConfigFromClipboard.IgnoredKeys.Header" = "下列項目未被接受：";
+"i18n:Settings.ImportConfigFromClipboard.NoDifferences.AlertMessage" = "這套配置與您當前的偏好設定無異，故未做任何變更。";
+"i18n:Settings.ImportConfigFromClipboard.NoDifferences.AlertTitle" = "無需變更";
+"i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertMessage" = "配置已套用至您的偏好設定。部分變更須待下次啟用輸入法時才會生效。";
+"i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertTitle" = "已套用配置";
 "i18n:settings.importFromKimoTxt.description" = "ℹ️ 點按「直接匯入」會嘗試從您的系統內已經安裝的奇摩輸入法的 SmartMandarinUserData.db 資料庫直接讀入使用者片語。您也可以手動讀入奇摩輸入法的 SmartMandarinUserData.db 資料庫、或者由奇摩輸入法辭典編輯器匯出的文殊（Manjusri）文字格式檔。無論您選擇哪一個匯入選項，敝輸入法均僅讀入 Unigram、且僅匯入「讀音串」與「詞語」這兩個欄位的資訊。敝輸入法的原廠辭典或使用者片語辭典裡面已經包含了的詞音配對記錄不會被再次匯入。";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "直接匯入";
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "已從總共 %@ 筆資料中成功匯入 %@ 筆新資料。";

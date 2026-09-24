@@ -6,6 +6,7 @@
 // 依「SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上」整段圈進 compiler condition，<6.2 分支不提供替代實作。
 #if compiler(>=6.2)
 
+  import AppKit
   import SwiftUI
 
   // MARK: - VwrSettingsPaneGeneral
@@ -94,6 +95,16 @@
             }
             Spacer()
           }
+          HStack {
+            Button("i18n:Settings.ImportConfigFromClipboard.ButtonTitle".i18n) {
+              activeAlert = .clipboardImport(
+                preparation: PrefsExchange.prepare(
+                  fromClipboardString: NSPasteboard.general.string(forType: .string)
+                )
+              )
+            }
+            Spacer()
+          }
         }
       }.formStyled()
         .frame(
@@ -121,6 +132,8 @@
       case fartWarning
       case confirmApplyingSCPCBatchSettings
       case succeededInApplyingSCPCBatchSettings
+      case clipboardImport(preparation: PrefsExchange.Preparation)
+      case clipboardImportSucceeded
     }
 
     @State
@@ -138,6 +151,8 @@
       case .fartWarning: return "i18n:Common.Warning".i18n
       case .confirmApplyingSCPCBatchSettings: return "i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle".i18n
       case .succeededInApplyingSCPCBatchSettings: return "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle".i18n
+      case let .clipboardImport(preparation): return preparation.alertTitle
+      case .clipboardImportSucceeded: return "i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertTitle".i18n
       case .none: return ""
       }
     }
@@ -150,6 +165,10 @@
         return Text("i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage".i18n)
       case .succeededInApplyingSCPCBatchSettings:
         return Text("i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage".i18n)
+      case let .clipboardImport(preparation):
+        return Text(preparation.alertMessage)
+      case .clipboardImportSucceeded:
+        return Text("i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertMessage".i18n)
       case .none:
         return Text(verbatim: "")
       }
@@ -173,6 +192,19 @@
         }
         Button("i18n:Common.No".i18n, role: .cancel) {}
       case .succeededInApplyingSCPCBatchSettings:
+        Button("i18n:Common.OK".i18n) {}
+      case let .clipboardImport(preparation):
+        if case let .confirmApplying(_, payload, _, _) = preparation {
+          Button("i18n:Settings.ImportConfigFromClipboard.Confirm.ButtonApply".i18n) {
+            PrefsExchange.applyPayload(payload)
+            activeAlert = .clipboardImportSucceeded
+          }
+          // 取消即完全不寫入：載荷之套用一概留待上方之「套用」鈕。
+          Button("i18n:Common.Cancel".i18n, role: .cancel) {}
+        } else {
+          Button("i18n:Common.OK".i18n) {}
+        }
+      case .clipboardImportSucceeded:
         Button("i18n:Common.OK".i18n) {}
       case .none:
         EmptyView()

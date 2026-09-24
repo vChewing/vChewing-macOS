@@ -78,8 +78,7 @@
               isShowingImportResult = true
               return
             }
-            let importResult = UserDef.importFromJSON(data)
-            PrefMgr.shared.fixOddPreferencesCore()
+            let importResult = PrefsExchange.applyPrefsJSONFromData(data)
             importResultMessage = Self.formatImportResult(importResult)
             isShowingImportResult = true
           case .failure:

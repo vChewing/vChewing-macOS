@@ -193,8 +193,7 @@ extension SettingsPanesCocoa {
         alert.beginSheetModal(at: window)
         return
       }
-      let importResult = UserDef.importFromJSON(data)
-      PrefMgr.shared.fixOddPreferencesCore()
+      let importResult = PrefsExchange.applyPrefsJSONFromData(data)
       let message = Self.formatImportResult(importResult)
       let alert = NSAlert()
       alert.messageText = "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n

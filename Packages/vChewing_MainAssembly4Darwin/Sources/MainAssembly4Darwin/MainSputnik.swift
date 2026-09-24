@@ -200,12 +200,12 @@ public final class MainSputnik4IME {
   }
 
   /// 把已讀入的偏好 JSON 套用進 `UserDefaults`，並印出逐筆結果。
+  /// 相容於配置助手之交換格式（根層 `__UserDefMeta` 等保留鍵會被摘除）。
   /// - Returns: 無任何一筆被拒則回 0，否則回 1。
   private static func applyPrefsJSON(_ data: Data) -> Int32 {
-    let importResult = UserDef.importFromJSON(data)
+    let (_, importResult) = UserDef.importFromExchangeJSON(data)
     // 與設定畫面之匯入路徑同款收尾（本行程緊接著便 `exit`，故尚需自行把偏好寫回 cfprefsd）。
-    PrefMgr.shared.fixOddPreferencesCore()
-    UserDefaults.current.synchronize()
+    PrefMgr.shared.reconcileAfterExternalPrefsImport()
     print(
       String(
         format: "i18n:DevZone.JSONPrefsExchange.ImportSummary:%d%d".i18n,

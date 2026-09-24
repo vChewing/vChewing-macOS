@@ -42,6 +42,37 @@ extension PrefMgr {
   }
 }
 
+// MARK: - Reconcile push-based side effects after an external prefs import.
+
+extension PrefMgr {
+  /// 於「外部來源直接寫入 `UserDefaults`」之後，把 `@AppProperty` setter 才會觸發的推式副作用補上。
+  ///
+  /// `UserDef` 之匯入繞過 `@AppProperty`，故帶 `didSet` 之偏好一概不會觸發；
+  /// 而 IME 行程是長駐的，故此和解不能省。
+  public func reconcileAfterExternalPrefsImport() {
+    // ① 值域與正規化（其 `candidateKeys = candidateKeys` 之技巧已涵蓋選字鍵之 didSet）。
+    fixOddPreferencesCore()
+    // ② 逐一自我賦值，以觸發其餘帶 didSet 之偏好的推式同步。
+    userPhrasesDatabaseBypassed = userPhrasesDatabaseBypassed
+    candidateListTextSize = candidateListTextSize
+    popupCompositionBufferTextSize = popupCompositionBufferTextSize
+    readingNarrationCoverage = readingNarrationCoverage
+    togglingAlphanumericalModeWithLShift = togglingAlphanumericalModeWithLShift
+    togglingAlphanumericalModeWithRShift = togglingAlphanumericalModeWithRShift
+    cns11643Enabled = cns11643Enabled
+    symbolInputEnabled = symbolInputEnabled
+    cassetteEnabled = cassetteEnabled
+    suppressFactoryUnigramsOfKanaSyllables = suppressFactoryUnigramsOfKanaSyllables
+    useSCPCTypingMode = useSCPCTypingMode
+    phraseReplacementEnabled = phraseReplacementEnabled
+    associatedPhrasesEnabled = associatedPhrasesEnabled
+    // ③ 顯式同步：常駐行程雖有 cfprefsd 代理，顯式同步無害且便於測試。
+    UserDefaults.current.synchronize()
+    // ④ 另有一項推式狀態 `inputHandler.assembler.maxSegLength` 並非即時：
+    //    其值於 `initInputHandler()` 時才重推，故須待下一次啟用輸入源時才會生效。
+  }
+}
+
 // MARK: Print share-safe UserDefaults into a bunch of "defaults write" commands.
 
 extension PrefMgr {
