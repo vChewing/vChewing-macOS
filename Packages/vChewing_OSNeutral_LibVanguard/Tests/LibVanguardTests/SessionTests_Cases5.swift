@@ -505,6 +505,9 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 客體應用接手，客體會以該鍵自身的字元改寫組字區（未遞交的讀音消失、並寫入不可列印
   /// 字元），`InputHandler_TriageInput` 終末處理那道「保護 F1－F12 不干擾組字區」的
   /// 防線因此永遠看不到它。
+  ///
+  /// 攔截**不得靜默**（否則使用者會以為功能鍵故障）：須發一次專用蜂鳴碼 `F1F20BEE`，
+  /// 而**非**終末處理那道泛用碼 `A9BFF20E`。
   @Test
   func test516_FunctionKeyDoesNotDisturbUncommittedReading() throws {
     testHandler.prefs.useSCPCTypingMode = false
@@ -523,7 +526,10 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       testHandler.assembler.assembledSentence.map(\.value).joined() == compositionBefore,
       "F5 不得改動尚未遞交的組字內容。"
     )
-    #expect(recordedErrors.isEmpty, "攔截功能鍵不應回報任何錯誤碼。")
+    #expect(
+      recordedErrors == ["F1F20BEE"],
+      "攔截功能鍵須發專用蜂鳴碼 F1F20BEE（不得靜默、亦不得沿用終末處理之 A9BFF20E），實際得到 \(recordedErrors)"
+    )
 
     // 遞交路徑須完好無損：Enter 仍得「你」。
     press(.dataEnterReturn)
@@ -545,10 +551,14 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(handled, "注拼槽內尚有未完成讀音時，F5 必須被輸入法攔截。")
     #expect(testHandler.composer.value == "ㄋㄧ", "F5 不得清掉未完成的讀音。")
     #expect(testClientProxy.toString().isEmpty, "F5 不得遞交任何內容至客體。")
-    #expect(recordedErrors.isEmpty, "攔截功能鍵不應回報任何錯誤碼。")
+    #expect(
+      recordedErrors == ["F1F20BEE"],
+      "攔截功能鍵須發專用蜂鳴碼 F1F20BEE，實際得到 \(recordedErrors)"
+    )
   }
 
-  /// 對照組：組字區與注拼槽皆空時，功能鍵照舊放行給系統（這些鍵可能會用來觸發系統功能）。
+  /// 對照組：組字區與注拼槽皆空時，功能鍵照舊放行給系統（這些鍵可能會用來觸發系統功能），
+  /// 且不得發任何蜂鳴碼。
   @Test
   func test518_FunctionKeyPassesThroughWhenNothingPending() throws {
     resetToEmptyAndClear()
@@ -557,6 +567,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(!handled, "組字內容為空時，F5 應放行給系統。")
     #expect(testClientProxy.toString().isEmpty, "F5 不得在空狀態下遞交任何內容。")
     #expect(testSession.state.type == .ofEmpty)
+    #expect(recordedErrors.isEmpty, "放行功能鍵時不得發蜂鳴碼，實際得到 \(recordedErrors)")
   }
 
   /// 攔截範圍僅限功能鍵本身：`Fn` 與其它鍵之組合（如表情符號選擇器 `Fn+E`）維持放行，

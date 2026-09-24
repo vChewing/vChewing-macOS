@@ -204,9 +204,15 @@ extension InputHandlerProtocol {
     case .ofEmpty, .ofInputting:
       // 功能鍵（F1－F20）於輸入法持有未遞交的內容時就地攔截、且不作任何處理：這些鍵若
       // 放行給客體，客體會以該鍵自身的字元改寫組字區（未遞交的讀音消失、且寫入不可列印
-      // 字元）。此處不遞交、不報錯、不提示，組字區與注拼槽一概不動；未遞交內容為空時
-      // 仍照下方規則放行給系統。
+      // 字元）。此處不遞交、不提示，組字區與注拼槽一概不動；未遞交內容為空時仍照下方規則
+      // 放行給系統。
+      // 惟**不得靜默**：靜默會令使用者以為功能鍵故障，故比照終末處理發一次蜂鳴。用碼取
+      // `F1F20BEE`——與終末處理之泛用碼 `A9BFF20E` 有別，俾便自紀錄分辨兩者。
       if input.isFunctionKey, state.hasComposition || !isComposerOrCalligrapherEmpty {
+        vCLog(
+          "Blocked function key: charCode: \(input.charCode), keyCode: \(input.keyCode)"
+        )
+        errorCallback?("F1F20BEE")
         return true
       }
 
