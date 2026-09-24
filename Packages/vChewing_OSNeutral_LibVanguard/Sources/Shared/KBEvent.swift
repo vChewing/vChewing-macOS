@@ -414,6 +414,24 @@ public enum KeyCode: UInt16 {
   }
 }
 
+// MARK: - KeyCode - Function Keys
+
+extension KeyCode {
+  /// 該鍵碼是否為功能鍵（F1－F20）。
+  ///
+  /// 功能鍵一律以硬體鍵碼判定、不受 macOS 基礎鍵盤佈局影響；F1－F12 之按鍵事件另帶
+  /// `.function` 與 `.numericPad` 修飾旗標（見 `InputSignalProtocol.isNonLaptopFunctionKey`）。
+  public var isFunctionKey: Bool {
+    switch self {
+    case .kF1, .kF2, .kF3, .kF4, .kF5, .kF6, .kF7, .kF8, .kF9, .kF10,
+         .kF11, .kF12, .kF13, .kF14, .kF15, .kF16, .kF17, .kF18, .kF19, .kF20:
+      true
+    default:
+      false
+    }
+  }
+}
+
 // MARK: - KeyCodeBlackListed
 
 public enum KeyCodeBlackListed: UInt16 {

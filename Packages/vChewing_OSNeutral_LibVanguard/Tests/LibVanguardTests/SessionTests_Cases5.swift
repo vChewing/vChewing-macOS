@@ -496,4 +496,81 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(yearMidScore() == nil, "過濾後，當前組字器節點內不應再留有「年中」。")
     #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "年終")
   }
+
+  /// 組字內容尚未遞交時按功能鍵（F1－F20），輸入法必須就地攔截該鍵：
+  /// 既不得遞交任何字元、亦不得令未遞交的讀音消失。
+  ///
+  /// 病灶原委：`handleKeyDown` 的 Fn 快篩（`fnKeyCheck`）對任何帶 `.function` 旗標、
+  /// 且不在「無辜鍵碼」清單內者一律直接放行——功能鍵正落在該清單之外。事件一放行即由
+  /// 客體應用接手，客體會以該鍵自身的字元改寫組字區（未遞交的讀音消失、並寫入不可列印
+  /// 字元），`InputHandler_TriageInput` 終末處理那道「保護 F1－F12 不干擾組字區」的
+  /// 防線因此永遠看不到它。
+  @Test
+  func test516_FunctionKeyDoesNotDisturbUncommittedReading() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    resetToEmptyAndClear()
+
+    typeSentenceOrCandidates("su3")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.hasComposition)
+    let compositionBefore = testHandler.assembler.assembledSentence.map(\.value).joined()
+    #expect(compositionBefore == "你")
+
+    let handled = testSession.handleEvent(KBEvent.KeyEventData.f5Event.asEvent)
+    #expect(handled, "組字內容尚未遞交時，F5 必須被輸入法攔截。")
+    #expect(testClientProxy.toString().isEmpty, "F5 不得遞交任何內容至客體。")
+    #expect(
+      testHandler.assembler.assembledSentence.map(\.value).joined() == compositionBefore,
+      "F5 不得改動尚未遞交的組字內容。"
+    )
+    #expect(recordedErrors.isEmpty, "攔截功能鍵不應回報任何錯誤碼。")
+
+    // 遞交路徑須完好無損：Enter 仍得「你」。
+    press(.dataEnterReturn)
+    #expect(testClientProxy.toString() == "你")
+  }
+
+  /// 未完成讀音（尚在注拼槽內、未湊成音節）同樣屬「未遞交的內容」，功能鍵不得令其消失。
+  @Test
+  func test517_FunctionKeyDoesNotDisturbUnfinishedReading() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    resetToEmptyAndClear()
+
+    typeSentenceOrCandidates("su")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testHandler.composer.value == "ㄋㄧ")
+    #expect(!testHandler.isComposerOrCalligrapherEmpty)
+
+    let handled = testSession.handleEvent(KBEvent.KeyEventData.f5Event.asEvent)
+    #expect(handled, "注拼槽內尚有未完成讀音時，F5 必須被輸入法攔截。")
+    #expect(testHandler.composer.value == "ㄋㄧ", "F5 不得清掉未完成的讀音。")
+    #expect(testClientProxy.toString().isEmpty, "F5 不得遞交任何內容至客體。")
+    #expect(recordedErrors.isEmpty, "攔截功能鍵不應回報任何錯誤碼。")
+  }
+
+  /// 對照組：組字區與注拼槽皆空時，功能鍵照舊放行給系統（這些鍵可能會用來觸發系統功能）。
+  @Test
+  func test518_FunctionKeyPassesThroughWhenNothingPending() throws {
+    resetToEmptyAndClear()
+
+    let handled = testSession.handleEvent(KBEvent.KeyEventData.f5Event.asEvent)
+    #expect(!handled, "組字內容為空時，F5 應放行給系統。")
+    #expect(testClientProxy.toString().isEmpty, "F5 不得在空狀態下遞交任何內容。")
+    #expect(testSession.state.type == .ofEmpty)
+  }
+
+  /// 攔截範圍僅限功能鍵本身：`Fn` 與其它鍵之組合（如表情符號選擇器 `Fn+E`）維持放行，
+  /// 以免 July-2026 那套「略過 Fn 熱鍵」的政策被本修正一併撤除。
+  @Test
+  func test519_FnNonFunctionKeyCombinationStillPassesThrough() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    resetToEmptyAndClear()
+
+    typeSentenceOrCandidates("su3")
+    #expect(testSession.state.hasComposition)
+
+    let handled = testSession.handleEvent(KBEvent.KeyEventData.fnEWithLetterEvent.asEvent)
+    #expect(!handled, "Fn+字母鍵不屬功能鍵，應維持放行。")
+    #expect(testClientProxy.toString().isEmpty, "放行 Fn+字母鍵時，輸入法本身不得遞交內容。")
+  }
 }

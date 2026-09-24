@@ -172,4 +172,26 @@ extension KBEvent.KeyEventData {
     charsSansModifiers: "g",
     keyCode: mapKeyCodesANSIForTests["g"] ?? 5
   )
+  /// 功能鍵之事件一律另帶 `.function` 與 `.numericPad` 修飾旗標（實機如此）。
+  static func functionKeyEvent(_ keyCode: KeyCode) -> KBEvent.KeyEventData {
+    let chars = keyCode.correspondedSpecialKeyScalar(flags: [])?.description ?? ""
+    return KBEvent.KeyEventData(
+      type: .keyDown,
+      flags: [.function, .numericPad],
+      chars: chars,
+      charsSansModifiers: chars,
+      keyCode: keyCode.rawValue
+    )
+  }
+
+  /// 實機之 F5 事件（`NSF5FunctionKey`；keyCode 96）。
+  static let f5Event = functionKeyEvent(.kF5)
+  /// `Fn` + 字母鍵（如表情符號選擇器 `Fn+E`）：帶 `.function` 旗標、但該鍵本身不是功能鍵。
+  static let fnEWithLetterEvent = KBEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.function],
+    chars: "e",
+    charsSansModifiers: "e",
+    keyCode: mapKeyCodesANSIForTests["e"] ?? 14
+  )
 }

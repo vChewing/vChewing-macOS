@@ -110,6 +110,11 @@ extension SessionProtocol {
       if innocentKeyCodes.contains(keyCode) {
         break fnKeyCheck
       }
+      // 功能鍵（F1－F20）例外：輸入法尚有未遞交的組字內容時一律不得放行——放行即由客體
+      // 接手該鍵，客體會以該鍵自身的字元改寫組字區（未遞交的讀音消失、且寫入不可列印
+      // 字元）。此時改交 InputHandler 分診，由其在組字內容為真時就地攔截。組字內容為空時
+      // 仍照舊放行（這些鍵可能會用來觸發系統功能）。
+      if keyCode.isFunctionKey, hasUncommittedContent { break fnKeyCheck }
       return false
     }
 
@@ -209,6 +214,14 @@ extension SessionProtocol {
     }
 
     return result
+  }
+
+  /// 輸入法當前是否持有尚未遞交的內容（組字區內容，或以注拼槽／組筆區承載的未完成讀音）。
+  ///
+  /// 該判準與 `InputHandlerProtocol.triageInput(event:)` 之終末處理同源。凡有未遞交內容者，
+  /// 該內容一律由輸入法獨占，不得任由客體應用經由放行的按鍵改寫。
+  private var hasUncommittedContent: Bool {
+    state.hasComposition || !(inputHandler?.isComposerOrCalligrapherEmpty ?? true)
   }
 
   /// 切換英數模式開關。

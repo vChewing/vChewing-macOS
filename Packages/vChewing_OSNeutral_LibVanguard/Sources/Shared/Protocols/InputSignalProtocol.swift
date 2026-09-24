@@ -108,6 +108,9 @@ extension InputSignalProtocol {
 
   public var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
 
+  /// 該按鍵是否為功能鍵（F1－F20）。
+  public var isFunctionKey: Bool { KeyCode(rawValue: keyCode)?.isFunctionKey ?? false }
+
   public var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
 
   public var mainAreaNumKeyChar: String? { mapMainAreaNumKey[keyCode] }

@@ -202,6 +202,14 @@ extension InputHandlerProtocol {
       session.switchState(state.convertedToInputting)
       return triageInput(event: input)
     case .ofEmpty, .ofInputting:
+      // 功能鍵（F1－F20）於輸入法持有未遞交的內容時就地攔截、且不作任何處理：這些鍵若
+      // 放行給客體，客體會以該鍵自身的字元改寫組字區（未遞交的讀音消失、且寫入不可列印
+      // 字元）。此處不遞交、不報錯、不提示，組字區與注拼槽一概不動；未遞交內容為空時
+      // 仍照下方規則放行給系統。
+      if input.isFunctionKey, state.hasComposition || !isComposerOrCalligrapherEmpty {
+        return true
+      }
+
       // 提前放行一些用不到的特殊按鍵輸入情形。
       guard !(input.isInvalid && state.type == .ofEmpty) else { return false }
 
