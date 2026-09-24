@@ -2250,4 +2250,124 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(testSession.recentCommissions.joined() == "ls", "上鎖時應即刻遞交整段")
   }
+
+  // MARK: - 空白鍵行為偏好於混打路徑之貫徹（`spaceKeyBehaviorAgainstICB`）
+
+  /// 供本節測項使用：注入足以令 auto-split 命中單鍵尾綴之讀音。
+  ///
+  /// 測試辭典僅收少量讀音，若不注入，`tryAutoSplitASCIIAndPhoneticSuffix` 會因詞庫
+  /// 查無結果而自然落回「整段 ASCII ＋ 空格」，測項遂失去判別力。
+  fileprivate func injectSingleKeySuffixReadings(_ handler: MockInputHandler) {
+    ["ㄍ", "ㄠ", "ㄇ", "ㄌ", "ㄟ"].forEach {
+      handler.currentLM.insertTemporaryData(
+        unigram: .init(keyArray: [$0], value: "◉", score: -1), isFiltering: false
+      )
+    }
+  }
+
+  /// 偏好「空格鍵對內文組字區的行為」為「插入空格」（`spaceKeyBehaviorAgainstICB == 0`）時，
+  /// 中英混打之空白鍵語意必須與 Shift+Space 一致：整段緩衝加一個半形空格、**一次遞交**，
+  /// 不得把尾鍵送進注拼槽。
+  ///
+  /// 病灶原委：混打路徑自始未讀該偏好——`apple` / `school` 之緩衝長度達 5 字元以上時，
+  /// 空白鍵會繞過 `shouldPreferASCIIWordPath` 之英文判定而強行走 auto-split，
+  /// 遂遞交 `appl` 並把 `e`（＝ㄍ）留在注拼槽，與使用者「空白鍵＝插入空格」之明示相衝。
+  @Test(arguments: ["apple", "school", "schema", "personal", "hello"])
+  func test_IH512_MixedSpacePrefInsertSpaceCommitsWholeBuffer(_ word: String) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    injectSingleKeySuffixReadings(testHandler)
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    typeSentence(word)
+    #expect(testHandler.mixedAlphanumericalBuffer == word)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == [word + " "],
+      "`\(word)` ＋ 空白應一次遞交整段緩衝加半形空格，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.assembler.isEmpty, "`\(word)` 之尾鍵不得被送進注拼槽")
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  /// 對照組：偏好維持預設「呼出選字窗」（1）或「輪替候選字」（2）時，混打空白鍵行為**不動**
+  /// ——同一組字仍走 auto-split（遞交 ASCII 前綴、尾鍵成讀音）。
+  @Test(arguments: [1, 2])
+  func test_IH513_MixedSpaceKeepsStatusQuoUnderDefaultAndRevolvePreferences(_ behavior: Int) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = behavior
+    injectSingleKeySuffixReadings(testHandler)
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    typeSentence("apple")
+    #expect(testHandler.mixedAlphanumericalBuffer == "apple")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == ["appl"],
+      "偏好 \(behavior) 下 `apple` ＋ 空白應維持現狀（auto-split），實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(!testHandler.assembler.isEmpty, "偏好 \(behavior) 下尾鍵仍應成讀音、留在組字器內")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ"],
+      "尾鍵 `e`（大千＝ㄍ）應留在組字器內，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+  }
+
+  /// Shift+Space 於預設偏好下仍為「整段緩衝加半形空格」，不受本 phase 影響。
+  @Test
+  func test_IH514_MixedShiftSpaceStillCommitsWholeBufferUnderDefaultPreference() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    injectSingleKeySuffixReadings(testHandler)
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    typeSentence("apple")
+    var shiftSpace = KBEvent.KeyEventData.spaceEvent
+    shiftSpace.flags = [.shift]
+    #expect(testHandler.triageInput(event: shiftSpace.asEvent))
+    #expect(testSession.recentCommissions == ["apple "])
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  /// 偏好「插入空格」**不**及於合法注音：`su3` 於按下聲調鍵時即已令混打緩衝區清空、讀音
+  /// 成字，空白鍵所見之混打緩衝區為空 ⇒ 混打路徑不得攔截，仍歸既有之組字區送字邏輯處置。
+  @Test
+  func test_IH515_MixedSpacePrefInsertSpaceDoesNotAffectPhoneticFlow() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    let testKanjiData = """
+    ㄋㄧˇ 你 -1
+    """
+    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
+    defer {
+      cleanup()
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    typeSentence("su3")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "`su3` 應已於聲調鍵上成為組字內容")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "你")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == ["你", " "],
+      "合法注音不因本偏好而改走混打路徑，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.assembler.isEmpty)
+  }
 }

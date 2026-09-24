@@ -93,7 +93,13 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若不提前攔截，Space 將返回 nil，無法走到注音確認路徑。
     // Shift+Space 在 non-empty 狀態下放棄注音處理，
     // 直接遞交 mixed buffer 內容 + ASCII 空格。
-    if input.isSpace, input.isShiftHeld {
+    // 偏好「空格鍵對內文組字區的行為」設為「插入空格」（值 0）時，**混打緩衝非空**者亦比照
+    // 辦理：該偏好即使用者對「空白鍵＝插入空格」之明示，混打路徑不得逕自改判為「遞交尾段
+    // ASCII ＋ 將尾鍵送進注拼槽」。**緩衝區為空者不在此攔截**——仍交還既有流程處置，
+    // 故純中文組字之空白鍵語意不因本偏好而變。
+    let commitsWholeMixedBufferOnSpace = input.isShiftHeld
+      || (!handler.mixedAlphanumericalBuffer.isEmpty && handler.prefs.spaceKeyBehaviorAgainstICB == 0)
+    if input.isSpace, commitsWholeMixedBufferOnSpace {
       guard !handler.isConsideredEmptyForNow else { return nil }
       let chineseText = handler.committableDisplayText(sansReading: true)
       let asciiText = handler.mixedAlphanumericalBuffer + " "
