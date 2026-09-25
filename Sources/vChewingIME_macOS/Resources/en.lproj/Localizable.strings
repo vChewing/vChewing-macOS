@@ -267,6 +267,14 @@
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
 "i18n:Settings.NoSearchResults" = "No matching settings found.";
 "i18n:Settings.OnlyLoadFactoryLanguageModels" = "Only load factory language models if needed";
+"i18n:Settings.OpenConfigAssistant.ButtonTitle" = "Recommended for Beginners: Open the Quick Configuration Assistant";
+"i18n:Settings.OpenConfigAssistant.Choose.AlertMessage" = "Your installed input method bundles the Configuration Assistant, which works offline. You may also use the latest version from the official website.\n\nPlease note: the version on the official website may only be compatible with the latest release of the input method.";
+"i18n:Settings.OpenConfigAssistant.Choose.AlertTitle" = "Open Configuration Assistant";
+"i18n:Settings.OpenConfigAssistant.Choose.ButtonBundled" = "Use Bundled Version";
+"i18n:Settings.OpenConfigAssistant.Choose.ButtonOnline" = "Use Website Version";
+"i18n:Settings.OpenConfigAssistant.Unbundled.AlertMessage" = "The currently installed input method does not bundle the Configuration Assistant; the online version is required.\n\nPlease note: the version on the official website may only be compatible with the latest release of the input method.";
+"i18n:Settings.OpenConfigAssistant.Unbundled.AlertTitle" = "Configuration Assistant Not Bundled";
+"i18n:Settings.OpenConfigAssistant.Unbundled.ButtonOnline" = "Open Online Version";
 "i18n:Settings.OptionAuto" = "Follow System Settings";
 "i18n:Settings.OptionsMovedToOtherTabs" = "Some previous options are moved to other tabs.";
 "i18n:Settings.SearchCurrentPage" = "Search Current Page";

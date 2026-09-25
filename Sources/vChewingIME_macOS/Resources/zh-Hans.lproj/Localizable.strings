@@ -267,6 +267,14 @@
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其余尚未汇入的资料可能是已有的记录、或记录本身不合理。若您想把全部资料完整导出为独立文字档，建议改用 KeyKeyUserDBKit（GitHub 仓库: vChewing/KeyKeyUserDBKit）来操作。";
 "i18n:Settings.NoSearchResults" = "找不到符合的设定项目。";
 "i18n:Settings.OnlyLoadFactoryLanguageModels" = "按需载入简繁体模式的原厂辞典资料";
+"i18n:Settings.OpenConfigAssistant.ButtonTitle" = "新手推荐：开启快速配置助手";
+"i18n:Settings.OpenConfigAssistant.Choose.AlertMessage" = "唯音输入法已为您同捆配置助手，可直接离线使用；亦可改用官方网站的最新版本。\n\n请注意：官方网站的版本可能仅适用于最新版的输入法。";
+"i18n:Settings.OpenConfigAssistant.Choose.AlertTitle" = "开启配置助手";
+"i18n:Settings.OpenConfigAssistant.Choose.ButtonBundled" = "使用同捆版本";
+"i18n:Settings.OpenConfigAssistant.Choose.ButtonOnline" = "使用官网最新版";
+"i18n:Settings.OpenConfigAssistant.Unbundled.AlertMessage" = "当前安装的输入法并未同捆配置助手，需要使用线上版本。\n\n请注意：官方网站的版本可能仅适用于最新版的输入法。";
+"i18n:Settings.OpenConfigAssistant.Unbundled.AlertTitle" = "未同捆配置助手";
+"i18n:Settings.OpenConfigAssistant.Unbundled.ButtonOnline" = "开启线上版本";
 "i18n:Settings.OptionAuto" = "与系统设定一致";
 "i18n:Settings.OptionsMovedToOtherTabs" = "该页面某些先前曾经有过的选项已被移往其它页签。";
 "i18n:Settings.SearchCurrentPage" = "搜寻当前页面";

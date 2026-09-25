@@ -110,6 +110,14 @@ extension SettingsPanesCocoa {
           }
           NSStackView.build(.horizontal) {
             NSButton(
+              "i18n:Settings.OpenConfigAssistant.ButtonTitle".i18n,
+              target: self,
+              action: #selector(beginOpenConfigAssistant(_:))
+            )
+            NSView()
+          }
+          NSStackView.build(.horizontal) {
+            NSButton(
               "i18n:Settings.ImportConfigFromClipboard.ButtonTitle".i18n,
               target: self,
               action: #selector(beginClipboardImport(_:))
@@ -186,6 +194,37 @@ extension SettingsPanesCocoa {
               title: "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle".i18n,
               text: "i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage".i18n
             )
+          }
+        }
+      }
+    }
+
+    /// 兩態分派：當前輸入法之 main bundle 內是否同捆 `assistant.html`（見 `AssistantLauncher`）。
+    /// 判準於按下之當下求值，不得於面板載入時快取。
+    @IBAction
+    func beginOpenConfigAssistant(_ sender: NSButton) {
+      asyncOnMain {
+        let window = CtlSettingsCocoa.shared?.window
+        let alert = NSAlert()
+        if AssistantLauncher.hasBundledAssistant {
+          alert.messageText = "i18n:Settings.OpenConfigAssistant.Choose.AlertTitle".i18n
+          alert.informativeText = "i18n:Settings.OpenConfigAssistant.Choose.AlertMessage".i18n
+          alert.addButton(withTitle: "i18n:Settings.OpenConfigAssistant.Choose.ButtonBundled".i18n)
+          alert.addButton(withTitle: "i18n:Settings.OpenConfigAssistant.Choose.ButtonOnline".i18n)
+          alert.beginSheetModal(at: window) { response in
+            switch response {
+            case .alertFirstButtonReturn: AssistantLauncher.openBundled()
+            case .alertSecondButtonReturn: AssistantLauncher.openOnline()
+            default: break
+            }
+          }
+        } else {
+          alert.messageText = "i18n:Settings.OpenConfigAssistant.Unbundled.AlertTitle".i18n
+          alert.informativeText = "i18n:Settings.OpenConfigAssistant.Unbundled.AlertMessage".i18n
+          alert.addButton(withTitle: "i18n:Settings.OpenConfigAssistant.Unbundled.ButtonOnline".i18n)
+          alert.beginSheetModal(at: window) { response in
+            guard response == .alertFirstButtonReturn else { return }
+            AssistantLauncher.openOnline()
           }
         }
       }

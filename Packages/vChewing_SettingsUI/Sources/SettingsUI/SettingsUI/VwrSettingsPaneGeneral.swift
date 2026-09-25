@@ -96,6 +96,13 @@
             Spacer()
           }
           HStack {
+            Button("i18n:Settings.OpenConfigAssistant.ButtonTitle".i18n) {
+              // 判準於按下之當下求值（見 AssistantLauncher 之註解）。
+              activeAlert = .openConfigAssistant(bundled: AssistantLauncher.hasBundledAssistant)
+            }
+            Spacer()
+          }
+          HStack {
             Button("i18n:Settings.ImportConfigFromClipboard.ButtonTitle".i18n) {
               activeAlert = .clipboardImport(
                 preparation: PrefsExchange.prepare(
@@ -134,6 +141,8 @@
       case succeededInApplyingSCPCBatchSettings
       case clipboardImport(preparation: PrefsExchange.Preparation)
       case clipboardImportSucceeded
+      /// 兩態共用一 case：`bundled` 決定文案與按鈕之組數。
+      case openConfigAssistant(bundled: Bool)
     }
 
     @State
@@ -153,6 +162,10 @@
       case .succeededInApplyingSCPCBatchSettings: return "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle".i18n
       case let .clipboardImport(preparation): return preparation.alertTitle
       case .clipboardImportSucceeded: return "i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertTitle".i18n
+      case let .openConfigAssistant(bundled):
+        return bundled
+          ? "i18n:Settings.OpenConfigAssistant.Choose.AlertTitle".i18n
+          : "i18n:Settings.OpenConfigAssistant.Unbundled.AlertTitle".i18n
       case .none: return ""
       }
     }
@@ -169,6 +182,12 @@
         return Text(preparation.alertMessage)
       case .clipboardImportSucceeded:
         return Text("i18n:Settings.ImportConfigFromClipboard.Succeeded.AlertMessage".i18n)
+      case let .openConfigAssistant(bundled):
+        return Text(
+          bundled
+            ? "i18n:Settings.OpenConfigAssistant.Choose.AlertMessage".i18n
+            : "i18n:Settings.OpenConfigAssistant.Unbundled.AlertMessage".i18n
+        )
       case .none:
         return Text(verbatim: "")
       }
@@ -206,6 +225,19 @@
         }
       case .clipboardImportSucceeded:
         Button("i18n:Common.OK".i18n) {}
+      case let .openConfigAssistant(bundled):
+        if bundled {
+          Button("i18n:Settings.OpenConfigAssistant.Choose.ButtonBundled".i18n) {
+            AssistantLauncher.openBundled()
+          }
+          Button("i18n:Settings.OpenConfigAssistant.Choose.ButtonOnline".i18n) {
+            AssistantLauncher.openOnline()
+          }
+        } else {
+          Button("i18n:Settings.OpenConfigAssistant.Unbundled.ButtonOnline".i18n) {
+            AssistantLauncher.openOnline()
+          }
+        }
       case .none:
         EmptyView()
       }

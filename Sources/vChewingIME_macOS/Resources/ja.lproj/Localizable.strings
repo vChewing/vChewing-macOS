@@ -267,6 +267,14 @@
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
 "i18n:Settings.NoSearchResults" = "一致する設定が見つかりません。";
 "i18n:Settings.OnlyLoadFactoryLanguageModels" = "必要性を判断してから内蔵辞書を読み込む";
+"i18n:Settings.OpenConfigAssistant.ButtonTitle" = "初心者におすすめ：クイック設定アシスタントを開く";
+"i18n:Settings.OpenConfigAssistant.Choose.AlertMessage" = "ご使用中の入力メソッドには設定アシスタントが同梱されており、オフラインでそのままご利用いただけます。公式サイトの最新版を使うこともできます。\n\nご注意：公式サイトの版は、最新版の入力メソッドにのみ対応している場合があります。";
+"i18n:Settings.OpenConfigAssistant.Choose.AlertTitle" = "設定アシスタントを開く";
+"i18n:Settings.OpenConfigAssistant.Choose.ButtonBundled" = "同梱版を使う";
+"i18n:Settings.OpenConfigAssistant.Choose.ButtonOnline" = "公式サイト版を使う";
+"i18n:Settings.OpenConfigAssistant.Unbundled.AlertMessage" = "現在インストールされている入力メソッドには設定アシスタントが同梱されていません。オンライン版が必要です。\n\nご注意：公式サイトの版は、最新版の入力メソッドにのみ対応している場合があります。";
+"i18n:Settings.OpenConfigAssistant.Unbundled.AlertTitle" = "設定アシスタントは未同梱です";
+"i18n:Settings.OpenConfigAssistant.Unbundled.ButtonOnline" = "オンライン版を開く";
 "i18n:Settings.OptionAuto" = "システム設定に準ず";
 "i18n:Settings.OptionsMovedToOtherTabs" = "かつてこのページに載った一部のオプションは、今は他のページへ移動しました。";
 "i18n:Settings.SearchCurrentPage" = "現在のページを検索";
