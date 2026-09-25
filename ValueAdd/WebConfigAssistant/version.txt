@@ -1,0 +1,8 @@
+# 唯音輸入法配置助手 // 適配之輸入法版本（本檔為助手側之單一事實來源）。
+#
+# `tools/build.mjs` 讀取本檔並將其注入產物（`VCA_TARGET_VERSION`），
+# 於首頁以 #114514 之小字顯示「適配唯音輸入法 4.8.4 (4840)」。
+# 其值須與倉根之 `Release-Version.plist`（本倉版本之 SSOT）一致：
+# `make version-check`（已納入 `make audit`）會逐值比對，不一致即失敗。
+version=4.8.4
+build=4840

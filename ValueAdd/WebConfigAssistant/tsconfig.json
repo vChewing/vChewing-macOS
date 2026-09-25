@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "lib": ["ES5", "DOM"],
+    "rootDir": "src",
+    "outDir": "dist/js",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
+    "newLine": "lf",
+    "noEmitOnError": true,
+    "declaration": false,
+    "sourceMap": false,
+    "pretty": true
+  },
+  "include": ["src"]
+}

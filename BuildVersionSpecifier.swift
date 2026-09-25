@@ -71,4 +71,26 @@ if CommandLine.arguments.count == 3 {
   theDictionary?.setValue(verMarket, forKeyPath: "CFBundleShortVersionString")
   theDictionary?.write(toFile: dirUpdateInfoPlist4SPM, atomically: true)
   NSLog(" - SPM 專案版本資訊更新完成：\(verMarket) \(verBuild)。")
+
+  // WebConfigAssistant (ValueAdd) version update.
+  // 該目錄之 version.txt 為配置助手側之單一事實來源（其值由助手之 `make version-check`
+  // 與本倉之 Release-Version.plist 比對）。該檔其餘內容為說明註解，故只改這兩行。
+  let dirWebConfigAssistantVersionFile = "./ValueAdd/WebConfigAssistant/version.txt"
+  do {
+    var strVersionFileContent = try String(
+      contentsOfFile: dirWebConfigAssistantVersionFile, encoding: .utf8
+    )
+    strVersionFileContent.regReplace(pattern: #"^version=.*$"#, replaceWith: "version=" + verMarket)
+    strVersionFileContent.regReplace(pattern: #"^build=.*$"#, replaceWith: "build=" + verBuild)
+    try strVersionFileContent.write(
+      to: URL(fileURLWithPath: dirWebConfigAssistantVersionFile),
+      atomically: false, encoding: .utf8
+    )
+    NSLog(" - WebConfigAssistant 版本資訊更新完成：\(verMarket) \(verBuild)。")
+  } catch {
+    NSLog(
+      " -: WebConfigAssistant 之 version.txt 未能更新（\(error)）。"
+        + "請於該目錄手動同步版本，否則助手側之 `make version-check` 會失敗。"
+    )
+  }
 }

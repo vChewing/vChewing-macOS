@@ -8,7 +8,7 @@ This folder contains `vchewing-update.swift` which automates the following proje
 - Compute a build number: major*1000 + minor*100 + patch*10.
 - Run `BuildVersionSpecifier.swift` with the computed version/build number. It is launched through `/usr/bin/swift` instead of its own shebang, so that a PATH-level `swift` shim (e.g. the swiftly proxy, which refuses to re-enter itself) cannot silently swallow the invocation.
 - Commit version bump using `[VersionUp] <version> GM Build <build>.` and create the corresponding tag.
-- Abort with a non-zero exit status unless the version bump really landed in `project.pbxproj` and both plists, the `[VersionUp]` commit was really created, and the tag was really created. The tag is never created from a stale tree.
+- Abort with a non-zero exit status unless the version bump really landed in `project.pbxproj`, both plists, and `ValueAdd/WebConfigAssistant/version.txt` (the WebConfigAssistant-side single source of truth for the input method version it targets), the `[VersionUp]` commit was really created, and the tag was really created. The tag is never created from a stale tree.
 - Revert only `Update-Info.plist` to its parent commit state and commit the revert as `[SUPPRESSOR]`.
 
 Usage:

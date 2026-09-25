@@ -4,6 +4,12 @@ LegacyZone/[Bb]uild/
 **/.index-build/
 !*.[Cc]ache/
 !.axoCover/settings.json
+# ValueAdd/WebConfigAssistant（唯音輸入法配置助手）之建置產物與暫存：逐次建置即全量改寫、
+# 且產物本身可觀（約 1.3 MB），入庫會令倉庫體積滾雪球。此處另立一份，免於只靠該目錄內之
+# .gitignore（後者仍保留，兩者互為備援）。注意 assets/*.json 與 tests/fixtures/*.json 係
+# 刻意入庫之防漂移物資，不在此列。
+ValueAdd/WebConfigAssistant/dist/
+ValueAdd/WebConfigAssistant/tmp/
 $RECYCLE.BIN/
 $tf/
 **/*.DesktopClient/GeneratedArtifacts

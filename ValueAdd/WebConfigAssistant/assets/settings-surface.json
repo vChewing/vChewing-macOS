@@ -1,0 +1,213 @@
+{
+  "generator": "tools/settings-surface.mjs",
+  "sourceDirectories": [
+    "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsUI",
+    "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsCocoa"
+  ],
+  "scannedFileCount": 31,
+  "count": 107,
+  "keys": [
+    "kAcceptLeadingIntonations",
+    "kAllowRescoringSingleKanjiCandidates",
+    "kAlphanumericalKeyboardLayout",
+    "kAlsoConfirmAssociatedCandidatesByEnter",
+    "kAlwaysExpandCandidateWindow",
+    "kAlwaysShowTooltipTextsHorizontally",
+    "kAlwaysUsePCBWithElectronBasedClients",
+    "kAppleLanguages",
+    "kAutoCompositeWithLongestPossibleCassetteKey",
+    "kAutoCorrectReadingCombination",
+    "kBasicKeyboardLayout",
+    "kBeepSoundPreference",
+    "kBypassNonAppleCapsLockHandling",
+    "kCNS11643Enabled",
+    "kCandidateKeys",
+    "kCandidateListTextSize",
+    "kCandidateNarrationToggleType",
+    "kCandidateStateJKHLBehavior",
+    "kCandidateWindowShowOnlyOneLine",
+    "kCassetteEnabled",
+    "kCassettePath",
+    "kCheckAbusersOfSecureEventInputAPI",
+    "kCheckUpdateAutomatically",
+    "kClassicHaninKeyboardSymbolModeShortcutEnabled",
+    "kConsolidateContextOnCandidateSelection",
+    "kCursorPlacementAfterSelectingCandidate",
+    "kDisableSegmentedThickUnderlineInMarkingModeForManagedClients",
+    "kDodgeInvalidEdgeCandidateCursorPosition",
+    "kEnableCandidateWindowAnimation",
+    "kEnableLatchedAlnumStateInMixedAlnumMode",
+    "kEnforceETenDOSCandidateSequence",
+    "kEnforceSingleLineCandidateWindowLayout4SCPC",
+    "kEscToCleanInputBuffer",
+    "kFetchSuggestionsFromPerceptionOverrideModel",
+    "kFilterFactoryKanjisOfNonCurrentInputMode",
+    "kFilterNonCNSReadingsForCHTInput",
+    "kForceCassetteChineseConversion",
+    "kFuriousTypingEnabled",
+    "kHardenVerticalPunctuations",
+    "kInlineDumpPinyinInLieuOfZhuyin",
+    "kIsDebugModeEnabled",
+    "kKanjiConversionPreferences",
+    "kKeepReadingUponCompositionError",
+    "kKeyboardParser4Pinyin",
+    "kKeyboardParser4Zhuyin",
+    "kMinCellWidthForHorizontalMatrix",
+    "kMixedAlnumJudgeReadingsBySequentialRawKeyOrder",
+    "kMixedAlphanumericalEnabled",
+    "kNumPadCharInputBehavior",
+    "kPhraseEditorAutoReloadExternalModifications",
+    "kPhraseReplacementEnabled",
+    "kPopupCompositionBufferTextSize",
+    "kPreferredRevolverForceLevel",
+    "kReadingNarrationCoverage",
+    "kReducePOMLifetimeToNoMoreThan12Hours",
+    "kReflectBPMFVSInCompositionBuffer",
+    "kReplaceSymbolMenuNodeWithUserSuppliedData",
+    "kRespectClientAccentColor",
+    "kRomanNumeralOutputFormat",
+    "kSecurityHardenedCompositionBuffer",
+    "kShareAlphanumericalModeStatusAcrossClients",
+    "kShiftEisuToggleOffTogetherWithCapsLock",
+    "kShouldAutoReloadUserDataFiles",
+    "kShouldNotFartInLieuOfBeep",
+    "kShowCodePointInCandidateUI",
+    "kShowHanyuPinyinInCompositionBuffer",
+    "kShowModeDescriptionOnActivatingServer",
+    "kShowNotificationsWhenTogglingCapsLock",
+    "kShowNotificationsWhenTogglingEisu",
+    "kShowNotificationsWhenTogglingShift",
+    "kShowReverseLookupInCandidateUI",
+    "kShowTranslatedStrokesInCompositionBuffer",
+    "kSpaceKeyBehaviorAgainstICB",
+    "kSpecifiedNotifyUIColorScheme",
+    "kSpecifyCmdOptCtrlEnterBehavior",
+    "kSpecifyIntonationKeyBehavior",
+    "kSpecifyShiftBackSpaceKeyBehavior",
+    "kSpecifyShiftSpaceKeyBehavior4CandidateWindow",
+    "kSpecifyShiftSpaceKeyBehavior4EmptyState",
+    "kSpecifyShiftTabKeyBehavior",
+    "kSuppressFactoryUnigramsOfKanaSyllables",
+    "kSuppressTooltipForIntonationKeyOverrideEvents",
+    "kSymbolInputEnabled",
+    "kTogglingAlphanumericalModeWithLShift",
+    "kTogglingAlphanumericalModeWithRShift",
+    "kTrimUnfinishedReadingsOnCommit",
+    "kUpperCaseLetterKeyBehavior",
+    "kUseDynamicCandidateWindowOrigin",
+    "kUseExternalFactoryDict",
+    "kUseFixedCandidateOrderOnSelection",
+    "kUseHorizontalCandidateList",
+    "kUseRearCursorMode",
+    "kUseSCPCTypingMode",
+    "kUseShiftQuestionToCallServiceMenu",
+    "kUseSpaceToCommitHighlightedCandidate4SCPC",
+    "kUserDataFolderSpecified",
+    "kUserPhrasesDatabaseBypassed",
+    "kUsingHotKeyAssociates",
+    "kUsingHotKeyCNS",
+    "kUsingHotKeyCassette",
+    "kUsingHotKeyCurrencyNumerals",
+    "kUsingHotKeyHalfWidthPunctuation",
+    "kUsingHotKeyInputMode",
+    "kUsingHotKeyKanjiConversionMode",
+    "kUsingHotKeyPinyinZhuyinTypingSwitch",
+    "kUsingHotKeyRevLookup",
+    "kUsingHotKeySCPC"
+  ],
+  "keyboardParsers": {
+    "dividerBefore": [
+      7,
+      100
+    ],
+    "zhuyin": [
+      {
+        "name": "ofStandard",
+        "value": 0,
+        "i18nKey": "i18n:KeyboardLayout.DachenMicrosoftStandard"
+      },
+      {
+        "name": "ofETen",
+        "value": 1,
+        "i18nKey": "i18n:KeyboardLayout.EtenTraditional"
+      },
+      {
+        "name": "ofIBM",
+        "value": 4,
+        "i18nKey": "i18n:KeyboardLayout.IBM"
+      },
+      {
+        "name": "ofMiTAC",
+        "value": 5,
+        "i18nKey": "i18n:KeyboardLayout.MiTAC"
+      },
+      {
+        "name": "ofSeigyou",
+        "value": 8,
+        "i18nKey": "i18n:KeyboardLayout.Seigyou"
+      },
+      {
+        "name": "ofFakeSeigyou",
+        "value": 6,
+        "i18nKey": "i18n:KeyboardLayout.FakeSeigyou"
+      },
+      {
+        "name": "ofDachen26",
+        "value": 7,
+        "i18nKey": "i18n:KeyboardLayout.Dachen26"
+      },
+      {
+        "name": "ofETen26",
+        "value": 3,
+        "i18nKey": "i18n:KeyboardLayout.Eten26"
+      },
+      {
+        "name": "ofHsu",
+        "value": 2,
+        "i18nKey": "i18n:KeyboardLayout.Hsu"
+      },
+      {
+        "name": "ofStarlight",
+        "value": 9,
+        "i18nKey": "i18n:KeyboardLayout.Starlight"
+      },
+      {
+        "name": "ofAlvinLiu",
+        "value": 10,
+        "i18nKey": "i18n:KeyboardLayout.AlvinLiuImitative"
+      }
+    ],
+    "pinyin": [
+      {
+        "name": "ofHanyuPinyin",
+        "value": 100,
+        "i18nKey": "i18n:TypingMethod.HanyuPinyinNumeral"
+      },
+      {
+        "name": "ofSecondaryPinyin",
+        "value": 101,
+        "i18nKey": "i18n:TypingMethod.SecondaryPinyinNumeral"
+      },
+      {
+        "name": "ofYalePinyin",
+        "value": 102,
+        "i18nKey": "i18n:TypingMethod.YalePinyinNumeral"
+      },
+      {
+        "name": "ofHualuoPinyin",
+        "value": 103,
+        "i18nKey": "i18n:TypingMethod.HualuoPinyinNumeral"
+      },
+      {
+        "name": "ofUniversalPinyin",
+        "value": 104,
+        "i18nKey": "i18n:TypingMethod.UniversalPinyinNumeral"
+      },
+      {
+        "name": "ofWadeGilesPinyin",
+        "value": 105,
+        "i18nKey": "i18n:TypingMethod.WadeGilesPinyinNumeral"
+      }
+    ]
+  }
+}

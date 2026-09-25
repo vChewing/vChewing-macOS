@@ -1,0 +1,4572 @@
+{
+  "count" : 118,
+  "entries" : [
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kIsDebugModeEnabled",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Debug Mode"
+        },
+        "ja" : {
+          "shortTitle" : "欠陥辿着モード"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "侦错模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "偵錯模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_DebugMode",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : true,
+      "key" : "kFailureFlagForPOMObservation",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_FailureFlag_POMObservation",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUserPhrasesDatabaseBypassed",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, all editable data in your User Phrases folder will be ignored (except Associated Phrases data). The developer may ask you to enable this to help determine whether it suppresses certain pernicious issues related to sentence composition.",
+          "shortTitle" : "Bypass the User Phrases database"
+        },
+        "ja" : {
+          "description" : "これを有効にすると、ユーザー辞書フォルダ内の（関連文節データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。",
+          "shortTitle" : "ユーザー辞書を無効化"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，使用者片语辞典目录内所有可编辑的资料将被忽略（但关联词语除外）。开发者可能会请您启用此项，以协助确认与组句有关的某些恶性故障是否与使用者片语辞典资料内容有关。",
+          "shortTitle" : "暂时停用使用者片语资料库"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，使用者片語辭典目錄內所有可編輯的資料將被忽略（但關聯詞語除外）。開發者可能會請您啟用此項，以協助確認與組句有關的某些惡性故障是否與使用者片語辭典資料內容有關。",
+          "shortTitle" : "暫時停用使用者片語資料庫"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UserPhrasesDatabaseBypassed",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kReplaceSymbolMenuNodeWithUserSuppliedData",
+      "labels" : {
+        "en" : {
+          "description" : "Single-tapping [Symbol Menu Key] without modifier keys triggers the hierarchical symbol menu. By enabling this feature, this symbol menu will represent only the contents supplied by `symbols.dat` which is optionally suppliable in the user dictionary folder, conforming to LibChewing symbol data file format. If toggling this off, these user-supplied contents will instead become the trailing subnode of the root node of the factory symbol menu contents.",
+          "shortTitle" : "Replace the entire hierarchical symbol menu contents with user-supplied `symbols.dat` data"
+        },
+        "ja" : {
+          "description" : "修飾キーなしで[符号メニューキー]を単打すると階層符号メニューが表示されます。この機能を有効にすると、符号メニューにはユーザー辞書フォルダに任意で配置可能な `symbols.dat`（酷音符号データファイル形式に準拠）の内容のみが表示されます。この機能をオフにすると、ユーザー提供の内容はデフォルトの符号メニューのルートノードの末尾サブノードとして追加されます。",
+          "shortTitle" : "階層符号メニューの内容全体をユーザー提供の `symbols.dat` データで置き換える"
+        },
+        "zh-Hans" : {
+          "description" : "在未按住修饰键的情况下单击[符号选单键]会触发层级符号选单。启用该功能后，该符号选单将仅呈现由 `symbols.dat` 提供的内容（该档案可自行放置于使用者片语辞典目录中，需遵循酷音符号资料档案格式）。关闭该功能后，这些使用者提供的内容将改为追加至出厂符号选单根节点的末尾子节点。",
+          "shortTitle" : "以使用者提供的 `symbols.dat` 资料完全取代层级符号选单内容"
+        },
+        "zh-Hant" : {
+          "description" : "在未按住修飾鍵的情況下單擊[符號選單鍵]會觸發層級符號選單。啟用該功能後，該符號選單將僅呈現由 `symbols.dat` 提供的內容（該檔案可自行放置於使用者片語辭典目錄中，需遵循酷音符號資料檔案格式）。關閉該功能後，這些使用者提供的內容將改為追加至出廠符號選單根節點的末尾子節點。",
+          "shortTitle" : "以使用者提供的 `symbols.dat` 資料完全取代層級符號選單內容"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ReplaceSymbolMenuNodeWithUserSuppliedData",
+      "type" : "bool"
+    },
+    {
+      "default" : [
+        "Unicode Metadata: %s\t@SEL:copyUnicodeMetadata:",
+        "macOS Dict: %s\t@URL:dict:\/\/%s",
+        "Bing: %s\t@WEB:https:\/\/www.bing.com\/search?q=%s",
+        "DuckDuckGo: %s\t@WEB:https:\/\/duckduckgo.com\/?t=h_&q=%s",
+        "Ecosia: %s\t@WEB:https:\/\/www.ecosia.org\/search?method=index&q=%s",
+        "Google: %s\t@WEB:https:\/\/www.google.com\/search?q=%s",
+        "MoeDict: %s\t@WEB:https:\/\/www.moedict.tw\/%s",
+        "Wikitonary: %s\t@WEB:https:\/\/zh.wiktionary.org\/wiki\/Special:Search?search=%s",
+        "Unihan: %s\t@WEB:https:\/\/www.unicode.org\/cgi-bin\/GetUnihanData.pl?codepoint=%s",
+        "Zi-Hi: %s\t@WEB:https:\/\/zi-hi.com\/sp\/uni\/%s",
+        "HTML Ruby Zhuyin: %s\t@SEL:copyRubyHTMLZhuyinTextbookStyle:",
+        "HTML Ruby Pinyin: %s\t@SEL:copyRubyHTMLHanyuPinyinTextbookStyle:",
+        "Zhuyin Annotation: %s\t@SEL:copyInlineZhuyinAnnotationTextbookStyle:",
+        "Pinyin Annotation: %s\t@SEL:copyInlineHanyuPinyinAnnotationTextbookStyle:",
+        "Braille 1947: %s\t@SEL:copyBraille1947:",
+        "Braille 2018: %s\t@SEL:copyBraille2018:",
+        "Baidu: %s\t@WEB:https:\/\/www.baidu.com\/s?wd=%s",
+        "BiliBili: %s\t@WEB:https:\/\/search.bilibili.com\/all?keyword=%s",
+        "Genshin BiliWiki: %s\t@WEB:https:\/\/wiki.biligame.com\/ys\/%s",
+        "HSR BiliWiki: %s\t@WEB:https:\/\/wiki.biligame.com\/sr\/%s"
+      ],
+      "defaultsType" : "array",
+      "exchangeBlacklisted" : true,
+      "key" : "kCandidateServiceMenuContents",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CandidateServiceMenuContents",
+      "type" : "arrayOfStrings"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kRespectClientAccentColor",
+      "labels" : {
+        "en" : {
+          "description" : "This will force the highlighted candidate background color to follow the accent color of the current client app, behaving like what macOS built-in input methods do. If it doesn't have one (or the system accent color is set with a non-default value), then the system accent color will be used instead. Note that this won't be effective if either JIS or KangXi conversion mode is enabled.",
+          "shortTitle" : "Respect accent colors of the client app and the system"
+        },
+        "ja" : {
+          "description" : "これで田所候補陳列ウィンドウの「選択中の候補の背景色」を「今が文字入力を受けている客体アプリのアクセントカラー」と一致することになる。もしその客体アプリ自体のアクセントカラーが未指定であり、あるいはシステムのアクセントカラーがデフォルト値ではないのなら、システム設定でのアクセントカラーに準ず。１つ例外状況：JIS \/ 康熙字体変換モードがONの場合、このチェックは効かぬ。",
+          "shortTitle" : "客体アプリ・システムのアクセントカラーに準ず"
+        },
+        "zh-Hans" : {
+          "description" : "这会使田所选字窗的高亮候选字词背景色优先改用当前接收文字输入的客体应用的强调主题色，与 macOS 内建输入法的行为一致。如果当前接收文字输入的客体应用没有专门指定强调主题色（或者系统主题色被设定为非预设值）的话，则会自动改用系统偏好设定内的系统全域强调主题色。注意：该特性在启用了 JIS \/ 康熙文字转换模式时不会生效。",
+          "shortTitle" : "遵循客体应用或系统全域的强调色偏好设定"
+        },
+        "zh-Hant" : {
+          "description" : "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全域強調主題色。注意：該特性在啟用了 JIS \/ 康熙文字轉換模式時不會生效。",
+          "shortTitle" : "遵循客體應用或系統全域的強調色偏好設定"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "RespectClientAccentColor",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAlwaysUsePCBWithElectronBasedClients",
+      "labels" : {
+        "en" : {
+          "description" : "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.",
+          "shortTitle" : "Always use popup composition buffer for Electron-based client apps"
+        },
+        "ja" : {
+          "description" : "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。",
+          "shortTitle" : "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用"
+        },
+        "zh-Hans" : {
+          "description" : "基于 Electron 技术构建的客体往往臭名昭彰于各自的对 IMKTextInput API 的「行为难以预测、难以保证」的实作上。更糟糕的是，这类 App 的开发者们均有着各自的不可控的原因、而难以保证他们的 App 的这种问题能被及时地、妥当地解决。这也是为什么这个开关在预设情况下处于开启状态。",
+          "shortTitle" : "对基于 Electron 技术构建的客体软体一律强制启用浮动组字窗"
+        },
+        "zh-Hant" : {
+          "description" : "基於 Electron 技術構建的客體往往臭名昭彰於各自的對 IMKTextInput API 的「行為難以預測、難以保證」的實作上。更糟糕的是，這類 App 的開發者們均有著各自的不可控的原因、而難以保證他們的 App 的這種問題能被及時地、妥當地解決。這也是為什麼這個開關在預設情況下處於開啟狀態。",
+          "shortTitle" : "對基於 Electron 技術構建的客體軟體一律強制啟用浮動組字窗"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AlwaysUsePCBWithElectronBasedClients",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSecurityHardenedCompositionBuffer",
+      "labels" : {
+        "en" : {
+          "description" : "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead.",
+          "shortTitle" : "Security-harden the composition buffer for all clients"
+        },
+        "ja" : {
+          "description" : "これで、どの客体アプリも、入力緩衝列の送り出さなかった内容を（勝手に）読み用いることは不可能になる。すなわち「吹き出し入力緩衝列ウィンドウ」の「常に出番」である。",
+          "shortTitle" : "全ての客体アプリに対して、入力緩衝列にセキュリティ強化対策を起用"
+        },
+        "zh-Hans" : {
+          "description" : "这会阻止任何客体擅自存取尚未递交的组字区内容。此举也会全域启用浮动组字窗。",
+          "shortTitle" : "针对所有客体软体启用强化型组字区安全防护"
+        },
+        "zh-Hant" : {
+          "description" : "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全域啟用浮動組字窗。",
+          "shortTitle" : "針對所有客體軟體啟用強化型組字區安全防護"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "SecurityHardenedCompositionBuffer",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kCheckAbusersOfSecureEventInputAPI",
+      "labels" : {
+        "en" : {
+          "description" : "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.",
+          "shortTitle" : "Actively check those processes abusing the SecureEventInput API"
+        },
+        "ja" : {
+          "description" : "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。",
+          "shortTitle" : "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知"
+        },
+        "zh-Hans" : {
+          "description" : "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感资料的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去回应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。",
+          "shortTitle" : "主动侦测正在滥用 SecureEventInput API 的后台执行绪"
+        },
+        "zh-Hant" : {
+          "description" : "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。",
+          "shortTitle" : "主動偵測正在濫用 SecureEventInput API 的後檯執行緒"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CheckAbusersOfSecureEventInputAPI",
+      "type" : "bool"
+    },
+    {
+      "default" : -2000,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kDeltaOfCalendarYears",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "DeltaOfCalendarYears",
+      "type" : "integer"
+    },
+    {
+      "default" : "",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : true,
+      "key" : "kMostRecentInputMode",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "MostRecentInputMode",
+      "type" : "string"
+    },
+    {
+      "default" : "",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : true,
+      "key" : "kCassettePath",
+      "labels" : {
+        "en" : {
+          "description" : "Choose your desired cassette file path. Invalid paths will be ignored.\n\n⚠️💀 Avoid iCloud-hosted “Documents” and “Desktop” folders. Their sandbox bookmarks may stop working after reboot or system updates. Move the file to a local folder first if needed.",
+          "shortTitle" : "Cassette file path"
+        },
+        "ja" : {
+          "description" : "使いたい CIN カセットファイルをご指定ください。無効な設定は無視されます。\n\n⚠️💀 iCloud で管理されている「Documents」と「Desktop」は避けてください。これらの sandbox bookmark は、再起動やシステム更新の後で再利用できなくなることがあります。必要なら、先にローカルフォルダへ移動してください。",
+          "shortTitle" : "カセットファイルの指定"
+        },
+        "zh-Hans" : {
+          "description" : "请指定您要使用的 CIN 磁带档案。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。必要时请先把档案移到本机资料夹。",
+          "shortTitle" : "磁带档案路径"
+        },
+        "zh-Hant" : {
+          "description" : "請指定您要使用的 CIN 磁帶檔案。無效值會被忽略。\n\n⚠️💀 請避免使用由 iCloud 代管的「Documents」與「Desktop」目錄。這些位置的 sandbox bookmark 可能會在重新開機或系統更新後失效。必要時請先把檔案移到本機資料夾。",
+          "shortTitle" : "磁帶檔案路徑"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CassettePath",
+      "type" : "string"
+    },
+    {
+      "default" : "",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : true,
+      "key" : "kUserDataFolderSpecified",
+      "labels" : {
+        "en" : {
+          "description" : "Choose your desired user data folder path. Invalid paths will be ignored.\n\n⚠️💀 Avoid iCloud-hosted “Documents” and “Desktop” folders. Their sandbox bookmarks may stop working after reboot or system updates. Contact Apple Support if in doubt.",
+          "shortTitle" : "User data folder path"
+        },
+        "ja" : {
+          "description" : "使いたいユーザー辞書保存先をご指定ください。無効な設定は無視されます。\n\n⚠️💀 iCloud で管理されている「Documents」と「Desktop」は避けてください。これらの sandbox bookmark は、再起動やシステム更新の後で再利用できなくなることがあります。不明な点があれば、Apple Support にお問い合わせください。",
+          "shortTitle" : "ユーザーデータフォルダの指定"
+        },
+        "zh-Hans" : {
+          "description" : "请指定您要使用的使用者片语辞典目录。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。如有疑惑者，请洽 Apple Support。",
+          "shortTitle" : "使用者资料夹路径"
+        },
+        "zh-Hant" : {
+          "description" : "請指定您要使用的使用者片語辭典目錄。無效值會被忽略。\n\n⚠️💀 請避免使用由 iCloud 代管的「Documents」與「Desktop」目錄。這些位置的 sandbox bookmark 可能會在重新開機或系統更新後失效。如有疑惑者，請洽 Apple Support。",
+          "shortTitle" : "使用者資料夾路徑"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UserDataFolderSpecified",
+      "type" : "string"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kCheckUpdateAutomatically",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Check for updates automatically"
+        },
+        "ja" : {
+          "shortTitle" : "アプリの更新通知を受く"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "自动检查软体更新"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "自動檢查軟體更新"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CheckUpdateAutomatically",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseExternalFactoryDict",
+      "labels" : {
+        "en" : {
+          "description" : "This will use the SQLite database deployed by the “make install” command from vChewing-VanguardLexicon if possible.",
+          "shortTitle" : "Read external factory dictionary files if possible"
+        },
+        "ja" : {
+          "description" : "これで vChewing-VanguardLexicon の make install にて設置した公式辞書ファイルを優先的に用いる。",
+          "shortTitle" : "なるべく（内蔵辞書より）外部の公式辞書ファイルを利用"
+        },
+        "zh-Hans" : {
+          "description" : "这将会优先使用由 vChewing-VanguardLexicon 的 make install 部署的原厂辞典档案。",
+          "shortTitle" : "尽量使用外置原厂辞典档案"
+        },
+        "zh-Hant" : {
+          "description" : "這將會優先使用由 vChewing-VanguardLexicon 的 make install 部署的原廠辭典檔案。",
+          "shortTitle" : "盡量使用外置原廠辭典檔案"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UseExternalFactoryDict",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kKanjiConversionPreferences",
+      "labels" : {
+        "en" : {
+          "description" : "Revolves the kanji conversion mode among Modern Traditional \/ KangXi \/ JIS. This setting only takes effect in Traditional Chinese output mode. ‘Modern Traditional’ means no conversion: the output stays as standard Traditional Chinese, without KangXi or JIS glyphs applied.",
+          "shortTitle" : "Kanji Conversion Mode:"
+        },
+        "ja" : {
+          "description" : "漢字変換モードを現代繁体／康熙／JIS の間で循環します。この設定は繁体中文出力モードでのみ有効です。「現代繁体字」はすなわち変換なし——康熙・JIS 字形を適用せず、標準の繁体字で出力します。",
+          "shortTitle" : "漢字変換モード:"
+        },
+        "zh-Hans" : {
+          "description" : "在当代繁体／康熙／JIS 之间轮替汉字转换模式。此设定仅对繁体中文输出模式有效，简体中文输出模式下不适用。「当代繁体中文」即为不转换——输出维持标准繁体中文，不套用康熙或 JIS 字形。",
+          "shortTitle" : "汉字转换模式:"
+        },
+        "zh-Hant" : {
+          "description" : "在當代繁體／康熙／JIS 之間輪替漢字轉換模式。此設定僅對繁體中文輸出模式有效，簡體中文輸出模式下不適用。「當代繁體中文」即為不轉換——輸出維持標準繁體中文，不套用康熙或 JIS 字形。",
+          "shortTitle" : "漢字轉換模式:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:KanjiConversionMode.ModernTrad",
+          "labels" : {
+            "en" : "Modern Traditional",
+            "ja" : "現代繁体字",
+            "zh-Hans" : "当代繁体中文",
+            "zh-Hant" : "當代繁體中文"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:KanjiConversionMode.KangXi",
+          "labels" : {
+            "en" : "KangXi",
+            "ja" : "康熙",
+            "zh-Hans" : "康熙正体",
+            "zh-Hant" : "康熙正體"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:KanjiConversionMode.JIS",
+          "labels" : {
+            "en" : "JIS",
+            "ja" : "JIS",
+            "zh-Hans" : "JIS",
+            "zh-Hant" : "JIS"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "KanjiConversionPreferences",
+      "type" : "integer"
+    },
+    {
+      "default" : 100,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kKeyboardParser4Pinyin",
+      "labels" : {
+        "en" : {
+          "description" : "Specifies the pinyin input method used while typing in pinyin mode. In pinyin input mode, when the product of the possible reading counts across the reading units within the current +\/-10 scan range (i.e. the Cartesian product scale) exceeds the budget of 625, the compositor engine may cap candidate assembly to 4 readings, so that the assembling process is not stalled by a Cartesian explosion. Fully tone-marked spellings, as well as inputs whose Cartesian product scale stays within the budget (including tone-less combinations of up to 4 syllables), are not subject to this cap.",
+          "shortTitle" : "Pinyin Parser:"
+        },
+        "ja" : {
+          "description" : "弁音モードで使用する弁音入力の種類を指定します。弁音入力モードでは、現在位置の前後 ±10 の走査範囲内にある各音読み単位の可能な読み数の積（デカルト積の規模）が予算（625）を超える場合、組字エンジンに「最大 4 読み」の候補組字上限が適用され、デカルト積による処理の停滞を防ぎます。声調付きの完全表記、およびデカルト積の規模が予算内に収まる入力（声調なしの 4 音節以下の組み合わせを含む）には、この上限は適用されません。",
+          "shortTitle" : "弁音入力種類:"
+        },
+        "zh-Hans" : {
+          "description" : "指定拼音模式下的拼音输入种类。在拼音输入模式下，若当前前后半径 ±10 的扫描范围内各读音单位的可能读音数乘积（笛卡尔积规模）超过预算（625），组字引擎会套用「最长 4 个读音」的候选组字上限，以免组字过程被笛卡尔积卡死。全拼（带声调）输入、以及笛卡尔积规模在预算之内的输入（含免声调的 4 音节以下组合），不会套用此上限。",
+          "shortTitle" : "拼音输入种类:"
+        },
+        "zh-Hant" : {
+          "description" : "指定拼音模式下的拼音輸入種類。在拼音輸入模式下，若目前前後半徑 ±10 的掃描範圍內各讀音單位的可能讀音數乘積（笛卡爾積規模）超過預算（625），組字引擎會套用「最長 4 個讀音」的候選組字上限，以免組字過程被笛卡爾積卡死。全拼（帶聲調）輸入、以及笛卡爾積規模在預算之內的輸入（含免聲調的 4 音節以下組合），不會套用此上限。",
+          "shortTitle" : "拼音輸入種類:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : [
+        100,
+        105
+      ],
+      "rawValue" : "KeyboardParser4Pinyin",
+      "type" : "integer"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kKeyboardParser4Zhuyin",
+      "labels" : {
+        "en" : {
+          "description" : "Specifies the bopomofo keyboard layout used while typing in zhuyin mode.",
+          "shortTitle" : "Zhuyin Keyboard Layout:"
+        },
+        "ja" : {
+          "description" : "注音モードで使用する注音配列を指定します。",
+          "shortTitle" : "注音配列:"
+        },
+        "zh-Hans" : {
+          "description" : "指定注音模式下的注音排列。",
+          "shortTitle" : "注音排列:"
+        },
+        "zh-Hant" : {
+          "description" : "指定注音模式下的注音排列。",
+          "shortTitle" : "注音排列:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : [
+        0,
+        10
+      ],
+      "rawValue" : "KeyboardParser4Zhuyin",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kPinyinTypingEnabled",
+      "labels" : {
+        "en" : {
+          "description" : "Switches between pinyin and zhuyin typing modes. When enabled, the pinyin parser is used; when disabled, the zhuyin keyboard layout is used.",
+          "shortTitle" : "Pinyin\/Zhuyin Typing Mode"
+        },
+        "ja" : {
+          "description" : "弁音と注音のタイピングモードを切り替えます。有効時は弁音入力を、無効時は注音配列を使用します。",
+          "shortTitle" : "弁音\/注音タイピングモード"
+        },
+        "zh-Hans" : {
+          "description" : "在拼音与注音打字模式之间切换。启用时使用拼音输入，停用时使用注音排列。",
+          "shortTitle" : "拼音\/注音打字模式"
+        },
+        "zh-Hant" : {
+          "description" : "在拼音與注音打字模式之間切換。啟用時使用拼音輸入，停用時使用注音排列。",
+          "shortTitle" : "拼音\/注音打字模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "PinyinTypingEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : "com.apple.keylayout.ZhuyinBopomofo",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : false,
+      "key" : "kBasicKeyboardLayout",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the macOS-level basic keyboard layout. Zhuyin typing and Pinyin typing are now mutually switchable modes: while typing Pinyin, this layout determines the actual characters produced by your keys, so non-QWERTY alphanumerical keyboard layouts apply as well; while typing Zhuyin, keystrokes are translated as if on a standard layout, and the on-screen keyboard is displayed accordingly.",
+          "shortTitle" : "Basic Keyboard Layout:"
+        },
+        "ja" : {
+          "description" : "macOS 基礎キーボード配置をご指定ください。注音モードと弁音モードは、現在はいつでも相互に切り替えられます。弁音モードでは、この配置が実際のキー出力を決定します（QWERTY 以外の英数キーボードも適用可能）。注音モードでは、キーは常に標準配列として扱われ、キーボードビューアの表示もそれに応じて変わります。",
+          "shortTitle" : "基礎キーボード:"
+        },
+        "zh-Hans" : {
+          "description" : "请选择 macOS 基础键盘布局。注音打字与拼音打字现为可随时互相切换的打字模式：拼音打字时，此布局决定实际按键输出（非 QWERTY 英数布局亦适用）；注音打字时，按键一律依标准键位翻译，荧幕键盘亦随之显示。",
+          "shortTitle" : "基础键盘布局:"
+        },
+        "zh-Hant" : {
+          "description" : "請選擇 macOS 基礎鍵盤佈局。注音打字與拼音打字現為可隨時互相切換的打字模式：拼音打字時，此佈局決定實際按鍵輸出（非 QWERTY 英數佈局亦適用）；注音打字時，按鍵一律依標準鍵位翻譯，螢幕鍵盤亦隨之顯示。",
+          "shortTitle" : "基礎鍵盤佈局:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "BasicKeyboardLayout",
+      "type" : "string"
+    },
+    {
+      "default" : "com.apple.keylayout.ABC",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : false,
+      "key" : "kAlphanumericalKeyboardLayout",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
+          "shortTitle" : "Alphanumerical Layout:"
+        },
+        "ja" : {
+          "description" : "macOS 英数キーボード配置をご指定ください。Shift 英数入力モードだけに使われる配置である。",
+          "shortTitle" : "英数キーボード:"
+        },
+        "zh-Hans" : {
+          "description" : "请选择 macOS 英数键盘布局。该布局仅用于 Shift 英数输入模式。",
+          "shortTitle" : "英数键盘布局:"
+        },
+        "zh-Hant" : {
+          "description" : "請選擇 macOS 英數鍵盤佈局。該佈局僅用於 Shift 英數輸入模式。",
+          "shortTitle" : "英數鍵盤佈局:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AlphanumericalKeyboardLayout",
+      "type" : "string"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowModeDescriptionOnActivatingServer",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, vChewing shows the current typing mode as a transient floating hint right after it starts serving an input client — for example when you switch back to vChewing or toggle back to Chinese with Caps Lock. The hint automatically fades out after 0.7 seconds. Note that some client apps report the location of the text input area even when they are not actually receiving any text input, which may cause the hint to appear at an unexpected location.",
+          "shortTitle" : "Show the current typing mode as a floating hint upon connecting to an input client"
+        },
+        "ja" : {
+          "description" : "有効にすると、vChewing が入力クライアントへのサービスを開始した直後（vChewing に切り替えたときや、Caps Lock で中国語モードに戻したときなど）に、現在の入力モードが一時的なフローティングヒントで表示されます。ヒントは 0.7 秒後に自動的に消えます。ただし、一部のクライアントアプリは、文字入力を受け付けていないにもかかわらずテキスト入力エリアの位置を報告することがあり、ヒントが意図しない場所に表示される可能性があります。",
+          "shortTitle" : "入力クライアント接続時に現在の入力モードをフローティングヒントで表示"
+        },
+        "zh-Hans" : {
+          "description" : "勾选后，每次唯音开始服务某个输入客体（例如切换到唯音输入法、或以 Caps Lock 切回中文模式）时，会以浮动提示显示当前使用的打字模式。该提示会在 0.7 秒后自动消失。不过，有些客体软体在没有接收文字输入时也会谎报文字输入区的位置，使提示可能出现在非预期的位置。",
+          "shortTitle" : "在刚刚对接输入客体时，以浮动提示提醒当前的打字模式"
+        },
+        "zh-Hant" : {
+          "description" : "勾選後，每次唯音開始服務某個輸入客體（例如切換到唯音輸入法、或以 Caps Lock 切回中文模式）時，會以浮動提示顯示目前使用的打字模式。該提示會在 0.7 秒後自動消失。不過，有些客體軟體在沒有接收文字輸入時也會謊報文字輸入區的位置，使提示可能出現在非預期的位置。",
+          "shortTitle" : "在剛剛對接輸入客體時，以浮動提示提醒當前的打字模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowModeDescriptionOnActivatingServer",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowNotificationsWhenTogglingCapsLock",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Show notifications when toggling Caps Lock"
+        },
+        "ja" : {
+          "shortTitle" : "Caps Lock でASCII入力モード切り替えの時に吹出通知メッセージを"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "以 Caps Lock 切换输入法\/中英模式时显示通知"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "以 Caps Lock 切換輸入法\/中英模式時顯示通知"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 12,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowNotificationsWhenTogglingCapsLock",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowNotificationsWhenTogglingEisu",
+      "labels" : {
+        "en" : {
+          "description" : "☠️ This may let you feel harder to quickly identify the current ASCII mode ON\/OFF status.",
+          "shortTitle" : "Show notifications when toggling ASCII mode by hitting Eisu"
+        },
+        "ja" : {
+          "description" : "☠️ これをONにすると、ASCII モードの点滅状態をすばやく確認することが難しくなる恐れです。",
+          "shortTitle" : "JIS英数キーでASCII入力モード切り替えの時に吹出通知メッセージを"
+        },
+        "zh-Hans" : {
+          "description" : "☠️ 这可能会让您难以快速识别目前的 ASCII 模式开\/关状态。",
+          "shortTitle" : "以 JIS 英数键切换输入法\/中英模式时显示通知"
+        },
+        "zh-Hant" : {
+          "description" : "☠️ 這可能會讓您難以快速識別目前的 ASCII 模式開\/關狀態。",
+          "shortTitle" : "以 JIS 英數鍵切換輸入法\/中英模式時顯示通知"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowNotificationsWhenTogglingEisu",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowNotificationsWhenTogglingShift",
+      "labels" : {
+        "en" : {
+          "description" : "☠️ This may let you feel harder to quickly identify the current ASCII mode ON\/OFF status.",
+          "shortTitle" : "Show notifications when toggling ASCII mode by hitting Shift"
+        },
+        "ja" : {
+          "description" : "☠️ これをONにすると、ASCII モードの点滅状態をすばやく確認することが難しくなる恐れです。",
+          "shortTitle" : "ShiftキーでASCII入力モード切り替えの時に吹出通知メッセージを"
+        },
+        "zh-Hans" : {
+          "description" : "☠️ 这可能会让您难以快速识别目前的 ASCII 模式开\/关状态。",
+          "shortTitle" : "以 Shift 切换输入法\/中英模式时显示通知"
+        },
+        "zh-Hant" : {
+          "description" : "☠️ 這可能會讓您難以快速識別目前的 ASCII 模式開\/關狀態。",
+          "shortTitle" : "以 Shift 切換輸入法\/中英模式時顯示通知"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.15,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowNotificationsWhenTogglingShift",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifiedNotifyUIColorScheme",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Notifier Window Color Scheme:"
+        },
+        "ja" : {
+          "shortTitle" : "通知ウインドウの外観モード:"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "通知飘窗配色外观:"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "通知飄窗配色外觀:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.140000000000001,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.-1",
+          "labels" : {
+            "en" : "Bright Mode",
+            "ja" : "ライト (明るい)",
+            "zh-Hans" : "浅色模式",
+            "zh-Hant" : "淺色模式"
+          },
+          "value" : -1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.0",
+          "labels" : {
+            "en" : "Not Specified",
+            "ja" : "不指定",
+            "zh-Hans" : "不指定",
+            "zh-Hant" : "不指定"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.1",
+          "labels" : {
+            "en" : "Dark Mode",
+            "ja" : "ダーク (暗い)",
+            "zh-Hans" : "深色模式",
+            "zh-Hant" : "深色模式"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        -1,
+        1
+      ],
+      "rawValue" : "OverrideNotifyUIColorScheme",
+      "type" : "integer"
+    },
+    {
+      "default" : 16,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kCandidateListTextSize",
+      "labels" : {
+        "en" : {
+          "description" : "Choose candidate font size for better visual clarity.",
+          "shortTitle" : "Candidate Size:"
+        },
+        "ja" : {
+          "description" : "入力候補陳列の候補文字の字号をご指定ください。",
+          "shortTitle" : "候補文字の字号:"
+        },
+        "zh-Hans" : {
+          "description" : "变更选字窗的字型大小。",
+          "shortTitle" : "选字窗字号:"
+        },
+        "zh-Hant" : {
+          "description" : "變更選字窗的字型大小。",
+          "shortTitle" : "選字窗字號:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : "numeric",
+      "range" : [
+        12,
+        196
+      ],
+      "rawValue" : "CandidateListTextSize",
+      "type" : "integer"
+    },
+    {
+      "default" : 18,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kPopupCompositionBufferTextSize",
+      "labels" : {
+        "en" : {
+          "description" : "Adjust the font size of the popup composition buffer.",
+          "shortTitle" : "Popup Composition Buffer Font Size:"
+        },
+        "ja" : {
+          "description" : "吹き出し入力緩衝列のフォントサイズを指定します。",
+          "shortTitle" : "吹き出し入力緩衝列の字号:"
+        },
+        "zh-Hans" : {
+          "description" : "调整浮动组字窗的字型大小。",
+          "shortTitle" : "浮动组字窗字号:"
+        },
+        "zh-Hant" : {
+          "description" : "調整浮動組字窗的字型大小。",
+          "shortTitle" : "浮動組字窗字號:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : "numeric",
+      "range" : [
+        18,
+        40
+      ],
+      "rawValue" : "PopupCompositionBufferTextSize",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAlwaysExpandCandidateWindow",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Always expand candidate window panel"
+        },
+        "ja" : {
+          "shortTitle" : "文字候補陳列ウィンドウを折り畳みせずに"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "始终自动展开多行选字窗"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "始終自動展開多行選字窗"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AlwaysExpandCandidateWindow",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kCandidateWindowShowOnlyOneLine",
+      "labels" : {
+        "en" : {
+          "description" : "Tadokoro candidate window shows 4 rows \/ columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows \/ columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row \/ column. Only one reverse-lookup result can be made available in single row \/ column mode due to reduced candidate window size.",
+          "shortTitle" : "Use only one row \/ column in candidate window"
+        },
+        "ja" : {
+          "description" : "田所候補陳列ウィンドウは普段４つの行・列で文字候補を陳列しています。ただ、老眼の患者には、大きなる文字候補サイズが必要であり、複数の行・列の文字候補陳列ウィンドウのサイズも大きくなります。この場合、文字候補を１つ行・列だけにすれば、候補陳列ウィンドウのサイズを多少縮むことはできます。従って、このオプションを提供しました。ただ、注意点は２つ：１）縦書きの時には、このオプションは無視され、文字候補はずっと１つ行・列にされます；２）１つ行・列だけで文字候補を陳列する場合、候補陳列ウィンドウのサイズは不足で、表示できる逆引参照の結果は１つだけです。",
+          "shortTitle" : "ただ１つ行・列で文字候補を陳列"
+        },
+        "zh-Hans" : {
+          "description" : "田所选字窗在预设情况下会显示四列\/四行候选字，提供类似于 macOS 内建中文输入法（macOS 10.9 起算）以及微软新注音输入法那样的选字窗排版体验。然而，部分使用者受老花眼所困扰，需要以较大字号来显示候选字。这种情况下，多行\/多列的选字窗可能会占用过多的荧幕空间，也就需要这么一个选项来停用这个特性。需注意：如果当前文字输入环境是纵排输入的话，田所选字窗会始终使用单列\/单行来显示候选字、而无视该选项。因为单行\/单列选字窗的面积不够，所以最多只会显示一笔字根反查结果。",
+          "shortTitle" : "仅以单行\/单列来陈列候选字"
+        },
+        "zh-Hant" : {
+          "description" : "田所選字窗在預設情況下會顯示四列\/四行候選字，提供類似於 macOS 內建中文輸入法（macOS 10.9 起算）以及微軟新注音輸入法那樣的選字窗排版體驗。然而，部分使用者受老花眼所困擾，需要以較大字號來顯示候選字。這種情況下，多行\/多列的選字窗可能會佔用過多的螢幕空間，也就需要這麼一個選項來停用這個特性。需注意：如果當前文字輸入環境是縱排輸入的話，田所選字窗會始終使用單列\/單行來顯示候選字、而無視該選項。因為單行\/單列選字窗的面積不夠，所以最多只會顯示一筆字根反查結果。",
+          "shortTitle" : "僅以單行\/單列來陳列候選字"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CandidateWindowShowOnlyOneLine",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kEnforceSingleLineCandidateWindowLayout4SCPC",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, the Single Character Per Commit (SCPC) mode will always use the single-line candidate window layout.",
+          "shortTitle" : "Enforce single-line candidate window layout for SCPC mode"
+        },
+        "ja" : {
+          "description" : "有効にすると、全候補入力モード（SCPC）では常に候補陳列ウィンドウが１つ行で表示されます。",
+          "shortTitle" : "全候補入力モードで候補陳列ウィンドウを常に１つ行で表示"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，逐字选字模式（SCPC）将始终使用单行选字窗布局。",
+          "shortTitle" : "对逐字选字模式强制单行选字窗布局"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，逐字選字模式（SCPC）將始終使用單行選字窗佈局。",
+          "shortTitle" : "對逐字選字模式強制單行選字窗佈局"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "EnforceSingleLineCandidateWindowLayout4SCPC",
+      "type" : "bool"
+    },
+    {
+      "default" : [
+
+      ],
+      "defaultsType" : "array",
+      "exchangeBlacklisted" : true,
+      "key" : "kAppleLanguages",
+      "labels" : {
+        "en" : {
+          "description" : "Change user interface language (will reboot the IME).",
+          "shortTitle" : "UI Language:"
+        },
+        "ja" : {
+          "description" : "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。",
+          "shortTitle" : "表示用言語:"
+        },
+        "zh-Hans" : {
+          "description" : "变更输入法介面语言，会自动重启输入法。",
+          "shortTitle" : "介面语言:"
+        },
+        "zh-Hant" : {
+          "description" : "變更輸入法介面語言，會自動重啟輸入法。",
+          "shortTitle" : "介面語言:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AppleLanguages",
+      "type" : "arrayOfStrings"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShouldAutoReloadUserDataFiles",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Automatically reload user data files if changes detected"
+        },
+        "ja" : {
+          "shortTitle" : "ユーザー辞書データの変更を自動検出し、自動的に再読込"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "自动侦测并载入使用者片语档案变更"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "自動偵測並載入使用者片語檔案變更"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShouldAutoReloadUserDataFiles",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseRearCursorMode",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the cursor position where you want to list possible candidates.",
+          "shortTitle" : "Cursor Selection:"
+        },
+        "ja" : {
+          "description" : "カーソルはどこで入力候補を呼び出すかとご指定ださい。",
+          "shortTitle" : "カーソル候補呼出:"
+        },
+        "zh-Hans" : {
+          "description" : "请选择用以触发选字的游标相对位置。",
+          "shortTitle" : "选字游标:"
+        },
+        "zh-Hant" : {
+          "description" : "請選擇用以觸發選字的游標相對位置。",
+          "shortTitle" : "選字游標:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kUseRearCursorMode.option.0",
+          "labels" : {
+            "en" : "in front of the phrase (like macOS built-in Zhuyin IME)",
+            "ja" : "単語の前で \/\/ macOS 内蔵注音入力のやり方",
+            "zh-Hans" : "将游标置于词语前方 \/\/ macOS 内建注音风格",
+            "zh-Hant" : "將游標置於詞語前方 \/\/ macOS 內建注音風格"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kUseRearCursorMode.option.1",
+          "labels" : {
+            "en" : "at the rear of the phrase (like Microsoft New Phonetic)",
+            "ja" : "単語の後で \/\/ Microsoft 新注音入力のやり方",
+            "zh-Hans" : "将游标置于词语后方 \/\/ Windows 微软新注音风格",
+            "zh-Hant" : "將游標置於詞語後方 \/\/ Windows 微軟新注音風格"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : null,
+      "rawValue" : "UseRearCursorMode",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kCandidateStateJKHLBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "⚠︎ Regarding these specific composition-buffer-cursor-flipping-keys: 1) This will automatically prevent JKHL to be used as candidate keys; 2) They won't work with '%quick' candidates in cassette mode.",
+          "shortTitle" : "JKHL key behavior in candidate window:"
+        },
+        "ja" : {
+          "description" : "⚠︎ 入力緩衝列カーソル移動用キーについて：1) JKHL は言選り用キー陣列から自動的に外されます；2) カセットモードの「%quick」による早速候補入力状態では利用できません。",
+          "shortTitle" : "候補陳列ウィンドウでのJKHLキーの動作:"
+        },
+        "zh-Hans" : {
+          "description" : "⚠︎ 关于这些特定的组字区游标移动键：1) 这将自动禁止 JKHL 用作选字键；2) 该功能在磁带模式的「%quick」快速选字状态下无效。",
+          "shortTitle" : "选字窗内的 JKHL 键行为:"
+        },
+        "zh-Hant" : {
+          "description" : "⚠︎ 關於這些特定的組字區游標移動鍵：1) 這將自動禁止 JKHL 用作選字鍵；2) 該功能在磁帶模式的「%quick」快速選字狀態下無效。",
+          "shortTitle" : "選字窗內的 JKHL 鍵行為:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kCandidateStateJKHLBehavior.option.0",
+          "labels" : {
+            "en" : "Unassigned",
+            "ja" : "未設定",
+            "zh-Hans" : "未指派",
+            "zh-Hant" : "未指派"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kCandidateStateJKHLBehavior.option.1",
+          "labels" : {
+            "en" : "JK to move cursor in the composition buffer; HL to flip current candidate row \/ column",
+            "ja" : "JKで入力緩衝列のカーソルを移動；HLで現在の行・列を切り替え",
+            "zh-Hans" : "JK 移动组字区游标；HL 翻选字窗行列",
+            "zh-Hant" : "JK 移動組字區游標；HL 翻選字窗行列"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kCandidateStateJKHLBehavior.option.2",
+          "labels" : {
+            "en" : "HL to move cursor in the composition buffer; JK to flip current candidate row \/ column",
+            "ja" : "HLで入力緩衝列のカーソルを移動；JKで現在の行・列を切り替え",
+            "zh-Hans" : "HL 移动组字区游标；JK 翻选字窗行列",
+            "zh-Hant" : "HL 移動組字區游標；JK 翻選字窗行列"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "CandidateStateJKHLBehavior",
+      "type" : "integer"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseShiftQuestionToCallServiceMenu",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Also use Shift+? to call Service Menu in Candidate Window"
+        },
+        "ja" : {
+          "shortTitle" : "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "允许在选字窗内也使用「Shift+?」叫出服务选单"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "允許在選字窗內也使用「Shift+?」叫出服務選單"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UseShiftQuestionToCallServiceMenu",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseDynamicCandidateWindowOrigin",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Adjust candidate window location according to current node length"
+        },
+        "ja" : {
+          "shortTitle" : "カーソル所在位置の単語の長さによって候補陳列ウィンドウの位置を調整"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "根据当前位置的字词长度，自动调整选字窗的位置"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "根據當前位置的字詞長度，自動調整選字窗的位置"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UseDynamicCandidateWindowOrigin",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseHorizontalCandidateList",
+      "labels" : {
+        "en" : {
+          "description" : "Choose your preferred layout of the candidate window.",
+          "shortTitle" : "Candidate Layout:"
+        },
+        "ja" : {
+          "description" : "入力候補陳列の仕様をご指定ください。",
+          "shortTitle" : "入力候補陳列の仕様"
+        },
+        "zh-Hans" : {
+          "description" : "选择您所偏好的选字窗布局。",
+          "shortTitle" : "选字窗布局:"
+        },
+        "zh-Hant" : {
+          "description" : "選擇您所偏好的選字窗佈局。",
+          "shortTitle" : "選字窗佈局:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kUseHorizontalCandidateList.option.0",
+          "labels" : {
+            "en" : "Vertical",
+            "ja" : "縦型陳列",
+            "zh-Hans" : "纵向布局",
+            "zh-Hant" : "縱向佈局"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kUseHorizontalCandidateList.option.1",
+          "labels" : {
+            "en" : "Horizontal",
+            "ja" : "横型陳列",
+            "zh-Hans" : "横向布局",
+            "zh-Hant" : "橫向佈局"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : null,
+      "rawValue" : "UseHorizontalCandidateList",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kMinCellWidthForHorizontalMatrix",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Minimum cell width for horizontal matrix:"
+        },
+        "ja" : {
+          "shortTitle" : "多行横型陳列ウィンドウの候補の最小幅:"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "横向多列选字窗最低单元宽度:"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "橫向多列選字窗最低單元寬度:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0",
+          "labels" : {
+            "en" : "2 Kanjis",
+            "ja" : "２つの漢字（幅の狭い）",
+            "zh-Hans" : "两个汉字",
+            "zh-Hant" : "兩個漢字"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1",
+          "labels" : {
+            "en" : "2 Emojis (Wider)",
+            "ja" : "２つの絵文字（幅の広い）",
+            "zh-Hans" : "两个绘文字（更宽）",
+            "zh-Hant" : "兩個繪文字（更寬）"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : null,
+      "rawValue" : "MinCellWidthForHorizontalMatrix",
+      "type" : "integer"
+    },
+    {
+      "default" : 1,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpaceKeyBehaviorAgainstICB",
+      "labels" : {
+        "en" : {
+          "description" : "Determines whether the Space key opens the candidate window, inserts a space, or revolves candidates.\nWhen \"Revolve candidates\" is selected, Shift+Space will revolve candidates in the reverse direction.",
+          "shortTitle" : "Space key behavior against inline composition buffer:"
+        },
+        "ja" : {
+          "description" : "スペースキーで入力候補を呼び出すか、空白を挿入するか、候補を順送りするかを指定します。\n「候補を順送り」を選択している場合、Shift+Space で逆方向に順送りします。",
+          "shortTitle" : "Space キーが組込中の緩衝列に対する振る舞い:"
+        },
+        "zh-Hans" : {
+          "description" : "指定空格键是呼出选字窗、插入空格、还是轮替候选字。\n选择「轮替候选字」时，Shift+Space 会反向轮替。",
+          "shortTitle" : "空格键对内文组字区的行为:"
+        },
+        "zh-Hant" : {
+          "description" : "指定空格鍵是呼出選字窗、插入空格、還是輪替候選字。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。",
+          "shortTitle" : "空格鍵對內文組字區的行為:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0",
+          "labels" : {
+            "en" : "Insert space",
+            "ja" : "空白を挿入",
+            "zh-Hans" : "插入空格",
+            "zh-Hant" : "插入空格"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.1",
+          "labels" : {
+            "en" : "Call candidate window",
+            "ja" : "候補陳列ウィンドウを呼び出す",
+            "zh-Hans" : "呼出选字窗",
+            "zh-Hant" : "呼出選字窗"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.2",
+          "labels" : {
+            "en" : "Revolve candidates (forward direction)",
+            "ja" : "候補を順送り",
+            "zh-Hans" : "轮替候选字（正向顺延）",
+            "zh-Hant" : "輪替候選字（正向順延）"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "SpaceKeyBehaviorAgainstICB",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kCassetteEnabled",
+      "labels" : {
+        "en" : {
+          "description" : "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated).",
+          "shortTitle" : "Enable cassette mode, suppressing phonabet input"
+        },
+        "ja" : {
+          "description" : "カセットモードは、CIN ファイルを用いて、（五筆や倉頡や嘸蝦米などのような）筆画入力を機能拡張できるモードである。ですが、単なる予備機能として提供したもののため、使いやすいかどうか、RIME や OpenVanilla などに比べられないかもしれん。",
+          "shortTitle" : "カセットモードを起用（注音入力はこのモードで使えぬ）"
+        },
+        "zh-Hans" : {
+          "description" : "磁带模式类似于雅虎奇摩输入法的 CIN 支援模式，允许使用者借由 CIN 表格档案扩充自己想要的笔画输入法（比如五笔、仓颉、呒虾米，等）。然而，因为唯音不打算为了这个功能而牺牲注音输入的体验，所以这个磁带模式的体验对于已经习惯 RIME 或者 OpenVanilla 的人群而言可能会稍微麻烦一些。",
+          "shortTitle" : "启用磁带模式，会停用注音输入"
+        },
+        "zh-Hant" : {
+          "description" : "磁帶模式類似於雅虎奇摩輸入法的 CIN 支援模式，允許使用者藉由 CIN 表格檔案擴充自己想要的筆畫輸入法（比如五筆、倉頡、嘸蝦米，等）。然而，因為唯音不打算為了這個功能而犧牲注音輸入的體驗，所以這個磁帶模式的體驗對於已經習慣 RIME 或者 OpenVanilla 的人群而言可能會稍微麻煩一些。",
+          "shortTitle" : "啟用磁帶模式，會停用注音輸入"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CassetteEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kMixedAlphanumericalEnabled",
+      "labels" : {
+        "en" : {
+          "description" : "This feature is designed for users who are already accustomed to the typing experience offered by a certain Smart Input software from a PC vendor. It treats parser-covered ASCII keys as provisional phonetic input first, then falls back to raw ASCII when the sequence is no longer a pronounceable reading. This feature is unavailable in pinyin typing mode (that is, when the phonabet parser uses any pinyin layout) and in cassette mode. If this typing fallback is enabled, you may also want to check the Dictionary settings page to decide whether to filter out certain factory dictionary query results that could affect your typing experience. If you need half-width punctuation input, please toggle the Half-Width Phuctuation Mode to ON.",
+          "shortTitle" : "Enable mixed Chinese-English typing fallback"
+        },
+        "ja" : {
+          "description" : "この機能は、『とあるパソコン会社のインテリ入力』の入力体験に既に慣れているユーザーに向けて設計されています。この機能は現在の注音解析器で扱える ASCII キーは、まず暫定的な注音入力として扱います。入力列が発音可能な読みとして成立しなくなった時点で、raw ASCII にフォールバックします。弁音入力（つまり注音解析器を任意の弁音配列に設定した場合）とカセットモードでは、この機能は利用できません。この機能を有効にしている場合は、辞書設定ページで、入力体験に影響しうる一部の純正辞書の検索結果を除外するかどうかを確認しておくとよいでしょう。半角約物の入力が必要な場合は、半角句読モードをオンにしてください。",
+          "shortTitle" : "中英混在入力のフォールバックを有効化"
+        },
+        "zh-Hans" : {
+          "description" : "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将当前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。",
+          "shortTitle" : "启用中英混合输入回退"
+        },
+        "zh-Hant" : {
+          "description" : "該功能專為已適應某電腦廠牌輸入法打字體驗的使用者設計。該功能會優先將目前注音排列可覆蓋的 ASCII 按鍵暫時視為注音輸入；當整段序列不再構成可發音讀音時，再回退為原始 ASCII。若使用拼音輸入（也就是注音排列設為任一拼音排列）或磁帶模式，則該功能不可用。若已啟用該功能，您可能需要到辭典設定頁確認是否要篩除某些可能影響打字體驗的原廠辞典查詢結果。若有半形標點輸入需求，請開啟半形標點模式。",
+          "shortTitle" : "啟用中英混合輸入回退"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "MixedAlphanumericalEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kMixedAlnumJudgeReadingsBySequentialRawKeyOrder",
+      "labels" : {
+        "en" : {
+          "description" : "This option decides how the mixed Chinese-English typing mode judges whether a whole input run is a reading. It takes effect only when the \"Enable mixed Chinese-English typing fallback\" option above is on, and it is on by default.\n- When on: the criterion is the sequential raw-key order. A legal encoding of a dynamic phonabet layout (such as Dachen26, ETen26, Hsu, Starlight or Alvin Liu) rewrites slot values across keys by design (e.g. `qquu` = ㄅㄚ in Dachen26), so the phonabet engine decides whether the run is a reading you can actually type; static layouts keep the \"key count == occupied slot count\" test, in which a redundant key marks the boundary between an ASCII prefix and a phonetic suffix.\n- When off (back to the legacy judgement), there are two consequences: (1) two-letter ASCII tokens (such as `ls`, `ln`, `lc`, `mv`) are no longer treated as English intent and get absorbed as readings again (pressing Space composes candidates for that reading instead of committing `ls `). (2) Dynamic layouts are no longer judged by the engine — Dachen26 is exempt from that test because its code length is variable, so its multi-write encodings are no longer absorbed as a single reading (a run like `qquu` stays in the ASCII buffer and gets committed as `qquu ` when you press Space); other dynamic layouts fall back to the \"key count == occupied slot count\" test (ETen26's `ge` = ㄐㄧ still behaves as before).\n- If you wish to keep features such as simultaneous consonant-and-vowel keying in mixed typing — that is, not having to type Bopomofo strictly in order — turn this option off; otherwise leave it on.",
+          "shortTitle" : "Judge readings by sequential raw-key order"
+        },
+        "ja" : {
+          "description" : "この項目は、中英混在入力モードが「入力列が一つの読みであるか」をどう判定するかを決めます。上の「中英混在入力のフォールバックを有効化」を先に有効にしないと機能しません。既定では有効です。\n- 有効時：判定の基準は「キーの打鍵順による生のキー入力列」です。動的な注音配列（大千26、倚天26、許氏、星光、劉氏など）の正規の入力列は、キーをまたいでスロット値を書き換える仕様であるため（例：大千26 の `qquu`＝ㄅㄚ）、その区間が実際に打てる読みであるかは注音エンジン側で判定します。静的な注音配列では従来どおり「キー数 == 占有スロット数」の計数式を用い、冗長キーを「ASCII 接頭辞 ＋ 注音接尾辞」の境界として扱います。\n- 無効時（旧仕様の判定に戻ります）、結果は二つあります：①英字 2 文字の短いトークン（`ls`／`ln`／`lc`／`mv` など）は英文意図と見なされなくなり、再び注音として吸収されます（空白キーでの確定時、その読みの候補字が組まれ、`ls ` は確定されません）。②動的な注音配列はエンジン側の判定を行わなくなります——大千26 は符号長が不定のためこの判定の対象外であり、その正規の多重書き換え入力は単一の読みとして吸収されなくなります（`qquu` のような入力は ASCII バッファに残り、空白キーで `qquu ` として確定されます）。その他の動的配列は「キー数 == 占有スロット数」で判定します（倚天26 の `ge`＝ㄐㄧ は従来どおり）。\n- 声母と韻母の同時打鍵など、注音を厳密な順序で打たなくてもよい挙動を中英混在入力で維持したい場合は、本項目を無効にしてください。そうでなければ有効のままを推奨します。",
+          "shortTitle" : "キーの打鍵順による読み判定を有効化"
+        },
+        "zh-Hans" : {
+          "description" : "该选项决定中英混打模式如何判定「整段输入是否为一个读音」，需先启用上方的「启用中英混合输入回退」才有作用；本选项默认启用。\n- 启用时：判准为「依槽序键入之原始按键序」。动态注音排列（大千26、倚天26、许氏、星光、刘氏等）的合法编码本即跨键改写槽值（如大千26 之 `qquu`＝ㄅㄚ），故委由注拼引擎判定该段是否为一个打得出来的读音；静态注音排列则维持「键数 == 占用槽数」之计数式，其中冗余键即「ASCII 前缀 ＋ 注音后缀」之分界。\n- 停用后（回到旧制之判定），后果有二：①纯英文字母之短令牌（如 `ls`／`ln`／`lc`／`mv`）不再被视为英文意图，而会重新被当作注音吸收（于空格键确认时组出该读音之候选字，而非递交 `ls `）。②动态注音排列不再委由引擎层判定——大千26 因码长不定而不适用该检定，故其合法多写编码不再被吸收为单一读音（`qquu` 这类内容会留在 ASCII 缓冲、于按下空格键时以 `qquu ` 递交）；其余动态排列改以「键数 == 占用槽数」判定（倚天26 之 `ge`＝ㄐㄧ 仍如常）。\n- 若您希望在中英混打时维持声韵并击等「不需要严格按照顺序敲注音」的特性的话，请停用本选项；否则请维持启用。",
+          "shortTitle" : "依槽序键入判定读音"
+        },
+        "zh-Hant" : {
+          "description" : "該選項決定中英混打模式如何判定「整段輸入是否為一個讀音」，需先啟用上方的「啟用中英混合輸入回退」才有作用；本選項預設啟用。\n- 啟用時：判準為「依槽序鍵入之原始按鍵序」。動態注音排列（大千26、倚天26、許氏、星光、劉氏等）之合法編碼本即跨鍵改寫槽值（如大千26 之 `qquu`＝ㄅㄚ），故委由注拼引擎判定該段是否為一個打得出來的讀音；靜態注音排列則維持「鍵數 == 佔用槽數」之計數式，其中冗餘鍵即「ASCII 前綴 ＋ 注音後綴」之分界。\n- 停用後（回到舊制之判定），後果有二：①純英文字母之短令牌（如 `ls`／`ln`／`lc`／`mv`）不再被視為英文意圖，而會重新被當作注音吸收（於空白鍵確認時組出該讀音之候選字，而非遞交 `ls `）。②動態注音排列不再委由引擎層判定——大千26 因碼長不定而不適用該檢定，故其合法多寫編碼不再被吸收為單一讀音（`qquu` 這類內容會留在 ASCII 緩衝、於按下空白鍵時以 `qquu ` 遞交）；其餘動態排列改以「鍵數 == 佔用槽數」判定（倚天26 之 `ge`＝ㄐㄧ 仍如常）。\n- 若您希望在中英混打時維持聲韻並擊等「不需要嚴格按照順序敲注音」的特性的話，請停用本選項；否則請維持啟用。",
+          "shortTitle" : "依槽序鍵入判定讀音"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "MixedAlnumJudgeReadingsBySequentialRawKeyOrder",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kEnableLatchedAlnumStateInMixedAlnumMode",
+      "labels" : {
+        "en" : {
+          "description" : "This option takes effect only when \"Enable mixed Chinese-English typing fallback\" is on, and it is off by default.\n- Once enabled: the mixed-alphanumerical mode latches its verdict on alphanumerical content. As soon as a run is judged to be English, that run is committed at once and the verdict is pinned; every subsequent printable ASCII character is committed to the input client immediately instead of accumulating inside the input method, until you press a release key. This makes typing a long English run feel closer to a plain alphanumerical input mode, without confirming it piece by piece.\n- Release keys: Enter (releases and then passes through, not intercepted), BackSpace, Delete, Esc, and Option+BackSpace. The input method shows a floating hint for about 1.5 seconds on both latching and releasing. Please note in particular: BackSpace, Delete and Esc only release the latch — they do not send or delete any character, because what you typed earlier has already been committed and the input method cannot take it back. In other words, these keys cannot \"undo\" the English you just typed.\n- Keys that do not release the latch: the Space bar (while latched, it commits a half-width space immediately), the Tab key and the arrow keys (while the composition buffer is empty, these keys are passed straight through to the input client).\n- The latch is released automatically, without any notification, when you toggle the alphanumerical mode (Shift, CapsLock, or the JIS Eisu key), when you switch to another input client, or when the input method is reactivated.\n- Please note: this option does not switch vChewing into an alphanumerical input mode. vChewing stays in Chinese typing mode; only the verdict of its mixed-typing judgement is latched. Also, the latch applies to English only — there is no such state as \"latched to Chinese\". The first few keystrokes, before a verdict is reached, still go through the per-keystroke judgement as before. If you cannot clearly perceive the difference that a latched verdict makes, leaving this option off is recommended.",
+          "shortTitle" : "Enable latched alphanumerical state in mixed alphanumerical mode"
+        },
+        "ja" : {
+          "description" : "この項目は「中英混在入力のフォールバックを有効化」がオンの場合にのみ機能し、既定ではオフです。\n- オンにすると：中英混在モードの英数内容に対する判定結果がラッチされます。英文と判定された時点で、その区切りは直ちにコミットされ、判定結果が固定されます。以降、打鍵した印字可能な ASCII 文字は一文字ずつ直ちにクライアントへコミットされ、解除キーを押すまで入力法内に蓄積されません。これにより「英文をまとめて一気に入力する」体験が英数入力モードに近くなり、逐次確認が不要になります。\n- 解除キー：Enter（解除後に通過させます。傍受しません）、BackSpace、Delete、Esc、Option+BackSpace。ラッチの開始時と解除時に、それぞれ約 1.5 秒のフローティング通知が表示されます（組字バッファを占有しないため、連続打鍵中でも見えます）。ご注意：BackSpace・Delete・Esc はラッチを解除するだけであって、文字を送信も削除もしません。先に打った英数内容はすでにコミット済みで、入力法側から取り消せないためです。つまりこれらのキーで「今打った英文を撤回」することはできません。\n- ラッチを解除しないキー：スペースキー（ラッチ中は半角スペースを即座にコミットします）、Tab キーと方向キー（組字バッファが空のとき、これらのキーはそのままクライアントへ通過します）。\n- 次の場合はラッチが自動的に解除されます（通知は出ません）：英数モードの切替（Shift キー・CapsLock キー・JIS 英数キー）、別の入力クライアントへの切替、入力法の再有効化。\n- ご注意：この項目は唯音を英数入力モードに切り替えるものではありません。唯音は中文入力モードのままで、中英混在の判定結果が固定されるだけです。また、ラッチは英文にのみ作用し、「中文にラッチされる」状態は存在しません。判定が確定するまでの最初の数打鍵は、従来どおり打鍵ごとの判定になります。「判定結果が固定される」違いをはっきり感じられない場合は、オフのままを推奨します。",
+          "shortTitle" : "中英混在モードで英数のラッチ状態を有効化"
+        },
+        "zh-Hans" : {
+          "description" : "本选项仅在「启用中英混合输入回退」已开启时才有作用，且默认为关闭。\n- 启用后：中英混打模式对英数内容的判定结果会被「闩滞」住：一旦判定落定为英文，该段即立刻递交并固定判定结果，其后敲出的每一颗可打印 ASCII 字符都会立刻递交给当前的输入客体，不再累积在输入法内等待确认，直到您按下解除键为止；这让「一次打一整串英文」的体验接近英数输入模式，而不需逐段确认。\n- 解除键：Enter（解除后放行，不作拦截）、BackSpace、Delete、Esc、Option+BackSpace；进入与解除闩滞时各会显示一则约一秒半的浮动提示（不占用内文组字区，故连续打字时仍看得见）。请特别留意：BackSpace、Delete 与 Esc 只会解除闩滞，并不会送出或删除任何字符——先前的英数内容早已递交出去，输入法无从回收，故这些键并不能「撤销」您刚打的英文。\n- 不会解除闩滞的按键：键盘空白键（闩滞于英打时会即刻递交一个半角空格）、Tab 键与方向键（组字缓冲区为空时会直接放行给输入客体）。\n- 以下情形会自动解除闩滞、不另发提示：切换中英数模式（Shift 键、CapsLock 键、或 JIS 英数键）、切换到另一个输入客体、或输入法被重新启用。\n- 请注意：本选项并不是把唯音切换成英数模式——唯音仍处于中文打字模式，只是中英混打的判定结果被固定住了而已。另外，「闩滞」只作用于英文，不存在「闩滞于中文」的状态；而在判定落定之前的最初几颗按键，仍会走原有的逐键判定。若您感受不到「判定结果被固定」所带来的差别，建议维持关闭本选项。",
+          "shortTitle" : "启用中英混打模式的英数闩滞状态"
+        },
+        "zh-Hant" : {
+          "description" : "本選項僅在「啟用中英混合輸入回退」已開啟時才有作用，且預設為關閉。\n- 啟用後：中英混打模式對英數內容的判定結果會被「閂滯」住：一旦判定落定為英文，該段即立刻遞交並固定判定結果，其後敲出的每一顆可列印 ASCII 字元都會立刻遞交給當前的輸入客體，不再累積在輸入法內等待確認，直到您按下解除鍵為止；這讓「一次打一整串英文」的體驗接近英數輸入模式，而不需逐段確認。\n- 解除鍵：Enter（解除後放行，不作攔截）、BackSpace、Delete、Esc、Option+BackSpace；進入與解除閂滯時各會顯示一則約一秒半的浮動提示（不佔用內文組字區，故連續打字時仍看得見）。請特別留意：BackSpace、Delete 與 Esc 只會解除閂滯，並不會送出或刪除任何字元——先前的英數內容早已遞交出去，輸入法無從回收，故這些鍵並不能「撤銷」您剛打的英文。\n- 不會解除閂滯的按鍵：鍵盤空白鍵（閂滯於英打時會即刻遞交一個半形空格）、Tab 鍵與方向鍵（組字緩衝區為空時會直接放行給輸入客體）。\n- 以下情形會自動解除閂滯、不另發提示：切換中英數模式（Shift 鍵、CapsLock 鍵、或 JIS 英數鍵）、切換到另一個輸入客體、或輸入法被重新啟用。\n- 請注意：本選項並不是把唯音切換成英數模式——唯音仍處於中文打字模式，只是中英混打的判定結果被固定住了而已。另外，「閂滯」只作用於英文，不存在「閂滯於中文」的狀態；而在判定落定之前的最初幾顆按鍵，仍會走原有的逐鍵判定。若您感受不到「判定結果被固定」所帶來的差別，建議維持關閉本選項。",
+          "shortTitle" : "啟用中英混打模式的英數閂滯狀態"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "EnableLatchedAlnumStateInMixedAlnumMode",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kFuriousTypingEnabled",
+      "labels" : {
+        "en" : {
+          "description" : "This mode accommodates users accustomed to the continuous sentence-composing style of Sogou Pinyin or ChineseStar's 智能狂拼 (Furious Pinyin). Only takes effect with pinyin keyboards (any pinyin layout); cassette mode, SCPC (select-candidate-per-character) mode, and the code-point \/ Hanin keyboard symbol \/ Roman-numeral input methods are excluded. When enabled, you can type pinyin continuously without confirming each syllable with a tone key or the space bar. Pending pinyin is assembled into a whole-sentence guess by the language model and previewed inline, with the tail candidate window shown alongside — press Shift + a selection key to choose in place; while previewing, the raw letters are shown in a tooltip (automatically suppressed while the candidate window is visible, to avoid overlap). During the furious preview, pressing the space bar inserts the current reading into the composing buffer (and no longer rotates candidates); while a reading is still pending, pressing Enter likewise only solidifies the current reading (or confirms the highlighted candidate) and stays in the composing state — press Enter again once the buffer is empty to commit the whole sentence.",
+          "shortTitle" : "Enable Furious Typing mode (continuous pinyin)"
+        },
+        "ja" : {
+          "description" : "この機能は「智能狂弁入力 & Sogou入力」のような連続組句入力に慣れたユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。狂拼プレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補のローテーションは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。",
+          "shortTitle" : "狂拼モードを有効化（連続弁音入力）"
+        },
+        "zh-Hans" : {
+          "description" : "本开关是为了方便习惯「智能狂拼（ChineseStar）」或「搜狗拼音（Sogou）」连续组句输入的用户。仅对拼音输入（任一拼音排列）生效，对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续敲击拼音字母即可组句，无需逐音节敲声调或空格键确认。注拼槽内尚未完成的拼音会以语言模型试算整句、即时预览于组字区，尾段候选窗亦同步显示，可循「Shift+选字键」就地选字；预览期间原始拼音改以提示框显示（候选窗显示时自动让位、避免重叠）。狂拼预览中按空格会将当前读音插入组字器（不再兼任候选轮替）；注拼槽尚有未完成拼音时按 Enter 亦仅固化当前读音（或就地确认高亮候选）并停留于组字状态，待注拼槽清空后再按 Enter 才递交整句。",
+          "shortTitle" : "启用狂拼模式（连续拼音打字）"
+        },
+        "zh-Hant" : {
+          "description" : "本開關是為了方便習慣「智能狂拼（ChineseStar）」或「搜狗拼音（Sogou）」連續組句輸入的使用者。僅對拼音輸入（任一拼音排列）生效，對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續敲擊拼音字母即可組句，無需逐音節敲聲調或空格鍵確認。注拼槽內尚未完成的拼音會以語言模型試算整句、即時預覽於組字區，尾段候選窗亦同步顯示，可循「Shift+選字鍵」就地選字；預覽期間原始拼音改以提示框顯示（候選窗顯示時自動讓位、避免重疊）。狂拼預覽中按空格會將當前讀音插入組字器（不再兼任候選輪替）；注拼槽尚有未完成拼音時按 Enter 亦僅固化當前讀音（或就地確認高亮候選）並停留於組字狀態，待注拼槽清空後再按 Enter 才遞交整句。",
+          "shortTitle" : "啟用狂拼模式（連續拼音打字）"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "FuriousTypingEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kCNS11643Enabled",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Enable CNS+GBEX Mode Support (2026-08-10)"
+        },
+        "ja" : {
+          "shortTitle" : "CNS+GBEXモード支援を有効にする (2026-08-10)"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "启用 CNS+GBEX 模式支援 (2026-08-10)"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "啟用 CNS+GBEX 模式支援 (2026-08-10)"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CNS11643Enabled",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSymbolInputEnabled",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Enable symbol input support (incl. certain emoji symbols)"
+        },
+        "ja" : {
+          "shortTitle" : "僅かなる絵文字も含む符号入力サポートを起用"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "启用包括少许绘文字在内的符号输入支援"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "啟用包括少許繪文字在內的符號輸入支援"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "SymbolInputEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSuppressFactoryUnigramsOfKanaSyllables",
+      "labels" : {
+        "en" : {
+          "description" : "By turning this toggle ON, the factory lexicon will stop supplying the data of Kana Syllables. Some people may want to turn this on to avoid disruptive experiences while using mixed Chinese-English typing fallback.",
+          "shortTitle" : "Suppress factory kana syllable data"
+        },
+        "ja" : {
+          "description" : "このスイッチをオンにすると、内蔵辞書は仮名音節データを供給しなくなります。中英混在入力フォールバック中に仮名候補が邪魔だと感じる場合は、この設定を有効にしてください。",
+          "shortTitle" : "内蔵辞書の仮名音節データを無効化"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，原厂辞典将不再供应假名音节资料。若您在使用中英混输回退时觉得假名候选干扰体验，可考虑开启这个选项。",
+          "shortTitle" : "停用原厂假名音节资料"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，原廠辭典將不再供應假名音節資料。若您在使用中英混輸回退時覺得假名候選干擾體驗，可考慮開啟這個選項。",
+          "shortTitle" : "停用原廠假名音節資料"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "SuppressFactoryUnigramsOfKanaSyllables",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kCurrencyNumeralsEnabled",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Enable currency numerals output"
+        },
+        "ja" : {
+          "shortTitle" : "貨幣数字の出力を起用する"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "启用货币数字输出"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "啟用貨幣數字輸出"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CurrencyNumeralsEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kHalfWidthPunctuationEnabled",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Enable half-width punctuations"
+        },
+        "ja" : {
+          "shortTitle" : "半角句読点を起用する"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "启用半形标点"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "啟用半形標點"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "HalfWidthPunctuationEnable",
+      "type" : "bool"
+    },
+    {
+      "default" : 1,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kCursorPlacementAfterSelectingCandidate",
+      "labels" : {
+        "en" : {
+          "description" : "This defines the cursor position after a candidate is confirmed through the candidate window. Note that the Pre-Candidate-Window Cursor Position is the cursor position snapshotted right before the candidate window shows up. If you choose to let it move a step front, the step length may vary, depending on your preferred candidate cursor selection style.",
+          "shortTitle" : "Post-Candidate Cursor Position:"
+        },
+        "ja" : {
+          "description" : "候補陳列ウィンドウで候補を確定した後のカーソル位置を指定します。なお、「候補陳列ウィンドウ呼び出し前のカーソル位置」とは、候補陳列ウィンドウが表示される直前に記録されたカーソル位置を意味します。前方へ一歩進める設定を選んだ場合、その歩幅はお好みのカーソル候補呼出操作スタイルによって変わる場合がございます。",
+          "shortTitle" : "候補確定後のカーソル位置:"
+        },
+        "zh-Hans" : {
+          "description" : "此设定用来指定候选字在选字窗内被确认后，游标应该位于何处。请注意，「呼出选字窗之前的游标位置」指的是选字窗出现前所记录的游标位置。如果选择向前推进一格，实际推进的距离会因您偏好的选字游标操作样式而有所不同。",
+          "shortTitle" : "候选字确认后的游标位置:"
+        },
+        "zh-Hant" : {
+          "description" : "此設定用來指定候選字在選字窗內被確認後，游標應該位於何處。請注意，「呼出選字窗之前的游標位置」指的是選字窗出現前所記錄的游標位置。如果選擇向前推進一格，實際推進的距離會因您偏好的選字游標操作樣式而有所不同。",
+          "shortTitle" : "候選字確認後的游標位置:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0",
+          "labels" : {
+            "en" : "No Adjustments",
+            "ja" : "調整しない",
+            "zh-Hans" : "不调整",
+            "zh-Hant" : "不調整"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1",
+          "labels" : {
+            "en" : "A Step Front",
+            "ja" : "前へ一歩進める",
+            "zh-Hans" : "向前推进一格",
+            "zh-Hant" : "向前推進一格"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2",
+          "labels" : {
+            "en" : "Restore Pre-Candidate-Window Cursor Position",
+            "ja" : "候補陳列ウィンドウ呼び出し前のカーソル位置に戻す",
+            "zh-Hans" : "复原呼出选字窗之前的游标位置",
+            "zh-Hant" : "復原呼出選字窗之前的游標位置"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "CursorBehaviorAfterConfirmingCandidate",
+      "type" : "integer"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDodgeInvalidEdgeCandidateCursorPosition",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Dodge Invalid Edge Candidate Cursor Position"
+        },
+        "ja" : {
+          "shortTitle" : "端末での不合理的な候補選択用カーソル位置を是正"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "纠正不合理的端点选字游标位置"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "糾正不合理的端點選字游標位置"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "DodgeInvalidEdgeCandidateCursorPosition",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kEscToCleanInputBuffer",
+      "labels" : {
+        "en" : {
+          "description" : "If unchecked, the ESC key will try cleaning the unfinished readings \/ strokes first, and will commit the current composition buffer if there's no unfinished readings \/ strokes.",
+          "shortTitle" : "Use ESC key to clear the entire input buffer"
+        },
+        "ja" : {
+          "description" : "未チェックの場合、ESC キーはまず未完成の音読\/筆画を消す。\n未完成の音読\/筆画がない場合、全緩衝列をそのまま送り出す。",
+          "shortTitle" : "ESC キーで入力緩衝列を消す"
+        },
+        "zh-Hans" : {
+          "description" : "若取消勾选，则 ESC 键会先尝试清除未组成的读音\/字根；\n如果没有未组成的读音\/字根的话，则会递交当前组字区的内容。",
+          "shortTitle" : "敲 ESC 键以清空整个组字缓冲区"
+        },
+        "zh-Hant" : {
+          "description" : "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音\/字根；\n如果沒有未組成的讀音\/字根的話，則會遞交當前組字區的內容。",
+          "shortTitle" : "敲 ESC 鍵以清空整個組字緩衝區"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "EscToCleanInputBuffer",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAcceptLeadingIntonations",
+      "labels" : {
+        "en" : {
+          "description" : "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled).",
+          "shortTitle" : "Accept leading intonations in rare cases"
+        },
+        "ja" : {
+          "description" : "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。中英混在入力のフォール バックが有効な場合、この設定は無視されます——中英混在入力のフォール バックは常に音調前置入力を受け付けません。",
+          "shortTitle" : "まれな場合には、音調記号の優先入力を許容する"
+        },
+        "zh-Hans" : {
+          "description" : "声调键是专门用来确认注音组合输入的，从常理上来讲只能在最后键入。然而，总是有人会失手将声调键前置键入。该防呆功能专门应对这种情形，但无法用于拼音输入模式，且其优先权比「以声调键覆写游标身后的汉字的声调」更低（除非后者被停用）。在启用中英混合输入回退时，该设定会被无视——中英混合输入回退永远不会接受声调前置键入。",
+          "shortTitle" : "在个别情况下，允许声调前置键入"
+        },
+        "zh-Hant" : {
+          "description" : "聲調鍵是專門用來確認注音組合輸入的，從常理上來講只能在最後鍵入。然而，總是有人會失手將聲調鍵前置鍵入。該防呆功能專門應對這種情形，但無法用於拼音輸入模式，且其優先權比「以聲調鍵覆寫游標身後的漢字的聲調」更低（除非後者被停用）。在啟用中英混合輸入回退時，該設定會被無視——中英混合輸入回退永遠不會接受聲調前置鍵入。",
+          "shortTitle" : "在個別情況下，允許聲調前置鍵入"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AcceptLeadingIntonations",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifyIntonationKeyBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "Specify the behavior of intonation key when syllable composer is empty.",
+          "shortTitle" : "Intonation Key:"
+        },
+        "ja" : {
+          "description" : "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。中英混在入力のフォール バックが有効な場合、この設定は無視されます——中英混在入力のフォール バックは常に前置数字を音調キーとして扱いません。",
+          "shortTitle" : "音調キー:"
+        },
+        "zh-Hans" : {
+          "description" : "指定声调键（在注拼槽为「空」状态时）的行为。在启用中英混合输入回退时，该设定会被无视——中英混合输入回退永远不会将前置数字视为声调键。",
+          "shortTitle" : "声调键:"
+        },
+        "zh-Hant" : {
+          "description" : "指定聲調鍵（在注拼槽為「空」狀態時）的行為。在啟用中英混合輸入回退時，該設定會被無視——中英混合輸入回退永遠不會將前置數字視為聲調鍵。",
+          "shortTitle" : "聲調鍵:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0",
+          "labels" : {
+            "en" : "Override the previous reading's intonation with candidate-reset",
+            "ja" : "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す",
+            "zh-Hans" : "尝试对游标正后方的字音覆写声调，且重设其选字状态",
+            "zh-Hant" : "嘗試對游標正後方的字音覆寫聲調，且重設其選字狀態"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1",
+          "labels" : {
+            "en" : "Only override the intonation of the previous reading if different",
+            "ja" : "カーソルの後部の音読みの異なる音調だけを上書きする",
+            "zh-Hans" : "仅在键入的声调与游标正后方的字音不同时，尝试覆写",
+            "zh-Hant" : "僅在鍵入的聲調與游標正後方的字音不同時，嘗試覆寫"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2",
+          "labels" : {
+            "en" : "Always type intonations to the inline composition buffer",
+            "ja" : "常に入力緩衝列に音調を入力する",
+            "zh-Hans" : "始终在内文组字区内键入声调符号",
+            "zh-Hant" : "始終在內文組字區內鍵入聲調符號"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "SpecifyIntonationKeyBehavior",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSuppressTooltipForIntonationKeyOverrideEvents",
+      "labels" : {
+        "en" : {
+          "description" : "By turning this toggle ON, the IME will no longer show the tooltip when an intonation key overrides the tone of the previous reading in the compositor. Some people may want to turn this on to avoid disruptive experiences while typing.",
+          "shortTitle" : "Suppress the tooltip when overriding the previous reading's tone"
+        },
+        "ja" : {
+          "description" : "このスイッチをオンにすると、音調キーで後ろ側の漢字の音調を書き直した時にツールチップが表示されなくなります。入力中にツールチップが邪魔だと感じる場合は、この設定を有効にしてください。",
+          "shortTitle" : "後ろ側の漢字の音調を書き直した時のツールチップを表示しない"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，以声调键覆写游标身后的汉字的音调时，将不再显示内文提示。若您觉得该提示干扰工作心流，可考虑开启这个选项。",
+          "shortTitle" : "停用「已覆写游标身后的汉字的音调」内文提示"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，以聲調鍵覆寫游標身後的漢字的音調時，將不再顯示內文提示。若您覺得該提示干擾工作心流，可考慮開啟這個選項。",
+          "shortTitle" : "停用「已覆寫游標身後的漢字的音調」內文提示"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "SuppressTooltipForIntonationKeyOverrideEvents",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifyShiftBackSpaceKeyBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "Disassembling process does not work with non-phonetic reading keys.",
+          "shortTitle" : "Shift+BackSpace:"
+        },
+        "ja" : {
+          "description" : "実の意味の音読みだけを解くことができる。",
+          "shortTitle" : "Shift+BackSpace:"
+        },
+        "zh-Hans" : {
+          "description" : "析构行为仅针对组字器内「身为汉字读音」的读音索引单元有效。",
+          "shortTitle" : "Shift+退格键:"
+        },
+        "zh-Hant" : {
+          "description" : "析構行為僅針對組字器內「身為漢字讀音」的讀音索引單元有效。",
+          "shortTitle" : "Shift+退格鍵:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.0",
+          "labels" : {
+            "en" : "Disassemble the previous reading, dropping its intonation",
+            "ja" : "カーソルの後部の音読みを解き、その音調を除く",
+            "zh-Hans" : "析构游标正后方的字音，且剔除其声调",
+            "zh-Hant" : "析構游標正後方的字音，且剔除其聲調"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1",
+          "labels" : {
+            "en" : "Clear the entire inline composition buffer like Shift+Delete",
+            "ja" : "Shift+Delete のように入力緩衝列を消す",
+            "zh-Hans" : "像 Shift+Delete 那样清空当前组字区内容",
+            "zh-Hant" : "像 Shift+Delete 那樣清空當前組字區內容"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2",
+          "labels" : {
+            "en" : "Always drop the previous reading",
+            "ja" : "カーソルの後部の音読みを常に削除する",
+            "zh-Hans" : "始终剔除游标正后方的字音",
+            "zh-Hant" : "始終剔除游標正後方的字音"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "SpecifyShiftBackSpaceKeyBehavior",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifyShiftTabKeyBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the behavior of (Shift+)Tab key in the candidate window.",
+          "shortTitle" : "(Shift+)Tab:"
+        },
+        "ja" : {
+          "description" : "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。",
+          "shortTitle" : "(Shift+)Tab:"
+        },
+        "zh-Hans" : {
+          "description" : "指定 (Shift+)Tab 在选字窗内的轮替操作对象。",
+          "shortTitle" : "(Shift+)Tab:"
+        },
+        "zh-Hant" : {
+          "description" : "指定 (Shift+)Tab 在選字窗內的輪替操作對象。",
+          "shortTitle" : "(Shift+)Tab:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.0",
+          "labels" : {
+            "en" : "for revolving candidates",
+            "ja" : "候補文字そのもの",
+            "zh-Hans" : "轮替候选字",
+            "zh-Hant" : "輪替候選字"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1",
+          "labels" : {
+            "en" : "for revolving pages",
+            "ja" : "候補陳列ページ",
+            "zh-Hans" : "轮替页面",
+            "zh-Hant" : "輪替頁面"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : null,
+      "rawValue" : "SpecifyShiftTabKeyBehavior",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifyShiftSpaceKeyBehavior4CandidateWindow",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the behavior of (Shift+)Space key with candidates.\nNote: In Per-Char Select Mode (SCPC), Space without Shift always revolves pages regardless of this setting.\nNote: When \"Use Space to confirm highlighted candidate in Per-Char Select Mode\" is enabled, it takes priority over this setting.\nNote: This setting only affects the candidate window; for the width of Shift+Space when the compositor is empty, see \"Shift+Space (Empty Compositor)\" above.",
+          "shortTitle" : "(Shift+)Space (Candidates):"
+        },
+        "ja" : {
+          "description" : "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※全候補入力モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。\n※この設定は候補陳列ウィンドウ内にのみ有効です。入力緩衝列が空の時の Shift+Space キーの幅は、上の「Shift+Space (入力緩衝列が空の時)」をご参照ください。",
+          "shortTitle" : "(Shift+)Space (入力候補):"
+        },
+        "zh-Hans" : {
+          "description" : "指定 (Shift+)空格键 对候选字词而言的轮替操作对象。\n※在逐字选字模式（SCPC）下，无论此设定如何，不带 Shift 的空格键始终用于翻页。\n※若启用了「在逐字选字模式当中使用空格键确认当前高亮候选字」，则该设定优先于此项。\n※此设定仅对选字窗生效；组字区为空时的 Shift+空格键宽度见上方的「Shift+空格键 (组字区为空时)」。",
+          "shortTitle" : "(Shift+)空格键 (选字窗):"
+        },
+        "zh-Hant" : {
+          "description" : "指定 (Shift+)空格鍵 對候選字詞而言的輪替操作對象。\n※在逐字選字模式（SCPC）下，無論此設定如何，不帶 Shift 的空格鍵始終用於翻頁。\n※若啟用了「在逐字選字模式當中使用空格鍵確認當前高亮候選字」，則該設定優先於此項。\n※此設定僅對選字窗生效；組字區為空時的 Shift+空格鍵寬度見上方的「Shift+空格鍵 (組字區為空時)」。",
+          "shortTitle" : "(Shift+)空格鍵 (選字窗):"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0",
+          "labels" : {
+            "en" : "Space to +revolve candidates, Shift+Space to +revolve pages",
+            "ja" : "Shift+Space で次のページ、Space で次の候補文字を",
+            "zh-Hans" : "Shift+空格键 换下一页，空格键 换选下一个候选字",
+            "zh-Hant" : "Shift+空格鍵 換下一頁，空格鍵 換選下一個候選字"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1",
+          "labels" : {
+            "en" : "Space to +revolve pages, Shift+Space to +revolve candidates",
+            "ja" : "Space で次のページ、Shift+Space で次の候補文字を",
+            "zh-Hans" : "空格键 换下一页，Shift+空格键 换选下一个候选字",
+            "zh-Hant" : "空格鍵 換下一頁，Shift+空格鍵 換選下一個候選字"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : null,
+      "rawValue" : "SpecifyShiftSpaceKeyBehavior4CandidateWindow",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifyShiftSpaceKeyBehavior4EmptyState",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the width of the space character inserted by Shift+Space when the compositor is empty.\nNote: This setting only affects ordinary typing; for the (Shift+)Space behavior inside the candidate window, see \"(Shift+)Space (Candidates)\" below.\nNote: Space without Shift always inserts a half-width space, regardless of this setting.",
+          "shortTitle" : "Shift+Space (Empty Compositor):"
+        },
+        "ja" : {
+          "description" : "入力緩衝列が空の時に Shift+Space キーで挿入される空白の幅を指定します。\n※この設定は通常の入力にのみ有効です。候補陳列ウィンドウ内の (Shift+)Space キーの挙動は、下の「(Shift+)Space (入力候補)」をご参照ください。\n※Shift を押さない Space キーは、この設定に関わらず常に半角空白を挿入します。",
+          "shortTitle" : "Shift+Space (入力緩衝列が空の時):"
+        },
+        "zh-Hans" : {
+          "description" : "指定在组字区为空时敲 Shift+空格键时所插入的空格宽度。\n※此设定仅对一般打字生效；选字窗内的 (Shift+)空格键行为见下方的「(Shift+)空格键 (选字窗)」。\n※不带 Shift 的空格键一律插入半形空格，不受此设定影响。",
+          "shortTitle" : "Shift+空格键 (组字区为空时):"
+        },
+        "zh-Hant" : {
+          "description" : "指定在組字區為空時敲 Shift+空格鍵時所插入的空格寬度。\n※此設定僅對一般打字生效；選字窗內的 (Shift+)空格鍵行為見下方的「(Shift+)空格鍵 (選字窗)」。\n※不帶 Shift 的空格鍵一律插入半形空格，不受此設定影響。",
+          "shortTitle" : "Shift+空格鍵 (組字區為空時):"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.0",
+          "labels" : {
+            "en" : "Insert a full-width space",
+            "ja" : "全角空白を挿入",
+            "zh-Hans" : "插入全形空格",
+            "zh-Hant" : "插入全形空格"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4EmptyState.option.1",
+          "labels" : {
+            "en" : "Insert a half-width space",
+            "ja" : "半角空白を挿入",
+            "zh-Hans" : "插入半形空格",
+            "zh-Hant" : "插入半形空格"
+          },
+          "value" : 1
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : null,
+      "rawValue" : "SpecifyShiftSpaceKeyBehavior4EmptyState",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kSpecifyCmdOptCtrlEnterBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities. Using ButKo BPMFVS \/ Braille ASCII also requires a standards-compliant font to be installed on this computer; otherwise, the related information may not display correctly.",
+          "shortTitle" : "Command+Option+Ctrl+Enter:"
+        },
+        "ja" : {
+          "description" : "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。「ButKo BPMFVS」或いは「点字 ASCII」機能を利用するには、このコンピュータに規格準拠の専用フォントがインストールされている必要があります。そうでない場合、関連情報が正しく表示されないことがあります。",
+          "shortTitle" : "Command+Option+Ctrl+Enter:"
+        },
+        "zh-Hans" : {
+          "description" : "在磁带模式下，该热键组合将不再递交点字阵列（届时会改为递交括弧注解标记）。如另有对点字\/盲文功能的更专业的需求的话，请考虑使用专门的点字\/盲文工具软体。如需使用「ButKo BPMFVS」或「点字 \/ 盲文 ASCII」功能，目前电脑另须安装符合相关标准的专用字型，方可确保相关资讯得以正常显示。",
+          "shortTitle" : "Command+Option+Ctrl+Enter:"
+        },
+        "zh-Hant" : {
+          "description" : "在磁帶模式下，該熱鍵組合將不再遞交點字陣列（屆時會改為遞交括弧註解標記）。如另有對點字\/盲文功能的更專業的需求的話，請考慮使用專門的點字\/盲文工具軟體。若要使用「ButKo BPMFVS」或「點字 \/ 盲文 ASCII」功能，目前電腦另須安裝符合相關標準的專用字型，方可確保相關資訊得以正常顯示。",
+          "shortTitle" : "Command+Option+Ctrl+Enter:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0",
+          "labels" : {
+            "en" : "Commit Bracketed Annotation",
+            "ja" : "発音表記（丸括弧仕様）を送出",
+            "zh-Hans" : "递交括弧注解标记",
+            "zh-Hant" : "遞交括弧註解標記"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1",
+          "labels" : {
+            "en" : "Commit HTML Ruby Annotation",
+            "ja" : "発音表記（HTML ルビ仕様）を送出",
+            "zh-Hans" : "递交 HTML Ruby 注解标记",
+            "zh-Hant" : "遞交 HTML Ruby 註解標記"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2",
+          "labels" : {
+            "en" : "Commit Mandarin Braille (1947)",
+            "ja" : "中国語点字 (1947) を送出",
+            "zh-Hans" : "递交国语点字 (1947)",
+            "zh-Hant" : "遞交國語點字 (1947)"
+          },
+          "value" : 2
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3",
+          "labels" : {
+            "en" : "Commit Mandarin Braille (GF0019-2018)",
+            "ja" : "中国語点字 (GF0019-2018) を送出",
+            "zh-Hans" : "递交国通盲文 (GF0019-2018)",
+            "zh-Hant" : "遞交國通盲文 (GF0019-2018)"
+          },
+          "value" : 3
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4",
+          "labels" : {
+            "en" : "Commit ButKo BPMFVS Annotation",
+            "ja" : "ButKo BPMFVS 注音表記を送出",
+            "zh-Hans" : "递交 ButKo BPMFVS 注音标记",
+            "zh-Hant" : "遞交 ButKo BPMFVS 注音標記"
+          },
+          "value" : 4
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.5",
+          "labels" : {
+            "en" : "Commit Mandarin Braille ASCII (1947)",
+            "ja" : "中国語点字 ASCII (1947) を送出",
+            "zh-Hans" : "递交国语点字 ASCII (1947)",
+            "zh-Hant" : "遞交國語點字 ASCII (1947)"
+          },
+          "value" : 5
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.6",
+          "labels" : {
+            "en" : "Commit Mandarin Braille ASCII (GF0019-2018)",
+            "ja" : "中国語点字 ASCII (GF0019-2018) を送出",
+            "zh-Hans" : "递交国通盲文 ASCII (GF0019-2018)",
+            "zh-Hant" : "遞交國通盲文 ASCII (GF0019-2018)"
+          },
+          "value" : 6
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        6
+      ],
+      "rawValue" : "SpecifyCmdOptCtrlEnterBehavior",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kReflectBPMFVSInCompositionBuffer",
+      "labels" : {
+        "en" : {
+          "description" : "Only takes effect when Command+Option+Ctrl+Enter is set to commit ButKo BPMFVS annotation. When enabled, the composition buffer and candidate preview show the projected ButKo BPMFVS form so the visible glyphs stay aligned with the special-commit result.",
+          "shortTitle" : "Reflect ButKo BPMFVS in composition buffer"
+        },
+        "ja" : {
+          "description" : "Command+Option+Ctrl+Enter が ButKo BPMFVS 注音表記送出に設定されている場合にのみ有効です。有効にすると、入力緩衝列と候補プレビューも ButKo BPMFVS 投影結果で表示され、画面上の字形を特殊送出結果とできるだけ一致させます。",
+          "shortTitle" : "入力緩衝列にも ButKo BPMFVS を反映"
+        },
+        "zh-Hans" : {
+          "description" : "仅在 Command+Option+Ctrl+Enter 被设为递交 ButKo BPMFVS 注音标记时生效。启用后，组字区与候选预览也会直接显示 ButKo BPMFVS 投影结果，让画面字形尽量与特殊递交结果一致。",
+          "shortTitle" : "在组字区同步反映 ButKo BPMFVS"
+        },
+        "zh-Hant" : {
+          "description" : "僅在 Command+Option+Ctrl+Enter 被設為遞交 ButKo BPMFVS 注音標記時生效。啟用後，組字區與候選預覽也會直接顯示 ButKo BPMFVS 投影結果，讓畫面字形盡量與特殊遞交結果一致。",
+          "shortTitle" : "在組字區同步反映 ButKo BPMFVS"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ReflectBPMFVSInCompositionBuffer",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAllowRescoringSingleKanjiCandidates",
+      "labels" : {
+        "en" : {
+          "description" : "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.",
+          "shortTitle" : "Allow boosting \/ excluding a candidate of single kanji"
+        },
+        "ja" : {
+          "description" : "⚠️💀 センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがあります。ご自分は何かをしようとしているのかを弁えていない限り、このスィッチを常にOFFすることだと開発者からの是正勧告です。",
+          "shortTitle" : "排除\/最優先にできる候補の文字数の最低限は１字とする"
+        },
+        "zh-Hans" : {
+          "description" : "⚠️💀 这可能会妨碍组句函式，使其无法给出正确的结果。开发者极力劝阻您启用该功能，除非您真的知道您在做什么。",
+          "shortTitle" : "允许对单个汉字进行升权或排除"
+        },
+        "zh-Hant" : {
+          "description" : "⚠️💀 這可能會妨礙組句函式，使其無法給出正確的結果。開發者極力勸阻您啟用該功能，除非您真的知道您在做什麼。",
+          "shortTitle" : "允許對單個漢字進行升權或排除"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AllowRescoringSingleKanjiCandidates",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseSCPCTypingMode",
+      "labels" : {
+        "en" : {
+          "description" : "An accommodation for elder computer users.",
+          "shortTitle" : "Emulating select-candidate-per-character mode"
+        },
+        "ja" : {
+          "description" : "年配なるユーザーのために提供した機能である。",
+          "shortTitle" : "漢字１つづつ全候補選択入力モード"
+        },
+        "zh-Hans" : {
+          "description" : "针对年长使用者的习惯而提供。",
+          "shortTitle" : "模拟 90 年代前期注音逐字选字输入风格"
+        },
+        "zh-Hant" : {
+          "description" : "針對年長使用者的習慣而提供。",
+          "shortTitle" : "模擬 90 年代前期注音逐字選字輸入風格"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UseSCPCTypingMode",
+      "type" : "bool"
+    },
+    {
+      "default" : 10,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kMaxCandidateLength",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "MaxCandidateLength",
+      "type" : "integer"
+    },
+    {
+      "default" : 2,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kBeepSoundPreference",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Beep Sound"
+        },
+        "ja" : {
+          "shortTitle" : "SFX"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "蜂鸣音效"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "蜂鳴音效"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kBeepSoundPreference.option.0",
+          "labels" : {
+            "en" : "Muted",
+            "ja" : "鳴らず",
+            "zh-Hans" : "静音",
+            "zh-Hant" : "靜音"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kBeepSoundPreference.option.1",
+          "labels" : {
+            "en" : "Use OS Settings",
+            "ja" : "システムSFXを使用",
+            "zh-Hans" : "使用系统音效",
+            "zh-Hant" : "使用系統音效"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kBeepSoundPreference.option.2",
+          "labels" : {
+            "en" : "Use vChewing SFX",
+            "ja" : "唯音SFXを使用",
+            "zh-Hans" : "使用唯音音效",
+            "zh-Hant" : "使用唯音音效"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "BeepSoundPreference",
+      "type" : "integer"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShouldNotFartInLieuOfBeep",
+      "labels" : {
+        "en" : {
+          "description" : "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
+          "shortTitle" : "Stop farting (when typed phonetic combination is invalid, etc.)"
+        },
+        "ja" : {
+          "description" : "マナーモードのチェックの外すことになります。周りの人は貴殿のパソコンから屁音を聞いてしまい、それについての結果は全部貴殿の自己責任でございます。公的なる場所でこのチェックを外すのはお薦めできません。",
+          "shortTitle" : "マナーモード \/\/ 外すと入力間違った時に変な声が出る"
+        },
+        "zh-Hans" : {
+          "description" : "您即将取消对廉耻模式的勾选。周围的人会听到您的电脑传出放屁的声音，且您对此负全部责任。我们强烈建议您不要在任何公共场合取消对该模式的勾选。",
+          "shortTitle" : "廉耻模式 \/\/ 取消勾选的话，敲错字时会有异音"
+        },
+        "zh-Hant" : {
+          "description" : "您即將取消對廉恥模式的勾選。周圍的人會聽到您的電腦傳出放屁的聲音，且您對此負全部責任。我們強烈建議您不要在任何公共場合取消對該模式的勾選。",
+          "shortTitle" : "廉恥模式 \/\/ 取消勾選的話，敲錯字時會有異音"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShouldNotFartInLieuOfBeep",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowHanyuPinyinInCompositionBuffer",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Show Hanyu-Pinyin in the inline composition buffer"
+        },
+        "ja" : {
+          "shortTitle" : "弁音合併入力（入力緩衝列で音読みを漢語弁音に）"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "拼音并击（组字区内显示汉语拼音）"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "拼音並擊（組字區內顯示漢語拼音）"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowHanyuPinyinInCompositionBuffer",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kInlineDumpPinyinInLieuOfZhuyin",
+      "labels" : {
+        "en" : {
+          "description" : "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.",
+          "shortTitle" : "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"
+        },
+        "ja" : {
+          "description" : "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。",
+          "shortTitle" : "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換"
+        },
+        "zh-Hans" : {
+          "description" : "借由 Command+Option+Ctrl+Enter 输出的内容受对应的行为设定所影响。",
+          "shortTitle" : "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音"
+        },
+        "zh-Hant" : {
+          "description" : "藉由 Command+Option+Ctrl+Enter 輸出的內容受對應的行為設定所影響。",
+          "shortTitle" : "Ctrl(+Option)+Command+Enter 輸出漢語拼音而非注音"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "InlineDumpPinyinInLieuOfZhuyin",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kFetchSuggestionsFromPerceptionOverrideModel",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, the perception override memory (POM) module observes your candidate selections to accumulate temporary memory, and automatically offers suggestions from it while you type (applied to the composition or placed at the top of the candidate window); existing memory also participates in composition statistically. Memory records gradually decay and become ineffective over time; you can also erase all memory records at any time through the input method menu. Turn this off to stop such automatic suggestions, new memory learning, and existing memory from participating in composition statistically.",
+          "shortTitle" : "Enable perception memory learning and automatic suggestions"
+        },
+        "ja" : {
+          "description" : "有効にすると、漸退記憶（POM）モジュールが候補選択を観察して一時記憶を蓄積し、入力中にその記憶から候補を自動的に提案します（組句結果への適用、または候補ウィンドウ先頭への表示）。既存の記憶も統計的に組句へ参加します。記憶は時間の経過とともに徐々に減衰して効力を失います。入力アプリのメニューからいつでも全記録を消去することもできます。このオプションをオフにすると、このような自動提案と新しい記憶の学習、および既存の記憶の統計的な組句への参加は停止します。",
+          "shortTitle" : "漸退記憶の学習と自動提案を有効化"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，渐退记忆（POM）模块会观察您的选字行为以累积临时记忆，并在敲字时自动以这些记忆提供建议（套用至组句结果、或置顶于候选窗）；既有的记忆亦会以统计方式参与组句。记忆记录会随时间逐渐衰减失效，您亦可随时借由输入法选单清除全部记忆。关闭本选项可停止此类自动建议、新的记忆学习、以及既有的记忆以统计方式参与组句的行为。",
+          "shortTitle" : "启用渐退记忆的学习与自动建议"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，漸退記憶（POM）模組會觀察您的選字行為以累積臨時記憶，並在敲字時自動以這些記憶提供建議（套用至組句結果、或置頂於候選窗）；既有的記憶亦會以統計方式參與組句。記憶記錄會隨時間逐漸衰減失效，您亦可隨時藉由輸入法選單清除全部記憶。關閉本選項可停止此類自動建議、新的記憶學習、以及既有的記憶以統計方式參與組句的行為。",
+          "shortTitle" : "啟用漸退記憶的學習與自動建議"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "FetchSuggestionsFromPerceptionOverrideModel",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseFixedCandidateOrderOnSelection",
+      "labels" : {
+        "en" : {
+          "description" : "This will stop user override model from affecting how candidates get sorted.",
+          "shortTitle" : "Always use fixed listing order in candidate window"
+        },
+        "ja" : {
+          "description" : "これで臨時記憶モジュールは候補陳列の順番に影響を与えなくなる。",
+          "shortTitle" : "候補文字を固定順番で陳列する"
+        },
+        "zh-Hans" : {
+          "description" : "这将阻止渐退记忆模组影响候选字词的陈列顺序。",
+          "shortTitle" : "以固定顺序来陈列选字窗内的候选字"
+        },
+        "zh-Hant" : {
+          "description" : "這將阻止漸退記憶模組影響候選字詞的陳列順序。",
+          "shortTitle" : "以固定順序來陳列選字窗內的候選字"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UseFixedCandidateOrderOnSelection",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAutoCorrectReadingCombination",
+      "labels" : {
+        "en" : {
+          "description" : "This feature is disabled with mixed Chinese-English typing fallback due to compatibility concerns.",
+          "shortTitle" : "Automatically correct reading combinations when typing"
+        },
+        "ja" : {
+          "description" : "互換性のため、中英混在入力のフォールバックがONの場合、この機能は不作動。",
+          "shortTitle" : "入力中で打ち間違った発音組み合わせを自動的に訂正する"
+        },
+        "zh-Hans" : {
+          "description" : "该功能在中英混合输入回退时不起作用，以确保相容性。",
+          "shortTitle" : "敲字时自动纠正读音组合"
+        },
+        "zh-Hant" : {
+          "description" : "該功能在中英混合輸入回退時不起作用，以確保相容性。",
+          "shortTitle" : "敲字時自動糾正讀音組合"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AutoCorrectReadingCombination",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kReadingNarrationCoverage",
+      "labels" : {
+        "en" : {
+          "description" : "This reads your typed phonabets aloud. Only works with non-cassette Mode.",
+          "shortTitle" : "Reading composer contents to narrate"
+        },
+        "ja" : {
+          "description" : "音読組立緩衝列の内容の変化を朗読。該功能對磁帶模式無效。",
+          "shortTitle" : "音読組立の朗読"
+        },
+        "zh-Hans" : {
+          "description" : "这会将您的组音区的内容念出来。该功能对磁带模式无效。",
+          "shortTitle" : "要念读的组音区内容"
+        },
+        "zh-Hant" : {
+          "description" : "這會將您的組音區的內容唸出來。該功能對磁帶模式無效。",
+          "shortTitle" : "要唸讀的組音區內容"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kReadingNarrationCoverage.option.0",
+          "labels" : {
+            "en" : "Do not narrate",
+            "ja" : "朗読せずに",
+            "zh-Hans" : "不念读",
+            "zh-Hant" : "不唸讀"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kReadingNarrationCoverage.option.1",
+          "labels" : {
+            "en" : "Only when combined by intonation",
+            "ja" : "音調キーで確認するときに",
+            "zh-Hans" : "仅在用声调键确认时",
+            "zh-Hant" : "僅在用聲調鍵確認時"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kReadingNarrationCoverage.option.2",
+          "labels" : {
+            "en" : "All changes in reading composer",
+            "ja" : "いずれの変化が起きたときに",
+            "zh-Hans" : "实时念读组音区的任何变化",
+            "zh-Hant" : "實時唸讀組音區的任何變化"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "ReadingNarrationCoverage",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAlsoConfirmAssociatedCandidatesByEnter",
+      "labels" : {
+        "en" : {
+          "description" : "Otherwise, only the candidate keys are allowed to confirm associates.",
+          "shortTitle" : "Allow using Enter key to confirm associated candidate selection"
+        },
+        "ja" : {
+          "description" : "未チェックの場合、関連文節候補を選べられるのは言選りキーのみ。",
+          "shortTitle" : "Enter キーを関連文節候補の確認のために使う"
+        },
+        "zh-Hans" : {
+          "description" : "不勾选这一项的话，就只能用选字键来选取关联词语。",
+          "shortTitle" : "允许使用 Enter 确认当前选中的关联词语"
+        },
+        "zh-Hant" : {
+          "description" : "不勾選這一項的話，就只能用選字鍵來選取關聯詞語。",
+          "shortTitle" : "允許使用 Enter 確認當前選中的關聯詞語"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AlsoConfirmAssociatedCandidatesByEnter",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kKeepReadingUponCompositionError",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Allow backspace-editing miscomposed readings"
+        },
+        "ja" : {
+          "shortTitle" : "効かぬ音読みを BackSpace で再編集"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "允许对无效的读音使用 BackSpace 编辑"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "允許對無效的讀音使用 BackSpace 編輯"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "KeepReadingUponCompositionError",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kBypassNonAppleCapsLockHandling",
+      "labels" : {
+        "en" : {
+          "description" : "This won't affect the same feature offered by macOS since 10.14 Mojave and later.",
+          "shortTitle" : "Bypass the vChewing built-in Caps Lock handling"
+        },
+        "ja" : {
+          "description" : "macOS 10.14 からのシステム内蔵機能としての同じ機能に影響しません。",
+          "shortTitle" : "唯音入力アプリの内蔵CapsLock処理を不使用"
+        },
+        "zh-Hans" : {
+          "description" : "这不会影响到自 macOS 10.14 开始的系统内建的同名功能。",
+          "shortTitle" : "不使用唯音输入法内建的 Caps Lock 处理"
+        },
+        "zh-Hant" : {
+          "description" : "這不會影響到自 macOS 10.14 開始的系統內建的同名功能。",
+          "shortTitle" : "不使用唯音輸入法內建的 Caps Lock 處理"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.15,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "BypassNonAppleCapsLockHandling",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShiftEisuToggleOffTogetherWithCapsLock",
+      "labels" : {
+        "en" : {
+          "description" : "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key \/ JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.",
+          "shortTitle" : "Sync the off state between Caps Lock and Shift \/ Eisu Alphanumerical Toggle"
+        },
+        "ja" : {
+          "description" : "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。",
+          "shortTitle" : "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する"
+        },
+        "zh-Hans" : {
+          "description" : "勾选该选项后：1) [至少 macOS 12 起] Caps Lock 在关掉的时候，会连带关掉由 Shift 键 \/ JIS 英数键负责控制的英数模式；2) 在借由 JIS 英数键关掉其控制的英数模式的时候，也会关掉 Caps Lock。注：唯音无法在 Caps Lock 亮灯的时候感知 Shift 键的单独敲击事件。",
+          "shortTitle" : "使「Shift 键 \/ JIS 英数键」英数模式的关闭状态与 Caps Lock 的关闭状态保持彼此同步"
+        },
+        "zh-Hant" : {
+          "description" : "勾選該選項後：1) [至少 macOS 12 起] Caps Lock 在關掉的時候，會連帶關掉由 Shift 鍵 \/ JIS 英數鍵負責控制的英數模式；2) 在藉由 JIS 英數鍵關掉其控制的英數模式的時候，也會關掉 Caps Lock。註：唯音無法在 Caps Lock 亮燈的時候感知 Shift 鍵的單獨敲擊事件。",
+          "shortTitle" : "使「Shift 鍵 \/ JIS 英数鍵」英數模式的關閉狀態與 Caps Lock 的關閉狀態保持彼此同步"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.15,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShiftEisuToggleOffTogetherWithCapsLock",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kTogglingAlphanumericalModeWithLShift",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Toggle alphanumerical mode with Left-Shift"
+        },
+        "ja" : {
+          "shortTitle" : "左側の Shift キーで英数入力モードの切り替え"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "允许使用左侧的 Shift 键切换英数输入模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "允許使用左側的 Shift 鍵切換英數輸入模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.15,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "TogglingAlphanumericalModeWithLShift",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kTogglingAlphanumericalModeWithRShift",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Toggle alphanumerical mode with Right-Shift"
+        },
+        "ja" : {
+          "shortTitle" : "右側の Shift キーで英数入力モードの切り替え"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "允许使用右侧的 Shift 键切换英数输入模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "允許使用右側的 Shift 鍵切換英數輸入模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.15,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "TogglingAlphanumericalModeWithRShift",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kUpperCaseLetterKeyBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the behavior of Shift+Letter key with letter inputs.",
+          "shortTitle" : "Shift+Letter:"
+        },
+        "ja" : {
+          "description" : "Shift+文字キーの行為をご指定ください。",
+          "shortTitle" : "Shift+文字キー:"
+        },
+        "zh-Hans" : {
+          "description" : "指定 Shift+字母键 的行为。",
+          "shortTitle" : "Shift+字母键:"
+        },
+        "zh-Hant" : {
+          "description" : "指定 Shift+字母鍵 的行為。",
+          "shortTitle" : "Shift+字母鍵:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.0",
+          "labels" : {
+            "en" : "Type them into inline composition buffer",
+            "ja" : "入力緩衝列にローマ字入力",
+            "zh-Hans" : "直接键入内文组字区",
+            "zh-Hant" : "直接鍵入內文組字區"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.1",
+          "labels" : {
+            "en" : "Always directly commit lowercased letters",
+            "ja" : "いつでもローマ字（小文字）を直接出力",
+            "zh-Hans" : "始终直接递交小写字母",
+            "zh-Hant" : "始終直接遞交小寫字母"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.2",
+          "labels" : {
+            "en" : "Always directly commit uppercased letters",
+            "ja" : "いつでもローマ字（大文字）を直接出力",
+            "zh-Hans" : "始终直接递交大写字母",
+            "zh-Hant" : "始終直接遞交大寫字母"
+          },
+          "value" : 2
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.3",
+          "labels" : {
+            "en" : "Directly commit lowercased letters only if the compositor is empty",
+            "ja" : "入力緩衝列がからっぽの時、ローマ字（小文字）を直接出力",
+            "zh-Hans" : "直接递交小写字母，除非组字区不为空",
+            "zh-Hant" : "直接遞交小寫字母，除非組字區不為空"
+          },
+          "value" : 3
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.4",
+          "labels" : {
+            "en" : "Directly commit uppercased letters only if the compositor is empty",
+            "ja" : "入力緩衝列がからっぽの時、ローマ字（大文字）を直接出力",
+            "zh-Hans" : "直接递交大写字母，除非组字区不为空",
+            "zh-Hant" : "直接遞交大寫字母，除非組字區不為空"
+          },
+          "value" : 4
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        4
+      ],
+      "rawValue" : "UpperCaseLetterKeyBehavior",
+      "type" : "integer"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kNumPadCharInputBehavior",
+      "labels" : {
+        "en" : {
+          "description" : "Choose the behavior of numeric pad inputs.",
+          "shortTitle" : "Numeric Pad:"
+        },
+        "ja" : {
+          "description" : "テンキー文字の入力行為をご指定ください。",
+          "shortTitle" : "テンキー:"
+        },
+        "zh-Hans" : {
+          "description" : "指定数字小键盘的输入行为。",
+          "shortTitle" : "数字小键盘:"
+        },
+        "zh-Hant" : {
+          "description" : "指定數字小鍵盤的輸入行為。",
+          "shortTitle" : "數字小鍵盤:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kNumPadCharInputBehavior.option.0",
+          "labels" : {
+            "en" : "Always directly commit half-width chars",
+            "ja" : "いつでも半角で直接出力",
+            "zh-Hans" : "始终以半形文字直接递交",
+            "zh-Hant" : "始終以半形文字直接遞交"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kNumPadCharInputBehavior.option.1",
+          "labels" : {
+            "en" : "Always directly commit full-width chars",
+            "ja" : "いつでも全角で直接出力",
+            "zh-Hans" : "始终以全形文字直接递交",
+            "zh-Hant" : "始終以全形文字直接遞交"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kNumPadCharInputBehavior.option.2",
+          "labels" : {
+            "en" : "Insert into composition buffer (half-width)",
+            "ja" : "入力緩衝列に半角文字を挿入",
+            "zh-Hans" : "以半形文字插入组字区",
+            "zh-Hant" : "以半形文字插入組字區"
+          },
+          "value" : 2
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kNumPadCharInputBehavior.option.3",
+          "labels" : {
+            "en" : "Insert into composition buffer (full-width)",
+            "ja" : "入力緩衝列に全角文字を挿入",
+            "zh-Hans" : "以全形文字插入组字区",
+            "zh-Hant" : "以全形文字插入組字區"
+          },
+          "value" : 3
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kNumPadCharInputBehavior.option.4",
+          "labels" : {
+            "en" : "Directly commit half-width chars only if the compositor is empty",
+            "ja" : "入力緩衝列がからっぽの時、半角で直接出力",
+            "zh-Hans" : "直接递交半形文字，除非组字区不为空",
+            "zh-Hant" : "直接遞交半形文字，除非組字區不為空"
+          },
+          "value" : 4
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kNumPadCharInputBehavior.option.5",
+          "labels" : {
+            "en" : "Directly commit full-width chars only if the compositor is empty",
+            "ja" : "入力緩衝列がからっぽの時、全角で直接出力",
+            "zh-Hans" : "直接递交全形文字，除非组字区不为空",
+            "zh-Hant" : "直接遞交全形文字，除非組字區不為空"
+          },
+          "value" : 5
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        5
+      ],
+      "rawValue" : "NumPadCharInputBehavior",
+      "type" : "integer"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kConsolidateContextOnCandidateSelection",
+      "labels" : {
+        "en" : {
+          "description" : "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.",
+          "shortTitle" : "Consolidate the context on confirming candidate selection"
+        },
+        "ja" : {
+          "description" : "例えば、入力緩衝列には「章太炎」という節点があり、その範囲は [0,3) である。もし、「太」を「泰」にしたいのなら、今回の作業範囲は [1,2) で、「章太炎」の範囲と重ねてしまう。この場合、もし、事前強固措置がなければ、今回の作業でこの単語は「張泰言」のような望ましくない変換結果になってしまう。事前強固措置があるからこそ、「章泰炎」のような正確な作業結果の保証である。",
+          "shortTitle" : "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する"
+        },
+        "zh-Hans" : {
+          "description" : "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。",
+          "shortTitle" : "在使用选字窗选字时，自动巩固上下文"
+        },
+        "zh-Hant" : {
+          "description" : "打比方說，你敲了「章太炎」，你想將「太」改成「泰」。這個操作的作業索引範圍是開閉區間 [1,2)，會切到「章太炎」這個節點的所在索引範圍 [0,3)。如果沒有事前鞏固處理的話，這個詞會在你選字之後變成諸如「張泰言」這種你不想要的自動選字結果。當且僅當你啟用了這個鞏固功能的前提下，你選字之後的結果才會是「章泰炎」這種你想要的結果。",
+          "shortTitle" : "在使用選字窗選字時，自動鞏固上下文"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ConsolidateContextOnCandidateSelection",
+      "type" : "bool"
+    },
+    {
+      "default" : 2,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kPreferredRevolverForceLevel",
+      "labels" : {
+        "en" : {
+          "description" : "Introduced in v4.5.4, \"Weak-Revolve\" is a protection mechanism for in-place revolving via keyboard shortcuts (e.g., Space\/Tab). If a multi-syllable candidate would overwrite manually selected characters outside the current cursor position, it is skipped to prevent previous selections from being unexpectedly affected. This is especially useful for users who prefer \"character-by-character\" selection, ensuring that prior overrides remain intact while revolving subsequent text. This does not affect selections made via the candidate window.",
+          "shortTitle" : "In-place Revolve Strength"
+        },
+        "ja" : {
+          "description" : "v4.5.4より「軽きお回し」保護機能を導入しました。キーボードショートカット（Space\/Tab等）でその場での候補切り替え（お回し）を行う際、複数音節の候補が現在のカーソル位置以外で「既に手動選択された文字」を上書きしてしまう場合は、その候補をスキップし、選択内容が不意に書き換えられたり影響を受けたりするのを防ぎます。これにより、一文字ずつ丁寧に選字する方が、後方の文字を切り替えても前方の選択内容が維持されます。この機能は候補窓による選択には影響しません。",
+          "shortTitle" : "候補お回しの強度設定"
+        },
+        "zh-Hans" : {
+          "description" : "自 v4.5.4 版起引入「弱轮替」保护机制：当您使用键盘热键（如 Space\/Tab）进行就地轮替时，若目标为多音节候选、且其范围会覆盖到「非当前游标位置」且「已被您手动选定」的字词时，系统将跳过该候选，以防止已选定的内容受到意外影响。此功能特别适合习惯「一个字一个字地选字」的使用者，能确保您在修正后方字词时，前方已选定的内容依然稳固。此设定不影响选字窗的选字行为。",
+          "shortTitle" : "就地轮替强度偏好"
+        },
+        "zh-Hant" : {
+          "description" : "自 v4.5.4 版起引入「弱輪替」保護機制：當您使用鍵盤熱鍵（如 Space\/Tab）進行就地輪替時，若目標為多音節候選、且其範圍會覆蓋到「非當前游標位置」且「已被您手動選定」的字詞時，系統將跳過該候選，以防止已選定的內容受到意外影響。此功能特別適合習慣「一個字一個字地選字」的使用者，能確保您在修正後方字詞時，前方已選定的內容依然穩固。此設定不影響選字窗的選字行為。",
+          "shortTitle" : "就地輪替強度偏好"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kPreferredRevolverForceLevel.option.0",
+          "labels" : {
+            "en" : "Always use Strong Revolve (Prioritize Result)",
+            "ja" : "常に強きお回しを使用 (候補優先)",
+            "zh-Hans" : "一律使用强轮替 (优先候选结果)",
+            "zh-Hant" : "一律使用強輪替 (優先候選結果)"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kPreferredRevolverForceLevel.option.1",
+          "labels" : {
+            "en" : "Use Weak-Revolve only for (Shift+)Space",
+            "ja" : "(Shift+)Space時のみ軽きお回しを使用",
+            "zh-Hans" : "仅在 (Shift+)Space 轮替时启用弱轮替",
+            "zh-Hant" : "僅在 (Shift+)Space 輪替時啟用弱輪替"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kPreferredRevolverForceLevel.option.2",
+          "labels" : {
+            "en" : "Always use Weak-Revolve (Prioritize Protection)",
+            "ja" : "常に軽きお回しを使用 (保護優先)",
+            "zh-Hans" : "一律使用弱轮替 (优先保护已选内容)",
+            "zh-Hant" : "一律使用弱輪替 (優先保護已選內容)"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "PreferredRevolverForceLevel",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kHardenVerticalPunctuations",
+      "labels" : {
+        "en" : {
+          "description" : "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.",
+          "shortTitle" : "Harden vertical punctuations during vertical typing (not recommended)"
+        },
+        "ja" : {
+          "description" : "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。",
+          "shortTitle" : "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）"
+        },
+        "zh-Hans" : {
+          "description" : "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字元。",
+          "shortTitle" : "在纵排书写时，强制转换标点为纵排形式（不推荐）"
+        },
+        "zh-Hant" : {
+          "description" : "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。",
+          "shortTitle" : "在縱排書寫時，強制轉換標點為縱排形式（不推薦）"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "HardenVerticalPunctuations",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kTrimUnfinishedReadingsOnCommit",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Trim unfinished readings \/ strokes on commit"
+        },
+        "ja" : {
+          "shortTitle" : "送り出す緩衝列内容から未完成な音読み\/筆組みを除く"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "在递交时清理未完成拼写的读音或字根"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "在遞交時清理未完成拼寫的讀音或字根"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "TrimUnfinishedReadingsOnCommit",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAlwaysShowTooltipTextsHorizontally",
+      "labels" : {
+        "en" : {
+          "description" : "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English.",
+          "shortTitle" : "Always show tooltip texts horizontally"
+        },
+        "ja" : {
+          "description" : "縦書き入力の場合、ヒントにはキーの名前は常に符号で表示する。",
+          "shortTitle" : "ヒントを常に横書きにする"
+        },
+        "zh-Hans" : {
+          "description" : "纵排输入的情况下，工具提示内的按键名称会以符号显示。",
+          "shortTitle" : "始终使用横排来显示工具提示视窗"
+        },
+        "zh-Hant" : {
+          "description" : "縱排輸入的情況下，工具提示內的按鍵名稱會以符號顯示。",
+          "shortTitle" : "始終使用橫排來顯示工具提示視窗"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AlwaysShowTooltipTextsHorizontally",
+      "type" : "bool"
+    },
+    {
+      "default" : {
+        "com.openai.chat" : true,
+        "com.valvesoftware.steam" : true,
+        "jp.naver.line.mac" : true
+      },
+      "defaultsType" : "dict",
+      "exchangeBlacklisted" : false,
+      "key" : "kClientsIMKTextInputIncapable",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ClientsIMKTextInputIncapable",
+      "type" : "dictionary"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowTranslatedStrokesInCompositionBuffer",
+      "labels" : {
+        "en" : {
+          "description" : "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.",
+          "shortTitle" : "Show translated strokes in composition buffer"
+        },
+        "ja" : {
+          "description" : "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。",
+          "shortTitle" : "原始キーネームでなく、筆画を入力緩衝列で表示する"
+        },
+        "zh-Hans" : {
+          "description" : "不启用该选项的话，在组字区内的字根将会以原始键盘按键名称来显示。所有关于字根的定义，均请洽 CIN 磁带档案内的「%keyname」章节。",
+          "shortTitle" : "在组字区内显示字根、而非原始键盘码"
+        },
+        "zh-Hant" : {
+          "description" : "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。",
+          "shortTitle" : "在組字區內顯示字根、而非原始鍵盤碼"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowTranslatedStrokesInCompositionBuffer",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kForceCassetteChineseConversion",
+      "labels" : {
+        "en" : {
+          "description" : "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.",
+          "shortTitle" : "Chinese Conversion:"
+        },
+        "ja" : {
+          "description" : "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。",
+          "shortTitle" : "繁体字・簡体字変換:"
+        },
+        "zh-Hans" : {
+          "description" : "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。",
+          "shortTitle" : "繁简转换:"
+        },
+        "zh-Hant" : {
+          "description" : "該轉換僅對磁帶模式有影響，會將鍵入的內容根據該選項與當前的簡繁體模式來轉換。",
+          "shortTitle" : "繁簡轉換:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kForceCassetteChineseConversion.option.0",
+          "labels" : {
+            "en" : "Disable forced conversion for cassette outputs",
+            "ja" : "カセットモードによる漢字出力の簡繁転換を行わずにする",
+            "zh-Hans" : "对磁带模式禁用繁简转换",
+            "zh-Hant" : "對磁帶模式禁用繁簡轉換"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kForceCassetteChineseConversion.option.1",
+          "labels" : {
+            "en" : "Enforce conversion in both input modes",
+            "ja" : "カセットモードによる漢字出力の簡体繁体転換を常に行う",
+            "zh-Hans" : "依当前简繁模式强制转换",
+            "zh-Hant" : "依當前簡繁模式強制轉換"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kForceCassetteChineseConversion.option.2",
+          "labels" : {
+            "en" : "Only enforce conversion in Simplified Chinese mode",
+            "ja" : "簡体モードだけの場合、カセットモードの漢字出力転換を",
+            "zh-Hans" : "仅在简体模式转换至简体",
+            "zh-Hant" : "僅在簡體模式轉換至簡體"
+          },
+          "value" : 2
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kForceCassetteChineseConversion.option.3",
+          "labels" : {
+            "en" : "Only enforce conversion in Traditional Chinese mode",
+            "ja" : "繁体モードだけの場合、カセットモードの漢字出力転換を",
+            "zh-Hans" : "仅在繁体模式转换至繁体",
+            "zh-Hant" : "僅在繁體模式轉換至繁體"
+          },
+          "value" : 3
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        3
+      ],
+      "rawValue" : "ForceCassetteChineseConversion",
+      "type" : "integer"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowReverseLookupInCandidateUI",
+      "labels" : {
+        "en" : {
+          "description" : "The lookup results are supplied by the CIN cassette module.",
+          "shortTitle" : "Show available reverse-lookup results in candidate window"
+        },
+        "ja" : {
+          "description" : "逆引参照の結果は CIN カセットモジュールから提供。",
+          "shortTitle" : "候補陳列ウィンドウで可能な逆引参照結果を示す"
+        },
+        "zh-Hans" : {
+          "description" : "反查结果取自 CIN 磁带模组。",
+          "shortTitle" : "在选字窗内显示可用的字根反查结果"
+        },
+        "zh-Hant" : {
+          "description" : "反查結果取自 CIN 磁帶模組。",
+          "shortTitle" : "在選字窗內顯示可用的字根反查結果"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowReverseLookupInCandidateUI",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShowCodePointInCandidateUI",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Show Unicode codepoint metadata in candidate window"
+        },
+        "ja" : {
+          "shortTitle" : "候補陳列ウィンドウで Unicode のコードポイント情報を示す"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "在选字窗内显示当前候选字的万国码码位"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "在選字窗內顯示當前候選字的萬國碼碼位"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShowCodePointInCandidateUI",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAutoCompositeWithLongestPossibleCassetteKey",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Auto-composite when the longest possible key is formed"
+        },
+        "ja" : {
+          "shortTitle" : "最長可能キーができた場合、文字を組み立つ"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "在已经敲出最长可能码的时候自动组字"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "在已經敲出最長可能碼的時候自動組字"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AutoCompositeWithLongestPossibleCassetteKey",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kShareAlphanumericalModeStatusAcrossClients",
+      "labels" : {
+        "en" : {
+          "description" : "This only works when being toggled by Shift key and JIS Eisu key.",
+          "shortTitle" : "Share alphanumerical mode status across all clients"
+        },
+        "ja" : {
+          "description" : "Shift キーとJIS 英数キーだけでの英数入力モード状態切替の話。",
+          "shortTitle" : "全ての客体アプリに英数入力モードの状態を共有"
+        },
+        "zh-Hans" : {
+          "description" : "仅用于以 Shift 键或 JIS 英数键切换中英文输入模式的场合。",
+          "shortTitle" : "对所有客体应用共用中英文输入切换状态"
+        },
+        "zh-Hant" : {
+          "description" : "僅用於以 Shift 鍵或 JIS 英數鍵切換中英文輸入模式的場合。",
+          "shortTitle" : "對所有客體應用共用中英文輸入切換狀態"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ShareAlphanumericalModeStatusAcrossClients",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kPhraseEditorAutoReloadExternalModifications",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "This editor only: Auto-reload modifications happened outside of this editor"
+        },
+        "ja" : {
+          "shortTitle" : "このエディターの外部からの編集結果をこのエディターに自動的に読み込む"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "仅限该编辑器：自动读入来自该编辑器外部的档案内容修改"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "僅限該編輯器：自動讀入來自該編輯器外部的檔案內容修改"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "PhraseEditorAutoReloadExternalModifications",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kClassicHaninKeyboardSymbolModeShortcutEnabled",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"
+        },
+        "ja" : {
+          "shortTitle" : "「\\」・「¥」キーでも漢音キーボード符号入力"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "亦使用「\\」或「¥」键启用汉音键盘符号模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "亦使用「\\」或「¥」鍵啟用漢音鍵盤符號模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ClassicHaninKeyboardSymbolModeShortcutEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kFilterNonCNSReadingsForCHTInput",
+      "labels" : {
+        "en" : {
+          "description" : "For single-kanji candidates, non-conforming results will be demoted to the end of the candidate list instead of being completely removed.",
+          "shortTitle" : "Filter Non-CNS11643 factory readings (CHT input only)"
+        },
+        "ja" : {
+          "description" : "単漢字候補については、全字庫の読みに合致しない結果は完全に削除されず、候補リストの末尾に降格されます。",
+          "shortTitle" : "全字庫以外の音読みを内蔵辞書繁体中国語検索結果から除く"
+        },
+        "zh-Hans" : {
+          "description" : "对于单汉字候选字，不符合全字库读音的结果将被降权至候选字列表尾端，而非完全移除。",
+          "shortTitle" : "仅繁体中文: 原厂辞典仅传回符合全字库读音的结果"
+        },
+        "zh-Hant" : {
+          "description" : "對於單漢字候選字，不符合全字庫讀音的結果將被降權至候選字列表尾端，而非完全移除。",
+          "shortTitle" : "僅繁體中文: 原廠辭典僅傳回符合全字庫讀音的結果"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "FilterNonCNSReadingsForCHTInput",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kEnforceETenDOSCandidateSequence",
+      "labels" : {
+        "en" : {
+          "description" : "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting.",
+          "shortTitle" : "Enforce Eten DOS Sequence on all single-kanji candidates"
+        },
+        "ja" : {
+          "description" : "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。",
+          "shortTitle" : "単漢字候補の陳列順番を倚天中国語DOS順に強制する"
+        },
+        "zh-Hans" : {
+          "description" : "对敝输入法的候选字的顺序有着强烈的手动调整之需求的使用者们往往都是从倚天中文 DOS 开始积累了对候选字的直觉记忆、希望能使用这种候选字排序，故提供该选项。逐字选字模式会始终遵循该排序特性，不受该开关所影响。",
+          "shortTitle" : "对所有单汉字候选字强制施加倚天中文DOS系统排序"
+        },
+        "zh-Hant" : {
+          "description" : "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。",
+          "shortTitle" : "對所有單漢字候選字強制施加倚天中文DOS系統排序"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "enforceETenDOSCandidateSequence",
+      "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kRomanNumeralOutputFormat",
+      "labels" : {
+        "en" : {
+          "description" : "Roman Numeral Input Mode can be switched to while using [Opt]+[Symbol Menu Key] to revolve the current typing method, supporting integers in the closed range of [1, 3999]. After a successful or failed input, this mode will be automatically switched off.",
+          "shortTitle" : "Roman Numeral Output Format"
+        },
+        "ja" : {
+          "description" : "ローマ数字打込モードは [Opt]+[符号メニューキー] を使用中に打込方式を切り替えるときに有効にすることができ、[1, 3999] の閉区間内の整数をサポートしています。出力が成功したか失敗したかにかかわらず、このモードは自動的にオフになります。",
+          "shortTitle" : "ローマ数字出力形式"
+        },
+        "zh-Hans" : {
+          "description" : "罗马数字输入模式可以在敲 [Opt]+[符号选单键] 切换输入方式时启用，支援 [1, 3999] 闭区间内的整数。输入成功或失败后，该模式会自动关闭。",
+          "shortTitle" : "罗马数字输出格式"
+        },
+        "zh-Hant" : {
+          "description" : "羅馬數字輸入模式可以在敲 [Opt]+[符號選單鍵] 切換輸入方式時啟用，支援 [1, 3999] 閉區間內的整數。輸入成功或失敗後，該模式會自動關閉。",
+          "shortTitle" : "羅馬數字輸出格式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kRomanNumeralOutputFormat.option.0",
+          "labels" : {
+            "en" : "ASCII Uppercase",
+            "ja" : "ASCII大文字",
+            "zh-Hans" : "ASCII 大写",
+            "zh-Hant" : "ASCII 大寫"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kRomanNumeralOutputFormat.option.1",
+          "labels" : {
+            "en" : "ASCII Lowercase",
+            "ja" : "ASCII小文字",
+            "zh-Hans" : "ASCII 小写",
+            "zh-Hant" : "ASCII 小寫"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kRomanNumeralOutputFormat.option.2",
+          "labels" : {
+            "en" : "Unicode Roman Numerals (Uppercase)",
+            "ja" : "Unicodeローマ数字 大文字",
+            "zh-Hans" : "万国码罗马数字(大写)",
+            "zh-Hant" : "萬國碼羅馬數字(大寫)"
+          },
+          "value" : 2
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kRomanNumeralOutputFormat.option.3",
+          "labels" : {
+            "en" : "Unicode Roman Numerals (Lowercase)",
+            "ja" : "Unicodeローマ数字 小文字",
+            "zh-Hans" : "万国码罗马数字(小写)",
+            "zh-Hant" : "萬國碼羅馬數字(小寫)"
+          },
+          "value" : 3
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        3
+      ],
+      "rawValue" : "RomanNumeralOutputFormat",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kReducePOMLifetimeToNoMoreThan12Hours",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, the perception override model's forgetting cycle will be reduced from approximately one week to within 12 hours, clearing infrequently used memory records more quickly.",
+          "shortTitle" : "Enable rapid forgetting mode"
+        },
+        "ja" : {
+          "description" : "有効にすると、臨時記憶モジュールの忘却サイクルが約1週間から12時間以内に短縮され、使用頻度の低いメモリレコードがより迅速にクリアされます。",
+          "shortTitle" : "急速忘却モードを有効にする"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，渐退记忆模组的遗忘周期将从约一周降低至 12 小时内，更快地清除不常用的记忆记录。",
+          "shortTitle" : "启用急速遗忘模式"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，漸退記憶模組的遺忘週期將從約一週降低至 12 小時內，更快地清除不常用的記憶記錄。",
+          "shortTitle" : "啟用急速遺忘模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "ReducePOMLifetimeToNoMoreThan12Hours",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUseSpaceToCommitHighlightedCandidate4SCPC",
+      "labels" : {
+        "en" : {
+          "description" : "If enabled, pressing Space while candidate window is visible will confirm the highlighted candidate instead. This setting is only effective in the Per-Char Select Mode (SCPC).",
+          "shortTitle" : "Use Space to confirm highlighted candidate in Per-Char Select Mode"
+        },
+        "ja" : {
+          "description" : "有効にすると、候補ウィンドウ表示中にスペースキーを押すとハイライトされた候補を確定します。この設定は全候補入力モード（SCPC）でのみ有効です。",
+          "shortTitle" : "全候補入力の場合、ハイライト候補を Space キーで確認"
+        },
+        "zh-Hans" : {
+          "description" : "启用后，在选字窗可见时按空格键将确认高亮候选字。仅逐字选字模式（SCPC）下生效。",
+          "shortTitle" : "在逐字选字模式当中使用空格键确认当前高亮候选字"
+        },
+        "zh-Hant" : {
+          "description" : "啟用後，在選字窗可見時按空格鍵將確認高亮候選字。僅逐字選字模式（SCPC）下生效。",
+          "shortTitle" : "在逐字選字模式當中使用空格鍵確認當前高亮候選字"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UseSpaceToCommitHighlightedCandidate4SCPC",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kEnableCandidateWindowAnimation",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Enable animation for candidate window movement\/resize"
+        },
+        "ja" : {
+          "shortTitle" : "候補ウィンドウの移動\/サイズ変更にアニメーションを適用"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "选字窗移动\/变更大小时启用动画效果"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "選字窗移動\/變更大小時啟用動畫效果"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "EnableCandidateWindowAnimation",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDisableSegmentedThickUnderlineInMarkingModeForManagedClients",
+      "labels" : {
+        "en" : {
+          "description" : "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.",
+          "shortTitle" : "Disable segmented thick underline in marking mode for managed clients"
+        },
+        "ja" : {
+          "description" : "一部の「Web UI を用いた」客体アプリには、多段式太下線の描きをうまく取り扱えぬ支障はございます。このチェックを入れると、IME から「client().setMarkedText()」を経由して、客体に「多段式太下線を書かずに」と命令することはできます。多段式太下線はマーキングモードだけで用いるデザインですが、間違くて別のモードでもそれを書いてしまう客体アプリはございます（多分 IMKTextInput の実作の問題かもしれません）。このチェックは「文脈内入力緩衝列」だけに関わります。",
+          "shortTitle" : "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず"
+        },
+        "zh-Hans" : {
+          "description" : "部分采用 Web 前端介面设计的客体应用可能会无法正常绘制用于输入法标记模式的分段式粗型下划线。这个选项将会阻止输入法借由 client().setMarkedText() 函式向客体应用传达对粗型下划线的分段绘制请求。分段式粗型下划线仅用于输入法的标记模式，除非客体应用对 setMarkedText() 这个 IMKTextInput 协定方法的实作有问题。该选项仅影响内文组字区。",
+          "shortTitle" : "针对被管理的客体，在标记模式下禁用分段式粗型下划线"
+        },
+        "zh-Hant" : {
+          "description" : "部分採用 Web 前端介面設計的客體應用可能會無法正常繪製用於輸入法標記模式的分段式粗型下劃線。這個選項將會阻止輸入法藉由 client().setMarkedText() 函式向客體應用傳達對粗型下劃線的分段繪製請求。分段式粗型下劃線僅用於輸入法的標記模式，除非客體應用對 setMarkedText() 這個 IMKTextInput 協定方法的實作有問題。該選項僅影響內文組字區。",
+          "shortTitle" : "針對被管理的客體，在標記模式下禁用分段式粗型下劃線"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "DisableSegmentedThickUnderlineInMarkingModeForManagedClients",
+      "type" : "bool"
+    },
+    {
+      "default" : "",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : false,
+      "key" : "kCandidateTextFontName",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CandidateTextFontName",
+      "type" : "string"
+    },
+    {
+      "default" : "123456",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : false,
+      "key" : "kCandidateKeys",
+      "labels" : {
+        "en" : {
+          "description" : "This will also affect the row \/ column capacity of the candidate window.",
+          "inlinePrompt" : "Choose or hit Enter to confim your prefered keys for selecting candidates.",
+          "shortTitle" : "Selection Keys:"
+        },
+        "ja" : {
+          "description" : "言選り用キーの数は、候補陳列の行・列の容量制限にも影響。",
+          "inlinePrompt" : "お好きなる言選り用キー陣列をご指定ください。新しい組み合わせは Enter で効かす。",
+          "shortTitle" : "言選り用キー:"
+        },
+        "zh-Hans" : {
+          "description" : "该选项也会影响到选字窗每行\/每列最多显示的候选字数量。",
+          "inlinePrompt" : "请选择您所偏好的用来选字的按键组合。自订组合需敲 Enter 键生效。",
+          "shortTitle" : "选字键:"
+        },
+        "zh-Hant" : {
+          "description" : "該選項也會影響到選字窗每行\/每列最多顯示的候選字數量。",
+          "inlinePrompt" : "請選擇您所偏好的用來選字的按鍵組合。自訂組合需敲 Enter 鍵生效。",
+          "shortTitle" : "選字鍵:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "CandidateKeys",
+      "type" : "string"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kCandidateNarrationToggleType",
+      "labels" : {
+        "en" : {
+          "description" : "Controls when candidate selections are read aloud (text-to-speech). This allows you highlight selections by ear. If multiple candidates share a pronunciation, the system consults the user-customizable Associated Phrases database to explain each character; the accuracy of the explanation depends on the quality of that database.",
+          "shortTitle" : "Candidate Narration Mode:"
+        },
+        "ja" : {
+          "description" : "テキスト読み上げで候補を読み上げるタイミングを設定します。ハイライト済みの候補を耳で確認できます。同じ発音の候補が複数ある場合は、ユーザー関連文節データベースを参照して各漢字の説明を試みます。精度はそのデータベースの品質に依存します。",
+          "shortTitle" : "候補読み上げモード:"
+        },
+        "zh-Hans" : {
+          "description" : "设定何时以文字转语音朗读候选字词，便于透过听觉确认当前高亮显示的候选字词。若有同音候选，系统会查询可由使用者自订的关联词语资料库，尝试说明各字；准确度取决于该资料库的品质。",
+          "shortTitle" : "候选字词念读模式:"
+        },
+        "zh-Hant" : {
+          "description" : "設定何時以文字轉語音朗讀候選字詞，便於透過聽覺確認當前高亮顯示的候選字詞。若有同音候選，系統會查詢可由使用者自訂的關聯詞語資料庫，嘗試說明各字；準確度取決於該資料庫的品質。",
+          "shortTitle" : "候選字詞唸讀模式:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : [
+        {
+          "i18nKey" : "i18n:UserDef.kCandidateNarrationToggleType.option.0",
+          "labels" : {
+            "en" : "Always Off",
+            "ja" : "常にオフ",
+            "zh-Hans" : "总是关闭",
+            "zh-Hant" : "總是關閉"
+          },
+          "value" : 0
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kCandidateNarrationToggleType.option.1",
+          "labels" : {
+            "en" : "Always On",
+            "ja" : "常にオン",
+            "zh-Hans" : "总是开启",
+            "zh-Hant" : "總是開啟"
+          },
+          "value" : 1
+        },
+        {
+          "i18nKey" : "i18n:UserDef.kCandidateNarrationToggleType.option.2",
+          "labels" : {
+            "en" : "Only When VoiceOver is On",
+            "ja" : "VoiceOver がオンの時のみ",
+            "zh-Hans" : "仅在 VoiceOver 开启时",
+            "zh-Hant" : "僅在 VoiceOver 開啟時"
+          },
+          "value" : 2
+        }
+      ],
+      "optionsKind" : "labels",
+      "range" : [
+        0,
+        2
+      ],
+      "rawValue" : "CandidateNarrationToggleType",
+      "type" : "integer"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kAssociatedPhrasesEnabled",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "AssociatedPhrasesEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kPhraseReplacementEnabled",
+      "labels" : {
+        "en" : {
+          "description" : "This will batch-replace specified candidates.",
+          "shortTitle" : "Enable phrase replacement table"
+        },
+        "ja" : {
+          "description" : "指定された候補そのものを置き換える",
+          "shortTitle" : "言葉置換表を起用"
+        },
+        "zh-Hans" : {
+          "description" : "这将会对指定的候选字词进行整词取代。",
+          "shortTitle" : "启用语汇置换表"
+        },
+        "zh-Hant" : {
+          "description" : "這將會對指定的候選字詞進行整詞取代。",
+          "shortTitle" : "啟用語彙置換表"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "PhraseReplacementEnabled",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeySCPC",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Per-Char Select Mode"
+        },
+        "ja" : {
+          "shortTitle" : "全候補入力モード"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "模拟逐字选字输入"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "模擬逐字選字輸入"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeySCPC",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyAssociates",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Associated Phrases"
+        },
+        "ja" : {
+          "shortTitle" : "関連文節モード"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "关联词语模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "關聯詞語模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyAssociates",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyCNS",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "CNS+GBEX Mode"
+        },
+        "ja" : {
+          "shortTitle" : "CNS+GBEXモード"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "CNS+GBEX 模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "CNS+GBEX 模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyCNS",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyKanjiConversionMode",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Revolve Kanji Conversion"
+        },
+        "ja" : {
+          "shortTitle" : "漢字変換モード循環"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "轮替汉字转换"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "輪替漢字轉換"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyKanjiConversionMode",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyPinyinZhuyinTypingSwitch",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Pinyin\/Zhuyin Typing Mode Switch"
+        },
+        "ja" : {
+          "shortTitle" : "弁音\/注音タイピングモード切替"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "拼音\/注音打字模式切换"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "拼音\/注音打字模式切換"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyPinyinZhuyinTypingSwitch",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyHalfWidthPunctuation",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Half-Width Punctuation Mode"
+        },
+        "ja" : {
+          "shortTitle" : "半角句読モード"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "半形标点模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "半形標點模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyHalfWidthPunctuation",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyCurrencyNumerals",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Currency Numeral Output"
+        },
+        "ja" : {
+          "shortTitle" : "数字大字変換"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "大写汉字数字输出"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "大寫漢字數字輸出"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyCurrencyNumerals",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyCassette",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "CIN Cassette Mode"
+        },
+        "ja" : {
+          "shortTitle" : "CIN カセットモード"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "CIN 磁带模式"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "CIN 磁帶模式"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyCassette",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyRevLookup",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "Reverse Lookup (Phonabets)"
+        },
+        "ja" : {
+          "shortTitle" : "注音音読逆引参照"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "注音反查"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "注音反查"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyRevLookup",
+      "type" : "bool"
+    },
+    {
+      "default" : true,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kUsingHotKeyInputMode",
+      "labels" : {
+        "en" : {
+          "shortTitle" : "CHS \/ CHT Input Mode Switch"
+        },
+        "ja" : {
+          "shortTitle" : "簡体・繁体中国語入力の切り替え"
+        },
+        "zh-Hans" : {
+          "shortTitle" : "简体\/繁体中文输入模式切换"
+        },
+        "zh-Hant" : {
+          "shortTitle" : "簡體\/繁體中文輸入模式切換"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "UsingHotKeyInputMode",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kFilterFactoryKanjisOfNonCurrentInputMode",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, single-kanji candidates that are exclusive to the opposite script mode (e.g. simplified-only characters in Traditional mode) will be removed from the candidate window. Characters supported by EtenDOS and CNS are never filtered. Note: The filtering scope is limited to characters within Unicode 1.0.1 (the EtenDOS character set); characters introduced in later Unicode versions are not covered.",
+          "shortTitle" : "Filter out kanji candidates unrelated to the current input mode"
+        },
+        "ja" : {
+          "description" : "有効にすると、逆のスクリプトモードにのみ存在する単漢字候補（例：繁体字モードでの簡体字専用文字）が候補ウィンドウから削除されます。倚天中文システム対応の漢字とCNS全字庫漢字は影響を受けません。注意：フィルタ範囲は Unicode 1.0.1（倚天中文システムの収字範囲）に限定されます。それ以降の Unicode バージョンで追加された文字は対象外です。",
+          "shortTitle" : "入力モードに不対応の漢字候補を遮断する"
+        },
+        "zh-Hans" : {
+          "description" : "启用时，仅存在于相反输入模式（如在简体模式下出现的繁体特有字）的单一汉字候选将从选字窗中移除。倚天中文系统支持的汉字与 CNS 全字库汉字不受影响。注意：过滤范围仅限于万国码 1.0.1 所支持的汉字（即倚天中文系统收字范围）；较新版本万国码才引入的字元不在覆盖范围内。",
+          "shortTitle" : "滤除掉与输入模式不相符的汉字候选"
+        },
+        "zh-Hant" : {
+          "description" : "啟用時，僅存在於相反輸入模式（如在繁體模式下出現的簡體特有字）的單一漢字候選將從選字窗中移除。倚天中文系統支援的漢字與 CNS 全字庫漢字不受影響。注意：過濾範圍僅限萬國碼 1.0.1 所支援的漢字（即倚天中文系統收字範圍）；較新版本萬國碼才引入的字元不在覆蓋範圍內。",
+          "shortTitle" : "濾除掉與輸入模式不相符的漢字候選"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "FilterFactoryKanjisOfNonCurrentInputMode",
+      "type" : "bool"
+    }
+  ],
+  "extraLabelPrefixes" : [
+    "i18n:KeyboardLayout.",
+    "i18n:TypingMethod."
+  ],
+  "extraLabels" : {
+    "en" : {
+      "i18n:KeyboardLayout.AlvinLiuImitative" : "Alvin Liu (Imitative)",
+      "i18n:KeyboardLayout.AppleABC" : "Apple ABC (equivalent to English US)",
+      "i18n:KeyboardLayout.AppleChewingDachen" : "Apple Chewing - Dachen",
+      "i18n:KeyboardLayout.AppleChewingEtenTraditional" : "Apple Chewing - Eten Traditional",
+      "i18n:KeyboardLayout.AppleZhuyinBopomofoDachen" : "Apple Zhuyin Bopomofo (Standard)",
+      "i18n:KeyboardLayout.AppleZhuyinEtenTraditional" : "Apple Zhuyin Eten (Traditional)",
+      "i18n:KeyboardLayout.Dachen26" : "Dachen 26 (libChewing)",
+      "i18n:KeyboardLayout.DachenMicrosoftStandard" : "Dachen (Microsoft Standard \/ Wang \/ 01, etc.)",
+      "i18n:KeyboardLayout.DachenTraditional" : "Dachen Trad.",
+      "i18n:KeyboardLayout.Eten26" : "Eten 26",
+      "i18n:KeyboardLayout.EtenTraditional" : "Eten Traditional",
+      "i18n:KeyboardLayout.EtenTraditionalShort" : "Eten Trad.",
+      "i18n:KeyboardLayout.FakeSeigyou" : "Fake Seigyou (Similar to JinYei)",
+      "i18n:KeyboardLayout.Hsu" : "Hsu",
+      "i18n:KeyboardLayout.IBM" : "IBM",
+      "i18n:KeyboardLayout.MiTAC" : "MiTAC",
+      "i18n:KeyboardLayout.Seigyou" : "Seigyou (JinYei)",
+      "i18n:KeyboardLayout.Starlight" : "Starlight",
+      "i18n:TypingMethod.HanyuPinyinNumeral" : "Hanyu Pinyin with Numeral Intonation",
+      "i18n:TypingMethod.HualuoPinyinNumeral" : "Hualuo Pinyin with Numeral Intonation",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidCharacter" : "Only valid digits are allowed. E.g.: [1, 9] for the largest digit; [0, 9] for other digits.",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidInput" : "Invalid input.",
+      "i18n:TypingMethod.RomanNumerals.ErrorValueOutOfRange" : "Value out of range (1-3999).",
+      "i18n:TypingMethod.RomanNumerals.Tooltip" : "Roman Numeral Input.",
+      "i18n:TypingMethod.SecondaryPinyinNumeral" : "Secondary Pinyin with Numeral Intonation",
+      "i18n:TypingMethod.UniversalPinyinNumeral" : "Universal Pinyin with Numeral Intonation",
+      "i18n:TypingMethod.WadeGilesPinyinNumeral" : "Wade-Giles Pinyin with Numeral Intonation",
+      "i18n:TypingMethod.YalePinyinNumeral" : "Yale Pinyin with Numeral Intonation"
+    },
+    "ja" : {
+      "i18n:KeyboardLayout.AlvinLiuImitative" : "劉又銘擬音注音配列",
+      "i18n:KeyboardLayout.AppleABC" : "Apple ABC (Apple U.S. キーボードと同じ)",
+      "i18n:KeyboardLayout.AppleChewingDachen" : "Apple 大千注音キーボード",
+      "i18n:KeyboardLayout.AppleChewingEtenTraditional" : "Apple 倚天傳統キーボード",
+      "i18n:KeyboardLayout.AppleZhuyinBopomofoDachen" : "Apple 注音ボポモフォ（大千標準）",
+      "i18n:KeyboardLayout.AppleZhuyinEtenTraditional" : "Apple 注音ボポモフォ（倚天伝統）",
+      "i18n:KeyboardLayout.Dachen26" : "酷音大千 26 キー配列",
+      "i18n:KeyboardLayout.DachenMicrosoftStandard" : "大千配列 (Microsoft 標準・王安・零壹など)",
+      "i18n:KeyboardLayout.DachenTraditional" : "大千伝統",
+      "i18n:KeyboardLayout.Eten26" : "倚天形忘れ配列 (26 キー)",
+      "i18n:KeyboardLayout.EtenTraditional" : "倚天伝統配列",
+      "i18n:KeyboardLayout.EtenTraditionalShort" : "倚天伝統",
+      "i18n:KeyboardLayout.FakeSeigyou" : "偽精業配列",
+      "i18n:KeyboardLayout.Hsu" : "許氏国音自然配列",
+      "i18n:KeyboardLayout.IBM" : "IBM 配列",
+      "i18n:KeyboardLayout.MiTAC" : "神通配列",
+      "i18n:KeyboardLayout.Seigyou" : "精業配列",
+      "i18n:KeyboardLayout.Starlight" : "星光配列",
+      "i18n:TypingMethod.HanyuPinyinNumeral" : "漢語弁音 (ローマ字+数字音調)",
+      "i18n:TypingMethod.HualuoPinyinNumeral" : "中華ローマ弁音 (ローマ字+数字音調)",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidCharacter" : "有効な数字のみ許可されます。例：最上位桁は [1, 9]、他の桁は [0, 9]。",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidInput" : "無効な打込。",
+      "i18n:TypingMethod.RomanNumerals.ErrorValueOutOfRange" : "範囲外の値（1-3999）。",
+      "i18n:TypingMethod.RomanNumerals.Tooltip" : "ローマ数字打込。",
+      "i18n:TypingMethod.SecondaryPinyinNumeral" : "国音二式 (ローマ字+数字音調)",
+      "i18n:TypingMethod.UniversalPinyinNumeral" : "汎用弁音 (ローマ字+数字音調)",
+      "i18n:TypingMethod.WadeGilesPinyinNumeral" : "ウェード式弁音 (ローマ字+数字音調)",
+      "i18n:TypingMethod.YalePinyinNumeral" : "イェール弁音 (ローマ字+数字音調)"
+    },
+    "zh-Hans" : {
+      "i18n:KeyboardLayout.AlvinLiuImitative" : "刘又铭拟音注音排列",
+      "i18n:KeyboardLayout.AppleABC" : "Apple ABC (与 Apple 美规键盘等价)",
+      "i18n:KeyboardLayout.AppleChewingDachen" : "Apple 大千注音键盘布局",
+      "i18n:KeyboardLayout.AppleChewingEtenTraditional" : "Apple 倚天传统键盘布局",
+      "i18n:KeyboardLayout.AppleZhuyinBopomofoDachen" : "Apple 标准注音键盘布局 (大千)",
+      "i18n:KeyboardLayout.AppleZhuyinEtenTraditional" : "Apple 倚天注音键盘布局 (传统)",
+      "i18n:KeyboardLayout.Dachen26" : "酷音大千二十六键排列",
+      "i18n:KeyboardLayout.DachenMicrosoftStandard" : "大千排列 (微软标准\/王安\/零壹\/仲鼎\/国乔)",
+      "i18n:KeyboardLayout.DachenTraditional" : "大千传统",
+      "i18n:KeyboardLayout.Eten26" : "倚天忘形排列 (26 键)",
+      "i18n:KeyboardLayout.EtenTraditional" : "倚天传统排列",
+      "i18n:KeyboardLayout.EtenTraditionalShort" : "倚天传统",
+      "i18n:KeyboardLayout.FakeSeigyou" : "伪精业排列",
+      "i18n:KeyboardLayout.Hsu" : "许氏国音自然排列",
+      "i18n:KeyboardLayout.IBM" : "IBM 排列",
+      "i18n:KeyboardLayout.MiTAC" : "神通排列",
+      "i18n:KeyboardLayout.Seigyou" : "精业排列",
+      "i18n:KeyboardLayout.Starlight" : "星光排列",
+      "i18n:TypingMethod.HanyuPinyinNumeral" : "汉语拼音+数字标调",
+      "i18n:TypingMethod.HualuoPinyinNumeral" : "华罗拼音+数字标调",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidCharacter" : "仅允许有效数字。例如：首位数字为 [1, 9]；其他位数字为 [0, 9]。",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidInput" : "无效输入。",
+      "i18n:TypingMethod.RomanNumerals.ErrorValueOutOfRange" : "数值超出范围（1-3999）。",
+      "i18n:TypingMethod.RomanNumerals.Tooltip" : "罗马数字输入。",
+      "i18n:TypingMethod.SecondaryPinyinNumeral" : "国音二式+数字标调",
+      "i18n:TypingMethod.UniversalPinyinNumeral" : "通用拼音+数字标调",
+      "i18n:TypingMethod.WadeGilesPinyinNumeral" : "韦氏拼音+数字标调",
+      "i18n:TypingMethod.YalePinyinNumeral" : "耶鲁拼音+数字标调"
+    },
+    "zh-Hant" : {
+      "i18n:KeyboardLayout.AlvinLiuImitative" : "劉又銘擬音注音排列",
+      "i18n:KeyboardLayout.AppleABC" : "Apple ABC (與 Apple 美規鍵盤等價)",
+      "i18n:KeyboardLayout.AppleChewingDachen" : "Apple 大千注音鍵盤佈局",
+      "i18n:KeyboardLayout.AppleChewingEtenTraditional" : "Apple 倚天傳統鍵盤佈局",
+      "i18n:KeyboardLayout.AppleZhuyinBopomofoDachen" : "Apple 標準注音鍵盤佈局 (大千)",
+      "i18n:KeyboardLayout.AppleZhuyinEtenTraditional" : "Apple 倚天注音鍵盤佈局 (傳統)",
+      "i18n:KeyboardLayout.Dachen26" : "酷音大千二十六鍵排列",
+      "i18n:KeyboardLayout.DachenMicrosoftStandard" : "大千排列 (微軟標準\/王安\/零壹\/仲鼎\/國喬)",
+      "i18n:KeyboardLayout.DachenTraditional" : "大千傳統",
+      "i18n:KeyboardLayout.Eten26" : "倚天忘形排列 (26 鍵)",
+      "i18n:KeyboardLayout.EtenTraditional" : "倚天傳統排列",
+      "i18n:KeyboardLayout.EtenTraditionalShort" : "倚天傳統",
+      "i18n:KeyboardLayout.FakeSeigyou" : "偽精業排列",
+      "i18n:KeyboardLayout.Hsu" : "許氏國音自然排列",
+      "i18n:KeyboardLayout.IBM" : "IBM 排列",
+      "i18n:KeyboardLayout.MiTAC" : "神通排列",
+      "i18n:KeyboardLayout.Seigyou" : "精業排列",
+      "i18n:KeyboardLayout.Starlight" : "星光排列",
+      "i18n:TypingMethod.HanyuPinyinNumeral" : "漢語拼音+數字標調",
+      "i18n:TypingMethod.HualuoPinyinNumeral" : "華羅拼音+數字標調",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidCharacter" : "僅允許有效數字。例如：首位數字為 [1, 9]；其他位數字為 [0, 9]。",
+      "i18n:TypingMethod.RomanNumerals.ErrorInvalidInput" : "無效輸入。",
+      "i18n:TypingMethod.RomanNumerals.ErrorValueOutOfRange" : "數值超出範圍（1-3999）。",
+      "i18n:TypingMethod.RomanNumerals.Tooltip" : "羅馬數字輸入。",
+      "i18n:TypingMethod.SecondaryPinyinNumeral" : "國音二式+數字標調",
+      "i18n:TypingMethod.UniversalPinyinNumeral" : "通用拼音+數字標調",
+      "i18n:TypingMethod.WadeGilesPinyinNumeral" : "韋氏拼音+數字標調",
+      "i18n:TypingMethod.YalePinyinNumeral" : "耶魯拼音+數字標調"
+    }
+  },
+  "generator" : "vChewingSharedCLI dump-userdef-metadata",
+  "locales" : [
+    "zh-Hant",
+    "zh-Hans",
+    "en",
+    "ja"
+  ],
+  "missingI18nKeys" : [
+
+  ],
+  "pendingMetadataKeys" : [
+
+  ],
+  "schemaVersion" : 1
+}

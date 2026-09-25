@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>唯音輸入法配置助手 // vChewing Configuration Assistant</title>
+<!--
+  本檔為**建置產物**（單檔自足：CSS 與 JS 皆已內聯），請勿直接編輯。
+  來源：vChewing-macOS/ValueAdd/WebConfigAssistant/
+  建置：make bundle // 產出時間 {{BUILD_STAMP}}
+  授權：MulanPSL-2.0（與 vChewing-macOS 之自研內容一致）
+-->
+<style>
+{{STYLE}}
+</style>
+</head>
+<body>
+<div id="vca-root"></div>
+<noscript>
+  <div class="vca-noscript">唯音輸入法配置助手需要 JavaScript 才能運作。請在瀏覽器設定內啟用 JavaScript 後重新載入本頁。</div>
+</noscript>
+<script>
+{{SCRIPT}}
+</script>
+<script>
+VCA.boot();
+</script>
+</body>
+</html>

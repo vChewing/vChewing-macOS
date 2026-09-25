@@ -1,0 +1,630 @@
+/* ==========================================================================
+   唯音輸入法配置助手 // Windows 2000 / Windows ME 風格樣式表
+   --------------------------------------------------------------------------
+   色彩基準（事主指定）：
+     桌面底色 #3B6EA5 ／ 窗體 #C0C0C0 ／ 文字 #000 ／ 字型 Tahoma, Helvetica Neue, sans-serif
+   規範：
+     - 一律 CSS2.1 之寫法（`outset`／`inset`／`groove` 之 3D 邊框），
+       凡較新者（漸層、圓角、`box-shadow`、`::-webkit-scrollbar`）皆為**增益**：
+       不支援時自然退化、不影響可用性。
+     - 不用 flexbox／grid（Safari 7 不支援），版面以 table 佈局為之。
+     - 復古不可凌駕無障礙：可見焦點環、對比度、鍵盤可操作、語意標記皆保留。
+   ========================================================================== */
+
+/* ------------------------------- 桌面與窗體 ------------------------------- */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #3B6EA5;
+  color: #000;
+  font: 12px Tahoma, "Helvetica Neue", sans-serif;
+  line-height: 1.55;
+}
+
+.vca-window {
+  width: 720px;
+  max-width: 94%;
+  margin: 28px auto;
+  background: #C0C0C0;
+  border: 2px outset #C0C0C0;
+  color: #000;
+}
+
+.vca-noscript {
+  width: 720px;
+  max-width: 94%;
+  margin: 28px auto;
+  padding: 16px;
+  background: #C0C0C0;
+  border: 2px outset #C0C0C0;
+  color: #000;
+}
+
+/* --------------------------------- 標題帶 --------------------------------- */
+
+.vca-titlebar {
+  position: relative;
+  height: 20px;
+  padding: 2px 4px 2px 4px;
+  background: #0A246A;
+  background-image: -webkit-linear-gradient(left, #0A246A, #A6CAF0);
+  background-image: linear-gradient(to right, #0A246A, #A6CAF0);
+  color: #FFF;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.vca-titlebar-text {
+  float: left;
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 20px;
+  line-height: 20px;
+}
+
+.vca-titlebar-right {
+  /* 以 inline-table ＋ 兩個 table-cell 作垂直置中：與字型基線無關、不靠 vertical-align 之
+     半 x-height 補正（後者在 inline-block 上會把內容整體推低；事主 2026-09-24 指出分段方塊
+     「過於貼近標題列的底側」即此）。 */
+  float: right;
+  display: inline-table;
+  height: 20px;
+  line-height: 20px;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+.vca-titlebar-progress {
+  display: table-cell;
+  vertical-align: middle; /* 於 20px 之格位內置中（行盒之上下留白對稱） */
+  line-height: 20px;
+  padding-left: 8px; /* 與左側視窗標題之距離 */
+}
+
+.vca-seg-host {
+  display: table-cell;
+  vertical-align: middle; /* 於 20px 之格位內置中 */
+  /* 行盒高度＝方塊之總高（9 ＋ 上下各 1 之邊框＝11），故格位置中即方塊置中，
+     完全不涉及基線計算。 */
+  line-height: 11px;
+  padding-left: 10px; /* 步數文字與分段方塊之間距（事主 2026-09-24 要求隔開） */
+  padding-right: 2px;
+}
+
+.vca-seg {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 2px;
+  background: #FFF;
+  border: 1px solid #0A246A;
+  /* 行盒已恰為方塊高，故對齊行盒之頂即等於置中。 */
+  vertical-align: top;
+}
+
+.vca-seg-done {
+  background: #0A246A;
+  border-color: #FFF;
+}
+
+/* -------------------------------- 版面容積 -------------------------------- */
+
+.vca-body {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.vca-left {
+  display: table-cell;
+  width: 168px;
+  vertical-align: top;
+  padding: 14px 12px;
+  background: #FFF;
+  border-right: 1px solid #808080;
+  color: #000;
+}
+
+.vca-glyph {
+  font-size: 52px;
+  line-height: 1.1;
+  text-align: center;
+  color: #3B6EA5;
+  margin: 4px 0 12px 0;
+  font-family: "Apple Symbols", Tahoma, "Helvetica Neue", sans-serif;
+}
+
+.vca-left-title {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.vca-left-note {
+  font-size: 11px;
+  color: #000;
+}
+
+.vca-main {
+  display: table-cell;
+  vertical-align: top;
+  background: #C0C0C0;
+  padding: 0;
+}
+
+.vca-content {
+  /* **固定**高度（非 max-height）：各頁之窗體遂等高、底部按鈕之位置不隨頁面內容位移
+     ——俾使連續點「上一步／下一步」者不必追逐按鈕（事主 2026-09-24）。
+     2026-09-24 覆核後再 +100px（390 → 490）。內容過長者於區內捲動。 */
+  height: 490px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 16px 6px 16px;
+}
+
+.vca-footer {
+  border-top: 1px solid #808080;
+  background: #C0C0C0;
+  padding: 9px 12px;
+  text-align: right;
+}
+
+/* --------------------------------- 標題層級 -------------------------------- */
+
+.vca-h1 {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+}
+
+.vca-h2 {
+  font-size: 12px;
+  font-weight: bold;
+  margin: 14px 0 6px 0;
+}
+
+.vca-p {
+  margin: 0 0 9px 0;
+}
+
+.vca-lead {
+  margin: 0 0 12px 0;
+}
+
+.vca-rule {
+  border: 0;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #FFF;
+  height: 0;
+  margin: 12px 0;
+}
+
+.vca-link {
+  color: #0000EE;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.vca-link:visited {
+  color: #551A8B;
+}
+
+/* --------------------------------- 控制項 --------------------------------- */
+
+.vca-btn {
+  font: 12px Tahoma, "Helvetica Neue", sans-serif;
+  color: #000;
+  background: #C0C0C0;
+  border: 2px outset #C0C0C0;
+  padding: 2px 12px;
+  min-width: 76px;
+  min-height: 23px;
+  margin-left: 6px;
+  cursor: default;
+}
+
+.vca-btn:active {
+  border-style: inset;
+}
+
+.vca-btn:disabled {
+  color: #808080;
+}
+
+.vca-btn:focus {
+  outline: 1px dotted #000;
+}
+
+.vca-btn-small {
+  min-width: 0;
+  min-height: 0;
+  padding: 0 6px;
+  margin-left: 3px;
+  font-size: 11px;
+}
+
+.vca-input,
+.vca-num,
+.vca-select,
+.vca-textarea {
+  font: 12px Tahoma, "Helvetica Neue", sans-serif;
+  color: #000;
+  background: #FFF;
+  border: 2px inset #C0C0C0;
+  padding: 1px 3px;
+}
+
+.vca-input:focus,
+.vca-num:focus,
+.vca-select:focus,
+.vca-textarea:focus {
+  outline: 1px dotted #000;
+}
+
+.vca-num {
+  width: 64px;
+  text-align: right;
+}
+
+.vca-input {
+  width: 260px;
+}
+
+.vca-textarea {
+  width: 96%;
+  height: 150px;
+  font: 11px "Courier New", Courier, monospace;
+  white-space: pre;
+  overflow: auto;
+}
+
+.vca-select {
+  min-width: 120px;
+}
+
+.vca-spin {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 3px;
+}
+
+.vca-spin-btn {
+  display: block;
+  width: 17px;
+  height: 11px;
+  padding: 0;
+  margin: 0 0 1px 0;
+  background: #C0C0C0;
+  border: 1px outset #C0C0C0;
+  font: 8px Tahoma, "Helvetica Neue", sans-serif;
+  line-height: 9px;
+  text-align: center;
+  color: #000;
+  cursor: default;
+}
+
+.vca-spin-btn:active {
+  border-style: inset;
+}
+
+/* 分組框：Win2000 之 engraved 框線。 */
+
+.vca-group {
+  border: 2px groove #C0C0C0;
+  margin: 0 0 12px 0;
+  padding: 6px 12px 10px 12px;
+}
+
+.vca-group > legend {
+  font-weight: bold;
+  padding: 0 4px;
+}
+
+/* 選項：原生控制項以 `opacity: 0` 隱藏、由緊鄰之 `.vca-box` 繪製 Win2000 外觀。
+   如此可保住語意（label 之點擊、鍵盤、輔助技術）與復古外觀。 */
+
+.vca-opt {
+  display: block;
+  position: relative;
+  margin: 0 0 4px 0;
+  padding-left: 20px;
+  min-height: 16px;
+  cursor: default;
+}
+
+.vca-opt input {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.vca-box {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 11px;
+  height: 11px;
+  background: #FFF;
+  border: 1px solid;
+  border-color: #808080 #FFF #FFF #808080;
+}
+
+.vca-opt input[type="radio"] + .vca-box {
+  border-radius: 7px;
+}
+
+.vca-opt input[type="checkbox"]:checked + .vca-box:after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  width: 3px;
+  height: 7px;
+  border: solid #000;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.vca-opt input[type="radio"]:checked + .vca-box:after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 5px;
+  height: 5px;
+  background: #000;
+  border-radius: 3px;
+}
+
+.vca-opt input:focus + .vca-box {
+  outline: 1px dotted #000;
+}
+
+.vca-opt input:disabled + .vca-box {
+  background: #C0C0C0;
+}
+
+.vca-opt input:disabled ~ .vca-opt-label {
+  color: #808080;
+}
+
+.vca-opt-label {
+  display: inline;
+}
+
+/* 選項群內之分隔線（與設定介面之分組對位）。 */
+
+.vca-opt-sep {
+  border: 0;
+  border-top: 1px solid #808080;
+  margin: 5px 0 5px 20px;
+}
+
+.vca-opt-note {
+  /* 色與字級見上方之共用規則；此處只定其與「維持不變」之間距
+     （事主 2026-09-24：原 2px 過於貼近，改 8px）。 */
+  margin-left: 8px;
+}
+
+/* ------------------------------- 提示與警告 ------------------------------- */
+
+.vca-hint {
+  font-size: 11px;
+  margin: 2px 0 10px 0;
+}
+
+.vca-q {
+  margin: 0 0 14px 0;
+}
+
+.vca-q-title {
+  font-weight: bold;
+  margin: 0 0 4px 0;
+}
+
+.vca-why {
+  margin: 4px 0 2px 0;
+  font-size: 11px;
+}
+
+/* 小字（色為事主指定之 #114514）：推薦值、維持不變之註記、首頁之適配版本。
+   **一律不走 opacity**——黑字壓在 #C0C0C0 上時 0.9 之 alpha 幾乎無可見差異，
+   且半透明會把指定色沖淡（0.9 之 alpha 疊在 #C0C0C0 上得約 #22512A，非原色）。 */
+
+.vca-rec,
+.vca-opt-note,
+.vca-version {
+  color: #114514;
+  font-size: 11px;
+}
+
+.vca-rec {
+  margin: 2px 0 0 0;
+}
+
+.vca-version {
+  margin: 0 0 12px 0;
+}
+
+.vca-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 4px;
+  background: #0A246A;
+  color: #FFF;
+  font-size: 10px;
+  font-weight: normal;
+}
+
+/* 接待說明（來源頁）：Win2000 之唯讀欄位風——白底、內凹框線。 */
+
+.vca-note-box {
+  background: #FFF;
+  border: 2px inset #C0C0C0;
+  padding: 8px 10px;
+  margin: 10px 0 0 0;
+}
+
+.vca-warn {
+  border: 1px solid #808080;
+  background: #FFFFE1;
+  padding: 6px 8px;
+  margin: 0 0 12px 0;
+}
+
+/* --------------------------------- 摘要頁 --------------------------------- */
+
+.vca-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #FFF;
+  border: 2px inset #C0C0C0;
+}
+
+.vca-table th,
+.vca-table td {
+  border-bottom: 1px solid #C0C0C0;
+  padding: 3px 6px;
+  text-align: left;
+  vertical-align: top;
+  font-weight: normal;
+}
+
+.vca-table th {
+  background: #C0C0C0;
+  font-weight: bold;
+  border-bottom: 1px solid #808080;
+}
+
+.vca-table td.vca-td-value {
+  white-space: nowrap;
+}
+
+.vca-steps {
+  margin: 0 0 10px 18px;
+  padding: 0;
+}
+
+.vca-steps li {
+  margin: 0 0 4px 0;
+}
+
+/* --------------------------------- 對話框 --------------------------------- */
+
+.vca-modal-layer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  opacity: 0.25;
+  filter: alpha(opacity=25);
+}
+
+.vca-dialog {
+  position: fixed;
+  left: 50%;
+  top: 22%;
+  width: 380px;
+  margin-left: -190px;
+  background: #C0C0C0;
+  border: 2px outset #C0C0C0;
+}
+
+.vca-dialog-body {
+  padding: 16px 16px 8px 16px;
+}
+
+.vca-dialog-footer {
+  padding: 8px 12px 12px 12px;
+  text-align: right;
+}
+
+/* ------------------------------- 捲軸（Win2000 風） ------------------------------- */
+
+.vca-content::-webkit-scrollbar,
+.vca-textarea::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+.vca-content::-webkit-scrollbar-track,
+.vca-textarea::-webkit-scrollbar-track {
+  background: #DFDFDF;
+  border-left: 1px solid #808080;
+}
+
+.vca-content::-webkit-scrollbar-thumb,
+.vca-textarea::-webkit-scrollbar-thumb {
+  background: #C0C0C0;
+  border: 2px outset #C0C0C0;
+  min-height: 20px;
+}
+
+.vca-content::-webkit-scrollbar-button:single-button,
+.vca-textarea::-webkit-scrollbar-button:single-button {
+  background: #C0C0C0;
+  border: 2px outset #C0C0C0;
+  height: 16px;
+  width: 16px;
+}
+
+.vca-content::-webkit-scrollbar-corner,
+.vca-textarea::-webkit-scrollbar-corner {
+  background: #C0C0C0;
+}
+
+/* --------------------------------- 窄螢幕 --------------------------------- */
+
+/* 視口不夠高時縮短內容區——惟仍為**固定**高度，故按鈕位置依然恆定。 */
+
+@media (max-height: 780px) {
+  .vca-content {
+    height: 430px;
+  }
+}
+
+@media (max-height: 660px) {
+  .vca-content {
+    height: 340px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vca-window {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .vca-content {
+    height: 420px;
+  }
+
+  .vca-body,
+  .vca-left,
+  .vca-main {
+    display: block;
+    width: auto;
+  }
+
+  .vca-left {
+    border-right: 0;
+    border-bottom: 1px solid #808080;
+  }
+
+  .vca-glyph {
+    font-size: 32px;
+    margin: 0 0 6px 0;
+  }
+}

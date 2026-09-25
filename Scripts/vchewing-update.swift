@@ -371,7 +371,7 @@ func isLegacyByMacOSDeployment(_ pbxPath: String) -> Bool {
   return false
 }
 
-/// 檢查版本資訊是否確實寫入專案檔案（Xcode 專案 + 兩份 plist）。
+/// 檢查版本資訊是否確實寫入專案檔案（Xcode 專案 + 兩份 plist + 配置助手之 version.txt）。
 /// 只要有任何一處與期望值不符（或根本沒寫入），就回傳 false。
 func versionStampIsLanded(version: String, build: String) -> Bool {
   guard let pbxPath = locatePbxproj(at: repoPath),
@@ -405,6 +405,18 @@ func versionStampIsLanded(version: String, build: String) -> Bool {
           (plist["CFBundleShortVersionString"] as? String) == version,
           (plist["CFBundleVersion"] as? String) == build
     else { return false }
+  }
+
+  // 配置助手側之 version.txt（其所在目錄缺席時略過——該助手不隨發行版出貨）。
+  let assistantVersionRelPath = "ValueAdd/WebConfigAssistant/version.txt"
+  let assistantVersionPath = repoPath + "/" + assistantVersionRelPath
+  if FileManager.default.fileExists(atPath: assistantVersionPath) {
+    guard let content = try? String(contentsOfFile: assistantVersionPath, encoding: .utf8)
+    else { return false }
+    let lines = content.split(separator: "\n").map(String.init)
+    guard lines.contains("version=" + version), lines.contains("build=" + build) else {
+      return false
+    }
   }
 
   return true
@@ -519,6 +531,7 @@ if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swi
     // 專案內其他未提交的變更都會被 `git add -A` 一起收進版本提交，故先提醒。
     let versionedRelPaths = [
       "vChewing.xcodeproj/project.pbxproj", "Update-Info.plist", "Release-Version.plist",
+      "ValueAdd/WebConfigAssistant/version.txt",
     ]
     let otherDirty = Shell.runExec(
       "/usr/bin/git",
