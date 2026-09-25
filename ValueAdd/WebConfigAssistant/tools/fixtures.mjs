@@ -17,7 +17,11 @@ const CORE = path.join(ROOT, 'dist', 'core.js');
 const OUT_DIR = path.join(ROOT, 'tests', 'fixtures');
 const CHECK_DIR = path.join(ROOT, 'dist', 'fixtures');
 
-/// 情境：一組 profile ＋ 是否逐頁「以推薦值補齊」＋ 額外之手動答案。
+/// 情境：一組 profile ＋ 是否套用起始配置／逐頁「以推薦值補齊」＋ 額外之手動答案。
+///
+/// `starter: true` 者以 `starterFor()` 之產物填答——即助手之「起始配置」真實寫入之內容
+/// （封閉於鍵全集：指名者取其值、餘者回歸出廠預設），故 Swift 側之契約測試遂一併涵蓋
+/// 「多人共用一台電腦、來回套用配置」時所產生的那一種包。
 const SCENARIOS = [
   {
     name: 'msnewphonetic-scpc',
@@ -50,6 +54,15 @@ const SCENARIOS = [
     profile: { origin: 'newbie', typing: 'unsure' },
     fillAllPages: false,
     manualAnswers: { CandidateListTextSize: 32 },
+  },
+  {
+    name: 'starter-macoszhuyin',
+    title: 'macOS 內建注音轉唯音（起始配置）',
+    description: '由唯音輸入法配置助手生成：macOS 內建注音之用戶，套用助手建議之起始配置。',
+    profile: { origin: 'macoszhuyin', typing: 'zhuyin' },
+    starter: true,
+    fillAllPages: false,
+    manualAnswers: {},
   },
 ];
 
@@ -88,6 +101,11 @@ function buildScenario(VCA, scenario) {
     }
     state.answers[key] = scenario.manualAnswers[key];
     state.manual[key] = true;
+  }
+  if (scenario.starter === true) {
+    // 起始配置之封閉全集：指名者取其推薦值、餘者回歸唯音之出廠預設。
+    const starter = VCA.starterFor(scenario.profile, null);
+    for (const raw of starter.keys) state.answers[raw] = starter.values[raw];
   }
   if (scenario.fillAllPages) {
     for (const step of steps) {

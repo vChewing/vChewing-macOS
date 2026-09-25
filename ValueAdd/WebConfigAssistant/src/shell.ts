@@ -20,6 +20,8 @@ namespace VCA {
     /// 標題帶右側之「分段方塊」格位（`display: table-cell`）。
     titleSegments: HTMLElement;
     backBtn: HTMLButtonElement;
+    /// 「跳到摘要」鈕：只在「後面還有兩頁以上」時露面（見 main.ts 之 render）。
+    skipBtn: HTMLButtonElement;
     nextBtn: HTMLButtonElement;
     cancelBtn: HTMLButtonElement;
   }
@@ -66,15 +68,20 @@ namespace VCA {
     var footer = el("div", "vca-footer", null);
     var cancelBtn = el("button", "vca-btn", t("nav.cancel")) as HTMLButtonElement;
     var backBtn = el("button", "vca-btn", t("nav.back")) as HTMLButtonElement;
+    // 「跳到摘要」：起始配置之後，使用者隨時可就此收束（事主 2026-09-25：不必硬控走完全程）。
+    var skipBtn = el("button", "vca-btn", t("nav.toSummary")) as HTMLButtonElement;
     var nextBtn = el("button", "vca-btn", t("nav.next")) as HTMLButtonElement;
     cancelBtn.type = "button";
     backBtn.type = "button";
+    skipBtn.type = "button";
     nextBtn.type = "button";
     cancelBtn.onclick = function () { handlers.onNav("cancel"); return false; };
     backBtn.onclick = function () { handlers.onNav("back"); return false; };
+    skipBtn.onclick = function () { handlers.onNav("summary"); return false; };
     nextBtn.onclick = function () { handlers.onNav("next"); return false; };
     footer.appendChild(cancelBtn);
     footer.appendChild(backBtn);
+    footer.appendChild(skipBtn);
     footer.appendChild(nextBtn);
 
     root.appendChild(titlebar);
@@ -86,7 +93,7 @@ namespace VCA {
       root: root, glyph: glyph, leftTitle: leftTitle, leftNote: leftNote,
       content: content, titleText: titleText, titleProgress: titleProgress,
       titleSegments: titleSegments,
-      backBtn: backBtn, nextBtn: nextBtn, cancelBtn: cancelBtn,
+      backBtn: backBtn, skipBtn: skipBtn, nextBtn: nextBtn, cancelBtn: cancelBtn,
     };
   }
 

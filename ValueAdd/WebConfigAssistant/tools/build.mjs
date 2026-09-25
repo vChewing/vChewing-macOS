@@ -22,7 +22,27 @@ const DIST_DIR = path.join(ROOT, 'dist');
 const ASSETS_DIR = path.join(ROOT, 'assets');
 
 // 載入順序即執行順序：tsc 之產物是「全域 script」，沒有模組系統可供解析相依。
-const CORE_ORDER = ['globals', 'model', 'i18n', 'schema', 'questions', 'preset'];
+// 入口頁之文案（助手之全稱一律取 app l10n 之全稱；此處為靜態檔，故四語系各備一句）。
+const UI_TITLE = {
+  'zh-Hant': '唯音輸入法配置助手',
+  'zh-Hans': '唯音输入法配置助手',
+  en: 'vChewing Configuration Assistant',
+  ja: '唯音入力アプリ配置助手',
+};
+const UI_LEAD = {
+  'zh-Hant': '正在前往配置助手……',
+  'zh-Hans': '正在前往配置助手……',
+  en: 'Taking you to the Configuration Assistant…',
+  ja: '配置助手へ移動しています……',
+};
+const LINK_TEXT = {
+  'zh-Hant': '若未自動跳轉，請按此處。',
+  'zh-Hans': '若未自动跳转，请按此处。',
+  en: 'If nothing happens, press here.',
+  ja: '自動で移動しない場合はこちらを押してください。',
+};
+
+const CORE_ORDER = ['globals', 'model', 'i18n', 'schema', 'questions', 'starter', 'preset'];
 const APP_ORDER = ['widgets', 'shell', 'exits', 'main'];
 
 function readText(file) {
@@ -130,6 +150,42 @@ function buildMetadataJs(docBase) {
   };
 }
 
+// 產物之入口頁：`dist/` 整個目錄丟上網即可用（`/assistant/` 之目錄索引）。
+//
+// 何以用 `<meta http-equiv="refresh">`：它自 HTML 4.01 起即有、Safari 7（目標環境）亦支援，
+// 不勞 JavaScript；並附一個普通連結作後備（不支援 meta refresh 者仍可手動進入）。
+// 標題與說明取助手之全稱與首頁第一句，使分享出去之網址預覽不至空白。
+function buildRedirectHtml(stamp, lang) {
+  const title = UI_TITLE[lang] || UI_TITLE['zh-Hant'];
+  const lead = UI_LEAD[lang] || UI_LEAD['zh-Hant'];
+  return [
+    '<!DOCTYPE html>',
+    '<html lang="' + lang + '">',
+    '<head>',
+    '<meta charset="utf-8">',
+    '<meta http-equiv="refresh" content="0; url=assistant.html">',
+    '<title>' + title + '</title>',
+    '<style>',
+    'body { background: #3B6EA5; color: #000; font-family: Tahoma, "Helvetica Neue", sans-serif;',
+    '  font-size: 12px; margin: 0; padding: 40px 0; }',
+    '.win { background: #C0C0C0; border: 2px outset #FFF; width: 420px; margin: 0 auto; padding: 18px; }',
+    '.bar { background: #0A246A; color: #FFF; font-weight: bold; padding: 3px 6px; margin: -18px -18px 14px -18px; }',
+    'a { color: #0000EE; }',
+    '</style>',
+    '</head>',
+    '<body>',
+    '<div class="win">',
+    '<div class="bar">' + title + '</div>',
+    '<p>' + lead + '</p>',
+    '<p><a href="assistant.html">' + LINK_TEXT[lang] + '</a></p>',
+    '<p>' + stamp + '</p>',
+    '</div>',
+    '</body>',
+    '</html>',
+    '',
+  ].join('\n');
+}
+
 function buildHtml(style, script, stamp, lang) {
   const template = readText(path.join(ROOT, 'index.html'));
   return template
@@ -168,6 +224,9 @@ function main() {
   const style = readText(path.join(ASSETS_DIR, 'assistant.css'));
   const html = buildHtml(style, app, metadata.stamp, 'zh-Hant');
   fs.writeFileSync(path.join(DIST_DIR, 'assistant.html'), html, 'utf8');
+  // 入口頁：整個 dist/ 目錄即可直接上網（`<站根>/assistant/` 之目錄索引）。
+  const redirect = buildRedirectHtml(metadata.stamp, 'zh-Hant');
+  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), redirect, 'utf8');
 
   // 一律以**位元組**計（產物含大量 CJK，字元數與位元組數相去甚遠）。
   const kb = function (n) { return (n / 1024).toFixed(1) + ' KiB'; };
@@ -177,6 +236,8 @@ function main() {
   process.stdout.write('  dist/app.js         ' + kb(bytesOf(app)) + '\n');
   process.stdout.write('  dist/assistant.html ' + kb(bytesOf(html)) +
     '（內嵌之後設資料 ' + kb(metadata.metadataBytes) + '）\n');
+  process.stdout.write('  dist/index.html     ' + kb(bytesOf(redirect)) +
+    '（自動跳轉至 assistant.html）\n');
   process.stdout.write('  適配版本 ' + metadata.targetVersion.display + '\n');
   process.stdout.write('  產出時間 ' + metadata.stamp + '\n');
 }

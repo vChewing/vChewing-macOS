@@ -1,0 +1,22 @@
+{
+  "__UserDefMeta": {
+    "title": "macOS 內建注音轉唯音（起始配置）",
+    "description": "由唯音輸入法配置助手生成：macOS 內建注音之用戶，套用助手建議之起始配置。"
+  },
+  "CheckUpdateAutomatically": false,
+  "KeyboardParser4Pinyin": 100,
+  "EnforceSingleLineCandidateWindowLayout4SCPC": true,
+  "UseRearCursorMode": false,
+  "UseHorizontalCandidateList": true,
+  "CassetteEnabled": false,
+  "MixedAlphanumericalEnabled": false,
+  "SuppressFactoryUnigramsOfKanaSyllables": false,
+  "SpecifyIntonationKeyBehavior": 0,
+  "UseSCPCTypingMode": false,
+  "AlsoConfirmAssociatedCandidatesByEnter": false,
+  "TogglingAlphanumericalModeWithLShift": true,
+  "TogglingAlphanumericalModeWithRShift": true,
+  "ClassicHaninKeyboardSymbolModeShortcutEnabled": false,
+  "CandidateKeys": "123456",
+  "AssociatedPhrasesEnabled": false
+}

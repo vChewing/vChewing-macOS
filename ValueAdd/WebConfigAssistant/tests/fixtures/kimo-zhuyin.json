@@ -81,7 +81,7 @@
   "ReducePOMLifetimeToNoMoreThan12Hours": false,
   "EnableCandidateWindowAnimation": true,
   "DisableSegmentedThickUnderlineInMarkingModeForManagedClients": false,
-  "CandidateKeys": "123456",
+  "CandidateKeys": "123456789",
   "CandidateNarrationToggleType": 0,
   "PhraseReplacementEnabled": false,
   "UsingHotKeySCPC": true,

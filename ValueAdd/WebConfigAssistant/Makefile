@@ -93,8 +93,9 @@ serve: bundle    ## 本機預覽（產物本身可雙擊開啟，故僅開發期
 deploy: bundle   ## 複製產物進官網倉（不自動提交）
 	@test -d "$(HOMEPAGE_REPO)" || { echo "找不到官網倉：$(HOMEPAGE_REPO)"; exit 1; }
 	@mkdir -p "$(HOMEPAGE_REPO)/$(DEPLOY_SUBDIR)"
-	@cp dist/assistant.html "$(HOMEPAGE_REPO)/$(DEPLOY_SUBDIR)/index.html"
-	@echo "已部署。請於官網倉提交 $(DEPLOY_SUBDIR)/index.html"
+	@cp dist/assistant.html "$(HOMEPAGE_REPO)/$(DEPLOY_SUBDIR)/assistant.html"
+	@cp dist/index.html "$(HOMEPAGE_REPO)/$(DEPLOY_SUBDIR)/index.html"
+	@echo "已部署。請於官網倉提交 $(DEPLOY_SUBDIR)/index.html 與 $(DEPLOY_SUBDIR)/assistant.html（前者會自動跳轉至後者）"
 
 clean:           ## 清理提示（本工作區紀律：不執行 rm -rf，請手動移入 tmp/_filesToTrash）
 	@echo "請將 dist/ 與 node_modules/（若有）移入 tmp/_filesToTrash。"

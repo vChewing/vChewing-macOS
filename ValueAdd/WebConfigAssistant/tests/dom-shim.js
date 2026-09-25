@@ -93,7 +93,8 @@ function createDom() {
     if (this.type === 'checkbox') {
       this.checked = !this.checked;
     } else if (this.type === 'radio') {
-      const group = this.getAttribute('name');
+      // `name` 是 DOM 屬性（本專案以 `input.name = …` 設定），非 setAttribute。
+      const group = this.name || this.getAttribute('name');
       if (group && documentRef) {
         const self = this;
         walk(documentRef.body, function (node) {

@@ -21,7 +21,7 @@
   "OverrideNotifyUIColorScheme": 0,
   "CandidateListTextSize": 48,
   "AlwaysExpandCandidateWindow": false,
-  "CandidateWindowShowOnlyOneLine": true,
+  "CandidateWindowShowOnlyOneLine": false,
   "EnforceSingleLineCandidateWindowLayout4SCPC": true,
   "ShouldAutoReloadUserDataFiles": true,
   "UseRearCursorMode": true,

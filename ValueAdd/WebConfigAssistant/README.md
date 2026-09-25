@@ -9,6 +9,8 @@
 偏好設定。本目錄是其**建置來源**，產物為**單檔自足之 HTML**。
 
 - 產物：`dist/assistant.html`（CSS 與 JS 皆已內聯；可雙擊開啟、可上架、可直接嵌入官網）
+  ＋ `dist/index.html`（**目錄入口頁**：以 `<meta http-equiv="refresh">` 自動跳轉至
+  `assistant.html`，並附手動連結之後備——整個 `dist/` 目錄丟上網即可用）
 - 使用者之動線：助手 →〔拷貝配置資料〕→ 唯音「偏好設定 → 一般設定」→
   〔點此從剪貼簿匯入（由配置助手生成的）配置資料〕→ 核對清單 →〔套用〕
 - 契約之權威定義：`vChewing-DevLogs/Research/Phase239_Research.md` §三、§五
@@ -28,8 +30,90 @@
    依此規移除者：`kCandidateTextFontName`（事主明示：使用者亂填字型名稱可能導致部分候選字
    無法正常顯示）、`kAssociatedPhrasesEnabled`、`kCurrencyNumeralsEnabled`、
    `kHalfWidthPunctuationEnabled`、`kPinyinTypingEnabled`。
+4. **起始配置只用既有之推薦值，且不覆蓋使用者之表態。** 起始配置（見 §二）之每一鍵值皆取自
+   `recommendationFor`（＝官網既有策展文章之可執行化，或事主逐條裁定者），與題庫同受前兩規
+   之約束；助手**不**為「讓起始配置看起來有用」而臆造推薦值——無依據者寧可照實明示「沒有需要
+   先套用的項目」。使用者親自改過之鍵，取消套用時一律留下。
+   兩條附則（2026-09-25 事主裁定，皆為「以來源粗粒度落值」之校正）：
+   - **中英混打回退（`kMixedAlphanumericalEnabled`）不按來源預設**：除華碩外一律不推薦；要混打
+     者改由「打字方式」表態——該題之「注音組句＋中英混打」（`zhuyinmix`）推薦 `true`，
+     而純粹的「注音組句」（`zhuyin`）**刻意推薦 `false`**（使用者既已明示只要組句，
+     若其現行設定開著混打回退，助手即照其表態關掉它）。此為「值等於出廠預設者不收」之
+     經事主核定之例外。
+   - **左右 Shift 切換英數（`kTogglingAlphanumericalModeWithLShift`／`…RShift`）**：微軟新注音、
+     奇摩、自然、華碩、狂拼流拼音五個來源**刻意釘住為啟用**（兩鍵之出廠預設本即啟用）。
+     `typing` 級之推薦值優先於 `origin` 級（華碩＋純注音組句 ⇒ 停用混打）。
+   - **選字鍵（`kCandidateKeys`）逐來源定值**（事主 2026-09-25）：微軟新注音／小麥注音／奇摩／
+     OpenVanilla／自然／華碩／ㄅ半 ⇒ `123456789`；CIN（所有字根類，來源或打字方式為之皆然）
+     ⇒ `1234567890`；macOS 內建注音／漢音／狂拼流 ⇒ `123456`；其餘（含未列舉者）⇒ `123456`
+     （＝`recommendationFor` 之回退值）。
+   - **preset 不得指定「僅以單行/單列來陳列候選字」（`kCandidateWindowShowOnlyOneLine`）**：
+     該鍵為全域排版偏好（其說明載明係為老花眼者以大字號顯示而設），而ㄅ半之單行佈局已由
+     `kEnforceSingleLineCandidateWindowLayout4SCPC` 保證（其說明：「啟用後，逐字選字模式
+     （SCPC）將始終使用單行選字窗佈局。」）——故於ㄅ半之 preset 內再指定前者，既是多餘、
+     亦越權改動與ㄅ半無關之全域偏好（事主 2026-09-25 指出；該鍵自此退出鍵全集）。
 
-## 二、零 npm 相依
+## 二、流程：起始配置、快速路線與逐項路線
+
+事主 2026-09-25（Phase 245）：不必把使用者硬控在十二頁上。助手之動線遂有兩種：
+
+| 路線 | 頁序 | 適用 |
+| --- | --- | --- |
+| **快速**（預設） | 歡迎 → 背景 → **起始配置** → 摘要（四頁） | 只想先套用一組現成配置者 |
+| **逐項** | 同上，其後另有九頁逐項問題（十三頁） | 想逐項微調者 |
+
+- **背景頁**收兩個分支樞紐：「您原本用哪一款輸入法？」與「您主要用哪一種打字方式？」。
+  兩者皆不輸出任何鍵，卻是起始配置之唯二依據（`Profile`）。打字方式一題原在「打字方式」一頁
+  上——移往此處，方能於下一頁即據以給出配置。
+- **起始配置頁**（`src/starter.ts`）給出該 profile 之現成配置：
+  - 內容即 `questions.ts` 之推薦值表（`recommendationFor`）對該 profile 之**全集**——
+    **不另立一份題庫**。故「逐題頁面標示的推薦值」與「起始配置所寫入者」恆為同組同值；
+    套用之後，使用者在逐題頁面看到的就是同一組已選中之值，可逐項改回「維持不變」。
+  - 出廠預設值**不在**其中：那是「以推薦值補齊本頁」之事（逐頁、明示），不是處方。
+  - 該頁**明示會寫入哪些鍵值**（分兩段：本組「指名」者、以及「回歸唯音出廠預設」者），
+    並提醒：套用之後即可結束助手，除非想要更細緻的配置。
+  - **封閉性**（見下）：任兩組起始配置之**全集相同**（現為 17 鍵，舊系統 15 鍵），僅值有別
+    ——故同一台電腦上換人套用時，後者必然完整覆蓋前者，不會互相殘留。兩段皆為**逐項核取
+    清單**（**預設全選**，可逐項取消，各有全部勾選／取消之連結）。
+  - **該頁之取捨項預設為「套用這組起始配置」**（事主 2026-09-25：「使用者叫出這個配置畫面
+    就是為了想切換配置的」）——故一進該頁即已套用（`boot()` 隨即 `syncStarter()`，俾使狀態
+    與產物一致）；想要稀疏之包者須主動改選「不套用（維持不變）」。連帶：未表態來源時，
+    配置名之預設仍作通用之「自訂配置」（否則會得出「自訂配置的起始配置」之疊字）。
+  - 使用者親自表態者**不受起始配置覆蓋**；取消套用只撤回「未曾由使用者改過」之鍵。
+- **頁數即時可變**：核取項「只套用起始配置」決定 `buildSteps()` 是否收錄逐項頁面；
+  標題帶之「第 N 步，共 M 步」與分段方塊遂隨之由十三頁變四頁（反之亦然）。
+- **共用電腦之互不干擾（起始配置之封閉性）**：唯音之匯入語意是「只寫入包內出現的鍵」，
+  故稀疏的配置會互相殘留——實測最惡者為 `kCassetteEnabled`：行列三十（磁帶）使用者套用後
+  它為 `true`，而該鍵為真**會停用注音輸入**，下一位注音使用者遂當場壞掉。故起始配置一律
+  封閉於一組**固定的鍵全集**（`starterUniverse()`；＝任何一組配置都可能指名之鍵的聯集，
+  現為 17 鍵，以「還不確定」之超集題庫 ＋ 系統版本過濾求得）：全集內有推薦值者寫入該值
+  （「指名」）、無者寫入**唯音之出廠預設值**（「回歸」）。全集之外的一切偏好
+  （選字窗字級、熱鍵、通知……）一概不碰——那屬於使用者自己。此封閉性由
+  `tests/questions.test.js` 以「任兩組配置之鍵集逐項相等」之不變式守住。
+  **兩段皆為逐項核取清單**（事主 2026-09-25 裁定：「『一併回歸唯音出廠預設的項目』要是變成
+  一個 checkbox 清單讓使用者自己勾選就好了（預設是全勾選）」，繼而「『本組指名的項目』也
+  弄成 checklist 吧」）：兩段每一鍵各一核取項、**預設全選**；取消某項即該鍵不予更動（回到
+  「稀疏」之舉——他人或自己先前之配置可能在該鍵上留下痕跡）。狀態分存於
+  `state.starterNamedOff`／`state.starterResetOff`（**皆存「取消者」而非「勾選者」**，故預設
+  為空＝全選，語意自明）。兩段各有一條「全部取消勾選／全部勾選」之連結、**緊貼該段標題**
+  （兩條同名連結之作用範圍遂一眼可辨）。說明文字隨取消之項數改口（`starter.namedNoteOff`／
+  `starter.resetNoteOn`／`starter.resetNoteOff`，摘要頁為 `summary.starterNamedExcluded`／
+  `summary.starterScope`／`…Partial`／`…Off`）。清單本身恆可見（否則使用者無從勾回）。
+  **題庫外之鍵（`PRESET_ONLY_KEYS`）**：全集另收「不出題、但同屬打字風格」之鍵——現僅
+  `kAssociatedPhrasesEnabled`（關聯詞語模式；事主 2026-09-25：「ㄅ半模式請自動啟用關聯詞語」，
+  與 app 內建「我姓ㄅ」按鈕之處方一致）。該鍵不在設定介面曝露面內，故仍**不入題庫**
+  （「題庫 ⊆ 曝露面」之不變式不受影響），其可復原路徑是輸入法選單之「關聯詞語模式」⌃⌘O。
+  因其自身無標籤，顯示時取 `LABEL_ENTRY_ALIAS` 所指之 `kUsingHotKeyAssociates`
+  （「關聯詞語模式」）——仍屬 app 既有之 l10n，非助手手抄。
+- **底列另有「跳到摘要 ＞」**：逐項路線上隨時可就此收束；按「上一步」原路折返至跳轉前所在之頁
+  （而非逕退至最後一頁）。該鈕只在「距摘要尚有兩頁以上」時露面。
+
+- **左側水印區**由上而下為：大字圖示、該頁標題、**該頁之職能說明**（`left.<stepId>` 一句話，
+  如起始配置頁作「可先套用，亦可略過」）。該第三行原放助手全稱——與標題帶重複、對使用者
+  無益，事主 2026-09-25 指出後改為職能說明；`tests/questions.test.js` 逐頁斷言其存在、
+  於四語系皆備且不等於助手全稱，`tests/dom-smoke.test.js` 則斷言繪製結果隨頁面而變。
+
+## 三、零 npm 相依
 
 本目錄**沒有任何 npm 相依**：`package.json` 的 `dependencies` 與 `devDependencies` 皆為空。
 建置只需兩樣本機既有之物：`tsc`（TypeScript）與 `node`。
@@ -54,7 +138,7 @@ script」編譯，於是有兩條路：
   ES6+ 語法與標準庫 API；有一項即建置失敗。
 - 打包器（`esbuild` 一類）因此完全不必要：沒有相依要解析，串接即可。
 
-## 三、目錄結構
+## 四、目錄結構
 
 ```text
 ValueAdd/WebConfigAssistant/
@@ -65,17 +149,19 @@ ValueAdd/WebConfigAssistant/
 ├── index.html               ← 模板（含 {{STYLE}}／{{SCRIPT}}／{{BUILD_STAMP}} 佔位）
 ├── assets/
 │   ├── assistant.css        ← Windows 2000 / ME 風格樣式表
-│   ├── userdef-metadata.json← 由 vChewingSharedCLI 導出（**入庫**；防漂移見 §五）
+│   ├── userdef-metadata.json← 由 vChewingSharedCLI 導出（**入庫**；防漂移見 §六）
 │   └── settings-surface.json← 設定介面曝露之鍵集（**入庫**；由 tools/settings-surface.mjs 掃描生成）
 ├── src/                     ← 原始碼（TypeScript；namespace VCA）
 │   ├── globals.ts           ← 建置期注入之全域值（型別宣告）
 │   ├── model.ts             ← 資料模型（與後設資料 schema 對位）
 │   ├── i18n.ts              ← 助手自身之介面文案（四語系）
 │   ├── schema.ts            ← 後設資料查詢、型別正規化、前端先驗、版本碼
-│   ├── questions.ts         ← 題庫（分頁、排序、分支、推薦值）
+│   ├── questions.ts         ← 題庫（分頁、排序、分支、推薦值；含快速路線之頁序）
+│   ├── starter.ts           ← 起始配置（封閉於固定之鍵全集：指名者取推薦值、餘者回歸出廠預設）
 │   ├── preset.ts            ← 配置包之生成（純函式，核心可測件）
 │   ├── widgets.ts           ← 控制項（含「維持不變」之單選、數值／文字欄）
 │   ├── shell.ts             ← 外框（標題帶、左側水印區、按鈕列、模態對話框）
+│   │                          左側水印區之第三行為「該頁之職能」（`left.<stepId>`）
 │   ├── exits.ts             ← 出口（剪貼簿、檔案下載）
 │   └── main.ts              ← 進入點（狀態、流程、鍵盤導覽、摘要與出口）
 ├── tests/                   ← `node --test`（零額外相依）
@@ -83,25 +169,25 @@ ValueAdd/WebConfigAssistant/
 │   ├── dom-shim.js          ← 極簡 DOM 替身（供端到端冒煙測試）
 │   ├── metadata.test.js     ← 後設資料之契約與不變式
 │   ├── i18n.test.js         ← 四語系完整性、佔位符一致、zh-Hans-TW 語體
-│   ├── questions.test.js    ← 題庫完整性、值域、分支、系統版本過濾
+│   ├── questions.test.js    ← 題庫完整性、值域、分支、頁序（快速／逐項）、起始配置之界內性
 │   ├── preset.test.js       ← 配置包之稀疏／型別／黑名單／鍵序
 │   ├── dom-smoke.test.js    ← 以 DOM 替身驅動完整產物之端到端冒煙
 │   └── fixtures/*.json      ← 契約測試樣本（**入庫**；由 tools/fixtures.mjs 生成）
 └── tools/
-    ├── build.mjs            ← 串接、投影後設資料、產出單檔 HTML
+    ├── build.mjs            ← 串接、投影後設資料、產出單檔 HTML ＋ 目錄入口頁 index.html
     ├── es5guard.mjs         ← ES5 語法／API 守衛
     ├── settings-surface.mjs ← 掃描 SettingsUI／SettingsCocoa 之曝露面
     └── fixtures.mjs         ← 由助手自身之核心邏輯生成契約測試樣本
 ```
 
-## 四、常用指令
+## 五、常用指令
 
 ```sh
 make audit      # 提交前總檢：型別檢查 ＋ ES5 守衛 ＋ 單元測試 ＋ 後設資料防漂移 ＋ i18n 稽核 ＋ 曝露面防漂移 ＋ fixture 防漂移
 make bundle     # 產出 dist/assistant.html（單檔自足）
-make test       # 單元測試（node --test；50 支）
+make test       # 單元測試（node --test；61 支）
 make serve      # 本機預覽（http://127.0.0.1:8787/assistant.html）
-make deploy     # 複製產物進官網倉（DEPLOY_SUBDIR 預設 assistant；不自動提交）
+make deploy     # 複製 dist/assistant.html 與 dist/index.html 進官網倉（DEPLOY_SUBDIR 預設 assistant；不自動提交）
 make metadata-update  # 自 UserDef 重新導出後設資料並入庫
 ```
 
@@ -113,7 +199,7 @@ make metadata-update  # 自 UserDef 重新導出後設資料並入庫
 （部署於 `<站根>/assistant/`），可改用 `make deploy DOC_BASE=../`。文章路徑一律取官網各篇之
 實際 `permalink`（如 `manual/preferences.html`、`manual/onboarding_kimo.html`、`onboarding/`）。
 
-## 五、後設資料：防漂移
+## 六、後設資料：防漂移
 
 助手需要知道 118 條偏好鍵之名稱、型別、值域、預設值與四語系標籤。這些**一律不手抄**，而是由
 唯音自己導出：
@@ -137,7 +223,7 @@ swift run --disable-sandbox -c release \
   ／`i18n:TypingMethod.*`），不經 `UserDef.metaData`。如此助手既不必手抄這 17 條標籤、亦不必
   為此令 CLI 相依 Tekkon。
 
-## 六、契約測試（Swift 側）
+## 七、契約測試（Swift 側）
 
 `Packages/vChewing_SettingsUI/Tests/SettingsUITests/AssistantContractTests.swift` 會讀取
 `tests/fixtures/*.json`（由 `tools/fixtures.mjs` 以助手自己的核心邏輯生成）並斷言
@@ -148,7 +234,7 @@ swift run --disable-sandbox -c release \
 - 該測試只做**純查詢**（`destructureExchange` ＋ `diffAgainstCurrent`），不呼叫
   `importFromExchangeJSON`——後者會寫入 `UserDefaults`，在共用行程之測試之間會互相污染。
 
-## 七、i18n 之紀律
+## 八、i18n 之紀律
 
 - 助手自身之介面文案（步驟標題、按鈕、摘要頁……）為手寫之四語系表，置於 `src/i18n.ts`。
 - **偏好選項之標題與說明則一律來自 app 自己已翻譯好的 `.strings`**（經後設資料導出），
@@ -159,7 +245,7 @@ swift run --disable-sandbox -c release \
   （剪贴簿 ≠ 剪贴板、汇入 ≠ 导入、设定 ≠ 设置、资料 ≠ 数据、视窗 ≠ 窗口、软体 ≠ 软件、
   拷贝 ≠ 复制、使用者 ≠ 用户……）。此紀律由 `tests/i18n.test.js` 以禁用詞表守住。
 
-## 八、目標環境與相容性
+## 九、目標環境與相容性
 
 - 主要目標：現行 Safari／Chrome／Edge／Firefox。
 - **次要目標（進行中）：macOS 10.9 內建之 Safari 7。** 已作到：產物為 ES5 語法
@@ -174,7 +260,7 @@ swift run --disable-sandbox -c release \
   `border-radius`（圓形無線電鈕用）、`:checked + span` 之表現。
   以上皆為**增益**：不支援時只失去部分外觀，功能不受影響。
 
-## 九、施工中查得之 app 側落差（皆已修，2026-09-24 補記）
+## 十、施工中查得之 app 側落差（皆已修，2026-09-24 補記）
 
 1. ~~**三條鍵之 `metaData.options` 超出 `validNumeralValueRange`**~~ ⇒ **已修**：
    `kSpecifiedNotifyUIColorScheme` 之值域由 `0...2` 改為 `-1...1`、
@@ -197,7 +283,7 @@ swift run --disable-sandbox -c release \
 4. ~~**「深入說明 →」點了沒反應**~~ ⇒ **已修**（2026-09-24）：病灶有二——① 目標為相對路徑
    `../…`，在 `file://` 之下必為死鏈；② 文章路徑未取官網之實際 `permalink`（例如各篇
    `onboarding_*.md` 之 permalink 實為 `/manual/onboarding_*.html`，而非 `/onboarding/…`）。
-   今以官網絕對位址為預設（見 §四末），並逐篇改用實查之 permalink。
+   今以官網絕對位址為預設（見 §五末），並逐篇改用實查之 permalink。
 5. **「維持不變」之標示**（事主 2026-09-24 選定「兩者並列」）：該選項現作
    「維持不變」＋小字註記「推薦；保留您目前在唯音內的設定值，出廠預設為：〈值〉」。
 6. **說明文字之呈現**（事主 2026-09-24 指示）：短說明（≤ 60 字元）直接沿用到題目下方的註解欄位、
@@ -271,6 +357,6 @@ swift run --disable-sandbox -c release \
     `versionStampIsLanded()` 亦已把該檔納入驗收，故「txt 沒寫進去」會令發版流程以 exit code `6` 中止。
     `make version-check` 則是第二道防線（在任何時候由助手側自查）。
 
-## 十、授權與著作## 十、授權與著作
+## 十一、授權與著作
 
 本目錄之內容以 **MulanPSL-2.0** 授權（與 `vChewing-macOS` 之自研內容一致）。

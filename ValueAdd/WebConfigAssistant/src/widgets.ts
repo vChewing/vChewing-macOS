@@ -76,12 +76,15 @@ namespace VCA {
 
   /// 現行之答案（未表態者回 `null`）。
   ///
-  /// 分支樞紐之自訂題不輸出任何鍵，其答案寄存於 `state.profile`——重繪時亦須還原，
+  /// 分支樞紐與起始配置之取捨皆為自訂題、不輸出任何鍵，其答案分別寄存於
+  /// `state.profile` 與 `state.starterOn`——重繪時亦須還原，
   /// 否則切換語言或往返頁面即丟失選取狀態（此缺陷由 DOM 冒煙測試抓到）。
   function currentAnswer(question: Question, state: AssistantState): PrefValue | null {
     if (!question.entry) {
       if (question.id === "origin") return state.profile.origin === "" ? null : state.profile.origin;
       if (question.id === "typing") return state.profile.typing === "" ? null : state.profile.typing;
+      // 「不套用」即此題之「維持不變」：未套用時該項恆為選中態（事主 2026-09-25）。
+      if (question.id === "starter") return state.starterOn ? "on" : "off";
       return null;
     }
     var value = state.answers[question.entry.rawValue];
@@ -363,8 +366,12 @@ namespace VCA {
   // MARK: - 小工具
 
   /// 單一核取項（如「以推薦值補齊本頁未答之項目」）。
+  ///
+  /// `payload` 為可選之附加引數：回呼時原樣奉還——供「同一處理函式服務一整個核取清單」之用
+  /// （起始配置之回歸段即如此，見 main.ts 之 `preferenceCheckTable`）。
   export function renderCheckbox(
-    focusKey: string, labelText: string, checked: boolean, onToggle: (checked: boolean) => void
+    focusKey: string, labelText: string, checked: boolean,
+    onToggle: (checked: boolean, payload?: string) => void, payload?: string
   )
     : HTMLElement {
     var label = el("label", "vca-opt", null);
@@ -372,7 +379,7 @@ namespace VCA {
     input.type = "checkbox";
     input.checked = checked;
     input.setAttribute("data-focus-key", focusKey);
-    input.onclick = function () { onToggle(input.checked); };
+    input.onclick = function () { onToggle(input.checked, payload); };
     label.appendChild(input);
     label.appendChild(el("span", "vca-box", null));
     label.appendChild(el("span", "vca-opt-label", labelText));

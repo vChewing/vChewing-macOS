@@ -10,7 +10,7 @@
   "AlwaysUsePCBWithElectronBasedClients": true,
   "SecurityHardenedCompositionBuffer": false,
   "CheckAbusersOfSecureEventInputAPI": true,
-  "CheckUpdateAutomatically": false,
+  "CheckUpdateAutomatically": true,
   "UseExternalFactoryDict": true,
   "KanjiConversionPreferences": 0,
   "KeyboardParser4Pinyin": 100,

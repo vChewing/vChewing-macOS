@@ -150,7 +150,9 @@ test('配置包：fillSuggestions 只補「未表態且有推薦值」者', func
   const candidateAdditions = VCA.fillSuggestions(candidateStep, state);
   assert.strictEqual(typeof candidateAdditions['CandidateKeys'], 'undefined');
   assert.strictEqual(candidateAdditions['UseHorizontalCandidateList'], false);
-  assert.strictEqual(candidateAdditions['CandidateWindowShowOnlyOneLine'], true);
+  // 「僅以單行/單列來陳列候選字」已無推薦值（事主 2026-09-25：ㄅ半之單行佈局由
+  // `kEnforceSingleLineCandidateWindowLayout4SCPC` 保證即可）⇒ 由出廠預設值（false）補之。
+  assert.strictEqual(candidateAdditions['CandidateWindowShowOnlyOneLine'], false);
   // 無推薦值、亦未表態者：以出廠預設值補之（此為明示之「逐組」行為）。
   assert.strictEqual(typeof candidateAdditions['EnableCandidateWindowAnimation'], 'boolean');
 });
