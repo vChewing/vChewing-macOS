@@ -1023,9 +1023,15 @@ extension BundleAppsLegacyPlugin {
       .appendingPathComponent("ValueAdd/WebConfigAssistant/tools/embed-into-bundle.sh")
     guard FileManager.default.fileExists(atPath: script.path) else { return }
     print("📄 Embedding the Configuration Assistant (teaching articles)…")
-    guard (try? run("/bin/sh", arguments: [script.path, appDir.path])) != nil else {
-      print("  ⚠️ 助手之收錄未竟（腳本無法執行）；輸入法之建置照常。")
-      return
+    // 本檔之 `run(_:arguments:)` 與現代側者不同：它把子行程之 stdout／stderr **收進 Pipe**
+    // 再以字串回傳，故必須自行印出——否則腳本之警告（如「未偵測到 tsc」）會被吞掉，
+    // 而「警告要讓使用者看見」正是本步之紀律。
+    do {
+      let output = try run("/bin/sh", arguments: [script.path, appDir.path])
+      if !output.isEmpty { print(output) }
+    } catch {
+      print("  ⚠️ 助手之收錄未竟；輸入法之建置照常。")
+      print("  \(error.localizedDescription)")
     }
   }
 

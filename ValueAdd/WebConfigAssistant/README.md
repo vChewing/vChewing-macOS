@@ -163,9 +163,10 @@ ln -sf ~/.local/lib/tsc/lib/tsc ~/.local/bin/tsc
 
 ### 三.3 收錄進輸入法之 main bundle（Phase 246 追加任務）
 
-助手之產物（`dist/assistant.html` ＋ `dist/index.html`）會被收錄進 **`vChewing.app` 之
-`Contents/Resources/assistant/`**（`index.html` 為入口，其 `<meta http-equiv="refresh">` 自動
-導向 `assistant.html`），故使用者手上的輸入法即帶著一份**可離線開啟**的教學文章。
+助手之產物 **`dist/assistant.html`** 會被收錄進 **`vChewing.app` 之
+`Contents/Resources/assistant/`**，故使用者手上的輸入法即帶著一份**可離線開啟**的教學文章。
+**只收 `assistant.html`**（事主 2026-09-25 明示）：它是單檔自足之物（CSS 與 JS 皆已內聯），
+故 `dist/index.html`（目錄入口之跳轉頁）在本情境無用武之地，不收。
 
 **唯一的閘是 `tsc`**：**當且僅當**偵測到 `tsc` 時才編譯並收錄；未偵測到即印出警告、
 **絕不中斷輸入法之建置**。同理，本步之任何失敗（`tsc` 存在但不可用、或助手編譯失敗）

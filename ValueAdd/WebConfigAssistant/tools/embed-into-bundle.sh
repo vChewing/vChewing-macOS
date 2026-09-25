@@ -3,6 +3,9 @@
 #
 # 用法：embed-into-bundle.sh <vChewing.app 之路徑>
 #
+# 收錄範圍：**只 `dist/assistant.html`**（事主 2026-09-25 明示）——單檔自足，故 `index.html`
+# （目錄入口之跳轉頁）不收。落點 `<app>/Contents/Resources/assistant/assistant.html`。
+#
 # 三條建置路徑共用本檔，且皆於「組裝 .app 之後、**簽章之前**」呼叫（資源受簽章封印，
 # 故不可於簽章後追加）：
 #   * SwiftPM 現代側：`Plugins/BundleApps/plugin.swift`（`make debug`／`release`／`archive`）
@@ -50,20 +53,17 @@ if ! make -C "$ASSISTANT_DIR" bundle; then
   exit 0
 fi
 
-SRC="$ASSISTANT_DIR/dist"
-for file in assistant.html index.html; do
-  if [ ! -f "$SRC/$file" ]; then
-    warn "產物缺席：$SRC/$file（略過收錄）"
-    exit 0
-  fi
-done
+# 只收 `assistant.html`（事主 2026-09-25 明示）——它是單檔自足之物（CSS 與 JS 皆已內聯），
+# 故 `index.html`（目錄入口之跳轉頁）在本情境無用武之地，不收。
+SRC="$ASSISTANT_DIR/dist/assistant.html"
+if [ ! -f "$SRC" ]; then
+  warn "產物缺席：$SRC（略過收錄）"
+  exit 0
+fi
 
 rm -rf "$DEST"
 mkdir -p "$DEST"
-cp "$SRC/assistant.html" "$DEST/assistant.html"
-cp "$SRC/index.html" "$DEST/index.html"
+cp "$SRC" "$DEST/assistant.html"
 
-echo "[教學文章] 已收錄至 $DEST："
-echo "[教學文章]   assistant.html  $(wc -c < "$DEST/assistant.html" | tr -d ' ') bytes"
-echo "[教學文章]   index.html      $(wc -c < "$DEST/index.html" | tr -d ' ') bytes"
+echo "[教學文章] 已收錄至 $DEST/assistant.html（$(wc -c < "$DEST/assistant.html" | tr -d ' ') bytes）"
 exit 0
