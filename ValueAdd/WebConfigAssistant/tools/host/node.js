@@ -148,7 +148,14 @@ function __installNodeShim(context) {
     stderr: { write: write },
     exit: function (code) {
       __flushOutput();
-      if (code) throw new Error("__VCA_EXIT_" + code);
+      if (code) {
+        // 以「逃逸之例外」換取 osascript 之非零 rc（JXA 無設定 rc 之介面）；
+        // 標記其為工具之正常收場，俾入口得以換成人話、不洩漏內部哨兵。
+        var signal = new Error("工具以狀態 " + code + " 收場");
+        signal.isToolExit = true;
+        signal.exitCode = code;
+        throw signal;
+      }
     },
     cwd: function () { return __cwd(); },
   };

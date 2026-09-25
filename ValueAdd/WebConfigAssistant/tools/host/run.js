@@ -110,6 +110,15 @@ function run(argv) {
 
   var entryPath = __isAbsolute(argv[0]) ? argv[0] : __joinPath(__cwd(), argv[0]);
   process.argv = ["osascript", entryPath].concat(argv.slice(1));
-  __loadModule(entryPath, true);
+  try {
+    __loadModule(entryPath, true);
+  } catch (error) {
+    __flushOutput();
+    if (error && error.isToolExit) {
+      // 擲字串、不擲 Error：osascript 會自加一層「Error: 」，故字串之訊息較乾淨。
+      throw "工具以狀態 " + error.exitCode + " 收場；診斷見上方輸出";
+    }
+    throw error;
+  }
   __flushOutput();
 }

@@ -129,6 +129,10 @@
   `typecheck`／`build`。
 - 其餘一切照舊：產物由 `tools/build.js` 串接、由 `tools/es5guard.js` 掃描，等等。
 
+> **ES5 紀律之適用範圍**：**只及於 `src/` 與其產物**（目標環境含 macOS 10.9 之 Safari 7）。
+> `tools/`（含 `tools/host/`）跑在 **JXA 之現代引擎**上，**不受** ES5 限制——此即
+> `tools/es5guard.js` 只掃 `dist/*.js` 而不掃 `tools/*.js` 之理。
+
 ### 三.1 `tsc` 之取得（三條路，皆不需 node／npm）
 
 | 來源 | 下載 | 解壓 | 備註 |
