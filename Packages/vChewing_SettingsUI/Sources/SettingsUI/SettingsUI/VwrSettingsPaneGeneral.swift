@@ -49,12 +49,19 @@
 
     public var body: some View {
       Form {
-        VStack(alignment: .leading) {
-          Text(
-            "\u{2022} " + "i18n:InfoMessage.MouseWheelScrollWithCheatSheet".i18n
-              + "\n\u{2022} " + "i18n:InfoMessage.DeleteKeyNote".i18n
-          )
-          .settingsDescription()
+        Section {
+          VStack(alignment: .leading) {
+            Text(
+              "\u{2022} " + "i18n:InfoMessage.MouseWheelScrollWithCheatSheet".i18n
+                + "\n\u{2022} " + "i18n:InfoMessage.DeleteKeyNote".i18n
+            )
+            .settingsDescription()
+          }
+        }
+
+        // MARK: (header: Text("Interface Language:"))
+
+        Section {
           UserDef.kAppleLanguages.bind($appleLanguageTag).render()
         }
 
@@ -64,11 +71,9 @@
           UserDef.kReadingNarrationCoverage.renderUI {
             SpeechSputnik.shared.refreshStatus()
           }
-          UserDef.kAutoCorrectReadingCombination.renderUI()
-          UserDef.kShowHanyuPinyinInCompositionBuffer.renderUI()
-          UserDef.kKeepReadingUponCompositionError.renderUI()
-          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderUI()
-          UserDef.kUseSCPCTypingMode.renderUI()
+          // 「敲字時自動糾正讀音組合」「允許對無效的讀音使用 BackSpace 編輯」「拼音並擊」
+          // 「模擬 90 年代前期注音逐字選字輸入風格」「亦使用「\」或「¥」鍵啟用漢音鍵盤符號模式」
+          // 此五項已遷往「行為設定」（Phase 248）。
           if Date.isTodayTheDate(from: 0_401) {
             UserDef.kShouldNotFartInLieuOfBeep.renderUI {
               onFartControlChange()

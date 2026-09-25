@@ -25,6 +25,8 @@
             .disabled(Bundle.main.preferredLocalizations[0] == "en")
           UserDef.kShowModeDescriptionOnActivatingServer.renderUI()
           UserDef.kBeepSoundPreference.renderUI()
+          // 事主明示：列於「行為設定」之第一個 Section 之末尾（Phase 248）。
+          UserDef.kShowHanyuPinyinInCompositionBuffer.renderUI()
         }
 
         Section {
@@ -101,6 +103,21 @@
 
         Section {
           UserDef.kFuriousTypingEnabled.renderUI()
+        }
+
+        // Phase 248：以下三段係自「一般設定」遷入者，各為獨立之 Section（事主明示）。
+
+        Section {
+          UserDef.kAutoCorrectReadingCombination.renderUI()
+          UserDef.kKeepReadingUponCompositionError.renderUI()
+        }
+
+        Section {
+          UserDef.kUseSCPCTypingMode.renderUI()
+        }
+
+        Section {
+          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderUI()
         }
       }.formStyled()
         .frame(

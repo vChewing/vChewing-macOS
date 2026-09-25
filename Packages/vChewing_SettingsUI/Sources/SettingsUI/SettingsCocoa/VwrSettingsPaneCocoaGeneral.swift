@@ -43,6 +43,8 @@ extension SettingsPanesCocoa {
           strNotice += "\n\u{2022} "
           strNotice += "i18n:InfoMessage.DeleteKeyNote".i18n
           strNotice.makeNSLabel(descriptive: true, fixWidth: contentWidth)
+        }?.boxed()
+        NSStackView.buildSection(width: contentWidth) {
           UserDef.kAppleLanguages.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabGeneral
@@ -58,26 +60,9 @@ extension SettingsPanesCocoa {
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.updateNarratorSettingsAction(_:))
           }
-          UserDef.kAutoCorrectReadingCombination.renderCocoa(
-            fixWidth: contentWidth,
-            prefUITab: .tabGeneral
-          )
-          UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(
-            fixWidth: contentWidth,
-            prefUITab: .tabGeneral
-          )
-          UserDef.kKeepReadingUponCompositionError.renderCocoa(
-            fixWidth: contentWidth,
-            prefUITab: .tabGeneral
-          )
-          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderCocoa(
-            fixWidth: contentWidth,
-            prefUITab: .tabGeneral
-          )
-          UserDef.kUseSCPCTypingMode.renderCocoa(
-            fixWidth: contentWidth,
-            prefUITab: .tabGeneral
-          )
+          // 「敲字時自動糾正讀音組合」「允許對無效的讀音使用 BackSpace 編輯」「拼音並擊」
+          // 「模擬 90 年代前期注音逐字選字輸入風格」「亦使用「\」或「¥」鍵啟用漢音鍵盤符號模式」
+          // 此五項已遷往「行為設定」（Phase 248）。
           if Date.isTodayTheDate(from: 0_401) {
             UserDef.kShouldNotFartInLieuOfBeep
               .renderCocoa(

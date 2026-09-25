@@ -63,6 +63,11 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )
+          // 事主明示：列於「行為設定」之第一個 Section 之末尾（Phase 248）。
+          UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
           UserDef.kMixedAlphanumericalEnabled.renderCocoa(
@@ -203,6 +208,29 @@ extension SettingsPanesCocoa {
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
           UserDef.kFuriousTypingEnabled.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
+        }?.boxed()
+        // Phase 248：以下三段係自「一般設定」遷入者，各為獨立之 Section（事主明示）。
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kAutoCorrectReadingCombination.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
+          UserDef.kKeepReadingUponCompositionError.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
+        }?.boxed()
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kUseSCPCTypingMode.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
+        }?.boxed()
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )
