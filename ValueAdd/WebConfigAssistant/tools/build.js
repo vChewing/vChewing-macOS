@@ -1,21 +1,19 @@
-// 唯音輸入法配置助手之建置器（零 npm 相依：只用 Node 內建模組）。
+// 唯音輸入法配置助手之建置器（零 npm 相依；由 tools/host 之 JXA 宿主執行，不需要 node）。
 //
 // 產物：
 //   dist/js/<module>.js   ← `tsc` 之產物（本檔不負責編譯，只負責串接）
 //   dist/metadata.js      ← 由 assets/userdef-metadata.json 生成之全域注入
-//   dist/core.js          ← 無 DOM 之純邏輯（i18n／schema／問卷／配置包生成）——供 node --test 載入
+//   dist/core.js          ← 無 DOM 之純邏輯（i18n／schema／問卷／配置包生成）——供測試宿主載入
 //   dist/app.js           ← core ＋ DOM 介面（widgets／shell／exits／main）
 //   dist/assistant.html   ← 單檔自足之交付物（CSS 與 JS 皆內聯）
 //
-// 用法：node tools/build.mjs
+// 用法：osascript -l JavaScript tools/host/run.js tools/build.js
 
-import fs from 'node:fs';
-import path from 'node:path';
-import url from 'node:url';
-import { assertEs5 } from './es5guard.mjs';
-import { readTargetVersion } from './target-version.mjs';
-
-const ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const fs = require('node:fs');
+const path = require('node:path');
+const { assertEs5 } = require('./es5guard.js');
+const { readTargetVersion } = require('./target-version.js');
+const ROOT = path.resolve(path.dirname(__filename), '..');
 const SRC_DIR = path.join(ROOT, 'src');
 const JS_DIR = path.join(ROOT, 'dist', 'js');
 const DIST_DIR = path.join(ROOT, 'dist');
@@ -64,7 +62,7 @@ function assertOrderCoversSources() {
   const extra = declared.filter(function (s) { return actual.indexOf(s) < 0; });
   if (missing.length > 0 || extra.length > 0) {
     throw new Error(
-      'tools/build.mjs 之載入順序與 src/ 不一致。\n  未登錄：' + (missing.join(', ') || '（無）') +
+      'tools/build.js 之載入順序與 src/ 不一致。\n  未登錄：' + (missing.join(', ') || '（無）') +
       '\n  已失效：' + (extra.join(', ') || '（無）')
     );
   }
@@ -242,4 +240,4 @@ function main() {
   process.stdout.write('  產出時間 ' + metadata.stamp + '\n');
 }
 
-main();
+if (require.main === module) main();

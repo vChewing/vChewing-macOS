@@ -1,9 +1,6 @@
 # 唯音配置助手（WebConfigAssistant）——建置產物與暫存，皆不入庫。
 # 注意：`assets/*.json` 與 `tests/fixtures/*.json` 係**刻意入庫**之防漂移物資
 #（`make metadata`／`surface-check`／`fixtures-check` 皆與入庫版逐位元組比對），不在此列。
-node_modules/
 dist/
 tmp/
-*.tsbuildinfo
 *.local
-package-lock.json

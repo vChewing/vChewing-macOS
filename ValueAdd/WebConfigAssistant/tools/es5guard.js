@@ -1,4 +1,4 @@
-// 唯音輸入法配置助手之 ES5 語法守衛（零 npm 相依）。
+// 唯音輸入法配置助手之 ES5 語法守衛（零 npm 相依；由 tools/host 之 JXA 宿主執行，不需要 node）。
 //
 // 為何需要：本機之 TypeScript 為 7.x（Go 原生版），其已**移除** `target: es5` 與
 // `module: none` 兩個選項（實測：`error TS5108`）。故本專案改以 `target: es2015` 編譯、
@@ -6,11 +6,10 @@
 // 解構／展開／`class`）」為紀律；本守衛即該紀律之機器檢查——掃描**建置產物**而非原始碼，
 // 故能同時抓出 tsc 自行注入之 ES6+ 語法。
 //
-// 用途：`node tools/es5guard.mjs <file.js> [<file.js> ...]`（獨立執行時，有違規即 exit 1）；
-// 亦由 `tools/build.mjs` 以模組方式呼叫。
+// 用途：`osascript -l JavaScript tools/host/run.js tools/es5guard.js <file.js> [<file.js> ...]`（獨立執行時，有違規即 exit 1）；
+// 亦由 `tools/build.js` 以模組方式呼叫。
 
-import fs from 'node:fs';
-
+const fs = require('node:fs');
 // ES6+ 語法（Safari 7 不支援者）。
 const SYNTAX_RULES = [
   { name: 'arrow-function', pattern: /=>/ },
@@ -59,7 +58,7 @@ const KEYWORD_BEFORE_REGEX = [
 const PUNCTUATION_BEFORE_REGEX = '(,=:[!&|?{};+-*%~^<>';
 
 /// 把字串／樣板／註解／正則字面量之內容替換為空白（保留換行，俾使行號不變）。
-export function stripLiterals(code) {
+function stripLiterals(code) {
   const chars = code.split('');
   const out = new Array(chars.length);
   let i = 0;
@@ -119,7 +118,7 @@ export function stripLiterals(code) {
 }
 
 /// 掃描一份 JS 原始碼，回傳違規清單（每項含 rule 與 line）。
-export function scan(code, rules) {
+function scan(code, rules) {
   const stripped = stripLiterals(code);
   const lines = stripped.split('\n');
   const violations = [];
@@ -136,7 +135,7 @@ export function scan(code, rules) {
 }
 
 /// 供建置器使用：檢查一段產物，違規則擲出例外。
-export function assertEs5(code, label) {
+function assertEs5(code, label) {
   const violations = scan(code);
   if (violations.length === 0) return;
   let message = 'ES5 守衛失敗（' + label + '）：\n';
@@ -147,11 +146,10 @@ export function assertEs5(code, label) {
   throw new Error(message);
 }
 
-const invokedPath = process.argv[1] || '';
-if (invokedPath.endsWith('es5guard.mjs')) {
+if (require.main === module) {
   const files = process.argv.slice(2);
   if (files.length === 0) {
-    process.stdout.write('用法：node tools/es5guard.mjs <file.js> [...]\n');
+    process.stdout.write('用法：osascript -l JavaScript tools/host/run.js tools/es5guard.js <file.js> [...]\n');
     process.exit(2);
   }
   let failed = 0;
@@ -170,3 +168,5 @@ if (invokedPath.endsWith('es5guard.mjs')) {
   }
   process.exit(failed === 0 ? 0 : 1);
 }
+
+module.exports = { assertEs5, scan, stripLiterals };

@@ -1,18 +1,16 @@
-// 契約測試用之 fixture 產生器（零 npm 相依）。
+// 契約測試用之 fixture 產生器（零 npm 相依；由 tools/host 之 JXA 宿主執行，不需要 node）。
 //
 // 為何要「產生」而非「手抄」：fixture 是助手與唯音之間的契約樣本——手抄必然漂移。
 // 本檔以助手自己的核心邏輯（dist/core.js）實際生成配置包，故 fixture 恆等於助手之真實產物；
 // 其後由 Swift 側之契約測試斷言「唯音收得下這些包」。
 //
-// 用法：node tools/fixtures.mjs [--check]
+// 用法：osascript -l JavaScript tools/host/run.js tools/fixtures.js [--check]
 //   --check：只重新生成到 dist/ 並與入庫版比對，有差即失敗（供 `make fixtures-check` 用）。
 
-import fs from 'node:fs';
-import path from 'node:path';
-import url from 'node:url';
-import vm from 'node:vm';
-
-const ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const ROOT = path.resolve(path.dirname(__filename), '..');
 const CORE = path.join(ROOT, 'dist', 'core.js');
 const OUT_DIR = path.join(ROOT, 'tests', 'fixtures');
 const CHECK_DIR = path.join(ROOT, 'dist', 'fixtures');
@@ -158,4 +156,4 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) main();

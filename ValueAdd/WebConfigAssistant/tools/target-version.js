@@ -1,23 +1,21 @@
-// 助手所適配之輸入法版本：讀取、注入與防漂移比對（零 npm 相依）。
+// 助手所適配之輸入法版本：讀取、注入與防漂移比對（零 npm 相依；由 tools/host 之 JXA 宿主執行，不需要 node）。
 //
 // 助手側之單一事實來源為本目錄之 `version.txt`；倉庫側之 SSOT 為倉根之
 // `Release-Version.plist`（`Plugins/BundleApps/plugin.swift` 明文稱之為
-// "the single source of truth"）。兩者須一致——`node tools/target-version.mjs --check`
-// 即該比對（`make version-check`，已納入 `make audit`）。
+// "the single source of truth"）。兩者須一致——`make version-check`
+// 即該比對（已納入 `make audit`）。
 //
-// 用法：node tools/target-version.mjs [--check]
+// 用法：osascript -l JavaScript tools/host/run.js tools/target-version.js [--check]
 
-import fs from 'node:fs';
-import path from 'node:path';
-import url from 'node:url';
-import { execFileSync } from 'node:child_process';
-
-const ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const fs = require('node:fs');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+const ROOT = path.resolve(path.dirname(__filename), '..');
 const VERSION_TXT = path.join(ROOT, 'version.txt');
 const REPO_PLIST = path.join(ROOT, '..', '..', 'Release-Version.plist');
 
 /// 讀取並解析 `version.txt`（`key=value`；`#` 起頭為註解）。
-export function readTargetVersion() {
+function readTargetVersion() {
   if (!fs.existsSync(VERSION_TXT)) {
     throw new Error('找不到 version.txt：' + VERSION_TXT);
   }
@@ -39,7 +37,9 @@ export function readTargetVersion() {
   return { version: version, build: build, display: version + ' (' + build + ')' };
 }
 
-/// 讀取倉根 `Release-Version.plist`（以 `plutil` 轉為 JSON，避免自寫 plist 解析器）。
+/// 讀取倉根 `Release-Version.plist`。呼叫形制沿用 `plutil -convert json`，惟宿主
+/// （`tools/host/node.js`）之 `execFileSync` 並不啟動子行程——JXA 以 `NSDictionary`
+/// 直讀該 plist 並回傳等價之 JSON，故本函式之行為與在 node 上相同。
 function readRepoVersion() {
   if (!fs.existsSync(REPO_PLIST)) {
     throw new Error('找不到 Release-Version.plist：' + REPO_PLIST);
@@ -72,5 +72,6 @@ function main() {
   process.stdout.write('版本一致：' + target.display + '（對照 Release-Version.plist）\n');
 }
 
-const invokedPath = process.argv[1] || '';
-if (invokedPath.endsWith('target-version.mjs')) main();
+if (require.main === module) main();
+
+module.exports = { readTargetVersion };

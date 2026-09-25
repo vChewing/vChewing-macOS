@@ -1,5 +1,5 @@
 {
-  "generator": "tools/settings-surface.mjs",
+  "generator": "tools/settings-surface.js",
   "sourceDirectories": [
     "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsUI",
     "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsCocoa"

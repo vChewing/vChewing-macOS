@@ -4,10 +4,16 @@
 # 本目錄之建置**不跨倉**：後設資料走本倉自己那份 SwiftPM 套件
 # （`Packages/vChewing_OSNeutral_LibVanguard`），不觸及 vChewing-LibVanguard。
 #
-# 零 npm 相依：只用到 `tsc`（TypeScript，本機全域安裝即可）與 `node`。
+# 建置鏈之外部相依**只有 `tsc`**（Phase 246）：
+#   * JS 宿主改用 macOS 內建之 JXA（`osascript -l JavaScript`）——不再需要 node 與 npm；
+#   * `tsc` 須為**原生版**（TypeScript 7 之原生執行檔，非 npm 版之 node 啟動器）；
+#     取得方式見 README §三；`make check-tsc` 會擋下非原生者。
+# 宿主之實作與理由見 `tools/host/run.js` 檔首，以及
+# `vChewing-DevLogs/Research/Phase245-PostResearch.md` §7.10。
 
 TSC            ?= tsc
-NODE           ?= node
+HOST           ?= osascript -l JavaScript
+HOST_RUN        = $(HOST) tools/host/run.js
 PYTHON         ?= python3
 PORT           ?= 8787
 HOMEPAGE_REPO  ?= ../../../vChewing-HomePage.io
@@ -34,25 +40,32 @@ EXTRA_ARGS = \
 DUMP = swift run --disable-sandbox -c release --package-path $(CLI_PKG) \
 	vChewingSharedCLI dump-userdef-metadata $(LOCALE_ARGS) $(EXTRA_ARGS)
 
-.PHONY: help typecheck build bundle test es5 metadata metadata-update metadata-audit surface surface-check version-check fixtures fixtures-check audit serve deploy clean
+.PHONY: help check-tsc typecheck build bundle test es5 metadata metadata-update metadata-audit surface surface-check version-check fixtures fixtures-check audit serve deploy clean
 
 help:            ## 列出可用目標
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-typecheck:       ## 只做型別檢查（不輸出）
+check-tsc:       ## 驗證 $(TSC) 為原生版（非 npm 版之 node 啟動器）
+	@command -v "$(TSC)" >/dev/null 2>&1 || { \
+		echo "找不到 tsc。本鏈需要 TypeScript 7 之**原生**執行檔；取得方式見 README §三。"; exit 1; }
+	@if head -c 2 "$$(command -v "$(TSC)")" | grep -q '#!'; then \
+		echo "偵測到 $(TSC) 是腳本——npm 版之 tsc 由 node 啟動，而本鏈已免除 node。"; \
+		echo "請改用原生 tsc 7（見 README §三）。"; exit 1; fi
+
+typecheck: check-tsc  ## 只做型別檢查（不輸出）
 	$(TSC) --project tsconfig.json --noEmit
 
-build:           ## 編譯 TypeScript 至 dist/js/
+build: check-tsc ## 編譯 TypeScript 至 dist/js/
 	$(TSC) --project tsconfig.json
 
 bundle: build    ## 串接為 dist/core.js／dist/app.js／dist/assistant.html（單檔自足）
-	$(NODE) tools/build.mjs "--doc-base=$(DOC_BASE)"
+	$(HOST_RUN) tools/build.js "--doc-base=$(DOC_BASE)"
 
 es5: bundle      ## 只跑 ES5 語法守衛（目標環境含 macOS 10.9 之 Safari）
-	$(NODE) tools/es5guard.mjs dist/core.js dist/app.js
+	$(HOST_RUN) tools/es5guard.js dist/core.js dist/app.js
 
-test: bundle     ## 單元測試（node:test；零額外相依）
-	$(NODE) --test tests/*.test.js
+test: bundle     ## 單元測試（自建宿主；既有 5 支測試檔一字未改）
+	$(HOST_RUN) --tests
 
 metadata: bundle ## 自 UserDef 重新導出後設資料，並驗證與入庫版一致（防漂移）
 	@mkdir -p dist
@@ -71,19 +84,19 @@ metadata-audit:  ## i18n 稽核：缺鍵或未遷移之標籤即失敗（--stric
 	@$(DUMP) --strict > /dev/null
 
 version-check:   ## 驗證 version.txt 與倉根 Release-Version.plist 一致（防漂移）
-	$(NODE) tools/target-version.mjs --check
+	$(HOST_RUN) tools/target-version.js --check
 
 surface:         ## 掃描 SettingsUI／SettingsCocoa 之曝露面（助手之題庫不得越出此面）
-	$(NODE) tools/settings-surface.mjs
+	$(HOST_RUN) tools/settings-surface.js
 
 surface-check:   ## 驗證曝露面與入庫版一致（防漂移）
-	$(NODE) tools/settings-surface.mjs --check
+	$(HOST_RUN) tools/settings-surface.js --check
 
 fixtures: bundle  ## 由助手自身之核心邏輯重新生成契約測試用之 fixture
-	$(NODE) tools/fixtures.mjs
+	$(HOST_RUN) tools/fixtures.js
 
 fixtures-check: bundle ## 驗證 fixture 與助手產物一致（防漂移）
-	$(NODE) tools/fixtures.mjs --check
+	$(HOST_RUN) tools/fixtures.js --check
 
 audit: typecheck es5 test metadata metadata-audit surface-check version-check fixtures-check  ## 提交前總檢
 
@@ -98,4 +111,4 @@ deploy: bundle   ## 複製產物進官網倉（不自動提交）
 	@echo "已部署。請於官網倉提交 $(DEPLOY_SUBDIR)/index.html 與 $(DEPLOY_SUBDIR)/assistant.html（前者會自動跳轉至後者）"
 
 clean:           ## 清理提示（本工作區紀律：不執行 rm -rf，請手動移入 tmp/_filesToTrash）
-	@echo "請將 dist/ 與 node_modules/（若有）移入 tmp/_filesToTrash。"
+	@echo "請將 dist/ 移入 tmp/_filesToTrash。"

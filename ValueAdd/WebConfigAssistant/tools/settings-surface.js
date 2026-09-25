@@ -1,17 +1,15 @@
-// 設定介面曝露面之掃描器（零 npm 相依）。
+// 設定介面曝露面之掃描器（零 npm 相依；由 tools/host 之 JXA 宿主執行，不需要 node）。
 //
 // 事主 2026-09-24 立規：**只要不是 `SettingsUI`／`SettingsCocoa` 曝露給使用者的選項，
 // 就不要在配置助手裡面出現**。助手無法在執行期得知該集合（它不讀取任何本機檔案），
 // 故於建置期掃描那兩個目錄之源碼、生成 `assets/settings-surface.json`；
 // `tests/questions.test.js` 再以「題庫 ⊆ 曝露面」之不變式守住。
 //
-// 用法：node tools/settings-surface.mjs [--check]
+// 用法：osascript -l JavaScript tools/host/run.js tools/settings-surface.js [--check]
 
-import fs from 'node:fs';
-import path from 'node:path';
-import url from 'node:url';
-
-const ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
+const fs = require('node:fs');
+const path = require('node:path');
+const ROOT = path.resolve(path.dirname(__filename), '..');
 const ASSET_PATH = path.join(ROOT, 'assets', 'settings-surface.json');
 // 助手目錄位於 vChewing-macOS/ValueAdd/WebConfigAssistant ⇒ 往上三層即倉根。
 const SETTINGS_ROOT = path.join(ROOT, '..', '..', 'Packages', 'vChewing_SettingsUI', 'Sources', 'SettingsUI');
@@ -112,7 +110,7 @@ function main() {
   const sorted = Array.from(keys).sort();
   const keyboardParsers = extractKeyboardParsers();
   const payload = {
-    generator: 'tools/settings-surface.mjs',
+    generator: 'tools/settings-surface.js',
     sourceDirectories: SCAN_DIRS.map(function (dir) { return path.relative(ROOT, dir); }),
     scannedFileCount: files.length,
     count: sorted.length,
@@ -137,4 +135,4 @@ function main() {
   );
 }
 
-main();
+if (require.main === module) main();

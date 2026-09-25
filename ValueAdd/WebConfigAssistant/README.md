@@ -24,7 +24,7 @@
    `UserDef.importFromDictionary(_:)` 亦須接受（由 Swift 側之契約測試守住）。
 3. **助手只問「設定介面曝露過」的選項**（事主 2026-09-24 立規）：凡未出現於
    `vChewing_SettingsUI` 之 `SettingsUI/`（SwiftUI）或 `SettingsCocoa/`（AppKit）者，使用者即無從
-   於設定介面自行調整——助手問了也只會把人推進死巷。此集合由 `tools/settings-surface.mjs`
+   於設定介面自行調整——助手問了也只會把人推進死巷。此集合由 `tools/settings-surface.js`
    掃描那兩個目錄之源碼生成（`assets/settings-surface.json`），並由 `tests/questions.test.js`
    以「題庫 ⊆ 曝露面」之不變式守住；設定介面增刪曝露項時跑 `make surface` 即可跟上。
    依此規移除者：`kCandidateTextFontName`（事主明示：使用者亂填字型名稱可能導致部分候選字
@@ -113,10 +113,51 @@
   無益，事主 2026-09-25 指出後改為職能說明；`tests/questions.test.js` 逐頁斷言其存在、
   於四語系皆備且不等於助手全稱，`tests/dom-smoke.test.js` 則斷言繪製結果隨頁面而變。
 
-## 三、零 npm 相依
+## 三、外部相依只有 `tsc`（Phase 246）
 
-本目錄**沒有任何 npm 相依**：`package.json` 的 `dependencies` 與 `devDependencies` 皆為空。
-建置只需兩樣本機既有之物：`tsc`（TypeScript）與 `node`。
+本目錄之建置鏈**不依賴 node，亦不需要 npm**。整條鏈之外部相依**只有一樣：`tsc`**。
+
+作法是：
+
+- **JS 宿主改用 macOS 內建之 JXA**（`osascript -l JavaScript`）——原本跑 node 的那 5 支工具
+  與測試宿主，改由 `tools/host/` 之宿主執行。宿主提供 node API 之所需子集
+  （`fs`／`path`／`url`／`vm`／`process`／`child_process`／`Buffer`／`node:test`／`node:assert`）
+  與 CommonJS 載入器，**故 5 支工具與 5 支測試檔之邏輯一字未改**（僅模組語法由 ESM 改為
+  CommonJS、檔名由 `.mjs` 改為 `.js`）。
+- **`tsc` 須為原生版**（TypeScript 7 之原生執行檔）。**npm 版的 `tsc` 不能用**：它是
+  `#!/usr/bin/env node` 之啟動器（見 §三.2）。`make check-tsc` 會擋下非原生者，且已納入
+  `typecheck`／`build`。
+- 其餘一切照舊：產物由 `tools/build.js` 串接、由 `tools/es5guard.js` 掃描，等等。
+
+### 三.1 `tsc` 之取得（三條路，皆不需 node／npm）
+
+| 來源 | 下載 | 解壓 | 備註 |
+|---|---|---|---|
+| **npm registry 之平台套件（推薦）** | 約 9 MB | 26 MB | 純 HTTPS GET；中國鏡像 `registry.npmmirror.com` 與 npmjs **逐位元組相同**（已驗），< 1 s |
+| GitHub Releases | 8.8 MB | 約 26 MB | `microsoft/typescript-go` 之 tag `typescript/v7.0.2`（20 個平台之 `.tgz`） |
+| NuGet | 57 MB | 162 MB | `Microsoft.TypeScript.MSBuild`；一次得六個 RID |
+
+推薦之安裝（以 arm64 macOS 為例）：
+
+```sh
+mkdir -p ~/.local/bin ~/.local/lib/tsc
+curl -sSL -o /tmp/ts.tgz \
+  https://registry.npmmirror.com/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz
+tar xzf /tmp/ts.tgz -C /tmp && rm -rf ~/.local/lib/tsc && mv /tmp/package ~/.local/lib/tsc
+ln -sf ~/.local/lib/tsc/lib/tsc ~/.local/bin/tsc
+```
+
+（`~/.local/bin` 需在 `PATH` 內。實測：`make audit` 於 `PATH` **完全不含 node** 時 rc=0。）
+
+### 三.2 何以不能用 npm 版之 `tsc`
+
+實測：`npm i -g typescript@7` 之 `bin/tsc` 內容為 `#!/usr/bin/env node` ＋
+`import "../lib/tsc.js";`，而 `lib/tsc.js` 僅 609 B、靠 `getExePath.js` 去定位真正的原生編譯器
+（`@typescript/typescript-<平台>/lib/tsc`，23 MB）。**故「TypeScript 7 是 Go 原生版」為真，
+但 npm 之發行形態令 `tsc` 必須有 `node` 才能啟動。** `make check-tsc` 即以
+「執行檔是否以 `#!` 起頭」判別之。
+
+### 三.3 ES5 紀律之緣由（未變）
 
 理由是實測出來的：**本機之 TypeScript 7.x（Go 原生版）已移除 `target: es5` 與
 `module: none`**（`error TS5108`／`TS6046`）。既不能降到 ES5、又不能以「無模組系統之全域
@@ -133,8 +174,8 @@ script」編譯，於是有兩條路：
 - 型別檢查與編譯走 `tsc`（`tsconfig.json`：`target: es2015`、`module: commonjs`、
   `lib: ["ES5", "DOM"]`、`strict`）。`lib` 取 ES5 是刻意的：凡誤用 ES6+ 之標準庫 API
   （`Array.from`、`Object.assign`、`.includes`……），**編譯期即報錯**。
-- 產物由 `tools/build.mjs` 依序串接為單一 script（無模組系統：模組以 TypeScript 之
-  `namespace VCA` 合併），再以 `tools/es5guard.mjs` 掃描**產物**（而非原始碼）之
+- 產物由 `tools/build.js` 依序串接為單一 script（無模組系統：模組以 TypeScript 之
+  `namespace VCA` 合併），再以 `tools/es5guard.js` 掃描**產物**（而非原始碼）之
   ES6+ 語法與標準庫 API；有一項即建置失敗。
 - 打包器（`esbuild` 一類）因此完全不必要：沒有相依要解析，串接即可。
 
@@ -143,14 +184,13 @@ script」編譯，於是有兩條路：
 ```text
 ValueAdd/WebConfigAssistant/
 ├── Makefile                 ← 本目錄專用；主倉 Makefile 不受影響、亦不呼叫本檔
-├── package.json             ← 零相依（僅為專案標記與 npm script 之轉呼）
 ├── tsconfig.json
-├── .gitignore               ← node_modules/、dist/、tmp/
+├── .gitignore               ← dist/、tmp/、*.local
 ├── index.html               ← 模板（含 {{STYLE}}／{{SCRIPT}}／{{BUILD_STAMP}} 佔位）
 ├── assets/
 │   ├── assistant.css        ← Windows 2000 / ME 風格樣式表
 │   ├── userdef-metadata.json← 由 vChewingSharedCLI 導出（**入庫**；防漂移見 §六）
-│   └── settings-surface.json← 設定介面曝露之鍵集（**入庫**；由 tools/settings-surface.mjs 掃描生成）
+│   └── settings-surface.json← 設定介面曝露之鍵集（**入庫**；由 tools/settings-surface.js 掃描生成）
 ├── src/                     ← 原始碼（TypeScript；namespace VCA）
 │   ├── globals.ts           ← 建置期注入之全域值（型別宣告）
 │   ├── model.ts             ← 資料模型（與後設資料 schema 對位）
@@ -164,7 +204,7 @@ ValueAdd/WebConfigAssistant/
 │   │                          左側水印區之第三行為「該頁之職能」（`left.<stepId>`）
 │   ├── exits.ts             ← 出口（剪貼簿、檔案下載）
 │   └── main.ts              ← 進入點（狀態、流程、鍵盤導覽、摘要與出口）
-├── tests/                   ← `node --test`（零額外相依）
+├── tests/                   ← 由 tools/host/run.js --tests 驅動（5 支測試檔一字未改）
 │   ├── core-loader.js       ← 載入 dist/core.js（無 DOM 之純邏輯）
 │   ├── dom-shim.js          ← 極簡 DOM 替身（供端到端冒煙測試）
 │   ├── metadata.test.js     ← 後設資料之契約與不變式
@@ -172,12 +212,18 @@ ValueAdd/WebConfigAssistant/
 │   ├── questions.test.js    ← 題庫完整性、值域、分支、頁序（快速／逐項）、起始配置之界內性
 │   ├── preset.test.js       ← 配置包之稀疏／型別／黑名單／鍵序
 │   ├── dom-smoke.test.js    ← 以 DOM 替身驅動完整產物之端到端冒煙
-│   └── fixtures/*.json      ← 契約測試樣本（**入庫**；由 tools/fixtures.mjs 生成）
+│   └── fixtures/*.json      ← 契約測試樣本（**入庫**；由 tools/fixtures.js 生成）
 └── tools/
-    ├── build.mjs            ← 串接、投影後設資料、產出單檔 HTML ＋ 目錄入口頁 index.html
-    ├── es5guard.mjs         ← ES5 語法／API 守衛
-    ├── settings-surface.mjs ← 掃描 SettingsUI／SettingsCocoa 之曝露面
-    └── fixtures.mjs         ← 由助手自身之核心邏輯生成契約測試樣本
+    ├── build.js             ← 串接、投影後設資料、產出單檔 HTML ＋ 目錄入口頁 index.html
+    ├── es5guard.js          ← ES5 語法／API 守衛
+    ├── target-version.js    ← version.txt ↔ 倉根 Release-Version.plist 之比對
+    ├── settings-surface.js  ← 掃描 SettingsUI／SettingsCocoa 之曝露面
+    ├── fixtures.js          ← 由助手自身之核心邏輯生成契約測試樣本
+    └── host/                ← 宿主（取代 node）
+        ├── run.js           ← 入口：`osascript -l JavaScript tools/host/run.js <工具.js>|--tests`
+        ├── node.js          ← node API 之墊片（fs／path／vm／process／Buffer／test／assert…）
+        ├── loader.js        ← CommonJS 載入器（require／module／require.main === module）
+        └── tests.js         ← 測試宿主（掃描 tests/*.test.js 並逐支執行）
 ```
 
 ## 五、常用指令
@@ -185,7 +231,8 @@ ValueAdd/WebConfigAssistant/
 ```sh
 make audit      # 提交前總檢：型別檢查 ＋ ES5 守衛 ＋ 單元測試 ＋ 後設資料防漂移 ＋ i18n 稽核 ＋ 曝露面防漂移 ＋ fixture 防漂移
 make bundle     # 產出 dist/assistant.html（單檔自足）
-make test       # 單元測試（node --test；61 支）
+make check-tsc  # 驗證 $(TSC) 為原生版（非 npm 之 node 啟動器）
+make test       # 單元測試（78 支；由 tools/host 驅動）
 make serve      # 本機預覽（http://127.0.0.1:8787/assistant.html）
 make deploy     # 複製 dist/assistant.html 與 dist/index.html 進官網倉（DEPLOY_SUBDIR 預設 assistant；不自動提交）
 make metadata-update  # 自 UserDef 重新導出後設資料並入庫
@@ -226,7 +273,7 @@ swift run --disable-sandbox -c release \
 ## 七、契約測試（Swift 側）
 
 `Packages/vChewing_SettingsUI/Tests/SettingsUITests/AssistantContractTests.swift` 會讀取
-`tests/fixtures/*.json`（由 `tools/fixtures.mjs` 以助手自己的核心邏輯生成）並斷言
+`tests/fixtures/*.json`（由 `tools/fixtures.js` 以助手自己的核心邏輯生成）並斷言
 「唯音一概收得下」——助手一旦產出唯音不收的包，Swift 側測試即紅。
 
 - fixture 之定位以 `#filePath` 為錨，故**無須**改動任何 `Package.swift`、亦不必把 fixture
@@ -249,7 +296,7 @@ swift run --disable-sandbox -c release \
 
 - 主要目標：現行 Safari／Chrome／Edge／Firefox。
 - **次要目標（進行中）：macOS 10.9 內建之 Safari 7。** 已作到：產物為 ES5 語法
-  （由 `tools/es5guard.mjs` 守住）、版面以 table 佈局（不用 flexbox／grid）、
+  （由 `tools/es5guard.js` 守住）、版面以 table 佈局（不用 flexbox／grid）、
   控制項以 CSS2.1 之 `outset`／`inset`／`groove` 繪製（不依賴 `box-shadow`）、
   捲軸以 `::-webkit-scrollbar` 上色、漸層有純色後備。
 - **已備妥之降級路線**：剪貼簿（`navigator.clipboard` ＞ `execCommand("copy")` ＞
@@ -301,9 +348,9 @@ swift run --disable-sandbox -c release \
 8. **注音／拼音排列之順序、標籤與分組皆取自 app 源碼**（2026-09-24，事主指示「注音排列的 option
    順序請調整得跟輸入法 settingsUI 一致」）：該兩條鍵之標籤不在 `UserDef.metaData.options` 內，而設定
    介面是以 `KeyboardParser.allCases` 之**宣告序**列示（實查 `0,1,4,5,8,6,7,3,2,9,10`，非升冪），
-   並在 rawValue 7 與 100 之前插分隔線。故 `tools/settings-surface.mjs` 除掃描曝露鍵集外，另解析
+   並在 rawValue 7 與 100 之前插分隔線。故 `tools/settings-surface.js` 除掃描曝露鍵集外，另解析
    `Shared.swift` 之 `KeyboardParser` 宣告序與其 `localizedMenuName` switch、暨設定介面之
-   `Divider()` 條件，寫入 `assets/settings-surface.json` 之 `keyboardParsers` 段；`tools/build.mjs`
+   `Divider()` 條件，寫入 `assets/settings-surface.json` 之 `keyboardParsers` 段；`tools/build.js`
    將該段注入產物（`VCA_SURFACE`），`questions.ts` 之 `parserQuestion` 據以生成選項——**助手不再
    手抄這 17 條之順序或標籤**。**唯一例外**：清單首項之前的分隔線省略（清單之首無從標示分界）。
 
@@ -345,11 +392,11 @@ swift run --disable-sandbox -c release \
 
 14. **適配之輸入法版本**（2026-09-24 事主指示）：版本號與 build 編號存於本目錄之
     **`version.txt`**（助手側之單一事實來源；`key=value` 形制，`#` 起頭為註解），由
-    `tools/build.mjs` 讀取並注入產物（`VCA_TARGET_VERSION`），於**首頁**以 `.vca-version`
+    `tools/build.js` 讀取並注入產物（`VCA_TARGET_VERSION`），於**首頁**以 `.vca-version`
     之小字（與推薦值、維持不變之註記**共用** `#114514`／11px 之規則）顯示為
     「適配唯音輸入法 4.8.4 (4840)」（`welcome.targetVersion`，四語系齊備；寫法沿用 app 既有之
     「版本 (Build)」慣例）。**防漂移**：`make version-check`（已納入 `make audit`）以
-    `tools/target-version.mjs --check` 比對本檔與倉根之 **`Release-Version.plist`**——後者是
+    `tools/target-version.js --check` 比對本檔與倉根之 **`Release-Version.plist`**——後者是
     本倉版本之 SSOT（`Plugins/BundleApps/plugin.swift` 明文如此稱之），不一致即失敗。
     改版時**無須手動同步**：本倉之版本落地點是倉根之 `BuildVersionSpecifier.swift`
     （`Scripts/vchewing-update.swift` 之發版流程會以 `/usr/bin/swift` 呼叫它），該腳本現已一併改寫
