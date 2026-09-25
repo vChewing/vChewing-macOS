@@ -57,7 +57,7 @@ namespace VCA {
       // 歡迎頁
       "welcome.h1": "歡迎使用唯音輸入法配置助手",
       "welcome.p1": "唯音的偏好設定有上百個選項，對第一次接觸的人並不友善。本助手會問您幾組簡單的問題，據此整理出一份「配置包」；您再把配置包匯入唯音即可。",
-      "welcome.p2": "每一題的預設答案都是「維持不變」：您沒有表態的項目，助手一律不會代您決定。",
+      "welcome.p2": "每一題的預設答案都是「維持不變」：您沒有表態的項目，助手不會代您決定。但有一項前提——您沒有套用「起始配置」：那組現成配置一旦套用，它涵蓋的每一項便都由它決定（指名的項目寫入推薦值，其餘項目一併回歸唯音出廠預設）；您可在該頁逐項取消，或整組改選「不套用（維持不變）」，如此本句即對每一項皆成立。",
       "welcome.p3": "本助手完全在您的瀏覽器內運作，不會擅自將您填入的偏好帶離這台電腦，也不會讀取您電腦上的任何設定。",
       "welcome.p4": "選妥您原本使用的輸入法之後，助手會先給出一組現成的「起始配置」；套用它即可直接產生配置包，不必逐頁回答。",
       "welcome.targetVersion": "適配唯音輸入法 %1",
@@ -218,7 +218,7 @@ namespace VCA {
       // 欢迎页
       "welcome.h1": "欢迎使用唯音输入法配置助手",
       "welcome.p1": "唯音的偏好设定有上百个项目，对第一次接触的人并不友善。本助手会问您几组简单的问题，据此整理出一份「配置包」；您再把配置包汇入唯音即可。",
-      "welcome.p2": "每一题的预设答案都是「维持不变」：您没有表态的项目，助手一律不会代您决定。",
+      "welcome.p2": "每一题的预设答案都是「维持不变」：您没有表态的项目，助手不会代您决定。但有一项前提——您没有套用「起始配置」：那组现成配置一旦套用，它涵盖的每一项便都由它决定（指名的项目写入推荐值，其余项目一并回归唯音出厂预设）；您可在该页逐项取消，或整组改选「不套用（维持不变）」，如此本句即对每一项皆成立。",
       "welcome.p3": "本助手完全在您的浏览器内运作，不会擅自将您填入的偏好带离这台电脑，也不会读取您电脑上的任何设定。",
       "welcome.p4": "选妥您原本使用的输入法之后，助手会先给出一组现成的「起始配置」；套用它即可直接产生配置包，不必逐页回答。",
       "welcome.targetVersion": "适配唯音输入法 %1",
@@ -381,7 +381,7 @@ namespace VCA {
       // Welcome
       "welcome.h1": "Welcome to the vChewing Configuration Assistant",
       "welcome.p1": "vChewing ships with well over a hundred preference items, which is not friendly to newcomers. This assistant asks you a handful of simple questions and turns your answers into a configuration profile that you then import into vChewing.",
-      "welcome.p2": "Every question defaults to \"keep unchanged\": anything you do not answer will never be decided on your behalf.",
+      "welcome.p2": "Every question defaults to \"keep unchanged\": anything you do not answer is not decided on your behalf. There is one precondition, though — that you have not applied a \"starter profile\": once applied, every item it covers is decided by it (the items it names are written with the recommended values, and the rest are reverted to vChewing's factory defaults). You may untick any item on that page, or switch the whole profile to \"Do not apply (keep unchanged)\"; then this holds for every single item.",
       "welcome.p3": "This assistant runs entirely inside your browser. It will never take the preferences you enter away from this computer on its own, and it never reads any setting on your computer.",
       "welcome.p4": "Once you have picked the input method you came from, the assistant offers a ready-made \"starter profile\". Apply it and you can produce your profile right away, without answering page after page.",
       "welcome.targetVersion": "Compatible with vChewing %1",
@@ -544,7 +544,7 @@ namespace VCA {
       // 歓迎ページ
       "welcome.h1": "唯音入力アプリ配置助手へようこそ",
       "welcome.p1": "唯音の環境設定には百を超える項目があり、初めての方には優しくありません。本助手はいくつかの簡単な質問をし、それに基づいて「配置データ」をまとめます。あとはそれを唯音に読み込むだけです。",
-      "welcome.p2": "各設問の既定の答えは「変更しない」です。回答しなかった項目を、助手が勝手に決めることはありません。",
+      "welcome.p2": "各設問の既定の答えは「変更しない」です。回答しなかった項目を、助手が勝手に決めることはありません。ただし前提が一つあります——「開始時の設定」を適用していないことです。適用すると、それが扱う項目はすべてそれによって決まります（指名する項目には推奨値が書き込まれ、残りの項目は唯音の出荷時の既定値に戻されます）。そのページで項目ごとに取り消すか、組全体を「適用しない（変更しない）」に切り替えれば、本項はすべての項目について成り立ちます。",
       "welcome.p3": "本助手はすべてお使いのブラウザー内で動作します。ご入力いただいた設定を勝手にこのパソコンの外へ持ち出すことはありませんし、お使いのコンピューターの設定も読み取りません。",
       "welcome.p4": "以前お使いだった入力方法を選ぶと、助手が「開始時の設定」をひとそろい用意します。それを適用すれば、ページごとに答えることなくそのまま配置データを生成できます。",
       "welcome.targetVersion": "唯音入力アプリ %1 に対応",

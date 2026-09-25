@@ -56,6 +56,7 @@
     - 该 SDK **不是 Xcode 15 内建的**（Xcode 15 自带的是 macOS 14 系），故本仓库的 `LEGACY_SDK` 直接绑 **Command Line Tools 那份**：`/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk`（Xcode 15 内的同名目录只是指过去的 symlink）。
     - **这份 SDK 的来历**：内容是原厂 macOS 13.3 SDK（内部文件时间戳 2023-03-29，即 Xcode 14.3 发布那批）。它**不是现行 CLT 提供的**——现行 CLT（本机为 27.0，2026-09-10 装入）已把 macOS 11／12／13／14 的 legacy SDK 一律改成「移除包」（`CLTools_macOS_DevSDK_Remove_macOS13.pkg` 等），本机这份之顶层时间戳为 2026-05-27（当日并无任何 CLT 安装记录可查）。故在干净机器上请自行备妥：自 macOS 13.3 的 Command Line Tools（或自带 13.x SDK 的 Xcode 14.3）解出后放进 CLT 的 `SDKs/`。
     - **但 Xcode 15 仍不可省**：本路径的 build plugin 之编译取的是「active developer dir 的预设 macOS SDK」，`--sdk` 到不了那里，故仍须以一个「预设 SDK ≤ 14.x」的 Xcode 为 `DEVELOPER_DIR`（任何 ≤ 15.4 者皆等价）。
+- **（选用）建置配置助手**：`ValueAdd/WebConfigAssistant/` 是唯音的配置助手（互动式设定向导）；其外部相依**只有一样：`tsc`（TypeScript 7 之原生执行档）**——**不需 node、亦不需 npm**（npm 版之 `tsc` 是 `#!/usr/bin/env node` 之启动器，`make check-tsc` 会挡下它）。取得管道有三条，逐字步骤见[助手之说明 §三.1](ValueAdd/WebConfigAssistant/README.md)。**未装 `tsc` 亦不影响输入法本体之建置**——只是不会把助手收录进 `vChewing.app`。
 - **想在 macOS 27 之前的系统上以 Swift 6.4+ 编译**（例如末代 Intel MacBook Pro 13-inch）：请注意，**「让当前 shell 自动用上 Swift 6.4+ open-source toolchain」是您自己的责任**。官方推出的 **Swiftly** 是一条可行路径，但它的 shell 环境配置相当繁琐，且会把原本装在系统根目录的 FOSS toolchain 全部改成装进您的 user-space——至少在 macOS 26 上这是能用的选择。若您的电脑最高只能跑到 macOS 15，Swiftly 可能无法把 toolchain 装进 user-space，此时只能以系统管理员权限、手动将官方发行的 toolchain `.dmg`／`.pkg` 安装到系统根目录；这样一来，您可能得按自身需求改动本仓库的 `makefile`。这些繁琐事务在当今是可以交给 LLM 打点的，但便利与风险并存，请自行斟酌。
 - **本仓库不提供 `build640` 这类「锁定 Swift 版本号」的建置入口**：Swift 每发一版就得回头把所有 `makefile` 修一遍，得不偿失。建置入口一律以「当前 shell 的 `swift`」为准。
 
@@ -97,6 +98,18 @@
 第一次安装完之后，如有修改原厂辞典与程式码的话，只要重覆上述流程重新安装输入法即可。
 
 如果安装若干次后，发现程式修改的结果并没有出现、或甚至输入法已无法再选用的话，请重新登入系统。
+
+### 配置助手（Configuration Assistant）
+
+`ValueAdd/WebConfigAssistant/` 是唯音的配置助手：以 TypeScript 写成，编译后成为**单档自足**的 `assistant.html`——一份在浏览器内运作的互动式设定向导，用来产生可汇入唯音的「配置包」。该目录自有[一份说明](ValueAdd/WebConfigAssistant/README.md)，此处只讲它与本仓库建置流程之关系。
+
+**它不是唯音本体之建置相依**：不编它，`make debug`／`make release`／`make archive` 一概照常。两者之关系是：
+
+- **侦测到 `tsc` 时**：上述各目标（以及 legacy 路径之 `make debugLegacy`／`releaseLegacy`／`archiveLegacy`、乃至 Xcode 专案）会顺带编译助手，并把它收录进 `vChewing.app/Contents/Resources/assistant/assistant.html`。
+- **未侦测到 `tsc` 时**：只印一则警告，**不中断输入法之建置**，该资源亦不收录。故若您发现 app 内没有配置助手，请先确认 `tsc` 是否在 `PATH` 内。
+- **单独建置助手**：`cd ValueAdd/WebConfigAssistant && make bundle` ⇒ `dist/assistant.html`；`make audit` 为提交前之总检，`make serve` 可本机预览。
+
+**dev env 只需一样：`tsc`（TypeScript 7 之原生执行档）；不需 node、亦不需 npm**——助手之建置链自 Phase 246 起改以 macOS 内建之 JXA（`osascript -l JavaScript`）为 JS 宿主。**npm 版之 `tsc` 不可用**：它是 `#!/usr/bin/env node` 之启动器，一经使用即等于仍依赖 node；`make check-tsc` 以「执行档是否以 `#!` 起头」判别并挡下之。原生 `tsc` 之取得有三条管道（npm registry 之平台套件、GitHub Releases、NuGet），见[助手之说明 §三.1](ValueAdd/WebConfigAssistant/README.md)。
 
 ## 关于该仓库的历史记录
 
