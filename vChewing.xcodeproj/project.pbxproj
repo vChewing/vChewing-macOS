@@ -280,6 +280,7 @@
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
 				5BDC5CBE27C28E8B00E1CCE2 /* Embed Foundation Extensions */,
 				5B6F882E28D2F49F004EF52F /* Run Script (Build PKG Installer) */,
+				5B2A55E72F4C0001006B48E8 /* Run Script (Embed Configuration Assistant) */,
 			);
 			buildRules = (
 			);
@@ -437,6 +438,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Remove the README.md in the NotarizedArchives directory\nrm -f \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/NotarizedArchives/README.md\"\n";
+		};
+		5B2A55E72F4C0001006B48E8 /* Run Script (Embed Configuration Assistant) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script (Embed Configuration Assistant)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# 收錄「教學文章」（＝配置助手之產物）進輸入法之 main bundle（Phase 246）。\n# 紀律（事主 2026-09-25 明示）：當且僅當偵測到 tsc 時才編譯並收錄；否則給警告、\n# 但**絕不中斷輸入法之建置**。三條建置路徑共用同一支腳本——SwiftPM 現代側與 5.10\n# legacy 側分別由 BundleApps／BundleAppsLegacy plugin 在**簽章之前**呼叫，Xcode 側即本 phase。\nSCRIPT=\"${SRCROOT}/ValueAdd/WebConfigAssistant/tools/embed-into-bundle.sh\"\nif [ -x \"$SCRIPT\" ]; then\n  \"$SCRIPT\" \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\" || echo \"warning: [教學文章] 收錄腳本以非零狀態收場（不中斷建置）。\"\nelse\n  echo \"warning: [教學文章] 找不到收錄腳本：$SCRIPT\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

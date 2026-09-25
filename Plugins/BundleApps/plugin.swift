@@ -301,6 +301,10 @@ extension BundleAppsPlugin {
       try fm.copyItem(at: bundle, to: resources.appending(path: name))
     }
 
+    // ── Configuration Assistant（教學文章）之收錄 ──
+    // 必須在簽章之前：資源受簽章封印。見 `embedAssistant` 之說明。
+    embedAssistant(into: appDir, packageDir: packageDir)
+
     // ── Code sign with entitlements ──
     // Inject entitlements that Xcode derives from build settings:
     //   ENABLE_APP_SANDBOX = YES
@@ -708,6 +712,25 @@ extension BundleAppsPlugin {
   /// Nested code is signed first and the app afterwards, so no `--deep` is used: Apple
   /// deprecates `--deep` for signing, and it does not reliably propagate
   /// hardened-runtime options to nested binaries.
+
+  /// 收錄「教學文章」（＝配置助手之產物）進輸入法之 main bundle（Phase 246）。
+  ///
+  /// 何以由此處呼叫、而非於 `Makefile` 之 plugin 呼叫之後補做：`--archive` 會在同一趟
+  /// plugin 執行內完成組裝與封存，故事後補做會漏掉 `.xcarchive`；而此處亦恰好落在
+  /// **簽章之前**——資源受簽章封印，簽後追加會使簽章失效。
+  ///
+  /// 該腳本自身之紀律：**當且僅當偵測到 `tsc` 時**才編譯並收錄，否則印警告並以 0 收場；
+  /// 故本呼叫不因助手之缺席而中斷輸入法之建置。
+  private func embedAssistant(into appDir: URL, packageDir: URL) {
+    let script = packageDir.appending(path: "ValueAdd/WebConfigAssistant/tools/embed-into-bundle.sh")
+    guard FileManager.default.fileExists(atPath: script.path) else { return }
+    print("📄 Embedding the Configuration Assistant (teaching articles)…")
+    guard (try? run("/bin/sh", arguments: [script.path, appDir.path])) != nil else {
+      print("  ⚠️ 助手之收錄未竟（腳本無法執行）；輸入法之建置照常。")
+      return
+    }
+  }
+
   private func codesign(at target: URL, entitlements: URL? = nil, nestedCode: [URL] = []) throws {
     for nested in nestedCode {
       try codesign(at: nested)

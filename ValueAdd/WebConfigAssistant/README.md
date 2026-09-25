@@ -161,7 +161,31 @@ ln -sf ~/.local/lib/tsc/lib/tsc ~/.local/bin/tsc
 但 npm 之發行形態令 `tsc` 必須有 `node` 才能啟動。** `make check-tsc` 即以
 「執行檔是否以 `#!` 起頭」判別之。
 
-### 三.3 ES5 紀律之緣由（未變）
+### 三.3 收錄進輸入法之 main bundle（Phase 246 追加任務）
+
+助手之產物（`dist/assistant.html` ＋ `dist/index.html`）會被收錄進 **`vChewing.app` 之
+`Contents/Resources/assistant/`**（`index.html` 為入口，其 `<meta http-equiv="refresh">` 自動
+導向 `assistant.html`），故使用者手上的輸入法即帶著一份**可離線開啟**的教學文章。
+
+**唯一的閘是 `tsc`**：**當且僅當**偵測到 `tsc` 時才編譯並收錄；未偵測到即印出警告、
+**絕不中斷輸入法之建置**。同理，本步之任何失敗（`tsc` 存在但不可用、或助手編譯失敗）
+一律「警告後續行」——本步為選配。
+
+**三條建置路徑共用同一支腳本**（`tools/embed-into-bundle.sh`）：
+
+| 路徑 | 呼叫點 | 涵蓋之目標 |
+|---|---|---|
+| SwiftPM 現代側 | `Plugins/BundleApps/plugin.swift` 之 `embedAssistant` | `make debug`／`release`／`archive` |
+| SwiftPM 5.10 legacy 側 | `Plugins/BundleAppsLegacy/plugin.swift` 之 `embedAssistant` | `bundleLegacy`（`debugLegacy`／`releaseLegacy`／`archiveLegacy` 之收尾） |
+| Xcode | `vChewing` 靶之 Run Script phase「Run Script (Embed Configuration Assistant)」 | Xcode 之 Debug／Release |
+
+**何以在 plugin 內呼叫、而非於 `Makefile` 之 plugin 呼叫之後補做**：`--archive` 會在同一趟
+plugin 執行內完成組裝與封存，事後補做會漏掉 `.xcarchive`；且此二處與 Xcode 之 phase 皆恰好
+落在**簽章之前**——資源受簽章封印，簽後追加會使簽章失效（實測：收錄後
+`codesign --verify --strict` 仍回 `valid on disk` 與 `satisfies its Designated Requirement`）。
+另：收錄進 IME 之後，安裝程式所內嵌之那份 `vChewing.app` 亦一併帶著它（其組裝在 IME 之後）。
+
+### 三.4 ES5 紀律之緣由（未變）
 
 理由是實測出來的：**本機之 TypeScript 7.x（Go 原生版）已移除 `target: es5` 與
 `module: none`**（`error TS5108`／`TS6046`）。既不能降到 ES5、又不能以「無模組系統之全域
