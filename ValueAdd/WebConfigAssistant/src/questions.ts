@@ -67,7 +67,7 @@ namespace VCA {
   ///
   /// 判準：凡未出現於 `vChewing_SettingsUI` 之 `SettingsUI/`（SwiftUI）或 `SettingsCocoa/`
   /// （AppKit）者，即使用者無從於設定介面自行調整，助手亦不應過問——以免問出使用者
-  /// 在設定介面內找不到、因而無法自行復原的項目。此清單由 `tools/settings-surface.mjs`
+  /// 在設定介面內找不到、因而無法自行復原的項目。此清單由 `tools/settings-surface.js`
   /// 掃描那兩個目錄之源碼生成（`assets/settings-surface.json`），並由
   /// `tests/questions.test.js` 以「題庫 ⊆ 曝露面」之不變式守住。
   ///

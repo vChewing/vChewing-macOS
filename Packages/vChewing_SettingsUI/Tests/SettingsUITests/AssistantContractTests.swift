@@ -13,7 +13,7 @@ import Testing
 /// 助手一旦產出唯音不收的包，本測試即紅——此為「助手與 `UserDef` 不漂移」之最強手段。
 ///
 /// 兩項設計取捨：
-/// ① **fixture 由助手自己生成**（`ValueAdd/WebConfigAssistant/tools/fixtures.mjs`，以助手之
+/// ① **fixture 由助手自己生成**（`ValueAdd/WebConfigAssistant/tools/fixtures.js`，以助手之
 ///    核心邏輯實際產出配置包），故樣本恆等於助手之真實產物；手抄必然漂移。
 /// ② **只做純查詢**：以 `UserDef.destructureExchange(_:)` ＋ `UserDef.diffAgainstCurrent(_:)`
 ///    驗證，**不**呼叫 `importFromExchangeJSON(_:)`——後者會寫入 `UserDefaults`，在共用行程內
