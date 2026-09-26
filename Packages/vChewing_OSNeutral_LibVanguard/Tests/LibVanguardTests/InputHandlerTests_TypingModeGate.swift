@@ -259,4 +259,48 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "e").asEvent)
     #expect(!testHandler.currentLM.config.shouldSuppressFactoryZhuyinwenData)
   }
+
+  /// 逐字選字（SCPC）與磁帶模式下**不啟用狂打特性**——本靶驗其中一項：
+  /// 拼音連打之自動切音節須於 SCPC 下停用（注音側之孿生函式由狂打閘門把守；
+  /// 拼音側因歷史緣故無閘門，此即該閘之固化物）。磁帶不經本型別
+  /// （`handleComposition` 之打字模式分派：`.cassette` → `CassetteTypewriter`），
+  /// 故無從在同一個靶內驅動，僅以註解記之。
+  @Test("[IH706] SCPC 下拼音不自動切音節")
+  func test_IH706_SCPCDisablesPinyinAutoChop() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let savedParser = testHandler.prefs.keyboardParser
+    let savedFurious4Pinyin = testHandler.prefs.furiousTypingEnabled4Pinyin
+    defer {
+      testHandler.prefs.useSCPCTypingMode = false
+      testHandler.prefs.keyboardParser = savedParser
+      testHandler.prefs.furiousTypingEnabled4Pinyin = savedFurious4Pinyin
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
+
+    // ① 對照組：SCPC 關 ⇒ 自動切音節照常（`gao` 不可能延伸為 `gaol` ⇒ 切出 `ㄍㄠ`、
+    //    尾段字母留在注拼槽）。
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.currentLM.syncPrefs()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("gaol")
+    #expect(testHandler.assembler.actualKeys == ["ㄍㄠ"], "實得：\(testHandler.assembler.actualKeys)")
+    #expect(testHandler.composer.romajiBuffer == "l", "實得：\(testHandler.composer.romajiBuffer)")
+
+    // ② 實驗組：SCPC 開 ⇒ 不切，整段留在注拼槽（狂打特性不生效）。
+    testHandler.prefs.useSCPCTypingMode = true
+    testHandler.currentLM.syncPrefs()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(testHandler.typingMode == .pinyinKeyblock)
+    typeSentence("gaol")
+    #expect(testHandler.assembler.actualKeys.isEmpty, "實得：\(testHandler.assembler.actualKeys)")
+    #expect(testHandler.composer.romajiBuffer == "gaol", "實得：\(testHandler.composer.romajiBuffer)")
+  }
 }

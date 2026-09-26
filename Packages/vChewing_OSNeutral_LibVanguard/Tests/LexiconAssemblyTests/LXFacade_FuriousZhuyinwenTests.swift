@@ -55,11 +55,14 @@ struct LXFacadeFuriousZhuyinwenTests {
 
   /// 四態：抑制旗標 ＝「**當前打字方式所屬那一側**之狂打開關」。
   ///
-  /// 枚舉 `pinyinTypingEnabled` × 兩顆狂打開關之全部 8 種組合，逐組驗兩件事：
-  /// ① `syncPrefs()` 寫入 config 之值即析取式之期望值；② 該值確實反映到查詢結果
-  /// （注音文「ㄋㄟㄋㄟ」在抑制時不得出現）——只驗 ① 不足以證明旗標接得上下游。
+  /// 枚舉 `pinyinTypingEnabled` × 兩顆狂打開關 × 磁帶 × 逐字選字之全部 **32** 種組合，
+  /// 逐組驗兩件事：① `syncPrefs()` 寫入 config 之值即期望式之值；② 該值確實反映到查詢
+  /// 結果（注音文「ㄋㄟㄋㄟ」在抑制時不得出現）——只驗 ① 不足以證明旗標接得上下游。
+  ///
+  /// 期望式即「狂打確實生效中」：**磁帶與 SCPC 下狂打不生效 ⇒ 一律不抑制**（此為事主
+  /// 2026-09-26 之裁定「磁帶與 SCPC 先不要啟用狂打特性」），其餘看該側之開關。
   @Test
-  func testZhuyinwenSuppressionTruthTableOverBothFuriousSwitches() throws {
+  func testZhuyinwenSuppressionTruthTableOverAllModes() throws {
     defer {
       LXAssembly.LXFacade.disconnectFactoryDictionary()
     }
@@ -74,23 +77,35 @@ struct LXFacadeFuriousZhuyinwenTests {
       for isPinyin in [true, false] {
         for furious4Pinyin in [true, false] {
           for furious4Zhuyin in [true, false] {
-            let prefs = PrefMgr.sharedSansDidSetOps
-            prefs.pinyinTypingEnabled = isPinyin
-            prefs.furiousTypingEnabled4Pinyin = furious4Pinyin
-            prefs.furiousTypingEnabled4Zhuyin = furious4Zhuyin
-            instance.syncPrefs()
+            for cassette in [true, false] {
+              for scpc in [true, false] {
+                let prefs = PrefMgr.sharedSansDidSetOps
+                prefs.pinyinTypingEnabled = isPinyin
+                prefs.furiousTypingEnabled4Pinyin = furious4Pinyin
+                prefs.furiousTypingEnabled4Zhuyin = furious4Zhuyin
+                prefs.cassetteEnabled = cassette
+                prefs.useSCPCTypingMode = scpc
+                instance.syncPrefs()
 
-            let expected = (isPinyin && furious4Pinyin) || (!isPinyin && furious4Zhuyin)
-            let context = """
-            拼音打字＝\(isPinyin)、狂拼＝\(furious4Pinyin)、狂注＝\(furious4Zhuyin)
-            """
-            #expect(
-              instance.config.shouldSuppressFactoryZhuyinwenData == expected,
-              "旗標不符：\(context)"
-            )
-            let hasZhuyinwen = instance.unigramsFor(keyArray: Self.boobsKey)
-              .contains { $0.current == "ㄋㄟㄋㄟ" }
-            #expect(hasZhuyinwen != expected, "查詢結果不符：\(context)")
+                let furiousSideEnabled = isPinyin ? furious4Pinyin : furious4Zhuyin
+                let expected = !cassette && !scpc && furiousSideEnabled
+                let context = """
+                拼音打字＝\(isPinyin)、狂拼＝\(furious4Pinyin)、狂注＝\(furious4Zhuyin)\
+                、磁帶＝\(cassette)、SCPC＝\(scpc)
+                """
+                #expect(
+                  instance.config.shouldSuppressFactoryZhuyinwenData == expected,
+                  "旗標不符：\(context)"
+                )
+                // 查詢層之斷言只在「原廠 TextMap 為現行辭典來源」時有意義：磁帶模式下
+                // 查詢走磁帶辭典（本靶未載入任何磁帶）⇒ 該條於磁帶下恆為「查不到」，
+                // 與本旗標無涉（此為靶之界線，非語義之界線）。
+                guard !cassette else { continue }
+                let hasZhuyinwen = instance.unigramsFor(keyArray: Self.boobsKey)
+                  .contains { $0.current == "ㄋㄟㄋㄟ" }
+                #expect(hasZhuyinwen != expected, "查詢結果不符：\(context)")
+              }
+            }
           }
         }
       }

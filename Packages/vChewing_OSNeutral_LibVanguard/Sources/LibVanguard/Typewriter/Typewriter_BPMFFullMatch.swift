@@ -364,6 +364,14 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     session: Session
   )
     -> Bool? {
+    // 逐字選字模式（SCPC）下不啟用狂打特性：拼音連打之自動切音節屬狂打語義
+    // （其注音孿生 `performZhuyinAutoChopIfNeeded` 由狂打閘門把守；此處之拼音側
+    // 因歷史緣故無閘門，故顯式補上 SCPC 這一條）。磁帶模式不經本型別
+    // （`handleComposition` 之打字模式分派：`.cassette` → `CassetteTypewriter`），
+    // 故無須在此另設磁帶閘。
+    // SCPC 下之逐音節選字不受影響：讀音完成（聲調鍵／空格）時仍走
+    // `composeReadingIfReady` → `handleTypewriterSCPCTasks()`。
+    guard !prefs.useSCPCTypingMode else { return nil }
     guard let autoChop = handler.composer.pinyinAutoChopResult(appending: inputText) else {
       // R3-a：完整音節自動 chop 不可行時，嘗試狂拼 α 自動套用——注拼槽整段為多音節
       // 簡拼（如「ysxb」）且整詞簡拼查詢有明確勝出的頂級候選時，自動把其實際讀音
