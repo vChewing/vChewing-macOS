@@ -5,7 +5,7 @@
 // `Tekkon.SyllableIndex` 之行為測試。
 //
 // 索引之語意與兩條紅線見 `Sources/Tekkon/Tekkon_SyllableIndex.swift` 之型別說明。
-// 本檔之斷言分三類：① 資料規模（427／442／15／37 四項可稽核數字）；② 成員資格之正反例；
+// 本檔之斷言分三類：① 資料規模（426／442／16／37 四項可稽核數字）；② 成員資格之正反例；
 // ③ 與引擎既有表（`allowedConsonants` 等）及測試素材之交叉比對。
 
 import Foundation
@@ -20,7 +20,7 @@ struct TekkonTestsSyllableIndex {
   @Test("完整讀音集即 mapHanyuPinyin 之 value 集")
   func canonicalReadingsMatchThePinyinMap() {
     let index = Tekkon.SyllableIndex.shared(parser: .ofDachen)
-    #expect(index.readings.count == 427)
+    #expect(index.readings.count == 426)
     #expect(Tekkon.SyllableIndex.allReadings == index.readings)
     #expect(Set(index.readings) == Set(Tekkon.mapHanyuPinyin.values))
     // 升冪、且無重複。
@@ -75,14 +75,14 @@ struct TekkonTestsSyllableIndex {
     }
     let strict = derived.filter { !index.isComplete($0) }.sorted()
     #expect(
-      strict == ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄈㄧ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄎㄧ", "ㄏ", "ㄐ", "ㄒ"],
+      strict == ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄈㄧ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄎㄧ", "ㄏ", "ㄐ", "ㄑ", "ㄒ"],
       "實得：\(strict)"
     )
     for symbol in strict {
       #expect(index.isPrefix(symbol), "\(symbol) 應為前綴")
       #expect(!index.isComplete(symbol), "\(symbol) 不應為完整讀音")
     }
-    // 反向：推導集之中，凡不在上述 15 條者皆須為完整讀音。
+    // 反向：推導集之中，凡不在上述 16 條者皆須為完整讀音。
     for prefix in derived where !strict.contains(prefix) {
       #expect(index.isComplete(prefix), "\(prefix) 應為完整讀音")
     }
@@ -92,40 +92,45 @@ struct TekkonTestsSyllableIndex {
     #expect(index.completions(of: "ㄎㄧ") == ["ㄎㄧㄡ", "ㄎㄧㄤ"])
   }
 
-  @Test("單符號讀音之 24／13 分裂，暨 mapHanyuPinyin 之單字母異常條目")
+  @Test("單符號讀音之 23／14 分裂，暨單字母條目之現況")
   func singleSymbolCompleteSplit() {
     let index = Tekkon.SyllableIndex.shared(parser: .ofDachen)
     var oneChar: Set<String> = []
     for reading in index.readings { oneChar.insert(String(reading.prefix(1))) }
     let completeOneChar = oneChar.filter { index.isComplete($0) }.sorted()
     let strictOneChar = oneChar.filter { !index.isComplete($0) }.sorted()
-    // 37 ＝ 24 完整 ＋ 13 嚴格。
-    #expect(completeOneChar.count == 24)
-    #expect(strictOneChar == ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄏ", "ㄐ", "ㄒ"])
-    // 預期之完整單符號：21 個聲母中之 8 個（ㄑ ㄓ ㄔ ㄕ ㄖ ㄗ ㄘ ㄙ）
-    // ＋ 3 個介母（ㄧ ㄨ ㄩ）＋ 13 個韻母。
+    // 37 ＝ 23 完整 ＋ 14 嚴格。
+    #expect(completeOneChar.count == 23)
+    #expect(strictOneChar == ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄏ", "ㄐ", "ㄑ", "ㄒ"])
+    // 預期之完整單符號：7 個可獨立成音節之聲母（ㄓ ㄔ ㄕ ㄖ ㄗ ㄘ ㄙ）
+    // ＋ 3 個介母（ㄧ ㄨ ㄩ）＋ 13 個韻母 ＝ 23 條。
     #expect(
       completeOneChar == [
-        "ㄑ", "ㄓ", "ㄔ", "ㄕ", "ㄖ", "ㄗ", "ㄘ", "ㄙ",
+        "ㄓ", "ㄔ", "ㄕ", "ㄖ", "ㄗ", "ㄘ", "ㄙ",
         "ㄚ", "ㄛ", "ㄜ", "ㄝ", "ㄞ", "ㄟ", "ㄠ", "ㄡ", "ㄢ", "ㄣ", "ㄤ", "ㄥ", "ㄦ",
         "ㄧ", "ㄨ", "ㄩ",
       ].sorted()
     )
-    // **異常之釘死**：`ㄑ` 之所以擠身完整讀音，唯一原因是 `mapHanyuPinyin` 收了單字母條目
-    // `"q": "ㄑ"`——其餘 20 個聲母皆無單字母條目（`b`／`p`／`m`… 皆不存在）。
-    // `"q"` 不是合法之漢語拼音音節（`qi` 才是，且 `"qi"` 另有條目）。
-    // 本 phase **不動**此條目（移除即為 Tekkon 之行為變動，超出本 phase 之範圍），
-    // 僅以本斷言把它釘成可觀測之事實。
-    #expect(Tekkon.mapHanyuPinyin["q"] == "ㄑ")
-    #expect(Tekkon.mapHanyuPinyin["qi"] == "ㄑㄧ")
+    // 嚴格單符號則為 14 條：其餘 14 個聲母——**含 `ㄑ`**。`ㄑ` 不是獨立音節（`ㄑㄧ` 才是），
+    // 故它只以「`ㄑ` 一族之嚴格前綴」之身分存在。此點曾因 `mapHanyuPinyin` 收有單字母條目
+    // `"q": "ㄑ"` 而失真；該條目已於 2026-09-26 依事主指示自 `mapHanyuPinyin` 與
+    // `LexiconAssembly` 之內嵌 `jsnHanyuPinyinToMPS` 兩表同步刪去。
+    #expect(!index.isComplete("ㄑ"))
+    #expect(index.isPrefix("ㄑ"))
+    #expect(!index.completions(of: "ㄑ").isEmpty)
+    #expect(
+      Tekkon.mapHanyuPinyin["qi"] == "ㄑㄧ"
+    )
     #expect(Tekkon.mapHanyuPinyin["b"] == nil)
     #expect(Tekkon.mapHanyuPinyin["p"] == nil)
+    // **單字母條目僅餘三條真音節**：`a`／`e`／`o` 皆為合法之漢語拼音音節。
     let singleLetterKeys = Tekkon.mapHanyuPinyin.keys.filter { $0.count == 1 }.sorted()
-    #expect(singleLetterKeys == ["a", "e", "o", "q"], "實得：\(singleLetterKeys)")
-    // 前 3 條（a／e／o）確為合法之漢語拼音音節；`q` 不是。
+    #expect(singleLetterKeys == ["a", "e", "o"], "實得：\(singleLetterKeys)")
     #expect(Tekkon.mapHanyuPinyin["a"] == "ㄚ")
     #expect(Tekkon.mapHanyuPinyin["e"] == "ㄜ")
     #expect(Tekkon.mapHanyuPinyin["o"] == "ㄛ")
+    #expect(Tekkon.mapHanyuPinyin["q"] == nil)
+    #expect(Tekkon.mapHanyuPinyin.count == 426)
   }
 
   // MARK: 成員資格
@@ -147,7 +152,7 @@ struct TekkonTestsSyllableIndex {
     #expect(index.completions(of: "ㄍㄚ") == ["ㄍㄚ"])
     // 空字串：全部 427 條（`hasPrefix("")` 恆真）。此與 `isPrefix("") == false` 並不矛盾
     // ——後者是「非空」之定義，前者是列舉之定義。
-    #expect(index.completions(of: "").count == 427)
+    #expect(index.completions(of: "").count == 426)
     #expect(!index.isPrefix(""))
     // 非前綴：空集。
     #expect(index.completions(of: "ㄍㄋ").isEmpty)
@@ -176,14 +181,20 @@ struct TekkonTestsSyllableIndex {
       stems.insert(reading)
     }
     #expect(stems.count == 422)
-    // 強於「成員或其前綴」：全部皆為**完整讀音**。
-    let notComplete = stems.filter { !index.isComplete($0) }
-    #expect(notComplete.isEmpty, "非完整讀音者：\(notComplete.sorted())")
+    // 422 條之中，**421 條**為完整讀音；唯一之例外是 `ㄑ`——素材收錄它是因為五個動態排列
+    // 皆能將它編成單鍵、且原廠辭典確有 `ㄑ` 這個單符號詞條，惟它並非漢語音節。
+    // 此即「音節表 vs 辭典」之職責邊界在資料上之現形。
+    let notComplete = stems.filter { !index.isComplete($0) }.sorted()
+    #expect(notComplete == ["ㄑ"], "非完整讀音者：\(notComplete)")
     // 反向落差：字典有而素材無者恰為 5 條。
     #expect(
       Set(index.readings).subtracting(stems).sorted()
         == ["ㄈㄨㄥ", "ㄍㄧ", "ㄍㄨㄜ", "ㄎㄧㄡ", "ㄘㄟ"]
     )
+    // 反向落差恰為 1 條：`ㄑ`。素材收錄它是因為五個動態排列皆能將它編成單鍵、且原廠辭典
+    // 確有 `ㄑ` 這個單符號詞條；惟它並非漢語音節，故不在索引之內。此即「音節表 vs 辭典」
+    // 之職責邊界在資料上之現形。
+    #expect(stems.subtracting(Set(index.readings)).sorted() == ["ㄑ"])
   }
 
   // MARK: 共用快取
@@ -194,7 +205,7 @@ struct TekkonTestsSyllableIndex {
       .ofDachen, .ofDachen26, .ofETen, .ofHanyuPinyin, .ofWadeGilesPinyin,
     ]
     let readings = parsers.map { Tekkon.SyllableIndex.shared(parser: $0).readings }
-    #expect(Set(readings.map { $0.count }) == [427])
+    #expect(Set(readings.map { $0.count }) == [426])
     for list in readings { #expect(list == readings[0]) }
     // 清快取之後仍可重建，且內容不變。
     Tekkon.SyllableIndex.clearSharedCache()

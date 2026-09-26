@@ -297,22 +297,24 @@ struct TekkonTestsAutoChopPredicate {
     // ① 測試資料之相異無調詞幹實為 422 條（《規劃書》§4.2 之「439」係未把 `_` 正規化為
     //    空格所致——`ㄔ_` 之類 17 列被當成了獨立的詞幹）。
     #expect(stems.count == 422, "測試資料相異無調詞幹數：實測 \(stems.count)")
-    // ② 422 條**全部**皆為 427 條之成員（不只是前綴）。
-    #expect(onlyTable.isEmpty, "只在測試資料者：\(onlyTable.sorted())")
-    // ③ 落差實為「測試資料少了 5 條」。
+    // ② 422 條之中，**421 條**為詞幹集之成員；唯一之例外是 `ㄑ`——測試資料收錄它是因為
+    //    五個動態排列皆能將它編成單鍵、且原廠辭典確有 `ㄑ` 這個單符號詞條，惟它並非
+    //    漢語音節，故不在詞幹集之內。（此即「音節表 vs 辭典」之職責邊界。）
+    #expect(onlyTable.sorted() == ["ㄑ"], "只在測試資料者：\(onlyTable.sorted())")
+    // ③ 落差另含「測試資料少了 5 條」。
     #expect(onlyMap == ["ㄈㄨㄥ", "ㄍㄧ", "ㄍㄨㄜ", "ㄎㄧㄡ", "ㄘㄟ"], "只在字典者：\(onlyMap)")
 
-    // ④ §4.2 之資料規模六項，逐項複驗。
-    #expect(index.allReadings.count == 427)
+    // ④ §4.2 之資料規模六項，逐項複驗（`ㄑ` 條目已於 2026-09-26 刪去，故 427→426、15→16）。
+    #expect(index.allReadings.count == 426)
     #expect(index.allPrefixes.count == 442)
     #expect(
       index.allPrefixes.subtracting(index.allReadings).sorted()
-        == ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄈㄧ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄎㄧ", "ㄏ", "ㄐ", "ㄒ"]
+        == ["ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄈㄧ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄎㄧ", "ㄏ", "ㄐ", "ㄑ", "ㄒ"]
     )
     #expect(index.allPrefixes.reduce(0) { $0 + $1.utf8.count } == 3_069)
     #expect(
       index.allReadings.reduce(into: [Int: Int]()) { $0[$1.count, default: 0] += 1 }
-        == [1: 24, 2: 227, 3: 176]
+        == [1: 23, 2: 227, 3: 176]
     )
     #expect(index.allPrefixes.map(\.count).max() == 3)
 
