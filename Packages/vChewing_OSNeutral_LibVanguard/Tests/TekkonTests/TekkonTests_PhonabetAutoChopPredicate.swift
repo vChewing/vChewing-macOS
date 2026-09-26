@@ -52,8 +52,15 @@ enum AutoChopCorpus {
   /// 之語料整批讀不到（`rows == []`），而當時之靶全以列舉為主，遂只在兩處下界斷言上失手。
   static var rawRowCount: Int { parsed.raw }
 
+  /// 診斷訊息（空字串代表載入成功）。
+  static var diagnostic: String { parsed.report }
+
   /// 自素材檔解析 `testTable4DynamicLayouts` 之內容。僅解析一次，`rows` 與 `rawRowCount` 共用。
   static var rows: [Row] { parsed.rows }
+
+  /// 載入診斷（供失敗訊息引用）。**非 Darwin 之靶不得再靜默失敗**：Windows 之 `#filePath`
+  /// 形制與非 Darwin 之 Foundation 尚待實測，故凡失敗一律附上嘗試過的路徑與失敗原因。
+  static var loadReport: String { parsed.report }
 
   /// 由靜態排列之鍵表反推「注音符號 → 按鍵」。
   ///
@@ -86,18 +93,47 @@ enum AutoChopCorpus {
 
   // MARK: Private
 
-  private static let parsed: (rows: [Row], raw: Int) = {
+  private static let parsed: (rows: [Row], raw: Int, report: String) = {
     var loadedRows: [Row] = []
     var raw = 0
-    let assetURL = URL(fileURLWithPath: (#filePath as NSString).deletingLastPathComponent as String)
-      .appendingPathComponent("TestAssets_Tekkon")
-      .appendingPathComponent("Tekkon_TestData.swift")
-    guard let data = try? Data(contentsOf: assetURL),
-          let text = String(data: data, encoding: String.Encoding.utf8) else { return ([Row](), 0) }
-    let lines = text.components(separatedBy: "\n")
+    // 素材檔之候選路徑。**第一個是正解**（`#filePath` 之目錄 ＋ 相對路徑），其餘為跨平台保險：
+    // Windows 之 `#filePath` 形制與非 Darwin 之 Foundation 皆未在本機實測過，而此靶先前在該平台
+    // 是**靜默**失敗（只以魔數下界間接失手）⇒ 寧可多試幾條並把結果全數回報。
+    let anchorDir = (#filePath as NSString).deletingLastPathComponent as String
+    let candidates: [String] = [
+      URL(fileURLWithPath: anchorDir).appendingPathComponent("TestAssets_Tekkon/Tekkon_TestData.swift").path,
+      (anchorDir as NSString).appendingPathComponent("TestAssets_Tekkon/Tekkon_TestData.swift"),
+      (anchorDir as NSString).appendingPathComponent("TestAssets_Tekkon\\Tekkon_TestData.swift"),
+      (anchorDir as NSString).appendingPathComponent("TestAssets_Tekkon: Tekkon_TestData.swift"),
+    ]
+    var attempts: [String] = []
+    var text: String?
+    for candidate in candidates {
+      let exists = FileManager.default.fileExists(atPath: candidate)
+      guard let data = try? Data(contentsOf: URL(fileURLWithPath: candidate)) else {
+        attempts.append("FAIL(absent, exists=\(exists)) \(candidate)")
+        continue
+      }
+      // 讀到了但解不成 UTF-8 時**不中斷**——可能只是挑錯了檔（例如同名的目錄），續試其餘候選。
+      guard let decoded = String(data: data, encoding: String.Encoding.utf8) else {
+        attempts.append("FAIL(not-utf8, bytes=\(data.count)) \(candidate)")
+        continue
+      }
+      attempts.append("OK(bytes=\(data.count)) \(candidate)")
+      text = decoded
+      break
+    }
+    func giveUp(_ why: String) -> (rows: [Row], raw: Int, report: String) {
+      ([Row](), 0, "#filePath=\(#filePath)\n" + why + "\n" + attempts.joined(separator: "\n"))
+    }
+    guard let text else { return giveUp("素材檔全數候選路徑讀取失敗。") }
+    // 行尾正規化：素材檔在版控內為 LF，但 Windows 之 checkout 可能改寫為 CRLF。
+    let lines = text.replacingOccurrences(of: "\r\n", with: "\n")
+      .replacingOccurrences(of: "\r", with: "\n")
+      .components(separatedBy: "\n")
     guard let start = lines.firstIndex(where: { $0.contains("let testTable4DynamicLayouts = \"\"\"") }),
           let end = lines[start...].firstIndex(where: { $0.trimmingCharacters(in: .whitespaces) == "\"\"\"" })
-    else { return ([Row](), 0) }
+    else { return giveUp("已讀到 \(text.count) 字元，但找不到表格之起訖錨點（前 120 字：\(text.prefix(120))）。") }
     // `start + 1` 為表頭列（`$READING Dachen26 …`），故自 `start + 2` 起。
     for line in lines[(start + 2) ..< end] {
       raw += 1
@@ -113,7 +149,7 @@ enum AutoChopCorpus {
       guard cells.allSatisfy({ cell in cell.allSatisfy(Self.isKeyCharacter) }) else { continue }
       loadedRows.append(Row(reading: reading, cells: cells))
     }
-    return (loadedRows, raw)
+    return (loadedRows, raw, "已解析：raw=\(raw)、kept=\(loadedRows.count)。")
   }()
 
   /// 單一按鍵之候選集（靜態注音排列之鍵面字元）。
@@ -132,7 +168,10 @@ struct PhonabetAutoChopPredicateTests {
   /// 覆蓋 **11 個排列**：5 個動態排列用素材之 1485 列編碼；6 個靜態排列用其鍵表反推全部前綴。
   @Test("判準不得在單一音節內誤切")
   func phonabetAutoChopNeverFiresWithinASyllable() {
-    #expect(!AutoChopCorpus.rows.isEmpty, "語料解析失敗——素材檔路徑或格式已變")
+    #expect(
+      !AutoChopCorpus.rows.isEmpty,
+      "語料解析失敗——素材檔路徑或格式已變：\n\(AutoChopCorpus.diagnostic)"
+    )
     var offenders: [String] = []
     var steps = 0
 
@@ -186,14 +225,17 @@ struct PhonabetAutoChopPredicateTests {
     }
 
     // 下界改以**結構**表達，不再釘死魔數：語料須幾近全數解析成功、且受檢步數須成規模。
-    #expect(AutoChopCorpus.rawRowCount > 1_000, "素材檔之資料列僅 \(AutoChopCorpus.rawRowCount)")
+    #expect(
+      AutoChopCorpus.rawRowCount > 1_000,
+      "素材檔之資料列僅 \(AutoChopCorpus.rawRowCount)：\n\(AutoChopCorpus.diagnostic)"
+    )
     // 實測剔除率 38/1485 ＝ 2.56%（全為上揭兩種「不適用」標記）；門檻取 95% 以為餘裕，
     // 意在攔住「整批讀不到」與「大規模解析失敗」，而非逐列計較。
     #expect(
       AutoChopCorpus.rows.count >= AutoChopCorpus.rawRowCount * 95 / 100,
       "語料解析損失過大：\(AutoChopCorpus.rows.count) / \(AutoChopCorpus.rawRowCount)"
     )
-    #expect(steps > 20_000, "受檢步數僅 \(steps)")
+    #expect(steps > 20_000, "受檢步數僅 \(steps)：\n\(AutoChopCorpus.diagnostic)")
     #expect(offenders.isEmpty, "誤切 \(offenders.count) 次：\(offenders.prefix(10))")
   }
 
@@ -237,7 +279,7 @@ struct PhonabetAutoChopPredicateTests {
     }
 
     // 同上：交界數之下界為結構量（0 即語料未載入）；「不得漏切」由 `missed` 承擔。
-    #expect(checked > 0, "受檢交界僅 \(checked)")
+    #expect(checked > 0, "受檢交界僅 \(checked)：\n\(AutoChopCorpus.diagnostic)")
     // P251 之實測為 2.19%；此處以 5% 為上限——殘餘之成因（與 `qquu` 之逐槽覆寫在局部
     // 可觀測量上同構）已證不可由局部判準分離，屬**已知界線**。
     let rate = Double(missed) * 100 / Double(max(checked, 1))
