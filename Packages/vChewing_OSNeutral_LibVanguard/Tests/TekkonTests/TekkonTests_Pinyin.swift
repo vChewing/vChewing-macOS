@@ -418,4 +418,52 @@ struct TekkonTestsPinyin {
     for char in "slliang" { extended.receiveKey(fromString: String(char)) }
     #expect(extended.romajiBuffer == "slliang")
   }
+
+  /// `mapHanyuPinyin` 之四條單字母條目（`a`／`e`／`o`／`q`）在**輸入解碼**上之可觀測後果。
+  ///
+  /// 前三條（`a`／`e`／`o`）是合法之漢語拼音音節；`q` **不是**（`qi` 才是，且另有條目），
+  /// 且其餘 20 個聲母**皆無**單字母條目。
+  ///
+  /// 唯一的可觀測不對稱：**狂拼模式下 `q` ＋ `f` 會自動切音節並提交 `ㄑ`**（緩衝留 `f`），
+  /// 而 `b` ＋ `f` 不會——因 `PinyinTrie.chop("qf")` 之前段 `"q"` 可經 `mapZhuyinPinyin`
+  /// 還原成 `ㄑ`，而 `"b"` 還原不了（`PinyinTrie.chop` 之 `committedReadings.count ==
+  /// leadingSlices.count` 閘因而失效）。本測試**釘住現狀**；若日後移除該條目（見
+  /// `Research/Phase250-ResearchAndNextSurgeryPlan.md` §4.2 之 v7 註），本測試即會亮燈，
+  /// 提醒複查狂拼之自動切音節路徑。
+  @Test("[Tekkon] PinyinSingleLetterEntries_DecodingConsequences")
+  func testSingleLetterEntryDecodingConsequences() async throws {
+    // 該表之單字母條目恰為四條。
+    #expect(Tekkon.mapHanyuPinyin.keys.filter { $0.count == 1 }.sorted() == ["a", "e", "o", "q"])
+    #expect(Tekkon.mapHanyuPinyin["q"] == "ㄑ")
+    #expect(Tekkon.mapHanyuPinyin["qi"] == "ㄑㄧ")
+    #expect(Tekkon.mapHanyuPinyin["b"] == nil)
+
+    // 逐鍵：`q` 使注拼槽得 ㄑ；`qf` 之整體查表失敗（無此條目）⇒ 槽清空。
+    var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
+    composer.receiveKey(fromString: "q")
+    #expect(composer.getComposition() == "ㄑ")
+    composer.receiveKey(fromString: "f")
+    #expect(composer.getComposition() == "")
+    #expect(composer.romajiBuffer == "qf")
+
+    // 狂拼之自動切音節：`q`＋`f` 提交 ㄑ；`b`＋`f` 不提交。
+    var chopped = Tekkon.Composer(arrange: .ofHanyuPinyin)
+    chopped.allowsExtendedRomajiBuffer = true
+    chopped.receiveKey(fromString: "q")
+    chopped.romajiBuffer = "q"
+    let qf = chopped.pinyinAutoChopResult(appending: "f")
+    #expect(qf?.committedReadings == ["ㄑ"])
+    #expect(qf?.remainingRomaji == "f")
+
+    var plain = Tekkon.Composer(arrange: .ofHanyuPinyin)
+    plain.allowsExtendedRomajiBuffer = true
+    plain.receiveKey(fromString: "b")
+    plain.romajiBuffer = "b"
+    #expect(plain.pinyinAutoChopResult(appending: "f") == nil)
+
+    // 拼音片段展開：`q` 因精確命中而僅回 ㄑ；`b` 則展開為全部 ㄅ 起首之讀音。
+    let trie = Tekkon.PinyinTrie.shared(parser: .ofHanyuPinyin)
+    #expect(trie.zhuyinReadings(forPinyinFragment: "q") == ["ㄑ"])
+    #expect(trie.zhuyinReadings(forPinyinFragment: "b").count > 1)
+  }
 }
