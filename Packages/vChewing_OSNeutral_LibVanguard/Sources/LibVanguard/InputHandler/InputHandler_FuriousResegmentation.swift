@@ -59,8 +59,23 @@ extension InputHandlerProtocol {
   /// 這是狂拼各功能（前方預覽、copilot 候選窗、固化、重切分、就地選字等）的共用閘門；
   /// 前方特定的額外條件（游標在組字區最前端、無聲調暫存、注拼槽非空等）由
   /// `furiousFrontContext`／`hasFuriousFrontPending` 各自把守。
-  /// `typingMode` 已把「狂拼開關＋非磁帶＋非逐字選字＋拼音注拼槽」打包為 `.pinyinFuriousTyping`。
+  /// `typingMode` 已把「狂打開關＋非磁帶＋非逐字選字＋注拼槽之鍵盤家族」打包為
+  /// `.pinyinFuriousTyping`／`.zhuyinFuriousTyping` 二者之一。
   public var isFuriousTypingModeEffective: Bool {
+    guard currentTypingMethod == .vChewingFactory else { return false }
+    switch typingMode {
+    case .pinyinFuriousTyping, .zhuyinFuriousTyping: return true
+    default: return false
+    }
+  }
+
+  /// 狂打模式有效**且為拼音側**（狂拼）。
+  ///
+  /// - Important: 三者必須保持**拼音專屬**，故一律用本旗子而非 `isFuriousTypingModeEffective`：
+  ///   ① `Typewriter_BPMFFullMatch` 之 `allowsExtendedRomajiBuffer`（該旗子只對 `romajiBuffer`
+  ///   有意義）；② 同檔之 trail 記錄（trail 是拼音字母 blob）；③ `isPinyinFamilyTypingMode`
+  ///   之語意（見 `InputHandler_CoreProtocol.swift`）。
+  public var isPinyinFuriousTypingModeEffective: Bool {
     currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
 

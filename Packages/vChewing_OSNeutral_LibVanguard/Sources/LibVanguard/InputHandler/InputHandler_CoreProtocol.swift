@@ -207,12 +207,17 @@ extension InputHandlerProtocol {
 
   /// 鍵盤佈局翻譯守衛：當前打字模式是否為「拼音系」（拼音鍵盤或狂拼）。
   ///
-  /// 拼音系（含狂拼）直接接收 ASCII 字母鍵，不需要將鍵盤佈局翻譯為美規鍵盤；
-  /// 狂拼模式必然為拼音系（`isFuriousTypingModeEffective` 內含 `composer.isPinyinMode`
-  /// 條件），故本旗子恆等於 `isComposerUsingPinyin`。此命名把該語義顯式化，
-  /// 避免鍵盤佈局翻譯等外部條件依賴「狂拼是否拼音」的隱式假設而與閘門語義脫鉤。
+  /// 拼音系（含狂拼）直接接收 ASCII 字母鍵，不需要將鍵盤佈局翻譯為美規鍵盤。
+  ///
+  /// - Important: **本旗子之語意恆為「注拼槽是否為拼音」，與狂打開關無關。** 原實作為
+  ///   `isComposerUsingPinyin || isFuriousTypingModeEffective`；該析取之所以多餘，是因
+  ///   `.pinyinFuriousTyping` 之成立本身即蘊含 `composer.isPinyinMode`。惟自狂打兩分起
+  ///   （P254），`isFuriousTypingModeEffective` 亦可能於**注音**注拼槽上成立
+  ///   （`.zhuyinFuriousTyping`）——若沿用原析取，注音狂打一開即令本旗子為真，鍵盤佈局
+  ///   翻譯被跳過、**注音完全打不出字**。故收緊為單一條件：此為**等價**變換（非放寬），
+  ///   且自此對新值免疫。
   public var isPinyinFamilyTypingMode: Bool {
-    isComposerUsingPinyin || isFuriousTypingModeEffective
+    isComposerUsingPinyin
   }
 
   public var moveCursorAfterSelectingCandidate: Bool {

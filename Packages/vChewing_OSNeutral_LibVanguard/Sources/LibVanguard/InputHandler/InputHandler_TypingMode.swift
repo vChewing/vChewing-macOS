@@ -20,6 +20,12 @@ public enum TypingMode: String, Equatable {
   case pinyinKeyblock
   /// 狂拼模式（Furious Typing）：拼音鍵盤＋快速自動 chop 組句。
   case pinyinFuriousTyping
+  /// 狂注模式（Furious Zhuyin Typing）：注音鍵盤＋快速自動切音節組句。
+  ///
+  /// - Important: 本值之可達性由 `prefs.furiousTypingEnabled4Zhuyin` 決定，而該偏好之出廠
+  ///   預設為 `false`、且其使用者介面要到 P258 才存在 ⇒ **在 P254／P255 之交付狀態下，
+  ///   本值不會出現於任何正式使用情境**（唯一觸及途徑是手改 `UserDefaults` 或匯入配置包）。
+  case zhuyinFuriousTyping
 
   // MARK: Public
 
@@ -40,8 +46,12 @@ extension InputHandlerProtocol {
   ///   （`furiousTypingEnabled4Zhuyin`）與 `TypingMode.zhuyinFuriousTyping` 之可達性留待 P254。
   public var typingMode: TypingMode {
     if prefs.cassetteEnabled { return .cassette }
-    if prefs.furiousTypingEnabled4Pinyin, !prefs.useSCPCTypingMode, composer.isPinyinMode {
-      return .pinyinFuriousTyping
+    // 狂打開關依注拼槽之鍵盤家族二選一；兩側各自獨立（§7.1）。
+    let isFurious = composer.isPinyinMode
+      ? prefs.furiousTypingEnabled4Pinyin
+      : prefs.furiousTypingEnabled4Zhuyin
+    if isFurious, !prefs.useSCPCTypingMode {
+      return composer.isPinyinMode ? .pinyinFuriousTyping : .zhuyinFuriousTyping
     }
     return composer.isPinyinMode ? .pinyinKeyblock : .bopomofoKeyblock
   }

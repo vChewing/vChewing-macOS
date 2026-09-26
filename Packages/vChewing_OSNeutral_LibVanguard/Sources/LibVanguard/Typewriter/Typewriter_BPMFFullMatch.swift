@@ -266,7 +266,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       // 狂拼等多音節簡拼字母流可超過注拼槽的單音節長度上限（預設 6 碼、超出會
       // 自動丟棄最早輸入的音頭），此處依當前打字模式即時設定旗子、讓注拼槽
       // 完整保留字母流（「slliang」不得被截斷成「lliang」而丟失前導字母）。
-      handler.composer.allowsExtendedRomajiBuffer = handler.isFuriousTypingModeEffective
+      handler.composer.allowsExtendedRomajiBuffer = handler.isPinyinFuriousTypingModeEffective
       handler.composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
       narrateTheComposer(
@@ -318,7 +318,8 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     }
 
     // 狂拼模式：記錄本次自動 chop 提交的讀音鍵所對應的拼音字母 blob（trail）。
-    if handler.isFuriousTypingModeEffective {
+    // 拼音專屬：trail 是拼音字母 blob，注音側不寫（§8.6 之 IH163）。
+    if handler.isPinyinFuriousTypingModeEffective {
       let fullLetters = handler.composer.romajiBuffer + inputText
       let consumedLetters = String(fullLetters.dropLast(autoChop.remainingRomaji.count))
       let blobs = Array(

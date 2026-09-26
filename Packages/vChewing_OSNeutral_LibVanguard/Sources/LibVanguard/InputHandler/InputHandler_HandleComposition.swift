@@ -32,7 +32,7 @@ extension InputHandlerProtocol {
           return MixedAlphanumericalTypewriter(self).handle(input)
         }
         return BPMFFullMatchTypewriter(self).handle(input)
-      case .pinyinFuriousTyping, .pinyinKeyblock:
+      case .pinyinFuriousTyping, .pinyinKeyblock, .zhuyinFuriousTyping:
         return BPMFFullMatchTypewriter(self).handle(input)
       }
     default: return nil
