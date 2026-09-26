@@ -26,10 +26,18 @@ extension InputHandlerProtocol {
     // 固化後注拼槽仍有未完成讀音（α 查無候選、或固化失敗）時，直接消費本拍空格、
     // 以新狀態刷新——避免空格流入注拼槽（拼音模式下空格＝中性聲調，其後的獨立聲調
     // 處理會清空注拼槽、丟失前方的簡拼整詞上下文）。
+    //
+    // ★ P260：**注音側之空格不屬固化觸發集合**。注音之五個聲調鍵為 `3`／`4`／`6`／`7`
+    // 與**空格**（陰平）——若把空格挪作「固化前方讀音」之用，陰平即無從指定（實測：
+    // 狂打下按空格所得者為**無調讀音桶**、由語言模型自行挑調，故陰平候選恆被高分之上聲／
+    // 去聲候選擠下）。拼音側之空格本即「無調確認組字」之鍵（`shouldUseToneInsensitivePinyinLookup`），
+    // 語義不變。固化另有 Tab／Enter／標點三條路（見 `handlePunctuation` 與同檔之 kTab 分支、
+    // 以及 `Typewriter_BPMFFullMatch` 之 Enter 分支）。
+    let spaceSolidifiesFuriousFront = isPinyinFuriousTypingModeEffective
     var spaceSolidifiedFuriousReading = false
     if session.isFuriousCopilotCandidateWindowVisible,
        !input.isHoldingAny([.control, .option, .command]),
-       input.isSpace || input.isPageUp || input.isPageDown
+       (input.isSpace && spaceSolidifiesFuriousFront) || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
       solidifyFuriousFrontReading()
       if input.isSpace, hasFuriousFrontPending {

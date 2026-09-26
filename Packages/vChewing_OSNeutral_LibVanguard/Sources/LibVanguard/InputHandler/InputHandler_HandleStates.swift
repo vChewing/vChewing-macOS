@@ -120,12 +120,14 @@ extension InputHandlerProtocol {
     return candidates.isEmpty ? nil : candidates
   }
 
-  /// 狂拼模式的前方簡拼整詞上下文（R2-α）：注拼槽整段無法展開成單一音節桶時
+  /// 狂打模式的前方簡拼整詞上下文（R2-α）：注拼槽整段無法展開成單一音節桶時
   /// （如「ysxb」），以 chop＋deduct 產生「每位置的 & 連接前綴候選」。
   ///
   /// 與 `furiousFrontContext` 互斥：單音節前綴走既有桶路徑，多音節簡拼走本路徑。
   /// 回傳的 cells 可直接餵給 `LXQuerier.abbreviatedWordCandidates(keysChopped:)`。
   /// 以注拼槽現況為準；R3-a 的自動套用需「含本拍字元」的版本，走 `furiousAbbreviatedCells(romaji:)`。
+  /// - Important: **本屬性為拼音專屬**（cells 由拼音字母流經 `PinyinTrie` 推得）；
+  ///   注音側之對位為 `furiousZhuyinAbbreviationCells`。
   var furiousAbbreviatedCells: [String]? {
     guard isFuriousTypingModeEffective else { return nil }
     guard composer.intonation.isEmpty else { return nil }
@@ -134,6 +136,37 @@ extension InputHandlerProtocol {
     guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return nil }
     return furiousAbbreviatedCells(romaji: romaji)
   }
+
+  /// 注音狂打之簡拼 cells（α 之**注音對位**）：逐位置之注音前綴，供整詞簡拼查詢。
+  ///
+  /// 取法：自組字器尾端起、向前收集**單注音鍵**（至多 3 個；遇非單注音鍵即停），
+  /// 再綴上注拼槽之當前讀音 ⇒ 至多 4 格。實例：鍵入 ㄍㄋㄋ（大千 `ess`）後，
+  /// 組字器尾段為 `["ㄍ","ㄋ"]`、注拼槽為「ㄋ」⇒ cells ＝ `["ㄍ","ㄋ","ㄋ"]`。
+  ///
+  /// - Note: **不新增任何狀態**——該序列本即完整存在於「組字器尾段 ＋ 注拼槽」，
+  ///   故 P255 之「注音不寫 `furiousTrail`」斷言照舊（trail 之語義仍為拼音字母 blob）。
+  /// - Note: cells 少於 2 格時回傳 `nil`：單一格即「整個聲母家族」（實測 ㄍ 有 59 筆同族
+  ///   讀音），作為簡拼查詢只會灌爆候選窗、無資訊量。
+  var furiousZhuyinAbbreviationCells: [String]? {
+    guard isZhuyinFuriousTypingModeEffective else { return nil }
+    var cells: [String] = []
+    let pendingReading = composer.getComposition(isHanyuPinyin: false)
+    if !pendingReading.isEmpty { cells.append(pendingReading) }
+    for key in assembler.keys.reversed() {
+      guard cells.count < Self.maxZhuyinAbbreviationCells else { break }
+      // 單注音鍵之連續鏈：鍵須只有一個讀音、且該讀音只有一個注音符號；遇完整音節即停。
+      guard !key.isMultiple, key.first.count == 1 else { break }
+      cells.insert(key.first, at: 0)
+    }
+    guard cells.count >= 2 else { return nil }
+    return cells
+  }
+
+  /// 注音簡拼 cells 之格數上限（含注拼槽之當前讀音）。
+  ///
+  /// 有界掃描：尾段之單注音鍵至多 3 個 ⇒ 連同待確認音節至多 4 格。
+  /// 界線值之研議見規劃書 §十一 #18。
+  static var maxZhuyinAbbreviationCells: Int { 4 }
 
   /// 以給定拼音字母流計算簡拼整詞的 cells（前述閘門由呼叫方把守）。
   /// 跨檔案 extension（`InputHandler_FuriousResegmentation` 的 α 自動套用）亦需使用，
@@ -247,6 +280,17 @@ extension InputHandlerProtocol {
       guard !gram.current.isEmpty else { continue }
       guard seenValues.insert(gram.current).inserted else { continue }
       ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+    }
+    // P260：注音狂打之**簡拼整詞候選**（α 之注音對位）。cells 取自「組字器尾段之單注音鍵
+    // ＋ 注拼槽之當前讀音」；`abbreviatedWordCandidates` 對各 cell 作逐位置 byte 前綴匹配
+    // （單次有界 Trie 查詢，無展開表、無笛卡爾積）。與前方候選同一清單 ⇒ 沿用本函式之
+    // 置頂／排序／去重；選取時由 `applyFuriousFrontCandidate` 之簡拼覆寫路徑處理。
+    if let abbreviationCells = furiousZhuyinAbbreviationCells {
+      for gram in currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: abbreviationCells) {
+        guard !gram.current.isEmpty else { continue }
+        guard seenValues.insert(gram.current).inserted else { continue }
+        ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+      }
     }
     // trail＋注拼槽聯合重切候選——「fangan」連打時 copilot 窗即呈現「反感」
     // （fan|gan）類替代切分整詞候選（與「fan gan」分開打的體驗一致）。

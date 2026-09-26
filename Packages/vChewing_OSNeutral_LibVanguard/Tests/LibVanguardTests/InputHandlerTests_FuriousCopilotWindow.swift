@@ -12,6 +12,7 @@
 // - Note: 大千排列之鍵位：ㄍ＝`e`、ㄠ＝`l`。測試辭典內 `ㄍㄠ`＝高（同音 12 條）。
 
 import Foundation
+import Homa
 import Shared
 import Tekkon
 import Testing
@@ -188,15 +189,19 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 既有 6 個 `hasFuriousFrontPending` 讀取點，在注音狂打下逐一驗其語義。
   ///
-  /// 空格／Tab／Enter／標點／方向鍵皆為「先固化前方讀音，再走各自既有語義」——
-  /// 注音側悉數沿用，無一改動（§3.5 之表）。
-  @Test("[IH162] 注音狂打：空格／Tab／Enter／標點／方向鍵之固化語義")
+  /// Tab／Enter／標點／方向鍵皆為「先固化前方讀音，再走各自既有語義」——注音側悉數沿用。
+  /// **空格不在此列**（P260）：注音之五個聲調鍵為 `3`／`4`／`6`／`7` 與**空格**（陰平），
+  /// 空格若被挪作固化之用則陰平無從指定 ⇒ 空格照常送入注拼槽當陰平（見 ①）。
+  @Test("[IH162] 注音狂打：空格／Tab／Enter／標點／方向鍵之語義")
   func test_IH162_FrontReadPointsUnderZhuyinFurious() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
-    defer { leaveFuriousTestEnvironment() }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
     clearTestPOM()
 
     /// 重置環境、鍵入 `ㄍㄠ`（前方待確認讀音成立）。
@@ -207,12 +212,23 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       #expect(testHandler.hasFuriousFrontPending)
     }
 
-    // ① 空格：固化前方讀音並消費本拍空格（語義為「插入讀音」而非「輪替候選／遞交空格」）。
+    // ① 空格（P260）：**空格即陰平鍵**，且陰平須確實被選用——測資刻意令去聲候選之分數遠高於
+    //    陰平（−0.1 對 −9）：若空格仍走「無調讀音桶」之路徑（P256 之過寬語義），語言模型會
+    //    挑走去聲者；本 phase 之後應得陰平者。
+    [
+      Homa.Gram(keyArray: ["ㄍㄠ"], value: "陰平測", score: -9),
+      Homa.Gram(keyArray: ["ㄍㄠˊ"], value: "陽平測", score: -9),
+      Homa.Gram(keyArray: ["ㄍㄠˇ"], value: "上聲測", score: -9),
+      Homa.Gram(keyArray: ["ㄍㄠˋ"], value: "去聲測", score: -0.1),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
     prepareTwoPendingKeys()
     typeSentence(" ")
+    // 鍵須為陰平者（單鍵 ㄍㄠ）；顯示值則取決於辭庫內陰平鍵之分數，故不釘字面值——
+    // 但**不得**為去聲者：若空格仍走無調桶之路徑，去聲候選（−0.1）必被選中（實測如此）。
     #expect(testHandler.assembler.actualKeys == ["ㄍㄠ"], "實得：\(testHandler.assembler.actualKeys)")
-    #expect(generateDisplayedText() == "高", "實得：\(generateDisplayedText())")
+    #expect(generateDisplayedText() != "去聲測", "實得：\(generateDisplayedText())")
     #expect(testHandler.composer.isEmpty)
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
     #expect(!generateDisplayedText().contains(" "))
 
     // ② Enter：固化前方讀音、停留在輸入狀態（不直接遞交全部內容）。
@@ -259,5 +275,103 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.composer.getComposition() == "ㄝ",
       "實得：\(testHandler.composer.getComposition())"
     )
+  }
+}
+
+// MARK: - 注音簡拼（P260）
+
+extension LibVanguardTestsRoot.InputHandlerTests {
+  /// 注音簡拼之 cells ＝「組字器尾段之單注音鍵（至多 3）＋ 注拼槽之當前讀音」。
+  ///
+  /// 三條界線同時釘住：① 少於 2 格不成立（單一格即整個聲母家族）；② 序列跨「已自動切出
+  /// 之單注音」與「注拼槽內待確認者」；③ **遇完整音節即停**（該鍵不是任何讀音之起頭候選）。
+  @Test("[IH166] 注音狂打：簡拼 cells 之還原與界線")
+  func test_IH166_ZhuyinAbbreviationCells() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    enterZhuyinFuriousTestEnvironment()
+
+    // 空槽：無 cells。
+    #expect(testHandler.furiousZhuyinAbbreviationCells == nil)
+
+    // 僅一格（注拼槽內一個注音）：nil——單一格即整個聲母家族，作簡拼查詢無資訊量。
+    typeSentence("e") // ㄍ
+    #expect(testHandler.composer.getComposition() == "ㄍ")
+    #expect(testHandler.furiousZhuyinAbbreviationCells == nil)
+
+    // 兩格：ㄍ 已自動切出、注拼槽為 ㄋ。
+    typeSentence("s") // ㄋ
+    #expect(testHandler.assembler.actualKeys == ["ㄍ"], "實得：\(testHandler.assembler.actualKeys)")
+    #expect(testHandler.composer.getComposition() == "ㄋ")
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄍ", "ㄋ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+
+    // 三格：即事主之例「ㄍㄋㄋ」。
+    typeSentence("s") // ㄋ
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄍ", "ㄋ", "ㄋ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+
+    // 遇完整音節即停：先鍵入 ㄍㄠ（自動切出、兩符號），再鍵入 ㄋ ⇒ cells 不含 ㄍㄠ、且僅一格 ⇒ nil。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("els") // ㄍㄠ → ㄋ
+    #expect(testHandler.assembler.actualKeys == ["ㄍㄠ"], "實得：\(testHandler.assembler.actualKeys)")
+    #expect(testHandler.composer.getComposition() == "ㄋ")
+    #expect(testHandler.furiousZhuyinAbbreviationCells == nil)
+    // 於該完整音節之後再續一個單注音：仍以「尾段單注音鏈」為界（不含 ㄍㄠ）。
+    typeSentence("s")
+    #expect(testHandler.assembler.actualKeys == ["ㄍㄠ", "ㄋ"], "實得：\(testHandler.assembler.actualKeys)")
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄋ", "ㄋ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+  }
+
+  /// 注音簡拼之整詞候選：`ㄍㄋㄋ` ⇒ copilot 窗得 `狗男女`，就地選字後三段讀音與詞值一次就位。
+  ///
+  /// 此即事主之原始用例（「打 ㄍㄋㄋ 可以預覽到狗男女」）在**注音側**之落地。
+  @Test("[IH167] 注音狂打：簡拼整詞候選與就地選字")
+  func test_IH167_ZhuyinAbbreviationCandidatesAndInPlaceSelection() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    enterZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"], value: "狗男女", score: -6.6),
+      isFiltering: false
+    )
+
+    typeSentence("ess") // ㄍㄋㄋ
+    #expect(testHandler.composer.getComposition() == "ㄋ")
+    #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "狗男女" }) else {
+      Issue.record("簡拼候選「狗男女」未入 copilot 窗：\(testSession.state.candidates.map(\.value))")
+      return
+    }
+
+    // 就地選字：三段讀音一次就位（尾段之單注音鍵一併被覆寫）、注拼槽清空。
+    testSession.candidatePairSelectionConfirmed(at: index)
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.isEmpty)
   }
 }

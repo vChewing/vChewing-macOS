@@ -297,8 +297,56 @@ extension InputHandlerProtocol {
         leadingOverlapCount = 1
       }
     }
+    // P260 注音簡拼之**尾段前綴重合**：候選之前 n-1 段讀音，逐位與組字器尾端之 n-1 個
+    // **單注音鍵**「前綴相符」（簡拼語義：該鍵係該讀音之起頭，如鍵「ㄍ」之於讀音「ㄍㄡˇ」）。
+    // 命中時只插入尾段讀音一枚、覆寫起點退至 `anchor - span`（與跨邊界路徑同構）——
+    // 亦即把「尾段單注音鍵 ＋ 注拼槽之當前音節」整段換成該詞之讀音。
+    // 註音專屬：拼音側之尾鍵為完整讀音、不存在「鍵是讀音之前綴」之情形，故以模式旗標設閘。
+    var abbreviatedOverlapSpan = 0
+    var abbreviatedTailKeys: [String] = []
+    if isZhuyinFuriousTypingModeEffective, !isBucketPinned, !isCrossBoundary,
+       leadingOverlapCount == 0, candidate.keyArray.count >= 2 {
+      let tailLimit = Self.maxZhuyinAbbreviationCells - 1
+      for key in targetAssembler.keys.reversed() {
+        guard abbreviatedTailKeys.count < tailLimit else { break }
+        guard !key.isMultiple, key.first.count == 1 else { break }
+        abbreviatedTailKeys.insert(key.first, at: 0)
+      }
+      // 逐位前綴對齊：尾段之每個單注音鍵須為候選對應讀音之起頭（簡拼語義）。
+      // 要求「全部尾鍵皆對齊」——若有殘鍵未消費，覆寫 span 會把它留成孤鍵。
+      if !abbreviatedTailKeys.isEmpty, candidate.keyArray.count >= abbreviatedTailKeys.count {
+        let isPrefixAligned = zip(abbreviatedTailKeys, candidate.keyArray).allSatisfy { key, reading in
+          reading.hasPrefix(key)
+        }
+        if isPrefixAligned { abbreviatedOverlapSpan = abbreviatedTailKeys.count }
+      }
+    }
     // 目標組字器的游標即新插入 span 的錨點（狂拼語義下位於組字區最前端）。
     let anchor = targetAssembler.cursor
+    // P260 注音簡拼之獨立路徑：尾段之單注音鍵係「簡拼前綴」、**不是**該詞之讀音 ⇒
+    // 先移除該批尾鍵、再把候選之讀音整段插入，令組字器之鍵鏈恰為該詞之讀音——
+    // 語言模組方得為其建立節點（`overrideCandidate` 之 `.withSpecified` 要求目標節點
+    // 已含該 keyArray；鍵鏈不符時該覆寫必然落空）。
+    if abbreviatedOverlapSpan > 0 {
+      var dropped = 0
+      while dropped < abbreviatedOverlapSpan,
+            (try? targetAssembler.dropKey(direction: .rear)) != nil {
+        dropped += 1
+      }
+      guard dropped == abbreviatedOverlapSpan else { return .failed }
+      let keysToInsert = candidate.keyArray.map { Homa.PossibleKey.singleKey($0) }
+      guard !keysToInsert.isEmpty,
+            (try? targetAssembler.insertKeys(keysToInsert)) != nil else { return .failed }
+      let success = (try? targetAssembler.overrideCandidate(
+        .init(keyArray: candidate.keyArray, value: candidate.value),
+        at: Swift.max(anchor - abbreviatedOverlapSpan, 0),
+        type: .withSpecified,
+        isExplicitlyOverridden: true,
+        enforceRetokenization: true,
+        perceptionHandler: perceptionHandler
+      )) != nil
+      return success ? .overridden : .inserted
+    }
     let inserted: Bool
     if preservingFuzzyKeys {
       inserted = (try? targetAssembler.insertKeys([.multipleKeys(bucket)])) != nil
