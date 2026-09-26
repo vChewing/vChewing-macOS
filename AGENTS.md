@@ -94,6 +94,15 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 ## 7. Contribution Workflow
 
 - **Commit format**: `ModuleName // SubModuleName: Change.` (Conventional Commit semantics kept terse.) Example: `LibVanguard // FSM: Fix cursor guard.`
+- **Devlogs prose is zh-Hant-TW**: `vChewing-DevLogs` records are written in Traditional Chinese
+  (Taiwan) -- `KnowledgeMemo4LLM.md`, `DevReqsHistory.md`, `Reqs4LLM/`, `Research/`. Do not narrate
+  in Japanese, English, or Simplified Chinese. Exceptions: the owner's words quoted verbatim,
+  i18n strings and terminology tables, and code/paths/API names. Replies to the owner are
+  zh-Hant-TW too; the language they write in is not a cue to switch.
+- **Never push**: commits are yours to make, pushes are the repository owner's. Several
+  repositories move together here and more than one remote is configured; report the commit
+  hashes and stop. Do not treat a push as having happened when judging whether `--amend`
+  or a history rewrite is safe.
 - **Reviews**: Highlight functional impact, state machine ramifications, and test coverage. Mention regression risk if tests are missing.
 - **Dependencies**: Prefer SwiftPM-targeted adjustments. When external patches are unavoidable, document rationale in code comments and PR description.
 - **Installer**: Keep pkg scripts idempotent. `pkgPreInstall.sh` / `pkgPostInstall.sh` must remain sandbox safe.
