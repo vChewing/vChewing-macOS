@@ -73,6 +73,74 @@ public struct FuriousTypingConfig: Sendable, Equatable {
   }
 }
 
+// MARK: - Zhuyin Furious Auto-Chop Predicate
+
+extension InputHandlerProtocol {
+  /// 注音狂打模式是否有效（狂打有效且注拼槽為注音）。
+  public var isZhuyinFuriousTypingModeEffective: Bool {
+    isFuriousTypingModeEffective && !composer.isPinyinMode
+  }
+}
+
+extension Tekkon.Composer {
+  /// 本鍵是否應先自動切音節（《規劃書》§3.2 之 v7，六條）。
+  ///
+  /// 判準全文與逐條理由見 `Research/Phase250-ResearchAndNextSurgeryPlan.md` §3.2；實作即該節之
+  /// 逐條移植，**不得**與規格各自演化。摘要：
+  ///
+  /// - **①** 注拼槽非空。
+  /// - **②** 本鍵非聲調鍵（以「本鍵施於空槽時是否寫入聲調」判之）。
+  /// - **④a** 本鍵未造成任何槽位變動 ⇒ **切**（冗餘鍵＝新音節之始）。
+  /// - **③** 固有目標槽 `S_new ≦ S_max`——`S_new` **取自「本鍵施於空槽時所寫入之首個非空槽」**，
+  ///   不得取「本次實際變動之最低槽」：後者會被動態排列之糾錯副作用（倚天26 `be`＝ㄐㄧ：
+  ///   鍵 `e` 寫介母 ㄧ之餘另把 ㄓ 糾正為 ㄐ）誤導而使條件失效。
+  /// - **④b′** 結果為合法前綴且比原內容更長 ⇒ **不切**（真實延伸）。
+  /// - **④d** 本鍵所摧毀之各槽值恰為本鍵空槽試跑之產物 ⇒ **不切**（動態排列之逐槽覆寫）。
+  /// - **④c** 否則以接續探針定之：`當前讀音字串 ＋ emptyPost[S_new]` 非任何讀音之前綴 ⇒ **切**。
+  ///
+  /// - Parameter key: 本拍之按鍵（單一字元）。
+  public func shouldAutoChopZhuyin(byTyping key: Character) -> Bool {
+    guard !isEmpty else { return false } // ①
+    guard let scalar = key.unicodeScalars.first else { return false }
+    let pre = zhuyinAutoChopSlots()
+    let sMax = zhuyinAutoChopHighestFilledSlot(pre) // 由 self 呼叫
+    var probe = self
+    probe.receiveKey(fromScalar: scalar)
+    let post = probe.zhuyinAutoChopSlots()
+    var empty = Tekkon.Composer(arrange: parser)
+    empty.receiveKey(fromScalar: scalar)
+    let emptyPost = empty.zhuyinAutoChopSlots()
+
+    let changed = (0 ..< 4).filter { pre[$0] != post[$0] }
+    let primarySlot = (0 ..< 4).first { !emptyPost[$0].isEmpty }
+      ?? changed.filter { $0 < 3 }.min() ?? 0
+    let sNew = primarySlot + 1
+    let emptyPhonabet = emptyPost[primarySlot]
+
+    guard emptyPost[3].isEmpty, !changed.contains(3) else { return false } // ②
+    if changed.isEmpty { return true } // ④a
+    guard sNew <= sMax else { return false } // ③
+    let index = Tekkon.SyllableIndex.shared(parser: parser)
+    let probedContent = probe.getComposition()
+    if probedContent.count > getComposition().count, index.isPrefix(probedContent) {
+      return false // ④b′
+    }
+    let destroyed = changed.filter { !pre[$0].isEmpty }
+    if !destroyed.isEmpty, destroyed.allSatisfy({ pre[$0] == emptyPost[$0] }) { return false } // ④d
+    return !index.isPrefix(getComposition() + emptyPhonabet) // ④c
+  }
+
+  /// 四槽內容（聲／介／韻／調）。
+  private func zhuyinAutoChopSlots() -> [String] {
+    [consonant.value, semivowel.value, vowel.value, intonation.value]
+  }
+
+  /// 「最高已填之聲介韻槽位」＋1（全空為 0）。槽序：聲 1 ＜ 介 2 ＜ 韻 3。
+  private func zhuyinAutoChopHighestFilledSlot(_ slots: [String]) -> Int {
+    (0 ..< 3).reduce(0) { slots[$1].isEmpty ? $0 : max($0, $1 + 1) }
+  }
+}
+
 // MARK: - BPMFFullMatchTypewriter
 
 /// 注音按鍵輸入處理 (Handle BPMF Keys)
@@ -263,6 +331,14 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       ) {
         return (autoChopHandled, true)
       }
+      // 注音狂打之自動切音節。與拼音側互斥（依注拼槽之鍵盤家族），故兩者先後無妨。
+      if let zhuyinAutoChopHandled = performZhuyinAutoChopIfNeeded(
+        inputText: inputText,
+        prefs: prefs,
+        session: session
+      ) {
+        return (zhuyinAutoChopHandled, true)
+      }
       // 狂拼等多音節簡拼字母流可超過注拼槽的單音節長度上限（預設 6 碼、超出會
       // 自動丟棄最早輸入的音頭），此處依當前打字模式即時設定旗子、讓注拼槽
       // 完整保留字母流（「slliang」不得被截斷成「lliang」而丟失前導字母）。
@@ -347,6 +423,57 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     handler.handleTypewriterSCPCTasks()
     // 狂拼模式：語言模型引導的重切分（僅在 trail 達標時起作用）。
     handler.resegmentFuriousTrailIfNeeded()
+    return true
+  }
+
+  /// 注音狂打之自動切音節：本鍵是否應先把當前音節固化進組字器。
+  ///
+  /// - Returns: 已固化則 `true`；不應固化則 `nil`（呼叫方照常把按鍵送入注拼槽）。
+  ///
+  /// 判準見 `InputHandlerProtocol.shouldAutoChopZhuyin(byTyping:)`（§3.2 之 v7）。本函式只負責
+  /// 「取出當前讀音 → 寫入組字器 → 清空注拼槽 → 刷新狀態」。
+  ///
+  /// - Note: 注音側**不**寫 `furiousTrail`——trail 是拼音字母 blob，注音鍵流無此概念
+  ///   （§8.6 之 IH163）。
+  private func performZhuyinAutoChopIfNeeded(
+    inputText: String,
+    prefs: some PrefMgrProtocol,
+    session: Session
+  )
+    -> Bool? {
+    guard handler.isZhuyinFuriousTypingModeEffective else { return nil }
+    guard let key = inputText.first else { return nil }
+    guard handler.composer.shouldAutoChopZhuyin(byTyping: key) else { return nil }
+    guard let readingKey = handler.composer.phonabetKeyForQuery(pronounceableOnly: true) else {
+      return nil
+    }
+    // 照 `composeReadingIfReady` 之既有政策：組字器認不得該讀音則不提交（例：15 條嚴格前綴中之
+    // `ㄈㄧ`——它不可能再延伸，故判準會判切，但辭典內無此讀音）。回 `nil` 讓本鍵照常送入注拼槽，
+    // 由既有流程處置，語義與今日一致。
+    guard handler.currentLM.lxQuerier.hasGrams(for: [readingKey]) else { return nil }
+    guard (try? handler.assembler.insertKey(readingKey)) != nil else {
+      errorCallback(
+        "7A1C4E30: Zhuyin auto-chop generated an insertion key rejected by the assembler."
+      )
+      return true
+    }
+    let textToCommit = handler.commitOverflownComposition
+    handler.retrievePOMSuggestions(apply: true)
+    handler.composer.clear()
+    // 清空注拼槽**然後才把本鍵送入**（§3.2）。本函式回傳 `true` 即代表本拍已消費，
+    // 呼叫方不會再送鍵——故本鍵必須在此親手補回，否則它會憑空消失。
+    // （拼音側之 `performPinyinAutoChopIfNeeded` 不需此步：它自己以 `replacePinyinBuffer`
+    //  重建緩衝、把尾段字母留在槽內。）
+    handler.composer.receiveKey(fromString: inputText)
+    narrateTheComposer(
+      narrator: handler.narrator,
+      when: prefs.readingNarrationCoverage >= 2,
+      allowDuplicates: false
+    )
+    var inputting = handler.generateStateOfInputting()
+    inputting.textToCommit = textToCommit
+    session.switchState(inputting)
+    handler.handleTypewriterSCPCTasks()
     return true
   }
 
