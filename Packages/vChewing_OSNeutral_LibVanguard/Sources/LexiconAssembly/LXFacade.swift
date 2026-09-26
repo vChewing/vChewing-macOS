@@ -70,10 +70,12 @@ extension LXAssembly {
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
       public var suppressFactoryUnigramsOfKanaSyllables = false
-      /// 隨狂拼主開關（kFuriousTypingEnabled4Pinyin）同步：true 時抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      /// 是否抑制來自原廠辭典（TextMapTrie）的注音文（zhuyinwen）資料。
       ///
-      /// - Note: 「兩種狂打開關各自判斷、兩種非狂打皆不抑制」之四態語意留待 P257 落地；本 phase
-      ///   只把屬性名跟上 `UserDef` 之兩分，語意一行不動。
+      /// 語意為「**當前打字方式所屬那一側**之狂打開關是否啟用」：當前打字方式為拼音
+      /// （`kPinyinTypingEnabled`）時看 `kFuriousTypingEnabled4Pinyin`，為注音時看
+      /// `kFuriousTypingEnabled4Zhuyin`。四態即「兩種狂打皆抑制、兩種非狂打皆不抑制」。
+      /// 唯一寫入端為 `syncPrefs()`；該判斷可續留本模組之理由見該函式內之註。
       public var shouldSuppressFactoryZhuyinwenData = false
     }
 
@@ -334,7 +336,19 @@ extension LXAssembly {
       config.fetchSuggestionsFromPerceptionOverrideModel = prefs.fetchSuggestionsFromPerceptionOverrideModel
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
       config.suppressFactoryUnigramsOfKanaSyllables = prefs.suppressFactoryUnigramsOfKanaSyllables
-      config.shouldSuppressFactoryZhuyinwenData = prefs.furiousTypingEnabled4Pinyin && prefs.pinyinTypingEnabled
+      // 注音文抑制：語意為「當前打字方式所屬那一側之狂打開關是否啟用」，兩側各自獨立
+      // 判斷（故非狂打側之開關不影響此處）。以 `pinyinTypingEnabled` 作「當前打字方式」
+      // 之依據、而不動用 `typingMode`／`composer.isPinyinMode`，理由有三：
+      // ① 打字方式之熱鍵動作即 `pinyinTypingEnabled.toggle()` 後接 `ensureKeyboardParser()`
+      //    （`IMEMenuSputnik` 之選單項）⇒ 本偏好即「使用者所宣告之打字方式」之真源，
+      //    而注拼槽之鍵盤家族係由其**導出**、非獨立狀態；
+      // ② 兩顆鍵盤排列槽（`keyboardParser4Pinyin`／`4Zhuyin`）不受該熱鍵影響；
+      // ③ 本函式於**每一次分診之頂端**被呼叫（`InputHandler_TriageInput.swift`）⇒
+      //    熱鍵之效果必然在下一拍按鍵被處理之前反映進來。
+      // 故本判斷無須改由 Handler 以 `typingMode` 推入（§8.8）。
+      config.shouldSuppressFactoryZhuyinwenData =
+        (prefs.pinyinTypingEnabled && prefs.furiousTypingEnabled4Pinyin)
+          || (!prefs.pinyinTypingEnabled && prefs.furiousTypingEnabled4Zhuyin)
     }
 
     /// 清除 InputToken HashMap。

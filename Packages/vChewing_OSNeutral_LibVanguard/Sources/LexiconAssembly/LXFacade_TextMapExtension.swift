@@ -475,7 +475,7 @@ extension LXAssembly.LXFacade {
          Self.isKanaSyllableValue(entry.value) {
         continue
       }
-      // 狂拼啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      // 當前打字方式所屬那一側之狂打啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
       if entryType == .zhuyinwen, config.shouldSuppressFactoryZhuyinwenData {
         continue
       }
@@ -518,7 +518,7 @@ extension LXAssembly.LXFacade {
          Self.isKanaSyllableValue(queriedGram.value) {
         continue
       }
-      // 狂拼啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      // 當前打字方式所屬那一側之狂打啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
       if entryType == .zhuyinwen, config.shouldSuppressFactoryZhuyinwenData {
         continue
       }

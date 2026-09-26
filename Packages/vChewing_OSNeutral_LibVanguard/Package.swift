@@ -263,6 +263,7 @@ let package = Package(
         "LXAssemblyMaterials4Tests"
         "Homa"
         "HomaSharedTestComponents"
+        "Shared"
         "Tekkon"
       },
       swiftSettings: buildSwiftSettings {

@@ -205,4 +205,58 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄅ")
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
   }
+
+  /// 打字方式熱鍵之效果須在**下一拍按鍵**即反映進語言模組之注音文抑制旗標。
+  ///
+  /// 熱鍵之動作即 `PrefMgr.shared.pinyinTypingEnabled.toggle()` ＋ `ensureKeyboardParser()`
+  /// （`IMEMenuSputnik`）；而 `syncPrefs()` 於**每一次分診之頂端**執行
+  /// （`InputHandler_TriageInput.swift`）⇒「切換後之下一拍」即「下一次 `triageInput`」。
+  /// 本靶以真實之分診釘住該語義：切換與分診之間旗標**必須仍是舊值**（證明它由分診頂端
+  /// 刷新、而非偏好之寫入即時連動），分診之後**必須已跟上**。
+  ///
+  /// 測資令兩側狂打開關**相反**，故旗標必然隨熱鍵反向翻轉——若實作誤認「當前打字方式」
+  /// 或只看拼音側，本靶即轉紅。
+  @Test("[IH705] 打字方式熱鍵於下一拍即反映進注音文抑制旗標")
+  func test_IH705_TypingModeHotKeyReflectsOnNextBeat() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let saved = (
+      pinyin: testHandler.prefs.pinyinTypingEnabled,
+      furious4Pinyin: testHandler.prefs.furiousTypingEnabled4Pinyin,
+      furious4Zhuyin: testHandler.prefs.furiousTypingEnabled4Zhuyin
+    )
+    defer {
+      testHandler.prefs.pinyinTypingEnabled = saved.pinyin
+      testHandler.prefs.furiousTypingEnabled4Pinyin = saved.furious4Pinyin
+      testHandler.prefs.furiousTypingEnabled4Zhuyin = saved.furious4Zhuyin
+      testHandler.currentLM.syncPrefs()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.useSCPCTypingMode = false
+    // 拼音側狂打關、注音側狂打開 ⇒ 抑制旗標隨「當前打字方式」反向。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = true
+
+    testHandler.prefs.pinyinTypingEnabled = true
+    testHandler.currentLM.syncPrefs() // 起點：拼音側狂打關 ⇒ 不抑制。
+    #expect(!testHandler.currentLM.config.shouldSuppressFactoryZhuyinwenData)
+
+    // 熱鍵：切換打字方式，不動兩顆鍵盤排列槽。
+    testHandler.prefs.pinyinTypingEnabled.toggle()
+    #expect(!testHandler.prefs.pinyinTypingEnabled)
+    // 尚未分診 ⇒ 旗標仍為舊值（本行即「由分診頂端刷新」之釘子）。
+    #expect(!testHandler.currentLM.config.shouldSuppressFactoryZhuyinwenData)
+
+    // 下一拍：任一按鍵之分診即令旗標跟上（注音側狂打開 ⇒ 抑制）。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "e").asEvent)
+    #expect(testHandler.currentLM.config.shouldSuppressFactoryZhuyinwenData)
+
+    // 反向再切一次：同一拍內即回復。
+    testHandler.prefs.pinyinTypingEnabled.toggle()
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "e").asEvent)
+    #expect(!testHandler.currentLM.config.shouldSuppressFactoryZhuyinwenData)
+  }
 }
