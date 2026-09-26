@@ -7,7 +7,7 @@
 // 本檔驗的是「注音狂打接入 copilot 窗」這條線：`hasFuriousFrontPending` 之兩側分流、
 // `unfinishedReading` 之分流、以及既有 6 個前方讀取點在注音下之語義。
 // 判準（何時自動切音節）之測試在 `InputHandlerTests_ZhuyinFurious.swift` 與
-// `ZhuyinAutoChopPredicateTests.swift`。
+// `TekkonTests_PhonabetAutoChopPredicate.swift`（自 P261 起住 `Tests/TekkonTests/`）。
 //
 // - Note: 大千排列之鍵位：ㄍ＝`e`、ㄠ＝`l`。測試辭典內 `ㄍㄠ`＝高（同音 12 條）。
 

@@ -194,13 +194,14 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       ) {
         return (autoChopHandled, true)
       }
-      // 注音狂打之自動切音節。與拼音側互斥（依注拼槽之鍵盤家族），故兩者先後無妨。
-      if let zhuyinAutoChopHandled = performZhuyinAutoChopIfNeeded(
+      // 注音狂打之自動切音節（判準住 `Tekkon`：`shouldAutoChopPhonabets`）。
+      // 與拼音側互斥（依注拼槽之鍵盤家族），故兩者先後無妨。
+      if let phonabetAutoChopHandled = performPhonabetAutoChopIfNeeded(
         inputText: inputText,
         prefs: prefs,
         session: session
       ) {
-        return (zhuyinAutoChopHandled, true)
+        return (phonabetAutoChopHandled, true)
       }
       // 狂拼等多音節簡拼字母流可超過注拼槽的單音節長度上限（預設 6 碼、超出會
       // 自動丟棄最早輸入的音頭），此處依當前打字模式即時設定旗子、讓注拼槽
@@ -228,7 +229,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   )
     -> Bool? {
     // 逐字選字模式（SCPC）下不啟用狂打特性：拼音連打之自動切音節屬狂打語義
-    // （其注音孿生 `performZhuyinAutoChopIfNeeded` 由狂打閘門把守；此處之拼音側
+    // （其孿生 `performPhonabetAutoChopIfNeeded` 由狂打閘門把守；此處之拼音側
     // 因歷史緣故無閘門，故顯式補上 SCPC 這一條）。磁帶模式不經本型別
     // （`handleComposition` 之打字模式分派：`.cassette` → `CassetteTypewriter`），
     // 故無須在此另設磁帶閘。
@@ -301,13 +302,13 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   ///
   /// - Returns: 已固化則 `true`；不應固化則 `nil`（呼叫方照常把按鍵送入注拼槽）。
   ///
-  /// 判準見 `Tekkon.Composer.shouldAutoChopZhuyin(byTyping:)`（§3.2 之 v7；
-  /// 實作住在 `Typewriter_ZhuyinFuriousAutoChop.swift`）。本函式只負責
+  /// 判準見 `Tekkon.Composer.shouldAutoChopPhonabets(byTyping:)`（規格 v7，實作住
+  /// `Sources/Tekkon/Tekkon_PhonabetAutoChop.swift`）。本函式只負責
   /// 「取出當前讀音 → 寫入組字器 → 清空注拼槽 → 刷新狀態」。
   ///
   /// - Note: 注音側**不**寫 `furiousTrail`——trail 是拼音字母 blob，注音鍵流無此概念
   ///   （§8.6 之 IH163）。
-  private func performZhuyinAutoChopIfNeeded(
+  private func performPhonabetAutoChopIfNeeded(
     inputText: String,
     prefs: some PrefMgrProtocol,
     session: Session
@@ -315,7 +316,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     -> Bool? {
     guard handler.isZhuyinFuriousTypingModeEffective else { return nil }
     guard let key = inputText.first else { return nil }
-    guard handler.composer.shouldAutoChopZhuyin(byTyping: key) else { return nil }
+    guard handler.composer.shouldAutoChopPhonabets(byTyping: key) else { return nil }
     guard let readingKey = handler.composer.phonabetKeyForQuery(pronounceableOnly: true) else {
       return nil
     }

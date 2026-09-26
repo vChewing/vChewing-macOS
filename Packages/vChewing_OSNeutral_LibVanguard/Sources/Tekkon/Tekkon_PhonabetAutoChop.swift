@@ -2,27 +2,20 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// MARK: - Zhuyin Furious Mode Gate
-
-extension InputHandlerProtocol {
-  /// 注音狂打模式是否有效（狂打有效且注拼槽為注音）。
-  public var isZhuyinFuriousTypingModeEffective: Bool {
-    isFuriousTypingModeEffective && !composer.isPinyinMode
-  }
-}
-
-// MARK: - Zhuyin Furious Auto-Chop Predicate
+// MARK: - Phonabet Auto-Chop Predicate
 
 extension Tekkon.Composer {
-  /// 本鍵是否應先自動切音節（《規劃書》§3.2 之 v7，六條）。
+  /// 本鍵是否應先自動切音節（**規格 v7，六條**；實作即該規格之逐條移植）。
   ///
   /// - Note: 本判準是**注拼槽狀態之純函式**——不讀 handler、不讀 session、不讀偏好，
-  ///   故得零成本驅動數十萬次（見 `ZhuyinAutoChopPredicateTests`）。**生產側之呼叫者僅
-  ///   `BPMFFullMatchTypewriter.performZhuyinAutoChopIfNeeded` 一處**：判準在此，
-  ///   執行（寫入組字器／清注拼槽／補回本鍵）在彼。
+  ///   故得零成本驅動數十萬次（自 P261 起其回歸靶住在 `Tests/TekkonTests/`）。
+  ///   **生產側之呼叫者僅 `BPMFFullMatchTypewriter.performPhonabetAutoChopIfNeeded` 一處**：
+  ///   判準在此、只回裁決；執行（寫入組字器／清注拼槽／補回本鍵）在彼。
   ///
-  /// 判準全文與逐條理由見 `Research/Phase250-ResearchAndNextSurgeryPlan.md` §3.2；實作即該節之
-  /// 逐條移植，**不得**與規格各自演化。摘要：
+  /// - Important: 本判準之**權威規格**（逐條理由、四則對照實例、三條已知界線）住在
+  ///   vChewing 開發倉之 `Research/Phase250-ResearchAndNextSurgeryPlan.md` §3.2（v7）——
+  ///   該檔**不在本套件內**，故本檔以摘要自持：任何修訂都不得只動此處之實作而不動該正本，
+  ///   亦不得只動正本而不動此處。摘要：
   ///
   /// - **①** 注拼槽非空。
   /// - **②** 本鍵非聲調鍵（以「本鍵施於空槽時是否寫入聲調」判之）。
@@ -35,17 +28,17 @@ extension Tekkon.Composer {
   /// - **④c** 否則以接續探針定之：`當前讀音字串 ＋ emptyPost[S_new]` 非任何讀音之前綴 ⇒ **切**。
   ///
   /// - Parameter key: 本拍之按鍵（單一字元）。
-  public func shouldAutoChopZhuyin(byTyping key: Character) -> Bool {
+  public func shouldAutoChopPhonabets(byTyping key: Character) -> Bool {
     guard !isEmpty else { return false } // ①
     guard let scalar = key.unicodeScalars.first else { return false }
-    let pre = zhuyinAutoChopSlots()
-    let sMax = zhuyinAutoChopHighestFilledSlot(pre) // 由 self 呼叫
+    let pre = phonabetAutoChopSlots()
+    let sMax = phonabetAutoChopHighestFilledSlot(pre) // 由 self 呼叫
     var probe = self
     probe.receiveKey(fromScalar: scalar)
-    let post = probe.zhuyinAutoChopSlots()
+    let post = probe.phonabetAutoChopSlots()
     var empty = Tekkon.Composer(arrange: parser)
     empty.receiveKey(fromScalar: scalar)
-    let emptyPost = empty.zhuyinAutoChopSlots()
+    let emptyPost = empty.phonabetAutoChopSlots()
 
     let changed = (0 ..< 4).filter { pre[$0] != post[$0] }
     let primarySlot = (0 ..< 4).first { !emptyPost[$0].isEmpty }
@@ -67,12 +60,12 @@ extension Tekkon.Composer {
   }
 
   /// 四槽內容（聲／介／韻／調）。
-  private func zhuyinAutoChopSlots() -> [String] {
+  private func phonabetAutoChopSlots() -> [String] {
     [consonant.value, semivowel.value, vowel.value, intonation.value]
   }
 
   /// 「最高已填之聲介韻槽位」＋1（全空為 0）。槽序：聲 1 ＜ 介 2 ＜ 韻 3。
-  private func zhuyinAutoChopHighestFilledSlot(_ slots: [String]) -> Int {
+  private func phonabetAutoChopHighestFilledSlot(_ slots: [String]) -> Int {
     (0 ..< 3).reduce(0) { slots[$1].isEmpty ? $0 : max($0, $1 + 1) }
   }
 }

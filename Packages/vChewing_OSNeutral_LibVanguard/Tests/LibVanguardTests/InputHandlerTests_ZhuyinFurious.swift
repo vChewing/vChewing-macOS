@@ -4,7 +4,8 @@
 
 // 注音狂打（狂注）之自動切音節：行為層測試。
 //
-// 判準本身之逐條移植與其全排列實測見 `ZhuyinAutoChopPredicateTests.swift`；本檔驗的是
+// 判準本身之逐條移植與其全排列實測見 `TekkonTests_PhonabetAutoChopPredicate.swift`
+// （自 P261 起住 `Tests/TekkonTests/`）；本檔驗的是
 // 「判準接上 Handler 之後」之行為。所用讀音一律取自**測試辭典素材自身**（`vanguardTextMap_test.txtMap`
 // 內確有之詞條：`ㄍㄠ`＝高（12 同音）、`ㄍㄨㄥ`＝供（19 同音）、`ㄓㄨㄥ`＝中、`ㄒㄧㄣ`＝新）。
 //
@@ -136,7 +137,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 大千排列之五個聲調鍵：3＝ˇ、4＝ˋ、6＝ˊ、7＝˙、空格＝陰平。
     for tone in ["3", "4", "6", "7", " "] {
       #expect(
-        !testHandler.composer.shouldAutoChopZhuyin(byTyping: Character(tone)),
+        !testHandler.composer.shouldAutoChopPhonabets(byTyping: Character(tone)),
         "聲調鍵 \(tone) 誤判為切"
       )
     }

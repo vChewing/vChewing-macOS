@@ -79,6 +79,18 @@ extension InputHandlerProtocol {
     currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
 
+  /// 狂打模式有效**且為注音側**（注音狂打）。
+  ///
+  /// - Note: 本旗子與其兩個同族（上方之通用閘、拼音閘）**同址自 P261 起**。它先前寄居於
+  ///   `Typewriter/` 內與其唯一消費者（自動切音節判準）同檔；判準遷入 `Tekkon` 之後，
+  ///   本旗子隨之歸位——它**消費 `typingMode`**，是 Handler 側之模式真值，不是打字機之物。
+  ///
+  /// - Important: 本旗子是**注音側各狂打特性之閘門**（自動切音節、copilot 窗之讀音桶、
+  ///   簡拼 cells 等），故一律用本旗子而非 `isFuriousTypingModeEffective`。
+  public var isZhuyinFuriousTypingModeEffective: Bool {
+    isFuriousTypingModeEffective && !composer.isPinyinMode
+  }
+
   /// 狂打模式有效時，注拼槽內尚未固化之讀音素材（copilot 窗頂部 pane 之資料源）。
   ///
   /// 兩側之素材形態不同：拼音側為可跨音節之字母流（`romajiBuffer`）；注音側為當前
