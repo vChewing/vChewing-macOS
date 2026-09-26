@@ -2,144 +2,7 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// MARK: - FuriousTypingConfig
-
-/// 狂拼模式（Furious Typing Mode）專用的執行期狀態容器。
-///
-/// 將該模式於 `InputHandler` 內散落之執行期狀態收斂成單一值型別，其後由
-/// `InputHandlerProtocol` 以單一屬性持有，各欄位再以薄存取器對外（比照
-/// `MixedAlnumConfig` 之做法）。
-///
-/// - Important: 三個欄位之生命週期不同，不可一概而論：
-///   - `trail`：自動 chop 之拼音字母 blob 序列，跨按鍵存在；任何使用者顯式干涉
-///     （選字、輪替、游標移動、聲調覆寫）或狀態重置皆使其失效——**唯一出口為
-///     `InputHandlerProtocol.invalidateFuriousTrail()`**（即 `resetTrail()`）。
-///   - `highlightOverride`：狂拼 copilot 窗之高亮候選，**當拍消費**（讀畢即歸零；
-///     不隨 trail 失效而清，但隨狀態重置 `resetAll()` 而清）。
-///   - `coSegmentedOffers`：聯合重切（P164）之替代切分 offers，於
-///     `furiousTypingFrontCandidates` 生成時**整批刷新**（非累積）。
-public struct FuriousTypingConfig: Sendable, Equatable {
-  // MARK: Lifecycle
-
-  public init(
-    trail: [String] = [],
-    highlightOverride: CandidateInState? = nil,
-    coSegmentedOffers: [FuriousCoSegmentedOffer] = []
-  ) {
-    self.trail = trail
-    self.highlightOverride = highlightOverride
-    self.coSegmentedOffers = coSegmentedOffers
-  }
-
-  // MARK: Public
-
-  /// 自動 chop 提交鍵對應的拼音字母 blob 序列（狂拼重切分之依據）。
-  public var trail: [String] = []
-
-  /// 狂拼 copilot 窗之高亮候選（**當拍消費**：讀畢即歸零）。
-  public var highlightOverride: CandidateInState?
-
-  /// 狂拼 copilot 窗聯合重切（P164）的替代切分 offers（生成時刷新）。
-  public var coSegmentedOffers: [FuriousCoSegmentedOffer] = []
-
-  // MARK: Equatable
-
-  /// `CandidateInState` 為 tuple 別名（無從合成 `Equatable`），故逐欄手寫。
-  public static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.trail == rhs.trail
-      && lhs.highlightOverride?.keyArray == rhs.highlightOverride?.keyArray
-      && lhs.highlightOverride?.value == rhs.highlightOverride?.value
-      && lhs.coSegmentedOffers == rhs.coSegmentedOffers
-  }
-
-  /// 清空 trail（**使用者顯式干涉**之複位粒度）。
-  ///
-  /// 唯一呼叫點為 `InputHandlerProtocol.invalidateFuriousTrail()`；
-  /// 重切分只認 trail 與組字器尾鍵的對應，故任何使該對應失效的操作都須經此。
-  /// **只清 trail**：當拍尚在消費週期內之高亮與重切 offers 不受影響。
-  public mutating func resetTrail() {
-    trail.removeAll()
-  }
-
-  /// 重設整批執行期狀態（**狀態重置**之複位粒度）。
-  ///
-  /// 唯一呼叫點為 `InputHandlerProtocol.clear()`——該函式即組字／會話狀態之整批
-  /// 複位口，故上一輪殘留之高亮與重切 offers 皆不得跨過此邊界
-  /// （否則它們會在下一輪被當成當拍狀態消費）。
-  public mutating func resetAll() {
-    resetTrail()
-    highlightOverride = nil
-    coSegmentedOffers.removeAll()
-  }
-}
-
-// MARK: - Zhuyin Furious Auto-Chop Predicate
-
-extension InputHandlerProtocol {
-  /// 注音狂打模式是否有效（狂打有效且注拼槽為注音）。
-  public var isZhuyinFuriousTypingModeEffective: Bool {
-    isFuriousTypingModeEffective && !composer.isPinyinMode
-  }
-}
-
-extension Tekkon.Composer {
-  /// 本鍵是否應先自動切音節（《規劃書》§3.2 之 v7，六條）。
-  ///
-  /// 判準全文與逐條理由見 `Research/Phase250-ResearchAndNextSurgeryPlan.md` §3.2；實作即該節之
-  /// 逐條移植，**不得**與規格各自演化。摘要：
-  ///
-  /// - **①** 注拼槽非空。
-  /// - **②** 本鍵非聲調鍵（以「本鍵施於空槽時是否寫入聲調」判之）。
-  /// - **④a** 本鍵未造成任何槽位變動 ⇒ **切**（冗餘鍵＝新音節之始）。
-  /// - **③** 固有目標槽 `S_new ≦ S_max`——`S_new` **取自「本鍵施於空槽時所寫入之首個非空槽」**，
-  ///   不得取「本次實際變動之最低槽」：後者會被動態排列之糾錯副作用（倚天26 `be`＝ㄐㄧ：
-  ///   鍵 `e` 寫介母 ㄧ之餘另把 ㄓ 糾正為 ㄐ）誤導而使條件失效。
-  /// - **④b′** 結果為合法前綴且比原內容更長 ⇒ **不切**（真實延伸）。
-  /// - **④d** 本鍵所摧毀之各槽值恰為本鍵空槽試跑之產物 ⇒ **不切**（動態排列之逐槽覆寫）。
-  /// - **④c** 否則以接續探針定之：`當前讀音字串 ＋ emptyPost[S_new]` 非任何讀音之前綴 ⇒ **切**。
-  ///
-  /// - Parameter key: 本拍之按鍵（單一字元）。
-  public func shouldAutoChopZhuyin(byTyping key: Character) -> Bool {
-    guard !isEmpty else { return false } // ①
-    guard let scalar = key.unicodeScalars.first else { return false }
-    let pre = zhuyinAutoChopSlots()
-    let sMax = zhuyinAutoChopHighestFilledSlot(pre) // 由 self 呼叫
-    var probe = self
-    probe.receiveKey(fromScalar: scalar)
-    let post = probe.zhuyinAutoChopSlots()
-    var empty = Tekkon.Composer(arrange: parser)
-    empty.receiveKey(fromScalar: scalar)
-    let emptyPost = empty.zhuyinAutoChopSlots()
-
-    let changed = (0 ..< 4).filter { pre[$0] != post[$0] }
-    let primarySlot = (0 ..< 4).first { !emptyPost[$0].isEmpty }
-      ?? changed.filter { $0 < 3 }.min() ?? 0
-    let sNew = primarySlot + 1
-    let emptyPhonabet = emptyPost[primarySlot]
-
-    guard emptyPost[3].isEmpty, !changed.contains(3) else { return false } // ②
-    if changed.isEmpty { return true } // ④a
-    guard sNew <= sMax else { return false } // ③
-    let index = Tekkon.SyllableIndex.shared(parser: parser)
-    let probedContent = probe.getComposition()
-    if probedContent.count > getComposition().count, index.isPrefix(probedContent) {
-      return false // ④b′
-    }
-    let destroyed = changed.filter { !pre[$0].isEmpty }
-    if !destroyed.isEmpty, destroyed.allSatisfy({ pre[$0] == emptyPost[$0] }) { return false } // ④d
-    return !index.isPrefix(getComposition() + emptyPhonabet) // ④c
-  }
-
-  /// 四槽內容（聲／介／韻／調）。
-  private func zhuyinAutoChopSlots() -> [String] {
-    [consonant.value, semivowel.value, vowel.value, intonation.value]
-  }
-
-  /// 「最高已填之聲介韻槽位」＋1（全空為 0）。槽序：聲 1 ＜ 介 2 ＜ 韻 3。
-  private func zhuyinAutoChopHighestFilledSlot(_ slots: [String]) -> Int {
-    (0 ..< 3).reduce(0) { slots[$1].isEmpty ? $0 : max($0, $1 + 1) }
-  }
-}
+import Tekkon
 
 // MARK: - BPMFFullMatchTypewriter
 
@@ -438,7 +301,8 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   ///
   /// - Returns: 已固化則 `true`；不應固化則 `nil`（呼叫方照常把按鍵送入注拼槽）。
   ///
-  /// 判準見 `InputHandlerProtocol.shouldAutoChopZhuyin(byTyping:)`（§3.2 之 v7）。本函式只負責
+  /// 判準見 `Tekkon.Composer.shouldAutoChopZhuyin(byTyping:)`（§3.2 之 v7；
+  /// 實作住在 `Typewriter_ZhuyinFuriousAutoChop.swift`）。本函式只負責
   /// 「取出當前讀音 → 寫入組字器 → 清空注拼槽 → 刷新狀態」。
   ///
   /// - Note: 注音側**不**寫 `furiousTrail`——trail 是拼音字母 blob，注音鍵流無此概念

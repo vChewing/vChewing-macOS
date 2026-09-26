@@ -6,7 +6,8 @@
 //
 // 本檔之前身是 `Tests/TekkonTests/TekkonTests_AutoChopPredicate.swift`（P251 之術前驗證靶）——
 // 當時判準尚未落地，故該檔自帶一份「測試端參考實作」與四個版本之對照。判準已於 P255 移入生產碼
-// （`InputHandlerProtocol.shouldAutoChopZhuyin(byTyping:)`），故**參考實作已刪**，改由本檔直接
+// （`Tekkon.Composer.shouldAutoChopZhuyin(byTyping:)`，實作現住
+// `Sources/LibVanguard/Typewriter/Typewriter_ZhuyinFuriousAutoChop.swift`），故**參考實作已刪**，改由本檔直接
 // 驅動生產實作，杜絕「兩份各自演化之判準」。
 //
 // 四項地面真相（與 P251 之結論逐項對應）：
