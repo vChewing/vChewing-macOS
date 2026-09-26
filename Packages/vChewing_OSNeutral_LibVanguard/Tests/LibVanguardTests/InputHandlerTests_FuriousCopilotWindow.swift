@@ -360,6 +360,12 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence("ess") // ㄍㄋㄋ
     #expect(testHandler.composer.getComposition() == "ㄋ")
     #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+    // P261：三音節之真詞須**居首**——待確認音節 ㄋ 之讀音原字串回退值不得再置頂
+    // （事主 2026-09-26 之實機：該回退值曾佔據第 1 名、把「狗男女」壓至第 2 名）。
+    #expect(
+      testSession.state.candidates.first?.value == "狗男女",
+      "實得：\(testSession.state.candidates.map(\.value))"
+    )
     guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "狗男女" }) else {
       Issue.record("簡拼候選「狗男女」未入 copilot 窗：\(testSession.state.candidates.map(\.value))")
       return

@@ -168,6 +168,12 @@ extension InputHandlerProtocol {
   /// 界線值之研議見規劃書 §十一 #18。
   static var maxZhuyinAbbreviationCells: Int { 4 }
 
+  /// 「讀音原字串回退值」於 copilot 窗排序時所取之權重地板值（P261）。
+  ///
+  /// 用於：前方預覽值恰為讀音原字串（語言模組查無詞條）時，令其與同長度之真詞相比
+  /// 恆居末位——但仍保留於清單內（使用者仍可顯式選取該讀音）。
+  static var rawReadingFallbackWeight: Double { -1e9 }
+
   /// 以給定拼音字母流計算簡拼整詞的 cells（前述閘門由呼叫方把守）。
   /// 跨檔案 extension（`InputHandler_FuriousResegmentation` 的 α 自動套用）亦需使用，
   /// 故不設為 private。
@@ -244,9 +250,22 @@ extension InputHandlerProtocol {
     // 與已置頂候選（POM 建議等）同值時跳過——copilot 窗去重：狂拼容錯查詢
     // 與組句橫跨節點可能對同一詞各回傳一次（如「tamade」的 POM 建議與 crossingPair 皆為
     // 「他媽的」），保留先出現者（POM 建議置頂語義不變）。
+    //
+    // P261：**唯有「預覽值確為語言模組之真詞」時才置頂**。若預覽值恰落在前方讀音桶內
+    // （＝語言模組對此讀音查無任何詞條，組句退回讀音原字串），則不置頂、改與其餘候選
+    // 一同按「詞長降冪 → 分數降冪」排序（其讀音僅一鍵，自然沉於長詞之後）。
+    // 事主 2026-09-26 之實機：注音狂打下鍵入 ㄍㄋㄋ 時，待確認音節 ㄋ 之組句預覽即原字串
+    // 「ㄋ」，若仍置頂則三音節之「狗男女」等真詞恆被壓於其下。
     if let crossingPair = furiousContext.crossingPair {
       if seenValues.insert(crossingPair.value).inserted {
         anchored.append(crossingPair)
+      }
+    } else if bucket.contains(furiousContext.preview) {
+      // 原字串回退值：降級入 `ranked`，權重取地板值俾其沉於同長度之真詞之後。
+      if seenValues.insert(furiousContext.preview).inserted {
+        ranked.append(
+          (keyArray: bucket, value: furiousContext.preview, weight: Self.rawReadingFallbackWeight)
+        )
       }
     } else {
       if seenValues.insert(furiousContext.preview).inserted {
@@ -299,10 +318,17 @@ extension InputHandlerProtocol {
       guard seenValues.insert(offer.value).inserted else { continue }
       ranked.append((keyArray: offer.keyArray, value: offer.value, weight: offer.weight))
     }
+    // 排序鍵之「段數」：`keyArray` 為前方讀音桶本身者（桶釘候選）代表**一個**位置、
+    // 其 `keyArray.count` 是桶內諸多讀音而非段數——故一律折算為 1（P261）。
+    func effectiveSegmentCount(_ keyArray: [String]) -> Int {
+      keyArray == bucket ? 1 : keyArray.count
+    }
     return anchored.map { ($0.keyArray, $0.value) } + ranked
       .stableSort { lhs, rhs in
-        (lhs.keyArray.count > rhs.keyArray.count)
-          || (lhs.keyArray.count == rhs.keyArray.count && lhs.weight > rhs.weight)
+        let lhsLength = effectiveSegmentCount(lhs.keyArray)
+        let rhsLength = effectiveSegmentCount(rhs.keyArray)
+        return (lhsLength > rhsLength)
+          || (lhsLength == rhsLength && lhs.weight > rhs.weight)
       }
       .map { ($0.keyArray, $0.value) }
   }
