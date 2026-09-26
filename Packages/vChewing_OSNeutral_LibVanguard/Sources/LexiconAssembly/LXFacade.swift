@@ -336,7 +336,7 @@ extension LXAssembly {
       config.fetchSuggestionsFromPerceptionOverrideModel = prefs.fetchSuggestionsFromPerceptionOverrideModel
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
       config.suppressFactoryUnigramsOfKanaSyllables = prefs.suppressFactoryUnigramsOfKanaSyllables
-      // 注音文抑制：語意為「**狂打確實生效中**」。三個維度：
+      // 注音文抑制：語意為「**狂打確實生效中**」。四個維度：
       // ① 模式——磁帶與逐字選字（SCPC）下狂打**不生效**（`typingMode` 之定義即如此：
       //    磁帶優先於一切、SCPC 使狂打退回 keyblock 模式）⇒ 該二模式下不得抑制。
       //    （本函式所見之「打字方法」僅及於 vChewingFactory 系；內碼／羅馬數字等
@@ -350,11 +350,17 @@ extension LXAssembly {
       //    (c) 本函式於**每一次分診之頂端**被呼叫（`InputHandler_TriageInput.swift`）
       //        ⇒ 熱鍵之效果必然在下一拍按鍵被處理之前反映進來。
       // ③ 該側之狂打開關。兩側各自獨立判斷 ⇒ 非狂打側之開關不影響此處。
+      // ④ **注音側之中英混合輸入回退否決**（P265）：回退啟用時注音狂打不生效
+      //    （`typingMode` 之注音臂已如此判定）⇒ 本旗標須同步為假。**本維度必須與
+      //    `typingMode` 逐字同步**：本判斷即「狂打確實生效中」之就地複製品（§8.8），
+      //    漏一維即出現「模式非狂打、抑制卻仍開」之第五態——違反 P257 之四態裁定。
+      //    拼音側不設此維度：回退本即注音鍵盤專屬（拼音輸入下不可用），連帶否決會令
+      //    一位注音時期遺留該偏好、其後改用拼音之使用者無故失去狂拼。
       // 故本判斷無須改由 Handler 以 `typingMode` 推入（§8.8；模式閘已在此就地補齊）。
       let furiousModeInEffect = !prefs.cassetteEnabled && !prefs.useSCPCTypingMode
       let furiousSideEnabled = prefs.pinyinTypingEnabled
         ? prefs.furiousTypingEnabled4Pinyin
-        : prefs.furiousTypingEnabled4Zhuyin
+        : (prefs.furiousTypingEnabled4Zhuyin && !prefs.mixedAlphanumericalEnabled)
       config.shouldSuppressFactoryZhuyinwenData = furiousModeInEffect && furiousSideEnabled
     }
 

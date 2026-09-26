@@ -380,4 +380,82 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
     #expect(testHandler.composer.isEmpty)
   }
+
+  // MARK: - 中英混合輸入回退對注音狂打之否決（P265）
+
+  /// 「中英混合輸入回退」一旦啟用，注音狂打即**一律被視為關閉**（即便其開關仍為真）。
+  ///
+  /// 事主 2026-09-26 之實機回報：注音狂打開啟後，注音之中英混合輸入回退失效。根因即
+  /// `typingMode` 之舊判定只問狂打開關 ⇒ `handleComposition` 把 ASCII 按鍵全數派給
+  /// `BPMFFullMatchTypewriter`，回退模式**根本沒有執行機會**（而非「兩者相爭、回退落敗」）。
+  ///
+  /// 本靶釘四件事：
+  /// ① 兩側旗子之語義（`InputHandler` 側之 `typingMode` 與三個狂打閘門）；
+  /// ② **行為層**：回退須真的活著——ASCII 序列依序累積於緩衝、空格遞交原文（行為即
+  ///   「按鍵確實改走 `MixedAlphanumericalTypewriter`」之鐵證，勝於斷言型別）；
+  /// ③ 否決可逆：關掉回退後狂打即刻復活（否決者為偏好、非一次性狀態）；
+  /// ④ **拼音側不受牽連**：回退本即注音鍵盤專屬，故 `4Pinyin` 與之無涉。
+  @Test("[IH168] 中英混合輸入回退否決注音狂打（拼音側不受牽連）")
+  func test_IH168_MixedAlnumVetoesZhuyinFurious() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    // 大千排列（＝測試環境之預設，同 `MockedInputHandlerAndStates`）：ㄑ＝`f`、ㄛ＝`i`、ㄠ＝`l`、
+    // ㄩ＝`m`，故 `film` 非任何合法讀音序列 ⇒ 應落入 ASCII 緩衝。
+    enterZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    #expect(!testHandler.prefs.mixedAlphanumericalEnabled, "回退之出廠預設為關，本靶之前提。")
+
+    // ① 基線：回退未啟用 ⇒ 注音狂打成立。
+    #expect(testHandler.typingMode == .zhuyinFuriousTyping)
+    #expect(testHandler.isFuriousTypingModeEffective)
+    #expect(testHandler.isZhuyinFuriousTypingModeEffective)
+    #expect(!testHandler.isPinyinFuriousTypingModeEffective)
+
+    // ② 啟用回退 ⇒ 狂打悉數為假（開關仍為真，被否決者為「有效」）。
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(testHandler.prefs.furiousTypingEnabled4Zhuyin, "開關不動——本靶要驗的是否決、不是改寫偏好。")
+    #expect(
+      testHandler.typingMode == .bopomofoKeyblock,
+      "實得：\(testHandler.typingMode)"
+    )
+    #expect(!testHandler.isFuriousTypingModeEffective)
+    #expect(!testHandler.isZhuyinFuriousTypingModeEffective)
+    #expect(!testHandler.hasFuriousFrontPending)
+    #expect(testHandler.furiousFrontUnfinishedReading == nil)
+    #expect(!testSession.isFuriousCopilotCandidateWindowVisible)
+
+    // ③ 行為層：ASCII 序列累積於緩衝（狂打若仍生效，這些鍵會被當注音吸收、緩衝恆空）。
+    typeSentence("film ")
+    #expect(
+      testSession.recentCommissions.joined() == "film ",
+      "實得：\(testSession.recentCommissions.joined())"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "遞交後緩衝應清空。")
+    #expect(testHandler.composer.isEmpty, "回退模式下不得有讀音被吸收進注拼槽。")
+
+    // ④ 否決可逆：關掉回退後狂打即刻復活，且同批次按鍵改由狂打吸收。
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(testHandler.typingMode == .zhuyinFuriousTyping)
+    #expect(testHandler.isZhuyinFuriousTypingModeEffective)
+    typeSentence("el") // ㄍㄠ
+    #expect(
+      testHandler.composer.getComposition() == "ㄍㄠ",
+      "實得：\(testHandler.composer.getComposition())"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    // ⑤ 拼音側不受牽連：回退啟用下，拼音狂打仍成立。
+    enterPinyinFuriousTestEnvironment()
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(testHandler.typingMode == .pinyinFuriousTyping, "實得：\(testHandler.typingMode)")
+    #expect(testHandler.isFuriousTypingModeEffective)
+    #expect(testHandler.isPinyinFuriousTypingModeEffective)
+    #expect(!testHandler.isZhuyinFuriousTypingModeEffective)
+  }
 }
