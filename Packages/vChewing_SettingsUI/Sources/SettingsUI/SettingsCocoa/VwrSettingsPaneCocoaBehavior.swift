@@ -207,7 +207,8 @@ extension SettingsPanesCocoa {
           )
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kFuriousTypingEnabled.renderCocoa(
+          // P253：同 SwiftUI 側——本 phase 只指向拼音側，注音側之第二列留待 P258。
+          UserDef.kFuriousTypingEnabled4Pinyin.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )

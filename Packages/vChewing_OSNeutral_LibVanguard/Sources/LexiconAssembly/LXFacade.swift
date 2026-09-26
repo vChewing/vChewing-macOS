@@ -70,7 +70,10 @@ extension LXAssembly {
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
       public var suppressFactoryUnigramsOfKanaSyllables = false
-      /// 隨狂拼主開關（kFuriousTypingEnabled）同步：true 時抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      /// 隨狂拼主開關（kFuriousTypingEnabled4Pinyin）同步：true 時抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      ///
+      /// - Note: 「兩種狂打開關各自判斷、兩種非狂打皆不抑制」之四態語意留待 P257 落地；本 phase
+      ///   只把屬性名跟上 `UserDef` 之兩分，語意一行不動。
       public var shouldSuppressFactoryZhuyinwenData = false
     }
 
@@ -331,7 +334,7 @@ extension LXAssembly {
       config.fetchSuggestionsFromPerceptionOverrideModel = prefs.fetchSuggestionsFromPerceptionOverrideModel
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
       config.suppressFactoryUnigramsOfKanaSyllables = prefs.suppressFactoryUnigramsOfKanaSyllables
-      config.shouldSuppressFactoryZhuyinwenData = prefs.furiousTypingEnabled && prefs.pinyinTypingEnabled
+      config.shouldSuppressFactoryZhuyinwenData = prefs.furiousTypingEnabled4Pinyin && prefs.pinyinTypingEnabled
     }
 
     /// 清除 InputToken HashMap。

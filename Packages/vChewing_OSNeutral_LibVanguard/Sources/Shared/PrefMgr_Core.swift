@@ -349,8 +349,11 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kEnableLatchedAlnumStateInMixedAlnumMode)
   public var enableLatchedAlnumStateInMixedAlnumMode: Bool
 
-  @AppProperty(userDef: .kFuriousTypingEnabled)
-  public var furiousTypingEnabled: Bool
+  @AppProperty(userDef: .kFuriousTypingEnabled4Pinyin)
+  public var furiousTypingEnabled4Pinyin: Bool
+
+  @AppProperty(userDef: .kFuriousTypingEnabled4Zhuyin)
+  public var furiousTypingEnabled4Zhuyin: Bool
 
   /// 舊版單一注拼槽 parser 屬性的相容層：依當前打字模式（注音/拼音）讀寫各自的 parser 槽位。
   ///
@@ -575,6 +578,15 @@ extension PrefMgr {
     if defaults.object(forKey: "UsingHotKeyHalfWidthASCII") != nil {
       usingHotKeyHalfWidthPunctuation = defaults.bool(forKey: "UsingHotKeyHalfWidthASCII")
       defaults.removeObject(forKey: "UsingHotKeyHalfWidthASCII")
+    }
+    // 遷移舊設定：狂打 pref 更名並兩分
+    // （"FuriousTypingEnabled" → "FuriousTypingEnabled4Pinyin" ＋ 新增 "FuriousTypingEnabled4Zhuyin"）。
+    // 舊 key 之用戶設定值只搬移至**拼音**側；注音側維持其出廠預設（false）——該側在舊版並不存在，
+    // 任何「推測之值」都是捏造（§6.3 之要點 2）。以「舊 key 存在與否」為閘、處理完即刪，故冪等
+    // （§0.3 之約束 2：本函式於每次 `InputSession.activateServer()` 執行）。
+    if defaults.object(forKey: "FuriousTypingEnabled") != nil {
+      furiousTypingEnabled4Pinyin = defaults.bool(forKey: "FuriousTypingEnabled")
+      defaults.removeObject(forKey: "FuriousTypingEnabled")
     }
   }
 }

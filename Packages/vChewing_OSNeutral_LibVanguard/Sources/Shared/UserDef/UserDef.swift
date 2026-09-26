@@ -59,7 +59,8 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kMixedAlphanumericalEnabled = "MixedAlphanumericalEnabled"
   case kMixedAlnumJudgeReadingsBySequentialRawKeyOrder = "MixedAlnumJudgeReadingsBySequentialRawKeyOrder"
   case kEnableLatchedAlnumStateInMixedAlnumMode = "EnableLatchedAlnumStateInMixedAlnumMode"
-  case kFuriousTypingEnabled = "FuriousTypingEnabled"
+  case kFuriousTypingEnabled4Pinyin = "FuriousTypingEnabled4Pinyin"
+  case kFuriousTypingEnabled4Zhuyin = "FuriousTypingEnabled4Zhuyin"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
   case kSuppressFactoryUnigramsOfKanaSyllables = "SuppressFactoryUnigramsOfKanaSyllables"
@@ -667,7 +668,8 @@ extension UserDef {
     case .kMixedAlphanumericalEnabled: return .bool(false)
     case .kMixedAlnumJudgeReadingsBySequentialRawKeyOrder: return .bool(true)
     case .kEnableLatchedAlnumStateInMixedAlnumMode: return .bool(false)
-    case .kFuriousTypingEnabled: return .bool(true)
+    case .kFuriousTypingEnabled4Pinyin: return .bool(true)
+    case .kFuriousTypingEnabled4Zhuyin: return .bool(false)
     case .kCNS11643Enabled: return .bool(false)
     case .kSymbolInputEnabled: return .bool(true)
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .bool(false)
@@ -968,9 +970,13 @@ extension UserDef {
         shortTitle: "i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.shortTitle",
         description: "i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.description"
       )
-    case .kFuriousTypingEnabled: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kFuriousTypingEnabled.shortTitle",
-        description: "i18n:UserDef.kFuriousTypingEnabled.description"
+    case .kFuriousTypingEnabled4Pinyin: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kFuriousTypingEnabled4Pinyin.shortTitle",
+        description: "i18n:UserDef.kFuriousTypingEnabled4Pinyin.description"
+      )
+    case .kFuriousTypingEnabled4Zhuyin: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kFuriousTypingEnabled4Zhuyin.shortTitle",
+        description: "i18n:UserDef.kFuriousTypingEnabled4Zhuyin.description"
       )
     case .kCNS11643Enabled: return .init(
         userDef: self,

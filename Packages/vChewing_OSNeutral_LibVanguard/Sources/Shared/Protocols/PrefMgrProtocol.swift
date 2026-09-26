@@ -90,7 +90,8 @@ public protocol PrefMgrProtocol {
   var mixedAlphanumericalEnabled: Bool { get set }
   var mixedAlnumJudgeReadingsBySequentialRawKeyOrder: Bool { get set }
   var enableLatchedAlnumStateInMixedAlnumMode: Bool { get set }
-  var furiousTypingEnabled: Bool { get set }
+  var furiousTypingEnabled4Pinyin: Bool { get set }
+  var furiousTypingEnabled4Zhuyin: Bool { get set }
   var symbolInputEnabled: Bool { get set }
   var suppressFactoryUnigramsOfKanaSyllables: Bool { get set }
   var currencyNumeralsEnabled: Bool { get set }

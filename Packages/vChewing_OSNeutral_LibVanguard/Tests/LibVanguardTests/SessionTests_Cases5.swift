@@ -158,7 +158,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     ]
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -171,7 +171,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijiedaz」：前段自動 chop 提交（世測界測大測），注拼槽暫存「z」。
@@ -201,7 +201,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     ]
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.candidateStateJKHLBehavior = 0
       testHandler.prefs.useHorizontalCandidateList = true
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
@@ -212,7 +212,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     customGrams.forEach {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
     }
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.candidateStateJKHLBehavior = 1 // JKHL 行為 1：HL 翻行列
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     for isVertical in [false, true] {

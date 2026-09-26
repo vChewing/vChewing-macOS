@@ -1559,7 +1559,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -1573,7 +1573,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijiedaz」：前段自動 chop 提交（世測界測大測），注拼槽暫存「z」。
@@ -1624,7 +1624,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
-    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「關閉時」行為）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 顯式停用狂拼（測試意圖為「關閉時」行為）。
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijiedaz")
@@ -1654,7 +1654,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -1668,7 +1668,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijiedaz")
@@ -1702,7 +1702,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -1716,7 +1716,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijiedaz」：前段自動 chop 提交（世測界測大測），注拼槽暫存「z」。
@@ -1731,7 +1731,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.state.candidates.count == (testHandler.furiousTypingFrontCandidates?.count ?? 0))
 
     // 狂拼關閉時不得附加候選（零行為差異）。
-    testHandler.prefs.furiousTypingEnabled = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
     testHandler.currentLM.syncPrefs()
     let stateSansFurious = testHandler.generateStateOfInputting()
     #expect(stateSansFurious.candidates.isEmpty)
@@ -1757,7 +1757,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testSession.mockCandidateController = nil
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -1771,7 +1771,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijiedaz")
@@ -1819,7 +1819,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testSession.mockCandidateController = nil
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -1833,7 +1833,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijiedaz")
@@ -1873,7 +1873,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.useSCPCTypingMode = false
       testHandler.prefs.showHanyuPinyinInCompositionBuffer = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
@@ -1889,7 +1889,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.useSCPCTypingMode = true
     testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
     testHandler.currentLM.syncPrefs()
@@ -1943,7 +1943,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -1955,7 +1955,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「fanganz」：第一次 chop 提交 fang（暫存 a），第二次 chop 提交 an（暫存 z），
@@ -2001,7 +2001,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「關閉時」行為）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 顯式停用狂拼（測試意圖為「關閉時」行為）。
     testHandler.currentLM.syncPrefs()
 
     typeSentence("fanganz")
@@ -2030,7 +2030,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2042,7 +2042,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("fanganz")
@@ -2072,7 +2072,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2084,7 +2084,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("fanganz")
@@ -2130,7 +2130,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2142,7 +2142,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 1 // Space 為選字窗呼叫鍵（預設值）。
     testHandler.currentLM.syncPrefs()
 
@@ -2182,7 +2182,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2194,7 +2194,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 橫排（MockSession 預設 isVerticalTyping == false）：Down＝isCursorClockLeft。
@@ -2230,7 +2230,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2242,7 +2242,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 字母鍵：不固化（不開候選窗）、維持既有 auto-chop 打字行為。
@@ -2255,7 +2255,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     // Enter：固化前方、停留 Inputting、不遞交；再按一次 Enter 才遞交全句。
     testSession.switchState(IMEState.ofAbortion()) // 清空組字區與注拼槽，不遞交。
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
     typeSentence("shijie")
     _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
@@ -2280,7 +2280,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2292,7 +2292,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -2313,7 +2313,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2325,7 +2325,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「fanganz」：auto-chop 提交 fang／an，注拼槽暫存「z」（不完整前綴）。
@@ -2355,7 +2355,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2367,7 +2367,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijie」：auto-chop 提交 shi、注拼槽暫存 jie、copilot 候選窗顯示。
@@ -2401,7 +2401,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testSession.mockCandidateController = nil
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2413,7 +2413,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -2458,7 +2458,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.showReverseLookupInCandidateUI = true
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
@@ -2472,7 +2472,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.showReverseLookupInCandidateUI = true
     testHandler.currentLM.syncPrefs()
 
@@ -2492,7 +2492,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.unfinishedReading == "jie")
 
     // 非狂拼時：provider 不提供 unfinishedReading（nil）；反查守衛路徑不受影響。
-    testHandler.prefs.furiousTypingEnabled = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
     testHandler.currentLM.syncPrefs()
     #expect(testSession.unfinishedReading == nil)
     #expect(testSession.reverseLookup(for: "界").isEmpty)
@@ -2510,7 +2510,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2522,7 +2522,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 只打首音節「jie」（無 auto-chop 提交）：組字器為空、注拼槽暫存 jie。
@@ -2549,7 +2549,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2561,7 +2561,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -2587,7 +2587,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testSession.mockCandidateController = nil
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2599,7 +2599,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -2636,7 +2636,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.showReverseLookupInCandidateUI = true
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
@@ -2650,7 +2650,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.showReverseLookupInCandidateUI = true
     testHandler.currentLM.syncPrefs()
 
@@ -2665,7 +2665,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testSession.isVerticalTyping = false
 
     // 狂拼關閉：provider 不提供 unfinishedReading；反查走一般守衛路徑（Mock 回空）。
-    testHandler.prefs.furiousTypingEnabled = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
     testHandler.currentLM.syncPrefs()
     #expect(testSession.unfinishedReading == nil)
     #expect(testSession.reverseLookup(for: "界").isEmpty)
@@ -2704,7 +2704,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2716,7 +2716,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijie」：auto-chop 提交 shi、注拼槽暫存 jie、copilot 候選窗顯示。
@@ -2741,7 +2741,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2753,7 +2753,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -2782,7 +2782,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2794,7 +2794,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 橫排（MockSession 預設 isVerticalTyping == false）：Left＝isCursorBackward。
@@ -2843,7 +2843,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2855,7 +2855,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -2895,7 +2895,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2907,7 +2907,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 第一段：高亮「界」後按 Enter → 固化「界」、停留 Inputting、不遞交。
@@ -2928,7 +2928,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 第二段：不切高亮直接 Enter → 固化置頂「世界」、停留；再按 Enter 遞交「世界」。
     testSession.switchState(IMEState.ofAbortion())
     testSession.recentCommissions.removeAll()
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
     typeSentence("shijie")
     _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
@@ -2949,7 +2949,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -2962,7 +2962,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
     testHandler.currentLM.syncPrefs()
 
     // 非狂拼：拼音模式注拼槽有未完成拼裝的字母。
@@ -2991,7 +2991,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testSession.mockCandidateController = nil
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3003,7 +3003,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -3039,7 +3039,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3051,7 +3051,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -3083,7 +3083,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3096,7 +3096,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
     testHandler.currentLM.syncPrefs()
 
     // 非狂拼：拼音模式打入完整可唸讀音（注拼槽非空）。
@@ -3130,7 +3130,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3143,7 +3143,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
     testHandler.currentLM.syncPrefs()
 
     // 非狂拼：拼音模式注拼槽為不完整前綴「z」。
@@ -3178,7 +3178,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testSession.mockCandidateController = nil
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3190,7 +3190,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -3228,7 +3228,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3246,7 +3246,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // Space 為候選輪替鍵。
     testHandler.currentLM.syncPrefs()
 
@@ -3287,7 +3287,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3298,7 +3298,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // Space 為候選輪替鍵。
     testHandler.currentLM.syncPrefs()
 
@@ -3339,7 +3339,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3350,7 +3350,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.trimUnfinishedReadingsOnCommit = true
     testHandler.currentLM.syncPrefs()
 
@@ -3382,7 +3382,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3393,7 +3393,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // POM 讀取閘門打開。
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shima」：auto-chop 提交 shi、前方 ma 暫存於注拼槽、copilot 候選窗顯示。
@@ -3426,7 +3426,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3438,7 +3438,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // POM 讀取閘門打開。
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijie」：auto-chop 提交 shi、前方 jie 暫存於注拼槽、copilot 候選窗顯示，
@@ -3484,7 +3484,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3496,7 +3496,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
     testHandler.currentLM.syncPrefs()
 
@@ -3536,7 +3536,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3552,7 +3552,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「shijie」：auto-chop 在 'j' 提交 shi（注拼槽暫存 jie）。
@@ -3592,7 +3592,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3608,7 +3608,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijie")
@@ -3639,7 +3639,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3664,7 +3664,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「ysxb」：無完整音節可自動 chop 提交，整段留在注拼槽。
@@ -3689,7 +3689,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3713,7 +3713,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("ysxb")
@@ -3755,7 +3755,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3778,7 +3778,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
     testHandler.currentLM.syncPrefs()
 
@@ -3813,7 +3813,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3833,7 +3833,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 記憶「是」之後的前方為「媽」（無調形 head；語境鍵 (ㄕˋ,是)）。
@@ -3866,7 +3866,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.useFixedCandidateOrderOnSelection = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
@@ -3886,7 +3886,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.useFixedCandidateOrderOnSelection = true
     testHandler.currentLM.syncPrefs()
 
@@ -3918,7 +3918,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.useFixedCandidateOrderOnSelection = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
@@ -3938,7 +3938,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     testHandler.currentLM.memorizePerception(
@@ -3972,7 +3972,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3994,7 +3994,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 記憶時戳一律以「現在」為基準。LXPerceptor.calculateWeight 對年齡達 wT（預設 8 天）
@@ -4035,7 +4035,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4054,7 +4054,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（一般拼音、全拼帶聲調）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 非狂拼（一般拼音、全拼帶聲調）。
     testHandler.currentLM.syncPrefs()
 
     // 記憶「(是)→右(ㄧㄡˋ)」。
@@ -4088,7 +4088,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     clearTestPOM()
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4104,7 +4104,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（全拼帶調）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 非狂拼（全拼帶調）。
     testHandler.currentLM.syncPrefs()
 
     // 錯位記憶：單 ㄕˊ 讀音、候選「體式」(2 字)。
@@ -4136,7 +4136,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     clearTestPOM()
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4153,7 +4153,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（全拼帶調 sheng1＝單鍵 ㄕㄥ）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 非狂拼（全拼帶調 sheng1＝單鍵 ㄕㄥ）。
     testHandler.currentLM.syncPrefs()
 
     // 記憶「(活)→聖(ㄕㄥˋ)」：ㄕㄥˋ 記憶不得注入 ㄕㄥ（第一聲）節點。
@@ -4189,7 +4189,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4208,7 +4208,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     testHandler.currentLM.memorizePerception(
@@ -4237,7 +4237,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4256,7 +4256,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false // 關閉主開關（全通道停用）。
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     testHandler.currentLM.memorizePerception(
@@ -4285,7 +4285,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4304,7 +4304,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // 主開關開啟（預設）：建議與 n-gram 餵入皆由此把守。
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     testHandler.currentLM.memorizePerception(
@@ -4335,7 +4335,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4353,7 +4353,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // 主開關開啟（預設）。
-    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（一般拼音）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false // 非狂拼（一般拼音）。
     testHandler.currentLM.syncPrefs()
 
     testHandler.currentLM.memorizePerception(
@@ -4386,7 +4386,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4407,7 +4407,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 打字「ysxb」：最後一鍵 b 觸發 α 自動套用（明確勝出）——注拼槽清空、
@@ -4435,7 +4435,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4457,7 +4457,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("ysxb")
@@ -4485,7 +4485,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4506,7 +4506,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
     testHandler.currentLM.syncPrefs()
 
@@ -4539,7 +4539,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4559,7 +4559,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「fangan」連打：auto-chop 提交「方」（trail=["fang"]）、注拼槽暫存 "an"。
@@ -4587,7 +4587,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4607,7 +4607,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("fangan")
@@ -4644,7 +4644,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -4664,7 +4664,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     typeSentence("fangan")
@@ -4695,7 +4695,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     clearTestPOM()
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4716,7 +4716,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // POM 記憶（使用者實際環境，2026-08-30）：三條全注入。
@@ -4759,7 +4759,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     clearTestPOM()
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4779,7 +4779,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
     [
       ("()&()&(ㄨㄛˇ,我)", "我"),
@@ -4818,7 +4818,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     clearTestPOM()
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4839,7 +4839,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
     [
       ("()&()&(ㄨㄛˇ,我)", "我"),
@@ -4875,7 +4875,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.errorCallback = nil
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4894,7 +4894,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
     testHandler.errorCallback = { errorMessages.append($0) }
 
@@ -4930,7 +4930,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     clearTestPOM()
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4939,7 +4939,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
     testHandler.currentLM.syncPrefs()
 
     // 「slliang」＝7 字元、超過注拼槽預設 6 碼上限；修復前「s」被音頭丟棄、

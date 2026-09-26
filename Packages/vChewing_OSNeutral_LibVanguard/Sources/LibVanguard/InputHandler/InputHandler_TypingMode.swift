@@ -34,10 +34,13 @@ extension InputHandlerProtocol {
   ///
   /// 判定順序：磁帶優先於一切；狂拼要求狂拼開關＋非逐字選字＋拼音注拼槽；
   /// 其餘以注拼槽是否拼音區分拼音鍵盤／注音鍵盤。
-  /// `furiousTypingEnabled` pref 保留為「快速切換」的底層開關，本枚舉是其語義化抽象。
+  /// `furiousTypingEnabled4Pinyin` pref 保留為「快速切換」的底層開關，本枚舉是其語義化抽象。
+  ///
+  /// - Note: 本 phase 只把屬性名跟上 `UserDef` 之兩分，判定語意一行不動 —— 注音側之閘門
+  ///   （`furiousTypingEnabled4Zhuyin`）與 `TypingMode.zhuyinFuriousTyping` 之可達性留待 P254。
   public var typingMode: TypingMode {
     if prefs.cassetteEnabled { return .cassette }
-    if prefs.furiousTypingEnabled, !prefs.useSCPCTypingMode, composer.isPinyinMode {
+    if prefs.furiousTypingEnabled4Pinyin, !prefs.useSCPCTypingMode, composer.isPinyinMode {
       return .pinyinFuriousTyping
     }
     return composer.isPinyinMode ? .pinyinKeyblock : .bopomofoKeyblock
