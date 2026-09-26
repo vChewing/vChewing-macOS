@@ -79,10 +79,35 @@ extension InputHandlerProtocol {
     currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
 
-  /// 狂拼模式有效且注拼槽尚有未完成拼裝的拼音字母流（前方待確認讀音）。
-  public var hasFuriousFrontPending: Bool {
-    isFuriousTypingModeEffective && !composer.romajiBuffer.isEmpty
+  /// 狂打模式有效時，注拼槽內尚未固化之讀音素材（copilot 窗頂部 pane 之資料源）。
+  ///
+  /// 兩側之素材形態不同：拼音側為可跨音節之字母流（`romajiBuffer`）；注音側為當前
+  /// 未完成之音節原字串（一鍵一符號，無跨音節字母流可言，故直接取注拼槽之組字結果）。
+  /// 註：若注拼槽內只有聲調、尚無任何聲介韻，則「非空」但無讀音可示 —— 本屬性一律回
+  /// `nil`，此即「未完成讀音素材」之唯一判準（見 `hasFuriousFrontPending`）。
+  public var furiousFrontUnfinishedReading: String? {
+    guard isFuriousTypingModeEffective else { return nil }
+    switch typingMode {
+    case .pinyinFuriousTyping:
+      let romaji = composer.romajiBuffer
+      return romaji.isEmpty ? nil : romaji
+    case .zhuyinFuriousTyping:
+      // 「非空」不足以代表「有讀音可示」：只有聲調時注拼槽非空、但無聲介韻可言。
+      guard composer.isPronounceable else { return nil }
+      let zhuyin = composer.getComposition(isHanyuPinyin: false)
+      return zhuyin.isEmpty ? nil : zhuyin
+    default:
+      return nil
+    }
   }
+
+  /// 狂打模式有效且注拼槽尚有未固化之讀音素材（前方待確認讀音）。
+  ///
+  /// - Important: 本旗子即「`furiousFrontUnfinishedReading != nil`」——二者共用同一判準，
+  ///   以免出現「旗子說有、顯示源說沒有」之狀態（copilot 窗開了卻無讀音可示）。
+  ///   P255 之前本旗子為拼音專屬之 `!romajiBuffer.isEmpty`；注音狂打接入 copilot 窗時
+  ///   改為依 `typingMode` 分流，並收斂為此單一判準。
+  public var hasFuriousFrontPending: Bool { furiousFrontUnfinishedReading != nil }
 
   /// 清空狂拼 trail。
   ///
@@ -124,21 +149,24 @@ extension InputHandlerProtocol {
       return
     }
     let bucket = furiousContext.bucket
+    let isPinyin = composer.isPinyinMode
     let romaji = composer.romajiBuffer
-    guard !romaji.isEmpty else { return }
     // 完整音節與否須在清空注拼槽之前判定（重切分 trail 不變量所需）。
-    let isCompleteSyllable = composer.parser.mapZhuyinPinyin?[romaji] != nil
+    // 注音側不寫 trail（§8.6 之 IH163），故整段 trail bookkeeping 為拼音專屬。
+    let isCompleteSyllable = isPinyin && composer.parser.mapZhuyinPinyin?[romaji] != nil
     guard (try? assembler.insertKeys([.multipleKeys(bucket)])) != nil else { return }
-    composer.replacePinyinBuffer(with: "")
+    composer.clear()
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
-    if isCompleteSyllable {
-      furiousTrail.append(romaji)
-      // 注意：此處不做重切分——單音節 trail（如「xian」）在打字中途即被拆開會
-      // 誤傷「先生」類的後續多音節組句（「xian 空格 sheng」應為「先生」而非
-      // 「西 安 生」）。重切分僅由 auto-chop 提交路徑觸發、且 trail 至少兩段時
-      // 才執行（見 `resegmentFuriousTrailIfNeeded`）。
-    } else {
-      invalidateFuriousTrail()
+    if isPinyin {
+      if isCompleteSyllable {
+        furiousTrail.append(romaji)
+        // 注意：此處不做重切分——單音節 trail（如「xian」）在打字中途即被拆開會
+        // 誤傷「先生」類的後續多音節組句（「xian 空格 sheng」應為「先生」而非
+        // 「西 安 生」）。重切分僅由 auto-chop 提交路徑觸發、且 trail 至少兩段時
+        // 才執行（見 `resegmentFuriousTrailIfNeeded`）。
+      } else {
+        invalidateFuriousTrail()
+      }
     }
     retrievePOMSuggestions(apply: true)
   }

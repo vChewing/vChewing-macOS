@@ -125,13 +125,11 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   public var localeForFontFallbacks: String { "zh-Hant" }
 
   public var unfinishedReading: String? {
-    // 與生產端 InputSession_Delegates 對應：狂拼 copilot 窗的未完成讀音（頂部 pane 資料源）。
-    guard let inputHandler = inputHandler else { return nil }
-    guard isFuriousCopilotCandidateWindowVisible, inputHandler.hasFuriousFrontPending else {
-      return nil
-    }
-    let romaji = inputHandler.composer.romajiBuffer
-    return romaji.isEmpty ? nil : romaji
+    // 與生產端 InputSession_Delegates 逐字對應：狂打 copilot 窗的未完成讀音
+    // （頂部 pane 資料源）。素材取得一律委由 handler 分流，本處不自行判讀注拼槽，
+    // 以免 mock 與生產之判準各自演化。
+    guard isFuriousCopilotCandidateWindowVisible else { return nil }
+    return inputHandler?.furiousFrontUnfinishedReading
   }
 
   public func callError(_ logMessage: String) {

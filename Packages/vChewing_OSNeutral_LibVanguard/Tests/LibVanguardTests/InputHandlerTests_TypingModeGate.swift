@@ -158,9 +158,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 注音側新偏好之出廠預設為 `false` ⇒ `zhuyinFuriousTyping` 於正式情境不可達；
-  /// 且 `hasFuriousFrontPending` 於注音側**仍為假**（P254 未動它——見 P256）。
-  @Test("[IH704] 注音狂打之出廠不可達性與 hasFuriousFrontPending 之現狀")
-  func test_IH704_ZhuyinFuriousIsUnreachableAndPendingStaysFalse() throws {
+  /// 但該值一旦被手工觸及，其「前方待確認讀音」閘門**與拼音側同構**（P256 交付）——
+  /// 注拼槽內有未完成音節即成立。
+  @Test("[IH704] 注音狂打之出廠不可達性與前方待確認讀音閘門")
+  func test_IH704_ZhuyinFuriousIsUnreachableButPendingGateWorks() throws {
     guard let testHandler else {
       Issue.record("testHandler 為 nil。")
       return
@@ -197,9 +198,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // `typingMode` 確實會回傳新值——此為**已知界線**，以斷言釘住而非隱藏。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = true
     #expect(testHandler.typingMode == .zhuyinFuriousTyping)
-    // 惟 P254 尚未動 `hasFuriousFrontPending`（其注音分支屬 P256）⇒ 仍為假。
+    // P256 已交付 `hasFuriousFrontPending` 之注音分支（P254 時此處尚為假，其反轉即
+    // P256 之交付內容）：注拼槽內有未完成音節 ⇒ 前方待確認讀音成立、顯示源即該音節。
     testHandler.composer.receiveKey(fromString: "1") // ㄅ
-    #expect(!testHandler.hasFuriousFrontPending)
+    #expect(testHandler.hasFuriousFrontPending)
+    #expect(testHandler.furiousFrontUnfinishedReading == "ㄅ")
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
   }
 }

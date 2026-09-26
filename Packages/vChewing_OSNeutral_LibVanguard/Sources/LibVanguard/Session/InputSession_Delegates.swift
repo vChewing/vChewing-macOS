@@ -196,15 +196,17 @@ extension SessionProtocol {
     return ""
   }
 
-  /// 狂拼 copilot 候選窗的「未完成讀音」顯示資料（選字窗頂部 pane 用；nullable）。
-  /// 由 data provider 這一側決定何時提供：僅在狂拼 copilot 候選窗顯示、且注拼槽尚有
-  /// 未固化的字母流時回傳該字母流；其餘場合一律 nil（選字窗側隱藏頂部 pane）。
+  /// 狂打 copilot 候選窗的「未完成讀音」顯示資料（選字窗頂部 pane 用；nullable）。
+  /// 由 data provider 這一側決定何時提供：僅在狂打 copilot 候選窗顯示、且注拼槽尚有
+  /// 未固化之讀音素材時回傳該素材；其餘場合一律 nil（選字窗側隱藏頂部 pane）。
   /// 自 P184 起，狂拼模式的讀音回顯由底部反查欄位移交此專用資料源
   /// （原回顯為 tooltip 因與候選窗重疊而被抑制時的敲鍵內容唯一可見管道）。
+  /// 素材之取得（拼音字母流／注音音節）一律交由 `InputHandlerProtocol`
+  /// 之 `furiousFrontUnfinishedReading` 分流，本處與 `MockSession` 皆只做轉發，
+  /// 以免同一判準兩處各自演化。
   public var unfinishedReading: String? {
-    guard isFuriousCopilotCandidateWindowVisible,
-          let romaji = inputHandler?.composer.romajiBuffer, !romaji.isEmpty else { return nil }
-    return romaji
+    guard isFuriousCopilotCandidateWindowVisible else { return nil }
+    return inputHandler?.furiousFrontUnfinishedReading
   }
 
   @discardableResult

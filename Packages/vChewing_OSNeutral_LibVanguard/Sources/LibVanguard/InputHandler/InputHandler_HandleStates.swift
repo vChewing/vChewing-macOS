@@ -21,11 +21,13 @@ extension InputHandlerProtocol {
     furiousFrontContext?.preview
   }
 
-  /// 狂拼模式的前方上下文：閘門判定＋讀音桶生成＋copilot 前方預覽試算。
+  /// 狂打模式（狂拼／狂注）的前方上下文：閘門判定＋讀音桶生成＋copilot 前方預覽試算。
   ///
   /// 即時預覽（`furiousTypingPreviewedReading`）與前方候選清單
   /// （`furiousTypingFrontCandidates`）共用同一份閘門與讀音桶，確保兩者行為一致。
-  /// 逐字選字模式（SCPC）啟用時狂拼完全無效，故在此一併設閘。
+  /// 逐字選字模式（SCPC）啟用時狂打完全無效，故在此一併設閘。
+  /// **讀音桶之來源依注拼槽之鍵盤家族分流**：拼音側由字母流反推可能之注音音節、
+  /// 再展開聲調；注音側之未完成音節本身即讀音，逕行展開聲調變體即可（見下）。
   /// 若 copilot 組句的最後節點橫跨「最後提交鍵＋前方」邊界，一併回傳該節點的完整
   /// 詞音配對（如「世界」[ㄕˋ,ㄐㄧㄝˋ]）；preedit 用的 preview 仍維持越界 suffix。
   /// `assembledMainValues` 為 copilot 全句組句的主段範圍擷取（與前方 suffix 擷取互為
@@ -41,17 +43,26 @@ extension InputHandlerProtocol {
     assembledMainValues: [String], tailReading: String?
   )? {
     guard isFuriousTypingModeEffective else { return nil }
-    guard composer.intonation.isEmpty else { return nil }
-    let romaji = composer.romajiBuffer
-    guard !romaji.isEmpty else { return nil }
     guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return nil }
-    // 將暫存拼音展開為注音讀音桶（含聲調變體）。
-    let tonelessZhuyin = Tekkon.PinyinTrie.shared(parser: composer.parser)
-      .zhuyinReadings(forPinyinFragment: romaji)
-    let bucket = tonelessZhuyin.flatMap { zhuyin -> [String] in
-      Tekkon.allowedIntonations.map { tone in
-        zhuyin + ((tone != " ") ? String(tone) : "")
-      }
+    // 前方讀音桶：拼音側須先由字母流反推可能之注音音節、再展開聲調；注音側之未完成
+    // 音節本身即為讀音，逕行展開聲調變體即可（聲調已進注拼槽時即為唯一解）。
+    let bucket: [String]
+    if composer.isPinyinMode {
+      // 拼音側：聲調一旦進入注拼槽，字母流之切分語義即不再單純
+      // （§3.2 條件 ②），故有聲調時不提供前方上下文。
+      guard composer.intonation.isEmpty else { return nil }
+      let romaji = composer.romajiBuffer
+      guard !romaji.isEmpty else { return nil }
+      let tonelessZhuyin = Tekkon.PinyinTrie.shared(parser: composer.parser)
+        .zhuyinReadings(forPinyinFragment: romaji)
+      bucket = tonelessZhuyin.flatMap { Tekkon.makeToneInsensitiveVariants(of: $0) }
+    } else {
+      // 注音側：未完成音節即讀音本體、無須反推；與顯示源共用同一判準（連聲調之有無
+      // 一併沿用），以免「窗開了、桶卻空著」或「桶由無讀音之聲調槽生成」。
+      guard let zhuyin = furiousFrontUnfinishedReading else { return nil }
+      bucket = composer.intonation.isEmpty
+        ? Tekkon.makeToneInsensitiveVariants(of: zhuyin)
+        : [zhuyin]
     }
     guard !bucket.isEmpty else { return nil }
     // 以組字器副本（copilot）試算前方組句；不影響原組字器。
@@ -252,10 +263,12 @@ extension InputHandlerProtocol {
       .map { ($0.keyArray, $0.value) }
   }
 
-  /// 狂拼模式：就地確認前方候選，將其詞音配對覆寫至組字器尾端的新插入 span。
+  /// 狂打模式（狂拼／狂注）：就地確認前方候選，將其詞音配對覆寫至組字器尾端的新插入 span。
   ///
   /// 先清空注拼槽、把候選的讀音（或讀音桶）插入組字器，再對 anchor 起的新 span 覆寫
   /// 使用者指定的詞音配對。任一環節失敗時靜默退回，不更動既有狀態語義。
+  /// **注拼槽之清空與還原為兩側通用**（整體快照／還原，而非拼音專屬之 `replacePinyinBuffer`）
+  /// ——注音狂打亦有前方待確認音節，本函式不再假設注拼槽內是拼音字母流。
   /// 注意：僅當確認來自**使用者顯式選字**（Shift+選字鍵／滑鼠點選，`memorizePOM: true`）
   /// 時才收集 POM 觀察；Enter 固化高亮候選（`memorizePOM` 預設 false）不寫入——copilot 未經
   /// 使用者逐字確認的最佳猜測不應寫入漸退記憶模組（否則記憶的短詞會綁架長詞的組句，
@@ -282,8 +295,11 @@ extension InputHandlerProtocol {
     guard !candidate.value.isEmpty else { return }
     let preservedSentenceBeforeConsolidation = assembler.assembledSentence
     let preservedCursorPosition = actualNodeCursorPosition
-    let romajiBackup = composer.romajiBuffer
-    composer.replacePinyinBuffer(with: "")
+    // 注拼槽暫存整體快照：拼音側為待切分之字母流、注音側為未完成之音節。
+    // 前方候選一旦套用，該暫存即被候選之讀音覆蓋，故先清空；失敗時整槽還原
+    // （比逐欄重建更忠實，且兩側共用同一段碼）。
+    let composerBackup = composer
+    composer.clear()
     // 三路徑套用（置頂無橫跨／跨邊界／前方單音節）共用於真實確認與高亮預覽。
     var pomObservation: Homa.PerceptionIntel?
     let outcome = applyFuriousFrontCandidate(
@@ -293,7 +309,7 @@ extension InputHandlerProtocol {
     switch outcome {
     case .failed:
       // 失敗防禦：復原注拼槽暫存，靜默退回。
-      composer.replacePinyinBuffer(with: romajiBackup)
+      composer = composerBackup
       return
     case .inserted:
       // 覆寫失敗：保留已插入讀音（組句結果與 copilot 預覽一致）。
