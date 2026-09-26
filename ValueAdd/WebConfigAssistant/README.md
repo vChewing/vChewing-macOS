@@ -261,7 +261,7 @@ ValueAdd/WebConfigAssistant/
 make audit      # 提交前總檢：型別檢查 ＋ ES5 守衛 ＋ 單元測試 ＋ 後設資料防漂移 ＋ i18n 稽核 ＋ 曝露面防漂移 ＋ fixture 防漂移
 make bundle     # 產出 dist/assistant.html（單檔自足）
 make check-tsc  # 驗證 $(TSC) 為原生版（非 npm 之 node 啟動器）
-make test       # 單元測試（78 支；由 tools/host 驅動）
+make test       # 單元測試（81 支；由 tools/host 驅動）
 make serve      # 本機預覽（http://127.0.0.1:8787/assistant.html）
 make deploy     # 複製 dist/assistant.html 與 dist/index.html 進官網倉（DEPLOY_SUBDIR 預設 assistant；不自動提交）
 make metadata-update  # 自 UserDef 重新導出後設資料並入庫
@@ -277,7 +277,7 @@ make metadata-update  # 自 UserDef 重新導出後設資料並入庫
 
 ## 六、後設資料：防漂移
 
-助手需要知道 118 條偏好鍵之名稱、型別、值域、預設值與四語系標籤。這些**一律不手抄**，而是由
+助手需要知道 119 條偏好鍵之名稱、型別、值域、預設值與四語系標籤。這些**一律不手抄**，而是由
 唯音自己導出：
 
 ```sh
@@ -296,7 +296,7 @@ swift run --disable-sandbox -c release \
   會變成可偵測的紅燈）；`make metadata-audit` 另以 `--strict` 做 i18n 稽核（缺鍵或真欠譯即失敗）。
 - `--extra-label-prefix` 收錄「不在 `UserDef` 命名空間內、但助手也需要」之既有 i18n 鍵：
   唯音之注音／拼音排列選單名稱係由 `KeyboardParser.localizedMenuName` 供出（`i18n:KeyboardLayout.*`
-  ／`i18n:TypingMethod.*`），不經 `UserDef.metaData`。如此助手既不必手抄這 17 條標籤、亦不必
+  ／`i18n:TypingMethod.*`），不經 `UserDef.metaData`。如此助手既不必手抄這 28 條標籤、亦不必
   為此令 CLI 相依 Tekkon。
 
 ## 七、契約測試（Swift 側）
@@ -367,7 +367,7 @@ swift run --disable-sandbox -c release \
    之值域即其選項，寫「可輸入」只會令人困惑（事主原見之「數字小鍵盤：可輸入 0 ～ 2」即此）。
 
 7. **值的顯示一律走「題目自身之選項標籤」**（2026-09-24）：`kKeyboardParser4Zhuyin`／
-   `kKeyboardParser4Pinyin` 之標籤**不在** `UserDef.metaData.options` 內（那 17 條由
+   `kKeyboardParser4Pinyin` 之標籤**不在** `UserDef.metaData.options` 內（那 28 條由
    `KeyboardParser.localizedMenuName` 供出，經 `--extra-label-prefix` 導出至 `extraLabels`），
    故若逕以 `formatValue` 呈現即為裸數字（`100`），使用者無從理解。凡顯示值之處
    （摘要表之「將寫入的值」、「推薦值：…」、以及「維持不變」之出廠預設值註記）一律先問
@@ -381,7 +381,7 @@ swift run --disable-sandbox -c release \
    `Shared.swift` 之 `KeyboardParser` 宣告序與其 `localizedMenuName` switch、暨設定介面之
    `Divider()` 條件，寫入 `assets/settings-surface.json` 之 `keyboardParsers` 段；`tools/build.js`
    將該段注入產物（`VCA_SURFACE`），`questions.ts` 之 `parserQuestion` 據以生成選項——**助手不再
-   手抄這 17 條之順序或標籤**。**唯一例外**：清單首項之前的分隔線省略（清單之首無從標示分界）。
+   手抄這 28 條之順序或標籤**。**唯一例外**：清單首項之前的分隔線省略（清單之首無從標示分界）。
 
 9. **標題帶**（2026-09-24 事主覆核）：右側為「第 n 步，共 N 步」＋一排分段方塊，兩者之間留
    10 px 間距；**不設關閉鈕**（取消已由底部按鈕承擔，故 `.vca-closebox` 之樣式與元素一併移除）。

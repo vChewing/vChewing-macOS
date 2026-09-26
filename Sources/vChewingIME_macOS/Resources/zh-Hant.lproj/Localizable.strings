@@ -346,8 +346,9 @@
 "i18n:TypingMode.i18nKey4InlineModeHint.asciiCpLk" = "Caps Lock 燈亮（英數可直接輸入）";
 "i18n:TypingMode.i18nKey4InlineModeHint.bopomofoKeyblock" = "注音打字模式";
 "i18n:TypingMode.i18nKey4InlineModeHint.cassette" = "磁帶模式";
-"i18n:TypingMode.i18nKey4InlineModeHint.pinyinFuriousTyping" = "狂拼模式";
+"i18n:TypingMode.i18nKey4InlineModeHint.pinyinFuriousTyping" = "拼音狂打";
 "i18n:TypingMode.i18nKey4InlineModeHint.pinyinKeyblock" = "拼音打字模式";
+"i18n:TypingMode.i18nKey4InlineModeHint.zhuyinFuriousTyping" = "注音狂打";
 "i18n:Uninstaller.failureGuidance" = "唯音在沙盒輸入法行程內無法自行將自身套件移到垃圾桶。您可以參閱 wiki 頁面的手動卸除說明。";
 "i18n:Uninstaller.openWikiPage" = "開啟卸除說明";
 "i18n:Uninstaller.Title" = "卸除輸入法";
@@ -441,8 +442,10 @@
 "i18n:UserDef.kForceCassetteChineseConversion.option.2" = "僅在簡體模式轉換至簡體";
 "i18n:UserDef.kForceCassetteChineseConversion.option.3" = "僅在繁體模式轉換至繁體";
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁簡轉換:";
-"i18n:UserDef.kFuriousTypingEnabled4Pinyin.description" = "本開關是為了方便習慣「智能狂拼（ChineseStar）」或「搜狗拼音（Sogou）」連續組句輸入的使用者。僅對拼音輸入（任一拼音排列）生效，對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續敲擊拼音字母即可組句，無需逐音節敲聲調或空格鍵確認。注拼槽內尚未完成的拼音會以語言模型試算整句、即時預覽於組字區，尾段候選窗亦同步顯示，可循「Shift+選字鍵」就地選字；預覽期間原始拼音改以提示框顯示（候選窗顯示時自動讓位、避免重疊）。狂拼預覽中按空格會將當前讀音插入組字器（不再兼任候選輪替）；注拼槽尚有未完成拼音時按 Enter 亦僅固化當前讀音（或就地確認高亮候選）並停留於組字狀態，待注拼槽清空後再按 Enter 才遞交整句。";
-"i18n:UserDef.kFuriousTypingEnabled4Pinyin.shortTitle" = "啟用狂拼模式（連續拼音打字）";
+"i18n:UserDef.kFuriousTypingEnabled4Pinyin.description" = "本開關是為了方便需要以不完整的讀音連續進行拼音打字的使用者。僅對拼音輸入（任一拼音排列）生效，對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續敲擊拼音字母即可組句，無需逐音節敲聲調或空格鍵確認。注拼槽內尚未完成的拼音會以語言模型試算整句、即時預覽於組字區，尾段候選窗亦同步顯示，可循「Shift+選字鍵」就地選字；預覽期間原始拼音改以提示框顯示（候選窗顯示時自動讓位、避免重疊）。拼音狂打預覽中按空格會將當前讀音插入組字器（不再兼任候選輪替）；注拼槽尚有未完成拼音時按 Enter 亦僅固化當前讀音（或就地確認高亮候選）並停留於組字狀態，待注拼槽清空後再按 Enter 才遞交整句。本模式會過濾掉原廠辭典內的注音文（注音符號字串）資料。";
+"i18n:UserDef.kFuriousTypingEnabled4Pinyin.shortTitle" = "啟用拼音狂打（連續拼音打字）";
+"i18n:UserDef.kFuriousTypingEnabled4Zhuyin.description" = "⚠︎ 該模式無法在中英混合輸入回退啟用時起作用。\n本開關是為了方便需要以不完整的讀音連續進行注音打字的使用者。僅對注音輸入（任一注音排列）生效，且與拼音側之「拼音狂打」各自獨立開關；對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續鍵入注音符號即可組句：每當當前音節已經打完、而下一鍵屬於新音節時，該音節會自動寫入組字器，無需逐音節敲聲調或空格鍵確認（空格在此模式下仍是陰平鍵；固化前方讀音另有 Tab、Enter 與標點三途）。只敲聲母亦可：連續的單一注音符號會被視為簡拼，候選窗即時列出整詞候選、長詞優先（例如 ㄍㄋㄋ 得「狗男女」），可循「Shift+選字鍵」就地選字；未完成之音節仍顯示於候選窗頂部。本模式會過濾掉原廠辭典內的注音文（注音符號字串）資料。";
+"i18n:UserDef.kFuriousTypingEnabled4Zhuyin.shortTitle" = "啟用注音狂打（連續注音打字）";
 "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "啟用半形標點";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
@@ -461,7 +464,7 @@
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "橫向多列選字窗最低單元寬度:";
 "i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.description" = "該選項決定中英混打模式如何判定「整段輸入是否為一個讀音」，需先啟用上方的「啟用中英混合輸入回退」才有作用；本選項預設啟用。\n- 啟用時：判準為「依槽序鍵入之原始按鍵序」。動態注音排列（大千26、倚天26、許氏、星光、劉氏等）之合法編碼本即跨鍵改寫槽值（如大千26 之 `qquu`＝ㄅㄚ），故委由注拼引擎判定該段是否為一個打得出來的讀音；靜態注音排列則維持「鍵數 == 佔用槽數」之計數式，其中冗餘鍵即「ASCII 前綴 ＋ 注音後綴」之分界。\n- 停用後（回到舊制之判定），後果有二：①純英文字母之短令牌（如 `ls`／`ln`／`lc`／`mv`）不再被視為英文意圖，而會重新被當作注音吸收（於空白鍵確認時組出該讀音之候選字，而非遞交 `ls `）。②動態注音排列不再委由引擎層判定——大千26 因碼長不定而不適用該檢定，故其合法多寫編碼不再被吸收為單一讀音（`qquu` 這類內容會留在 ASCII 緩衝、於按下空白鍵時以 `qquu ` 遞交）；其餘動態排列改以「鍵數 == 佔用槽數」判定（倚天26 之 `ge`＝ㄐㄧ 仍如常）。\n- 若您希望在中英混打時維持聲韻並擊等「不需要嚴格按照順序敲注音」的特性的話，請停用本選項；否則請維持啟用。";
 "i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.shortTitle" = "依槽序鍵入判定讀音";
-"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "該功能專為已適應某電腦廠牌輸入法打字體驗的使用者設計。該功能會優先將目前注音排列可覆蓋的 ASCII 按鍵暫時視為注音輸入；當整段序列不再構成可發音讀音時，再回退為原始 ASCII。若使用拼音輸入（也就是注音排列設為任一拼音排列）或磁帶模式，則該功能不可用。若已啟用該功能，您可能需要到辭典設定頁確認是否要篩除某些可能影響打字體驗的原廠辞典查詢結果。若有半形標點輸入需求，請開啟半形標點模式。";
+"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "該功能專為已適應某電腦廠牌輸入法打字體驗的使用者設計。該功能會優先將目前注音排列可覆蓋的 ASCII 按鍵暫時視為注音輸入；當整段序列不再構成可發音讀音時，再回退為原始 ASCII。若使用拼音輸入（也就是注音排列設為任一拼音排列）或磁帶模式，則該功能不可用。若已啟用該功能，您可能需要到辭典設定頁確認是否要篩除某些可能影響打字體驗的原廠辞典查詢結果。若有半形標點輸入需求，請開啟半形標點模式。另請注意：啟用本功能時，「注音狂打」模式會被視為關閉（該回退需逐鍵接管 ASCII 按鍵，兩者不可同時生效）。";
 "i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle" = "啟用中英混合輸入回退";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定數字小鍵盤的輸入行為。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始終以半形文字直接遞交";

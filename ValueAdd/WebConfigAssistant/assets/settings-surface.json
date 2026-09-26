@@ -5,7 +5,7 @@
     "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsCocoa"
   ],
   "scannedFileCount": 31,
-  "count": 107,
+  "count": 108,
   "keys": [
     "kAcceptLeadingIntonations",
     "kAllowRescoringSingleKanjiCandidates",
@@ -44,7 +44,8 @@
     "kFilterFactoryKanjisOfNonCurrentInputMode",
     "kFilterNonCNSReadingsForCHTInput",
     "kForceCassetteChineseConversion",
-    "kFuriousTypingEnabled",
+    "kFuriousTypingEnabled4Pinyin",
+    "kFuriousTypingEnabled4Zhuyin",
     "kHardenVerticalPunctuations",
     "kInlineDumpPinyinInLieuOfZhuyin",
     "kIsDebugModeEnabled",

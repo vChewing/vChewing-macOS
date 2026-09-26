@@ -10,6 +10,8 @@
   "UseHorizontalCandidateList": true,
   "CassetteEnabled": false,
   "MixedAlphanumericalEnabled": false,
+  "FuriousTypingEnabled4Pinyin": true,
+  "FuriousTypingEnabled4Zhuyin": false,
   "SuppressFactoryUnigramsOfKanaSyllables": false,
   "SpecifyIntonationKeyBehavior": 0,
   "UseSCPCTypingMode": false,

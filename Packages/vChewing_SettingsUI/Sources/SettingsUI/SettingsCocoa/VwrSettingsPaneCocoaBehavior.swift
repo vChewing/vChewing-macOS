@@ -207,8 +207,12 @@ extension SettingsPanesCocoa {
           )
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          // P253：同 SwiftUI 側——本 phase 只指向拼音側，注音側之第二列留待 P258。
+          // P258：同 SwiftUI 側——狂打開關兩分為拼音／注音兩鍵，兩列同置於一個 Section。
           UserDef.kFuriousTypingEnabled4Pinyin.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabBehavior
+          )
+          UserDef.kFuriousTypingEnabled4Zhuyin.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabBehavior
           )

@@ -258,6 +258,21 @@ namespace VCA {
   //      介面曝露面內；`kCassettePath`／`kBasicKeyboardLayout` 需使用者自備檔案或 TIS 識別碼，
   //      助手不以自由文字欄收之）。
 
+  /// **來源級否決**（P264）：少數鍵在特定來源下**一律停用**——不問打字方式。
+  ///
+  /// 為何需要它：本檔之一般推薦序為「打字方式 ＞ 來源」（見 `effectiveRecommended`），
+  /// 而「**全新使用者（`newbie`）現階段刻意停用狂打特性**」（事主 2026-09-26）是
+  /// 「來源 × **任何**打字方式」之合取條件——單靠 `typing`／`origin` 兩張表無從表達
+  ///（`kFuriousTypingEnabled4Pinyin` 之一般規則為「拼音方案刻意開啟」，而 newbie 須否決之）。
+  /// 值一律為 `false`：本表所列之鍵皆為 bool、且其否決之語義即「停用」。
+  /// **本表之鍵仍屬全集**（其一般規則已使其進入 `starterUniverse()`）⇒ 否決之效果是
+  /// 「指名為 false」而非「不予輸出」。
+  /// 註：鍵一律用 `UserDef` 之 **rawValue**（無 `k` 前綴）——本表以 `entry.rawValue` 查之。
+  export var ORIGIN_VETOED_KEYS: { [rawValue: string]: string[] } = {
+    "FuriousTypingEnabled4Pinyin": ["newbie"],
+    "FuriousTypingEnabled4Zhuyin": ["newbie"],
+  };
+
   function recommendationFor(key: string)
     : { value: PrefValue | null; typing: { [k: string]: PrefValue } | null; origin: { [k: string]: PrefValue } | null } {
     var none = { value: null, typing: null, origin: null };
@@ -287,6 +302,29 @@ namespace VCA {
           macoszhuyin: "123456", hanin: "123456", pinyin: "123456",
         },
       };
+    case "kFuriousTypingEnabled4Zhuyin":
+      // **事主 2026-09-26 裁定**：狂注模式（以不完整之讀音連續進行注音打字）**不是為桌面電腦
+      // 而設**之模式——其設計初衷為 iOS 等觸控裝置上之螢幕注音鍵盤 ⇒ **注音各方案一律刻意
+      // 關閉**之。
+      // 即便其值恰等於出廠預設（`false`），仍須**指名**寫入：此為本檔開頭「值等於出廠預設者
+      // 不收」（策展紀律 ①）之**經核定例外**。其效果有二：
+      //   · 該鍵因而進入 `starterUniverse()` ⇒ 任一份起始配置都會**明寫**此鍵；
+      //   · 於是匯入任何注音方案之配置時，使用者機器上可能已開啟之該模式會被**主動關閉**。
+      //   · `newbie`（全新使用者）另由 `ORIGIN_VETOED_KEYS` 否決——其打字方式即便為「還不確定」亦指名關閉（事主 2026-09-26）。
+      return {
+        value: null,
+        typing: { zhuyin: false, zhuyinmix: false, scpc: false },
+        origin: {
+          macoszhuyin: false, msnewphonetic: false, kimo: false, mcbpmf: false,
+          ov: false, goingime: false, hanin: false, asus: false,
+        },
+      };
+    case "kFuriousTypingEnabled4Pinyin":
+      // **事主 2026-09-26 裁定**：狂拼模式即光譜上之**桌面**連續拼音打字 ⇒ **拼音各方案一律
+      // 刻意開啟**之（其值恰等於出廠預設 `true`，仍指名寫入——同上之經核定例外）。
+      // 與注音側不同：本模式本就是為桌面而設，故並非「代為關閉」而是「代為確認開啟」。
+      // 例外：`newbie`（全新使用者）由 `ORIGIN_VETOED_KEYS` **否決**之——事主 2026-09-26「Newbie 來源現階段刻意停用該特性」（現階段＝日後可能再議）。
+      return { value: null, typing: { pinyin: true }, origin: { pinyin: true } };
     case "kUseHorizontalCandidateList":
       return { value: null, typing: { scpc: false }, origin: null };
     // 註：`kCandidateWindowShowOnlyOneLine`（僅以單行/單列來陳列候選字）**刻意不收**
@@ -518,7 +556,8 @@ namespace VCA {
       "kMixedAlphanumericalEnabled", "kEnableLatchedAlnumStateInMixedAlnumMode",
       "kMixedAlnumJudgeReadingsBySequentialRawKeyOrder",
       "kTogglingAlphanumericalModeWithLShift", "kTogglingAlphanumericalModeWithRShift",
-      "kFuriousTypingEnabled", "kShareAlphanumericalModeStatusAcrossClients",
+      "kFuriousTypingEnabled4Pinyin", "kFuriousTypingEnabled4Zhuyin",
+      "kShareAlphanumericalModeStatusAcrossClients",
     ])));
     seeds.push(seedOf("punctuation", "標", "manual/preferences.html", false, questionsForCase(table, [
       "kHardenVerticalPunctuations",
@@ -594,6 +633,11 @@ namespace VCA {
 
   /// 該題之有效推薦值（依 profile）。
   export function effectiveRecommended(question: Question, profile: Profile): PrefValue | null {
+    // 來源級否決優先於一切（P264：見 `ORIGIN_VETOED_KEYS` 之說明）。
+    if (question.entry) {
+      var vetoed = ORIGIN_VETOED_KEYS[question.entry.rawValue];
+      if (vetoed && vetoed.indexOf(profile.origin) >= 0) return false;
+    }
     if (question.recommendedByTyping &&
       typeof question.recommendedByTyping[profile.typing] !== "undefined") {
       return question.recommendedByTyping[profile.typing];

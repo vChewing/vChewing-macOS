@@ -1,5 +1,5 @@
 {
-  "count" : 118,
+  "count" : 119,
   "entries" : [
     {
       "default" : false,
@@ -1502,19 +1502,19 @@
       "key" : "kMixedAlphanumericalEnabled",
       "labels" : {
         "en" : {
-          "description" : "This feature is designed for users who are already accustomed to the typing experience offered by a certain Smart Input software from a PC vendor. It treats parser-covered ASCII keys as provisional phonetic input first, then falls back to raw ASCII when the sequence is no longer a pronounceable reading. This feature is unavailable in pinyin typing mode (that is, when the phonabet parser uses any pinyin layout) and in cassette mode. If this typing fallback is enabled, you may also want to check the Dictionary settings page to decide whether to filter out certain factory dictionary query results that could affect your typing experience. If you need half-width punctuation input, please toggle the Half-Width Phuctuation Mode to ON.",
+          "description" : "This feature is designed for users who are already accustomed to the typing experience offered by a certain Smart Input software from a PC vendor. It treats parser-covered ASCII keys as provisional phonetic input first, then falls back to raw ASCII when the sequence is no longer a pronounceable reading. This feature is unavailable in pinyin typing mode (that is, when the phonabet parser uses any pinyin layout) and in cassette mode. If this typing fallback is enabled, you may also want to check the Dictionary settings page to decide whether to filter out certain factory dictionary query results that could affect your typing experience. If you need half-width punctuation input, please toggle the Half-Width Phuctuation Mode to ON. Note that enabling this fallback makes the Furious Zhuyin mode count as off, since the two compete for the same ASCII keys.",
           "shortTitle" : "Enable mixed Chinese-English typing fallback"
         },
         "ja" : {
-          "description" : "この機能は、『とあるパソコン会社のインテリ入力』の入力体験に既に慣れているユーザーに向けて設計されています。この機能は現在の注音解析器で扱える ASCII キーは、まず暫定的な注音入力として扱います。入力列が発音可能な読みとして成立しなくなった時点で、raw ASCII にフォールバックします。弁音入力（つまり注音解析器を任意の弁音配列に設定した場合）とカセットモードでは、この機能は利用できません。この機能を有効にしている場合は、辞書設定ページで、入力体験に影響しうる一部の純正辞書の検索結果を除外するかどうかを確認しておくとよいでしょう。半角約物の入力が必要な場合は、半角句読モードをオンにしてください。",
+          "description" : "この機能は、『とあるパソコン会社のインテリ入力』の入力体験に既に慣れているユーザーに向けて設計されています。この機能は現在の注音解析器で扱える ASCII キーは、まず暫定的な注音入力として扱います。入力列が発音可能な読みとして成立しなくなった時点で、raw ASCII にフォールバックします。弁音入力（つまり注音解析器を任意の弁音配列に設定した場合）とカセットモードでは、この機能は利用できません。この機能を有効にしている場合は、辞書設定ページで、入力体験に影響しうる一部の純正辞書の検索結果を除外するかどうかを確認しておくとよいでしょう。半角約物の入力が必要な場合は、半角句読モードをオンにしてください。なお、本機能を有効にすると、「注音狂打ち」モードは無効（オフ）と見なされます（両者は同時に効きません）。",
           "shortTitle" : "中英混在入力のフォールバックを有効化"
         },
         "zh-Hans" : {
-          "description" : "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将当前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。",
+          "description" : "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将当前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。另请注意：启用本功能时，「注音狂打」模式会被视为关闭（该回退需逐键接管 ASCII 按键，两者不可同时生效）。",
           "shortTitle" : "启用中英混合输入回退"
         },
         "zh-Hant" : {
-          "description" : "該功能專為已適應某電腦廠牌輸入法打字體驗的使用者設計。該功能會優先將目前注音排列可覆蓋的 ASCII 按鍵暫時視為注音輸入；當整段序列不再構成可發音讀音時，再回退為原始 ASCII。若使用拼音輸入（也就是注音排列設為任一拼音排列）或磁帶模式，則該功能不可用。若已啟用該功能，您可能需要到辭典設定頁確認是否要篩除某些可能影響打字體驗的原廠辞典查詢結果。若有半形標點輸入需求，請開啟半形標點模式。",
+          "description" : "該功能專為已適應某電腦廠牌輸入法打字體驗的使用者設計。該功能會優先將目前注音排列可覆蓋的 ASCII 按鍵暫時視為注音輸入；當整段序列不再構成可發音讀音時，再回退為原始 ASCII。若使用拼音輸入（也就是注音排列設為任一拼音排列）或磁帶模式，則該功能不可用。若已啟用該功能，您可能需要到辭典設定頁確認是否要篩除某些可能影響打字體驗的原廠辞典查詢結果。若有半形標點輸入需求，請開啟半形標點模式。另請注意：啟用本功能時，「注音狂打」模式會被視為關閉（該回退需逐鍵接管 ASCII 按鍵，兩者不可同時生效）。",
           "shortTitle" : "啟用中英混合輸入回退"
         }
       },
@@ -1595,23 +1595,23 @@
       "default" : true,
       "defaultsType" : "bool",
       "exchangeBlacklisted" : false,
-      "key" : "kFuriousTypingEnabled",
+      "key" : "kFuriousTypingEnabled4Pinyin",
       "labels" : {
         "en" : {
-          "description" : "This mode accommodates users accustomed to the continuous sentence-composing style of Sogou Pinyin or ChineseStar's 智能狂拼 (Furious Pinyin). Only takes effect with pinyin keyboards (any pinyin layout); cassette mode, SCPC (select-candidate-per-character) mode, and the code-point \/ Hanin keyboard symbol \/ Roman-numeral input methods are excluded. When enabled, you can type pinyin continuously without confirming each syllable with a tone key or the space bar. Pending pinyin is assembled into a whole-sentence guess by the language model and previewed inline, with the tail candidate window shown alongside — press Shift + a selection key to choose in place; while previewing, the raw letters are shown in a tooltip (automatically suppressed while the candidate window is visible, to avoid overlap). During the furious preview, pressing the space bar inserts the current reading into the composing buffer (and no longer rotates candidates); while a reading is still pending, pressing Enter likewise only solidifies the current reading (or confirms the highlighted candidate) and stays in the composing state — press Enter again once the buffer is empty to commit the whole sentence.",
-          "shortTitle" : "Enable Furious Typing mode (continuous pinyin)"
+          "description" : "This mode accommodates users who want to type pinyin continuously from incomplete readings. Only takes effect with pinyin keyboards (any pinyin layout); cassette mode, SCPC (select-candidate-per-character) mode, and the code-point \/ Hanin keyboard symbol \/ Roman-numeral input methods are excluded. When enabled, you can type pinyin continuously without confirming each syllable with a tone key or the space bar. Pending pinyin is assembled into a whole-sentence guess by the language model and previewed inline, with the tail candidate window shown alongside -- press Shift + a selection key to choose in place; while previewing, the raw letters are shown in a tooltip (automatically suppressed while the candidate window is visible, to avoid overlap). During the Furious Pinyin preview, pressing the space bar inserts the current reading into the composing buffer (and no longer rotates candidates); while a reading is still pending, pressing Enter likewise only solidifies the current reading (or confirms the highlighted candidate) and stays in the composing state -- press Enter again once the buffer is empty to commit the whole sentence. This mode filters out the zhuyinwen (Zhuyin-symbol strings) entries in the factory dictionary.",
+          "shortTitle" : "Enable Furious Pinyin (continuous pinyin)"
         },
         "ja" : {
-          "description" : "この機能は「智能狂弁入力 & Sogou入力」のような連続組句入力に慣れたユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。狂拼プレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補のローテーションは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。",
-          "shortTitle" : "狂拼モードを有効化（連続弁音入力）"
+          "description" : "この機能は、不完全な読みのまま連続して弁音を入力したいユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。弁音狂打ちプレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補のローテーションは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。",
+          "shortTitle" : "弁音狂打ちを有効化（連続弁音入力）"
         },
         "zh-Hans" : {
-          "description" : "本开关是为了方便习惯「智能狂拼（ChineseStar）」或「搜狗拼音（Sogou）」连续组句输入的用户。仅对拼音输入（任一拼音排列）生效，对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续敲击拼音字母即可组句，无需逐音节敲声调或空格键确认。注拼槽内尚未完成的拼音会以语言模型试算整句、即时预览于组字区，尾段候选窗亦同步显示，可循「Shift+选字键」就地选字；预览期间原始拼音改以提示框显示（候选窗显示时自动让位、避免重叠）。狂拼预览中按空格会将当前读音插入组字器（不再兼任候选轮替）；注拼槽尚有未完成拼音时按 Enter 亦仅固化当前读音（或就地确认高亮候选）并停留于组字状态，待注拼槽清空后再按 Enter 才递交整句。",
-          "shortTitle" : "启用狂拼模式（连续拼音打字）"
+          "description" : "本开关是为了方便需要以不完整的读音连续进行拼音打字的使用者。仅对拼音输入（任一拼音排列）生效，对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续敲击拼音字母即可组句，无需逐音节敲声调或空格键确认。注拼槽内尚未完成的拼音会以语言模型试算整句、即时预览于组字区，尾段候选窗亦同步显示，可循「Shift+选字键」就地选字；预览期间原始拼音改以提示框显示（候选窗显示时自动让位、避免重叠）。拼音狂打预览中按空格会将当前读音插入组字器（不再兼任候选轮替）；注拼槽尚有未完成拼音时按 Enter 亦仅固化当前读音（或就地确认高亮候选）并停留于组字状态，待注拼槽清空后再按 Enter 才递交整句。本模式会过滤掉原厂辞典内的注音文（注音符号字串）数据。",
+          "shortTitle" : "启用拼音狂打（连续拼音打字）"
         },
         "zh-Hant" : {
-          "description" : "本開關是為了方便習慣「智能狂拼（ChineseStar）」或「搜狗拼音（Sogou）」連續組句輸入的使用者。僅對拼音輸入（任一拼音排列）生效，對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續敲擊拼音字母即可組句，無需逐音節敲聲調或空格鍵確認。注拼槽內尚未完成的拼音會以語言模型試算整句、即時預覽於組字區，尾段候選窗亦同步顯示，可循「Shift+選字鍵」就地選字；預覽期間原始拼音改以提示框顯示（候選窗顯示時自動讓位、避免重疊）。狂拼預覽中按空格會將當前讀音插入組字器（不再兼任候選輪替）；注拼槽尚有未完成拼音時按 Enter 亦僅固化當前讀音（或就地確認高亮候選）並停留於組字狀態，待注拼槽清空後再按 Enter 才遞交整句。",
-          "shortTitle" : "啟用狂拼模式（連續拼音打字）"
+          "description" : "本開關是為了方便需要以不完整的讀音連續進行拼音打字的使用者。僅對拼音輸入（任一拼音排列）生效，對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續敲擊拼音字母即可組句，無需逐音節敲聲調或空格鍵確認。注拼槽內尚未完成的拼音會以語言模型試算整句、即時預覽於組字區，尾段候選窗亦同步顯示，可循「Shift+選字鍵」就地選字；預覽期間原始拼音改以提示框顯示（候選窗顯示時自動讓位、避免重疊）。拼音狂打預覽中按空格會將當前讀音插入組字器（不再兼任候選輪替）；注拼槽尚有未完成拼音時按 Enter 亦僅固化當前讀音（或就地確認高亮候選）並停留於組字狀態，待注拼槽清空後再按 Enter 才遞交整句。本模式會過濾掉原廠辭典內的注音文（注音符號字串）資料。",
+          "shortTitle" : "啟用拼音狂打（連續拼音打字）"
         }
       },
       "metadataPending" : false,
@@ -1620,7 +1620,39 @@
       "options" : null,
       "optionsKind" : null,
       "range" : null,
-      "rawValue" : "FuriousTypingEnabled",
+      "rawValue" : "FuriousTypingEnabled4Pinyin",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kFuriousTypingEnabled4Zhuyin",
+      "labels" : {
+        "en" : {
+          "description" : "⚠︎ This mode cannot take effect while the mixed Chinese-English typing fallback is enabled.\nThis mode accommodates users who want to type Zhuyin continuously from incomplete readings. Only takes effect with Zhuyin keyboards (any Zhuyin layout), and it switches independently from the pinyin side's Furious Pinyin; cassette mode, SCPC (select-candidate-per-character) mode, and the code-point \/ Hanin keyboard symbol \/ Roman-numeral input methods are excluded. When enabled, you can type Zhuyin symbols continuously to compose sentences: whenever the current syllable is finished and the next key belongs to a new syllable, that syllable is written into the composing buffer automatically, with no need to confirm each syllable with a tone key or the space bar (space stays the level-tone key in this mode; Tab, Enter and punctuation are what solidify a pending reading). Single initials work too: a run of single Zhuyin symbols is treated as a shorthand, and the candidate window lists whole-word candidates for it, longest first (ㄍㄋㄋ gives 狗男女). Shift plus a selection key chooses in place, and the pending syllable stays visible at the top of the candidate window. This mode filters out the zhuyinwen (Zhuyin-symbol strings) entries in the factory dictionary.",
+          "shortTitle" : "Enable Furious Zhuyin (continuous zhuyin)"
+        },
+        "ja" : {
+          "description" : "⚠︎ 中英混在入力のフォールバックを有効にしている間、本モードは機能しません。\nこの機能は、不完全な読みのまま連続して注音を入力したいユーザーのために提供されています。注音入力（任意の注音配列）でのみ有効で、弁音側の「弁音狂打ち」とは独立して切り替えられます（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力には適用されません）。有効にすると、注音符号を連続して入力するだけで組句できます。現在の音節を入力し終えたところで次のキーが新しい音節に属する場合、その音節は自動的に組字器へ書き込まれ、音節ごとに声調キーやスペースキーで確定する必要はありません（スペースは本モードでも陰平キーです。前方の読みの確定には Tab／Enter／句読点が使えます）。声母だけの入力も可能です。連続した単一の注音符号は略打ちとして扱われ、候補ウィンドウに語の候補が即時表示されます（長い語が優先。例：ㄍㄋㄋ で「狗男女」）。Shift+選択キーでその場選択でき、未確定の音節は候補ウィンドウの上部に表示されます。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。",
+          "shortTitle" : "注音狂打ちを有効化（連続注音入力）"
+        },
+        "zh-Hans" : {
+          "description" : "⚠︎ 该模式无法在中英混合输入回退启用时起作用。\n本开关是为了方便需要以不完整的读音连续进行注音打字的使用者。仅对注音输入（任一注音排列）生效，且与拼音侧之「拼音狂打」各自独立开关；对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续键入注音符号即可组句：每当当前音节已经打完、而下一键属于新音节时，该音节会自动写入组字器，无需逐音节敲声调或空格键确认（空格在此模式下仍是阴平键；固化前方读音另有 Tab、Enter 与标点三途）。只敲声母亦可：连续的单一注音符号会被视为简拼，候选窗即时列出整词候选、长词优先（例如 ㄍㄋㄋ 得「狗男女」），可循「Shift+选字键」就地选字；未完成之音节仍显示于候选窗顶部。本模式会过滤掉原厂辞典内的注音文（注音符号字串）数据。",
+          "shortTitle" : "启用注音狂打（连续注音打字）"
+        },
+        "zh-Hant" : {
+          "description" : "⚠︎ 該模式無法在中英混合輸入回退啟用時起作用。\n本開關是為了方便需要以不完整的讀音連續進行注音打字的使用者。僅對注音輸入（任一注音排列）生效，且與拼音側之「拼音狂打」各自獨立開關；對磁帶、逐字選字（SCPC）、內碼、漢音鍵盤符號與羅馬數字等輸入方法不適用。啟用後，連續鍵入注音符號即可組句：每當當前音節已經打完、而下一鍵屬於新音節時，該音節會自動寫入組字器，無需逐音節敲聲調或空格鍵確認（空格在此模式下仍是陰平鍵；固化前方讀音另有 Tab、Enter 與標點三途）。只敲聲母亦可：連續的單一注音符號會被視為簡拼，候選窗即時列出整詞候選、長詞優先（例如 ㄍㄋㄋ 得「狗男女」），可循「Shift+選字鍵」就地選字；未完成之音節仍顯示於候選窗頂部。本模式會過濾掉原廠辭典內的注音文（注音符號字串）資料。",
+          "shortTitle" : "啟用注音狂打（連續注音打字）"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "FuriousTypingEnabled4Zhuyin",
       "type" : "bool"
     },
     {

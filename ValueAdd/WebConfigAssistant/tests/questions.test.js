@@ -651,3 +651,79 @@ test('schema：系統版本碼之解析（整數編碼，避免 10.9 ＞ 10.15 �
   // 關鍵不變式：Catalina 不該被當成比 Mavericks 還舊。
   assert.ok(VCA.osVersionCodeFromDouble(10.15) > VCA.osVersionCodeFromDouble(10.9));
 });
+
+test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉狂注、拼音各方案刻意開啟狂拼', function () {
+  const { VCA } = loadCore();
+  const KEY_ZHUYIN = 'FuriousTypingEnabled4Zhuyin';
+  const KEY_PINYIN = 'FuriousTypingEnabled4Pinyin';
+  const ZHUYIN_TYPINGS = ['zhuyin', 'zhuyinmix', 'scpc'];
+  const ZHUYIN_ORIGINS = ['macoszhuyin', 'msnewphonetic', 'kimo', 'mcbpmf', 'ov', 'goingime', 'hanin', 'asus'];
+
+  // 兩鍵皆須在全集內——否則起始配置**根本不寫它們**，使用者機器上既有的值會殘留。
+  const universe = VCA.starterUniverse(2700).map(function (q) { return q.entry.rawValue; });
+  assert.ok(universe.indexOf(KEY_ZHUYIN) >= 0, '狂注開關不在起始配置之全集內');
+  assert.ok(universe.indexOf(KEY_PINYIN) >= 0, '狂拼開關不在起始配置之全集內');
+
+  // 注音各方案（三種打字方式 × 全部來源）：狂注開關須**指名**為 false（值等於出廠預設亦須指名）。
+  for (const typing of ZHUYIN_TYPINGS) {
+    for (const origin of ALL_ORIGIN) {
+      const starter = VCA.starterFor({ origin: origin, typing: typing }, 2700);
+      const label = origin + '/' + typing;
+      assert.ok(starter.namedKeys.indexOf(KEY_ZHUYIN) >= 0, label + '：狂注開關未被指名');
+      assert.strictEqual(starter.values[KEY_ZHUYIN], false, label + '：狂注開關之值非 false');
+    }
+  }
+
+  // 拼音方案（`newbie` 以外之全部來源）：狂拼開關須指名為 true。
+  // `newbie` 為經核定之例外——見下段（來源級否決）。
+  for (const origin of ALL_ORIGIN) {
+    if (origin === 'newbie') continue;
+    const starter = VCA.starterFor({ origin: origin, typing: 'pinyin' }, 2700);
+    assert.ok(starter.namedKeys.indexOf(KEY_PINYIN) >= 0, origin + '/pinyin：狂拼開關未被指名');
+    assert.strictEqual(starter.values[KEY_PINYIN], true, origin + '/pinyin：狂拼開關之值非 true');
+    // 拼音方案之狂注開關：**值恆為 false**（出廠預設）——或由來源級之推薦值指名關閉
+    //（如「狂拼流」以外之注音系來源而打字方式為拼音者），或落於「回歸」段；
+    // 二者之值相同，故僅斷言值、不限定其段。
+    assert.strictEqual(starter.values[KEY_ZHUYIN], false, origin + '/pinyin：狂注開關之值非 false');
+  }
+
+  // 打字方式「還不確定」時，仍以來源判其派別：注音系來源須指名關閉、狂拼流來源須指名開啟。
+  for (const origin of ZHUYIN_ORIGINS) {
+    const starter = VCA.starterFor({ origin: origin, typing: 'unsure' }, 2700);
+    assert.ok(starter.namedKeys.indexOf(KEY_ZHUYIN) >= 0, origin + '/unsure：狂注開關未被指名');
+    assert.strictEqual(starter.values[KEY_ZHUYIN], false);
+  }
+  const pinyinUnsure = VCA.starterFor({ origin: 'pinyin', typing: 'unsure' }, 2700);
+  assert.ok(pinyinUnsure.namedKeys.indexOf(KEY_PINYIN) >= 0, 'pinyin/unsure：狂拼開關未被指名');
+  assert.strictEqual(pinyinUnsure.values[KEY_PINYIN], true);
+});
+
+test('題庫：全新使用者（newbie）現階段刻意停用狂打特性——兩鍵皆指名關閉', function () {
+  const { VCA } = loadCore();
+  const KEYS = ['FuriousTypingEnabled4Pinyin', 'FuriousTypingEnabled4Zhuyin'];
+  const NEWBIE_TYPINGS = ['zhuyin', 'zhuyinmix', 'scpc', 'pinyin', 'cin', 'unsure'];
+
+  // 來源級否決優先於打字方式級之一般規則：故 newbie ＋ 任何打字方式皆停用（含 pinyin）。
+  for (const typing of NEWBIE_TYPINGS) {
+    const starter = VCA.starterFor({ origin: 'newbie', typing: typing }, 2700);
+    for (const key of KEYS) {
+      assert.ok(starter.namedKeys.indexOf(key) >= 0,
+        'newbie/' + typing + '：' + key + ' 未被指名');
+      assert.strictEqual(starter.values[key], false,
+        'newbie/' + typing + '：' + key + ' 之值非 false');
+    }
+  }
+
+  // 對照組：同一打字方式下、非 newbie 之來源不受否決（拼音方案仍刻意開啟狂拼）。
+  const kimo = VCA.starterFor({ origin: 'kimo', typing: 'pinyin' }, 2700);
+  assert.strictEqual(kimo.values['FuriousTypingEnabled4Pinyin'], true);
+  assert.strictEqual(kimo.namedKeys.indexOf('FuriousTypingEnabled4Pinyin') >= 0, true);
+
+  // 否決之鍵仍屬全集（否決＝指名為 false，而非不予輸出）。
+  const universe = VCA.starterUniverse(2700).map(function (q) { return q.entry.rawValue; });
+  for (const key of KEYS) assert.ok(universe.indexOf(key) >= 0, key + ' 不在全集內');
+
+  // 否決表所載之鍵須存在於後設資料（防手抄漂移）。
+  const vetoed = Object.keys(VCA.ORIGIN_VETOED_KEYS);
+  for (const key of vetoed) assert.ok(VCA.entryByRawValue(key), '否決表之鍵不存在：' + key);
+});

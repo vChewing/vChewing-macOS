@@ -102,9 +102,10 @@
         }
 
         Section {
-          // P253：`UserDef` 之狂打開關已兩分為拼音／注音兩鍵。本 phase 只把既有之單一列
-          // 指向拼音側（維持使用者可見行為不變）；注音側之第二列與文案留待 P258 一併加入。
+          // P258：狂打開關自 P253 起兩分為拼音／注音兩鍵，兩列同置於一個 Section
+          // （拼音在上、注音在下）。二者係**並行**選項、非從屬關係，故不做 UI 層之連動停用。
           UserDef.kFuriousTypingEnabled4Pinyin.renderUI()
+          UserDef.kFuriousTypingEnabled4Zhuyin.renderUI()
         }
 
         // Phase 248：以下三段係自「一般設定」遷入者，各為獨立之 Section（事主明示）。

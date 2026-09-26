@@ -25,7 +25,7 @@ const PARSER_LABEL_KEYS = [
 test('後設資料：基本不變式', function () {
   const { metadata } = loadCore();
   assert.strictEqual(metadata.schemaVersion, 1);
-  assert.strictEqual(metadata.count, 118);
+  assert.strictEqual(metadata.count, 119);
   assert.strictEqual(metadata.count, metadata.entries.length);
   assert.deepStrictEqual(metadata.locales, ['zh-Hant', 'zh-Hans', 'en', 'ja']);
   assert.deepStrictEqual(metadata.missingI18nKeys, []);
@@ -143,5 +143,51 @@ test('後設資料：入庫版與內嵌版一致（同一份導出）', function
     assert.strictEqual(asset.entries[i].key, metadata.entries[i].key);
     assert.strictEqual(asset.entries[i].rawValue, metadata.entries[i].rawValue);
     assert.strictEqual(asset.entries[i].type, metadata.entries[i].type);
+  }
+});
+
+test('後設資料：文案之術語統一——已停用之舊稱謂不得再出現（事主 2026-09-26 裁定）', function () {
+  const { metadata } = loadCore();
+  // 舊稱謂：狂拼（→拼音狂打）／狂注（→注音狂打）及其 ja／en 對位。**本清單即該裁定之固化物。**
+  const RETIRED = ['狂拼', '狂注', '狂拼モード', '狂注モード', 'Furious Typing', 'Furious Zhuyin Typing'];
+  const text = JSON.stringify(metadata);
+  for (const term of RETIRED) {
+    assert.strictEqual(text.indexOf(term), -1, '後設資料之文案仍含已停用之稱謂：' + term);
+  }
+  // 新稱謂須確實在位（兩鍵之四語系標題）。
+  const EXPECTED = [
+    ['kFuriousTypingEnabled4Pinyin', { 'zh-Hant': '拼音狂打', 'zh-Hans': '拼音狂打', ja: '弁音狂打ち', en: 'Furious Pinyin' }],
+    ['kFuriousTypingEnabled4Zhuyin', { 'zh-Hant': '注音狂打', 'zh-Hans': '注音狂打', ja: '注音狂打ち', en: 'Furious Zhuyin' }],
+  ];
+  for (const pair of EXPECTED) {
+    const key = pair[0];
+    const expected = pair[1];
+    const entry = metadata.entries.filter(function (e) { return e.key === key; })[0];
+    assert.ok(entry, '找不到條目：' + key);
+    for (const loc of Object.keys(expected)) {
+      const title = entry.labels[loc].shortTitle;
+      assert.ok(title.indexOf(expected[loc]) >= 0,
+        key + '/' + loc + ' 之標題未含新稱謂（' + expected[loc] + '）：' + title);
+    }
+  }
+});
+
+test('後設資料：注音狂打之警示須置於 description 之首（事主 2026-09-26 裁定）', function () {
+  const { metadata } = loadCore();
+  // 事主原文：「kFuriousTypingEnabled4Zhuyin 的 description 得在最開頭就顯示
+  // 「⚠︎ 該模式無法在中英文輸入回退模式啟用時起作用。\n」，因為插在其他位置的話不醒目。」
+  // 本靶即「醒目性」之固化物：只驗「在不在」不足以守住該裁定——**位置**才是重點。
+  const MARK = '\u26a0\ufe0e';
+  const entry = metadata.entries.filter(function (e) {
+    return e.key === 'kFuriousTypingEnabled4Zhuyin';
+  })[0];
+  assert.ok(entry, '找不到條目：kFuriousTypingEnabled4Zhuyin');
+  for (const loc of ['zh-Hant', 'zh-Hans', 'ja', 'en']) {
+    const desc = entry.labels[loc].description;
+    assert.ok(desc, loc + ' 之 description 為空');
+    assert.ok(desc.indexOf(MARK) === 0,
+      loc + ' 之 description 未以警示符開頭（首 20 字：' + desc.slice(0, 20) + '）');
+    assert.ok(desc.indexOf('\n') > 0,
+      loc + ' 之警示行未與內文分行（缺少換行）');
   }
 });
