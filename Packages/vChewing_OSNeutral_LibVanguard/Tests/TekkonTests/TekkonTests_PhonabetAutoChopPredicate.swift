@@ -6,8 +6,8 @@
 //
 // 本檔之前身是 `Tests/TekkonTests/TekkonTests_AutoChopPredicate.swift`（P251 之術前驗證靶）——
 // 當時判準尚未落地，故該檔自帶一份「測試端參考實作」與四個版本之對照。判準已於 P255 移入生產碼
-// （`Tekkon.Composer.shouldAutoChopZhuyin(byTyping:)`，實作現住
-// `Sources/LibVanguard/Typewriter/Typewriter_ZhuyinFuriousAutoChop.swift`），故**參考實作已刪**，改由本檔直接
+// （`Tekkon.Composer.shouldAutoChopPhonabets(byTyping:)`，自 P261 起實作與本靶同住 `Tekkon`），
+// 故**參考實作已刪**，改由本檔直接
 // 驅動生產實作，杜絕「兩份各自演化之判準」。
 //
 // 四項地面真相（與 P251 之結論逐項對應）：
@@ -22,8 +22,6 @@
 import Foundation
 import Tekkon
 import Testing
-
-@testable import LibVanguard
 
 // MARK: - AutoChopCorpus
 
@@ -51,9 +49,8 @@ enum AutoChopCorpus {
   /// 自素材檔解析 `testTable4DynamicLayouts` 之內容。
   static let rows: [Row] = {
     let assetURL = URL(fileURLWithPath: #filePath)
-      .deletingLastPathComponent() // …/Tests/LibVanguardTests
-      .deletingLastPathComponent() // …/Tests
-      .appendingPathComponent("TekkonTests/TestAssets_Tekkon/Tekkon_TestData.swift")
+      .deletingLastPathComponent() // …/Tests/TekkonTests
+      .appendingPathComponent("TestAssets_Tekkon/Tekkon_TestData.swift")
     guard let data = try? Data(contentsOf: assetURL),
           let text = String(data: data, encoding: String.Encoding.utf8) else { return [] }
     let lines = text.components(separatedBy: "\n")
@@ -94,17 +91,17 @@ enum AutoChopCorpus {
     Array("0123456789abcdefghijklmnopqrstuvwxyz;,./-=[]\\'` ")
 }
 
-// MARK: - ZhuyinAutoChopPredicateTests
+// MARK: - PhonabetAutoChopPredicateTests
 
-@Suite("注音狂打之自動切音節判準（生產實作之回歸靶）", .serialized)
-struct ZhuyinAutoChopPredicateTests {
+@Suite("自動切音節判準（生產實作之回歸靶）", .serialized)
+struct PhonabetAutoChopPredicateTests {
   // MARK: Internal
 
   /// ① 合法單音節編碼之每一個中途前綴皆不得觸發切音節。
   ///
   /// 覆蓋 **11 個排列**：5 個動態排列用素材之 1485 列編碼；6 個靜態排列用其鍵表反推全部前綴。
   @Test("判準不得在單一音節內誤切")
-  func zhuyinAutoChopNeverFiresWithinASyllable() {
+  func phonabetAutoChopNeverFiresWithinASyllable() {
     #expect(!AutoChopCorpus.rows.isEmpty, "語料解析失敗——素材檔路徑或格式已變")
     var offenders: [String] = []
     var steps = 0
@@ -116,7 +113,7 @@ struct ZhuyinAutoChopPredicateTests {
         var composer = Tekkon.Composer(arrange: layout.parser)
         for (step, key) in cell.enumerated() {
           steps += 1
-          if composer.shouldAutoChopZhuyin(byTyping: key) {
+          if composer.shouldAutoChopPhonabets(byTyping: key) {
             offenders.append("\(layout.name)/\(row.reading)/拍\(step)/鍵`\(key)`")
           }
           composer.receiveKey(fromScalar: key.unicodeScalars.first)
@@ -141,7 +138,7 @@ struct ZhuyinAutoChopPredicateTests {
         var composer = Tekkon.Composer(arrange: layout.parser)
         for (step, key) in keys.enumerated() {
           steps += 1
-          if composer.shouldAutoChopZhuyin(byTyping: key) {
+          if composer.shouldAutoChopPhonabets(byTyping: key) {
             offenders.append("\(layout.name)/\(reading)/拍\(step)/鍵`\(key)`")
           }
           composer.receiveKey(fromScalar: key.unicodeScalars.first)
@@ -156,7 +153,7 @@ struct ZhuyinAutoChopPredicateTests {
   /// ② 音節交界處必須切。地面真相：A ＝ 一完整合法讀音；本鍵若**不能**把 A 延伸成更長之
   /// 合法前綴，則 A 須先固化 ⇒ 必切。
   @Test("判準須在音節交界處切分")
-  func zhuyinAutoChopFiresAtJunctions() {
+  func phonabetAutoChopFiresAtJunctions() {
     let index = Tekkon.SyllableIndex.shared(parser: .ofDachen)
     var checked = 0
     var missed = 0
@@ -184,7 +181,7 @@ struct ZhuyinAutoChopPredicateTests {
           let greedy = index.isPrefix(postContent) && postContent.count > preContent.count
           guard !greedy else { continue }
           checked += 1
-          if !composer.shouldAutoChopZhuyin(byTyping: key) {
+          if !composer.shouldAutoChopPhonabets(byTyping: key) {
             missed += 1
             if sample.count < 5 { sample.append("\(layout.name)/\(preContent)+`\(key)`") }
           }
@@ -214,7 +211,7 @@ struct ZhuyinAutoChopPredicateTests {
     var composer = Tekkon.Composer(arrange: .ofDachen26)
     var verdicts: [Bool] = []
     for key in "qquu" {
-      verdicts.append(composer.shouldAutoChopZhuyin(byTyping: key))
+      verdicts.append(composer.shouldAutoChopPhonabets(byTyping: key))
       composer.receiveKey(fromScalar: key.unicodeScalars.first)
     }
     #expect(verdicts == [false, false, false, false], "實得：\(verdicts)")
@@ -228,7 +225,7 @@ struct ZhuyinAutoChopPredicateTests {
     var composer = Tekkon.Composer(arrange: parser)
     var committed: [String] = []
     for key in keys {
-      let chopped = composer.shouldAutoChopZhuyin(byTyping: key)
+      let chopped = composer.shouldAutoChopPhonabets(byTyping: key)
       if chopped, let reading = composer.phonabetKeyForQuery(pronounceableOnly: true) {
         committed.append(reading)
         composer.clear()
