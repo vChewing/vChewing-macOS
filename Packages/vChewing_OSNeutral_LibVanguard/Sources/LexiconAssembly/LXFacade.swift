@@ -1174,10 +1174,22 @@ extension LXAssembly {
     /// 狂拼整詞簡拼查詢（R2-α）。
     ///
     /// 給定「每位置的 & 連接前綴候選」（如 `["ㄧ&ㄩ","ㄕ&ㄙ","ㄒ","ㄅ"]`），
-    /// 回傳可能的整詞候選。候選分區：置頂整詞猜測（factory 命中詞之首）→ 其餘
+    /// 回傳可能的整詞候選——**候選段數不得多於格數**（見下）。
+    /// 候選分區：置頂整詞猜測（factory 命中詞之首）→ 其餘
     /// factory「&」命中詞（逐位置 byte 前綴、恆為 partial 語義、與 `partialMatchEnabled`
     /// 偏好無關）→ user-phrase 命中詞（多位置前綴交集掃描、有界）。各分區依分數降冪、
-    /// 依詞值去重（保留先出現者＝factory 優先）。
+    /// 依詞值去重（保留先出現者＝factory 優先），長於格數者一律剔除。
+    ///
+    /// - Important: **「不得長於格數」即本查詢之上界**。原廠側本即等段
+    ///   （`getEntryGroups(keysChopped:…)` 內定 `longerSegment: false` ⇒ 節點讀音段數
+    ///   須與查詢格數相等）；使用者片語側所走的多位置前綴掃描則是通用前綴 API、**刻意
+    ///   忽略多出的段**（`lxCoreEX.keyMatchesCells`；其兄弟 `keys(matchingPrefix:)`
+    ///   同此語義）。故若不在此收斂，「兩格」之查詢會撈回三音節之詞（實錄：使用者片語
+    ///   「科技獎」ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ 會被「ㄎㄐ」／`kj` 撈出），而消費者（狂打 copilot 窗
+    ///   之簡拼整詞候選）會把使用者從未敲下之音節一併寫進組字器。
+    ///   收斂為**上界**而非等段：短於格數者不在本查詢之拒絕範圍內（今日之兩分區掃描皆要求
+    ///   覆蓋全部格，故實際輸出恆等段；「不短於格數」之要求由需要整詞完全匹配之消費端
+    ///   自行把守，見 `autoApplyFuriousAbbreviationIfClearWinner`）。
     func abbreviatedWordCandidates(keysChopped: [String]) -> [Homa.Gram] {
       guard !keysChopped.isEmpty, keysChopped.allSatisfy({ !$0.isEmpty }) else { return [] }
       var factoryGrams: [Homa.Gram] = []
@@ -1201,11 +1213,13 @@ extension LXAssembly {
           )
         }
       }
-      // 依詞值去重（保留先出現者＝factory 優先）、各分區依分數降冪排序。
+      // 依詞值去重（保留先出現者＝factory 優先）、各分區依分數降冪排序；
+      // 長於格數者剔除——多出的段即使用者從未敲下之音節（見本函式之文件）。
       var seenValues = Set<String>()
       var result: [Homa.Gram] = []
       for gram in factoryGrams.sorted(by: { $0.probability > $1.probability }) + userGrams
         .sorted(by: { $0.probability > $1.probability }) {
+        guard gram.keyArray.count <= keysChopped.count else { continue }
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
         result.append(gram)

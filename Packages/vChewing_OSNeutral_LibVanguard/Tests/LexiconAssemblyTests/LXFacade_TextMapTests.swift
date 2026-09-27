@@ -804,6 +804,61 @@ struct LXFacadeTextMapTests {
     #expect(firstYeShou < firstYaoShu)
   }
 
+  /// 整詞簡拼查詢之界線：**候選段數不得多於格數**（上界；每格對應詞內一個位置）。
+  ///
+  /// 原廠辭典側本即等段匹配（trie 之 `longerSegment: false`）；使用者片語側所走的多位置
+  /// 前綴掃描則是通用前綴 API、刻意忽略多出的段 ⇒ 若不在查詢端收斂，兩格之查詢會撈回
+  /// 三音節之使用者造詞（狂打 copilot 窗因而顯示／寫入使用者從未敲下之音節）。
+  /// 本靶以同一組讀音同時釘住兩分區、逐格數驗上界（2 格／3 格）。
+  /// 另釘「短於格數者亦不命中」——該側不是本查詢所收斂者，而是兩分區掃描自身之
+  /// 「覆蓋全部格」要求；它為下游套用路徑之前提（候選之讀音須覆蓋使用者所敲之格）。
+  @Test
+  func testAbbreviatedWordCandidatesRespectCellCountUpperBound() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = LXAssembly.LXFacade(isCHS: true)
+    let textMap = makeTextMap([
+      ("ㄎㄜ-ㄐㄧˋ", [("科技", -3.0, 5)]),
+      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ", [("科技江", -3.5, 5)]),
+      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ-ㄈㄨˊ", [("科技江福", -3.8, 5)]),
+    ])
+
+    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    instance.setOptions { config in
+      config.bypassUserPhrasesData = false
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.isCNSEnabled = false
+      config.filterNonCNSReadings = false
+      config.partialMatchEnabled = false // 整詞簡拼查詢恆為 partial 語義、與此偏好無關。
+    }
+    // 使用者造詞（reverse: true 格式「詞語 讀音 分數」）：兩分區各取不同詞值，
+    // 俾「誰命中、誰未命中」不被去重遮蔽。
+    instance.injectTestData(
+      userPhrases: { $0.replaceData(textData: "科技獎 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ -6\n科記 ㄎㄜ-ㄐㄧˋ -6.5\n") }
+    )
+
+    // 兩格：兩音節者（原廠 ＋ 使用者片語）命中；三音節以上者（長於格數）皆不得命中。
+    let twoCellValues = instance.lxQuerier
+      .abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ"]).map(\.current)
+    #expect(twoCellValues.contains("科技"), "實得：\(twoCellValues)")
+    #expect(twoCellValues.contains("科記"), "實得：\(twoCellValues)")
+    #expect(!twoCellValues.contains("科技獎"), "實得：\(twoCellValues)")
+    #expect(!twoCellValues.contains("科技江"), "實得：\(twoCellValues)")
+    #expect(!twoCellValues.contains("科技江福"), "實得：\(twoCellValues)")
+
+    // 三格：三音節者命中（四音節者仍不得命中）；兩音節者（短於格數）亦不命中。
+    let threeCellValues = instance.lxQuerier
+      .abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ", "ㄐ"]).map(\.current)
+    #expect(threeCellValues.contains("科技獎"), "實得：\(threeCellValues)")
+    #expect(threeCellValues.contains("科技江"), "實得：\(threeCellValues)")
+    #expect(!threeCellValues.contains("科技江福"), "實得：\(threeCellValues)")
+    #expect(!threeCellValues.contains("科技"), "實得：\(threeCellValues)")
+    #expect(!threeCellValues.contains("科記"), "實得：\(threeCellValues)")
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable, Hashable {

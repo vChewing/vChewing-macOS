@@ -381,6 +381,132 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.composer.isEmpty)
   }
 
+  /// 簡拼整詞候選**不得長於**當前 furious reading 所配對之格數（上界；P262）。
+  ///
+  /// 事主 2026-09-28 之實機：使用者語彙資料內有「科技獎 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ」時，
+  /// 注音狂打之 `ㄎㄐ`（大千 `dr`）與拼音狂打之 `kj` 皆為**兩格**，而 copilot 窗會出現
+  /// **三音節**之「科技獎」——注音側居首（排序鍵為段數降冪）、拼音側居末（α 路徑照
+  /// 語言模組序）。根因在使用者片語側之多位置前綴掃描忽略多出的段：簡拼查詢之兩分區
+  /// 本應受同一上界約束（原廠側之 trie 查詢恆為等段）。
+  ///
+  /// 本靶四臂：兩模式 × （兩格＝不得出現／三格＝須出現），並以就地選字證明三格者確實
+  /// 可套用（兩格情境下若仍顯示，選中即會寫入使用者從未敲下之音節）。
+  @Test("[IH169] 狂打：簡拼整詞候選之等段界線（注音／拼音兩側）")
+  func test_IH169_AbbreviationCandidatesStayWithinPairedSegmentCount() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    // 三音節者（＝事主所見之洩漏源）＋兩音節者（等段之正對照）＋近分競爭者
+    // （後者令拼音側之 α 自動套用因「非明確勝出」而不觸發，窗與注拼槽得以留存）。
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎", score: -6.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤ"], value: "科技江", score: -6.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+
+    // ① 注音狂打 `ㄎㄐ`（兩格）：兩音節者入窗、三音節者不得入窗。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("dr")
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄎ", "ㄐ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+    var values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科記"), "實得：\(values)")
+    #expect(!values.contains("科技獎"), "實得：\(values)")
+
+    // ② 注音狂打 `ㄎㄐㄐ`（三格）：三音節者入窗、兩音節者退場；就地選字三段讀音一次就位。
+    typeSentence("r")
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄎ", "ㄐ", "ㄐ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+    values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科技獎"), "實得：\(values)")
+    #expect(!values.contains("科記"), "實得：\(values)")
+    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "科技獎" }) else {
+      Issue.record("簡拼候選「科技獎」未入 copilot 窗：\(values)")
+      return
+    }
+    testSession.candidatePairSelectionConfirmed(at: index)
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "科技獎", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.isEmpty)
+
+    // ③ 拼音狂打 `kj`（兩格）：同上之界線（α 路徑之窗）。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("kj")
+    #expect(
+      testHandler.furiousAbbreviatedCells == ["ㄎ", "ㄐ"],
+      "實得：\(testHandler.furiousAbbreviatedCells ?? [])"
+    )
+    values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科記"), "實得：\(values)")
+    #expect(!values.contains("科技獎"), "實得：\(values)")
+
+    // ④ 拼音狂打 `kjj`（三格）：三音節者入窗（近分競爭者使之不觸發 α 自動套用）。
+    typeSentence("j")
+    #expect(
+      testHandler.furiousAbbreviatedCells == ["ㄎ", "ㄐ", "ㄐ"],
+      "實得：\(testHandler.furiousAbbreviatedCells ?? [])"
+    )
+    values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科技獎"), "實得：\(values)")
+    #expect(!values.contains("科記"), "實得：\(values)")
+  }
+
+  /// 簡拼整詞候選之順序與拼音 α 窗一致（事主 2026-09-28 之校正）。
+  ///
+  /// 窗內同段數時：**語境候選**（由已提交鍵／待確認音節推得者）先於**簡拼整詞候選**；
+  /// 簡拼整詞候選為一個區塊、其內依**語言模組自身之順序**（原廠命中先、其後使用者片語
+  /// 命中——即拼音 α 窗所見者），不再按查詢分數跨分區交錯。本靶以同一組語料驅動兩模式、
+  /// 比對共同候選之相對順序；拼音側（α 路徑＝單一來源）即該順序之基準。
+  @Test("[IH170] 狂打：簡拼整詞候選之順序與拼音 α 窗一致")
+  func test_IH170_AbbreviationCandidateOrderMatchesPinyinAlphaWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    // 兩音節之使用者片語（與測試辭典內之原廠命中「科技」「科際」同讀音）＋三音節者。
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎", score: -6.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤ"], value: "科技江", score: -6.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+
+    // ① 拼音狂打 `kj`（α 路徑）：原廠命中先、使用者片語命中後。
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("kj")
+    let pinyinValues = testSession.state.candidates.map(\.value)
+    #expect(pinyinValues == ["科技", "科際", "科記"], "實得：\(pinyinValues)")
+
+    // ② 注音狂打 `ㄎㄐ`：共同候選之相對順序須與拼音側逐項相同；待確認音節之讀音原字串
+    //    回退值（桶釘候選）仍沉於同段數之真詞之後（P261 之裁定不變）。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("dr")
+    let zhuyinValues = testSession.state.candidates.map(\.value)
+    #expect(zhuyinValues == ["科技", "科際", "科記", "ㄐ"], "實得：\(zhuyinValues)")
+    let pinyinSet = Set(pinyinValues)
+    let commonInZhuyin = zhuyinValues.filter { pinyinSet.contains($0) }
+    #expect(commonInZhuyin == pinyinValues, "注音：\(commonInZhuyin)；拼音：\(pinyinValues)")
+  }
+
   // MARK: - 中英混合輸入回退對注音狂打之否決（P265）
 
   /// 「中英混合輸入回退」一旦啟用，注音狂打即**一律被視為關閉**（即便其開關仍為真）。

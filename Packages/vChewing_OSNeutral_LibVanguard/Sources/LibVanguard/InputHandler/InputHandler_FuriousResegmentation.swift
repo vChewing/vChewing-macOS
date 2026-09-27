@@ -206,8 +206,9 @@ extension InputHandlerProtocol {
   /// Shift+選字鍵確認。
   ///
   /// 明確勝出條件（避免誤自動）：
-  /// 1) 頂級候選的讀音數與簡拼段數一致（整詞完全匹配；「ysx」只命中四字詞前綴時
-  ///    不得自動套用、仍留在 copilot 窗供使用者確認）；
+  /// 1) 頂級候選的讀音數與簡拼段數一致（整詞完全匹配）——簡拼查詢端已保證候選**不長於**
+  ///    格數，本條件補足「不短於格數」之要求：前綴殘缺者若被自動套用，尾段字母會隨
+  ///    注拼槽之清空而失落；
   /// 2) 無其他候選（唯一匹配），或頂級候選分數顯著高於次級（log-prob 差 ≥ 3.0，
   ///    即「一世雄霸」類近分競爭者不得自動套用）。
   /// 套用語義與 `solidifyAbbreviatedFrontReading` 一致：不覆寫、保留 LM 重切分自由度、
@@ -226,7 +227,8 @@ extension InputHandlerProtocol {
     guard let cells = furiousAbbreviatedCells(romaji: romaji) else { return false }
     let grams = currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: cells)
     guard let top = grams.first, !top.current.isEmpty else { return false }
-    // 條件 1：整詞完全匹配（讀音數與簡拼段數一致），攔截「前綴殘缺」的自動套用。
+    // 條件 1：整詞完全匹配（讀音數與簡拼段數一致）——查詢端已保證不長於格數，
+    // 此處攔截「前綴殘缺」（短於格數）之自動套用。
     guard top.keyArray.count == cells.count else { return false }
     // 條件 2：唯一匹配或顯著勝出。
     if grams.count >= 2 {

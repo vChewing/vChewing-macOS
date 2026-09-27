@@ -197,10 +197,13 @@ extension InputHandlerProtocol {
 
   /// 依據已通過閘門的前方上下文生成候選清單。
   ///
-  /// 清單結構：置頂段（POM 建議→組句預覽，保持原順序）＋其餘候選（跨邊界雙鍵
-  /// 查詢、前方單音節查詢、trail＋注拼槽聯合重切整詞）按「詞長（segLength）降冪、
-  /// 再查詢分數（weight）降冪」stable-sort——長詞（含替代切分整詞如「反感」）
-  /// 浮於大量單音節候選之前，避免被擠到選字窗末頁。全程按 value 去重（保留先出現者）。
+  /// 清單結構：置頂段（POM 建議→組句預覽，保持原順序）＋其餘候選，後者按
+  /// 「詞長（segLength）降冪 → 同段數內：語境候選先於簡拼整詞候選 → 各依自身之順序」
+  /// stable-sort——長詞（含替代切分整詞如「反感」）浮於大量單音節候選之前，避免被擠到
+  /// 選字窗末頁；「語境候選」指由已提交鍵／待確認音節推得者（跨邊界雙鍵查詢、前方單音節
+  /// 查詢、trail＋注拼槽聯合重切整詞），其內依查詢分數降冪；「簡拼整詞候選」為一個區塊、
+  /// 其內依**語言模組自身之順序**（原廠命中先、其後使用者片語命中），與拼音 α 窗同源同序。
+  /// 全程按 value 去重（保留先出現者）。
   private func buildFuriousFrontCandidates(
     from furiousContext: (
       bucket: [String], preview: String, crossingPair: CandidateInState?,
@@ -212,8 +215,9 @@ extension InputHandlerProtocol {
     var seenValues = Set<String>()
     // 置頂段：組句預覽（crossingPair／preview）與 POM 建議——保持原順序置頂。
     var anchored: [CandidateInState] = []
-    // 其餘候選（跨邊界／尾段／聯合重切）：帶查詢分數、按 (segLength, weight) 排序。
-    var ranked: [(keyArray: [String], value: String, weight: Double)] = []
+    // 其餘候選（跨邊界／尾段／聯合重切／簡拼整詞）：帶查詢分數與簡拼區塊序；
+    // `abbreviationOrder` 非 nil 者即「簡拼整詞候選」，其值為該詞在語言模組自身順序中之位次。
+    var ranked: [(keyArray: [String], value: String, weight: Double, abbreviationOrder: Int?)] = []
     // T1：copilot 窗置頂 POM 建議——以組字器副本＋虛擬尾段做唯讀查詢（不套用、不寫記憶），
     // 狂拼容錯模式（逐段去聲調等值）取回記憶，使聲調桶／無調形代表鍵不致落空；
     // 依分數降冪、按 value 去重置頂。
@@ -264,7 +268,10 @@ extension InputHandlerProtocol {
       // 原字串回退值：降級入 `ranked`，權重取地板值俾其沉於同長度之真詞之後。
       if seenValues.insert(furiousContext.preview).inserted {
         ranked.append(
-          (keyArray: bucket, value: furiousContext.preview, weight: Self.rawReadingFallbackWeight)
+          (
+            keyArray: bucket, value: furiousContext.preview,
+            weight: Self.rawReadingFallbackWeight, abbreviationOrder: nil
+          )
         )
       }
     } else {
@@ -277,7 +284,9 @@ extension InputHandlerProtocol {
       for gram in currentLM.lxQuerier.grams(for: [lastKey, .multipleKeys(bucket)]) {
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
-        ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+        ranked.append(
+          (keyArray: gram.keyArray, value: gram.current, weight: gram.probability, abbreviationOrder: nil)
+        )
       }
     }
     // 跨邊界整詞候選（P183）：前段為「多鍵節點／多音節」（如「電腦」）時，既有 L=1
@@ -290,7 +299,9 @@ extension InputHandlerProtocol {
         for gram in currentLM.lxQuerier.grams(for: suffixKeys + [.multipleKeys(bucket)]) {
           guard !gram.current.isEmpty else { continue }
           guard seenValues.insert(gram.current).inserted else { continue }
-          ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+          ranked.append(
+            (keyArray: gram.keyArray, value: gram.current, weight: gram.probability, abbreviationOrder: nil)
+          )
         }
       }
     }
@@ -298,17 +309,25 @@ extension InputHandlerProtocol {
     for gram in currentLM.lxQuerier.grams(for: [.multipleKeys(bucket)]) {
       guard !gram.current.isEmpty else { continue }
       guard seenValues.insert(gram.current).inserted else { continue }
-      ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+      ranked.append(
+        (keyArray: gram.keyArray, value: gram.current, weight: gram.probability, abbreviationOrder: nil)
+      )
     }
     // P260：注音狂打之**簡拼整詞候選**（α 之注音對位）。cells 取自「組字器尾段之單注音鍵
     // ＋ 注拼槽之當前讀音」；`abbreviatedWordCandidates` 對各 cell 作逐位置 byte 前綴匹配
     // （單次有界 Trie 查詢，無展開表、無笛卡爾積）。與前方候選同一清單 ⇒ 沿用本函式之
     // 置頂／排序／去重；選取時由 `applyFuriousFrontCandidate` 之簡拼覆寫路徑處理。
     if let abbreviationCells = furiousZhuyinAbbreviationCells {
-      for gram in currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: abbreviationCells) {
+      for (order, gram) in currentLM.lxQuerier
+        .abbreviatedWordCandidates(keysChopped: abbreviationCells).enumerated() {
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
-        ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+        ranked.append(
+          (
+            keyArray: gram.keyArray, value: gram.current, weight: gram.probability,
+            abbreviationOrder: order
+          )
+        )
       }
     }
     // trail＋注拼槽聯合重切候選——「fangan」連打時 copilot 窗即呈現「反感」
@@ -316,7 +335,9 @@ extension InputHandlerProtocol {
     furiousCoSegmentedOffers = buildFuriousCoSegmentedOffers()
     for offer in furiousCoSegmentedOffers {
       guard seenValues.insert(offer.value).inserted else { continue }
-      ranked.append((keyArray: offer.keyArray, value: offer.value, weight: offer.weight))
+      ranked.append(
+        (keyArray: offer.keyArray, value: offer.value, weight: offer.weight, abbreviationOrder: nil)
+      )
     }
     // 排序鍵之「段數」：`keyArray` 為前方讀音桶本身者（桶釘候選）代表**一個**位置、
     // 其 `keyArray.count` 是桶內諸多讀音而非段數——故一律折算為 1（P261）。
@@ -327,8 +348,15 @@ extension InputHandlerProtocol {
       .stableSort { lhs, rhs in
         let lhsLength = effectiveSegmentCount(lhs.keyArray)
         let rhsLength = effectiveSegmentCount(rhs.keyArray)
-        return (lhsLength > rhsLength)
-          || (lhsLength == rhsLength && lhs.weight > rhs.weight)
+        guard lhsLength == rhsLength else { return lhsLength > rhsLength }
+        // 同段數：語境候選（由已提交鍵／待確認音節推得者）先於簡拼整詞候選；前者依查詢
+        // 分數降冪，後者依語言模組自身之順序——如此簡拼整詞候選之相對順序與拼音 α 窗一致。
+        switch (lhs.abbreviationOrder, rhs.abbreviationOrder) {
+        case let (lhsOrder?, rhsOrder?): return lhsOrder < rhsOrder
+        case (nil, _?): return true
+        case (_?, nil): return false
+        case (nil, nil): return lhs.weight > rhs.weight
+        }
       }
       .map { ($0.keyArray, $0.value) }
   }
