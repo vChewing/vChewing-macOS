@@ -919,6 +919,44 @@ struct LXFacadeTextMapTests {
     #expect(mismatched.values == ["科技", "科吉"], "實得：\(mismatched.values)")
   }
 
+  /// 整詞簡拼查詢之回傳序即**分數序**（跨原廠與使用者片語兩來源合併排序）。
+  ///
+  /// 事主 2026-09-28 之裁定：「被降頻之原廠詞也不該壓過分數更高的使用者片語」——故本查詢
+  /// **不得**再現「原廠區塊先、其後使用者片語區塊」之分區陳列；去重仍以原廠側之讀音優先
+  /// （同值者），惟排序一律按（覆寫後之）分數。本靶以兩來源交錯之分數為測資。
+  @Test
+  func testAbbreviatedWordCandidatesOrderByScoreAcrossSources() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = LXAssembly.LXFacade(isCHS: true)
+    let textMap = makeTextMap([
+      ("ㄎㄜ-ㄐㄧˋ", [("科技", -3.0, 5)]),
+      ("ㄎㄜ-ㄐㄧˊ", [("科吉", -6.0, 5)]),
+    ])
+
+    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    instance.setOptions { config in
+      config.bypassUserPhrasesData = false
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.isCNSEnabled = false
+      config.filterNonCNSReadings = false
+      config.partialMatchEnabled = false
+    }
+    // 使用者側：一筆專有詞（科記 −4.0，分數居中）＋ 一筆對原廠「科技」之降頻（−9.0）。
+    instance.injectTestData(
+      userPhrases: { $0.replaceData(textData: "科記 ㄎㄜ-ㄐㄧˋ -4.0\n科技 ㄎㄜ-ㄐㄧˋ -9.0\n") }
+    )
+
+    let grams = instance.lxQuerier.abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ"])
+    #expect(grams.map(\.current) == ["科記", "科吉", "科技"], "實得：\(grams.map(\.current))")
+    #expect(grams.map(\.probability) == [-4.0, -6.0, -9.0], "實得：\(grams.map(\.probability))")
+    // 去重仍生效：同值者僅一筆，且其權重為使用者側之降頻值。
+    #expect(grams.filter { $0.current == "科技" }.count == 1, "實得：\(grams.map(\.current))")
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable, Hashable {

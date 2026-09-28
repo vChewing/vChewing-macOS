@@ -1175,10 +1175,11 @@ extension LXAssembly {
     ///
     /// 給定「每位置的 & 連接前綴候選」（如 `["ㄧ&ㄩ","ㄕ&ㄙ","ㄒ","ㄅ"]`），
     /// 回傳可能的整詞候選——**候選段數不得多於格數**（見下）。
-    /// 候選分區：置頂整詞猜測（factory 命中詞之首）→ 其餘
-    /// factory「&」命中詞（逐位置 byte 前綴、恆為 partial 語義、與 `partialMatchEnabled`
-    /// 偏好無關）→ user-phrase 命中詞（多位置前綴交集掃描、有界）。各分區依分數降冪、
-    /// 依詞值去重（保留先出現者＝factory 位置優先），長於格數者一律剔除；
+    /// 候選來源有二：factory「&」命中詞（逐位置 byte 前綴、恆為 partial 語義、與
+    /// `partialMatchEnabled` 偏好無關）與 user-phrase 命中詞（多位置前綴交集掃描、有界）。
+    /// 兩者依詞值去重（保留先出現者＝factory 側之讀音優先）、長於格數者一律剔除，
+    /// 末了**一律按分數降冪**（同分者維持 factory 側在前）——即回傳序即名次序，
+    /// **不得**再現「原廠區塊先、使用者片語區塊後」之分區陳列（見下）。
     /// **雷同之詞音配對（同值同讀音）者，其權重以使用者辭典者為最優先**（見下）。
     ///
     /// - Important: **「不得長於格數」即本查詢之上界**。原廠側本即等段
@@ -1193,10 +1194,10 @@ extension LXAssembly {
     ///   自行把守，見 `autoApplyFuriousAbbreviationIfClearWinner`）。
     ///
     /// - Note: **控頻**：通用查詢路徑以「使用者片語置前 ＋ `consolidate` 先插入者勝」令使用者
-    ///   辭典之權重優先；本查詢之呈現順序係**分區制**（原廠命中先、其後使用者片語命中），
-    ///   故不搬「置前」之形式，改以使用者側之條目**就地取代**同配對之原廠條目——該配對之
-    ///   位置仍留在原廠區塊內（依覆寫後之分數排序）、權重與讀音皆取使用者側。非雷同者
-    ///   （同值而異讀音）不在覆寫之列。
+    ///   辭典之權重優先；本查詢不搬「置前」之形式（那會連**讀音**一併改由使用者側決定），
+    ///   改以使用者側之條目**就地取代**同配對之原廠條目——權重與讀音皆取使用者側，而
+    ///   非雷同者（同值而異讀音）不在覆寫之列。因末了按分數排序，權重之升降**直接反映於
+    ///   名次**：被降頻之原廠配對會沉到分數更高之使用者片語命中之後。
     func abbreviatedWordCandidates(keysChopped: [String]) -> [Homa.Gram] {
       guard !keysChopped.isEmpty, keysChopped.allSatisfy({ !$0.isEmpty }) else { return [] }
       var factoryGrams: [Homa.Gram] = []
@@ -1233,18 +1234,17 @@ extension LXAssembly {
           userGramByPair[Homa.CandidatePair(keyArray: gram.keyArray, value: gram.current)] ?? gram
         }
       }
-      // 依詞值去重（保留先出現者＝factory 位置優先）、各分區依分數降冪排序；
-      // 長於格數者剔除——多出的段即使用者從未敲下之音節（見本函式之文件）。
+      // 依詞值去重（保留先出現者＝factory 側之讀音優先；長於格數者剔除——多出的段即使用者
+      // 從未敲下之音節），末了按分數降冪穩定排序：回傳序即名次序，令控頻之升降得以跨來源生效。
       var seenValues = Set<String>()
       var result: [Homa.Gram] = []
-      for gram in factoryGrams.sorted(by: { $0.probability > $1.probability }) + userGrams
-        .sorted(by: { $0.probability > $1.probability }) {
+      for gram in factoryGrams + userGrams {
         guard gram.keyArray.count <= keysChopped.count else { continue }
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
         result.append(gram)
       }
-      return result
+      return result.stableSort { $0.probability > $1.probability }
     }
 
     // MARK: Private

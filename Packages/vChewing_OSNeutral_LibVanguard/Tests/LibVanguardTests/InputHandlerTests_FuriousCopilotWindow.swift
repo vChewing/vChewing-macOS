@@ -465,12 +465,12 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!values.contains("科記"), "實得：\(values)")
   }
 
-  /// 簡拼整詞候選之順序與拼音 α 窗一致（事主 2026-09-28 之校正）。
+  /// 簡拼整詞候選之順序與拼音 α 窗一致；該序即**分數序**（跨原廠與使用者片語兩來源合併）。
   ///
   /// 窗內同段數時：**語境候選**（由已提交鍵／待確認音節推得者）先於**簡拼整詞候選**；
-  /// 簡拼整詞候選為一個區塊、其內依**語言模組自身之順序**（原廠命中先、其後使用者片語
-  /// 命中——即拼音 α 窗所見者），不再按查詢分數跨分區交錯。本靶以同一組語料驅動兩模式、
-  /// 比對共同候選之相對順序；拼音側（α 路徑＝單一來源）即該順序之基準。
+  /// 簡拼整詞候選為一個區塊、其內依**語言模組回傳之分數序**——查詢已跨來源合併排序，
+  /// 故分數更高之使用者片語命中得越過分數較低之原廠命中（事主 2026-09-28 之裁定）。
+  /// 本靶以同一組語料驅動兩模式、比對共同候選之相對順序；拼音側（α 路徑＝單一來源）即基準。
   @Test("[IH170] 狂打：簡拼整詞候選之順序與拼音 α 窗一致")
   func test_IH170_AbbreviationCandidateOrderMatchesPinyinAlphaWindow() throws {
     guard let testHandler, let testSession else {
@@ -489,11 +489,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
     ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
 
-    // ① 拼音狂打 `kj`（α 路徑）：原廠命中先、使用者片語命中後。
+    // ① 拼音狂打 `kj`（α 路徑）：分數序——科記（−6.2，使用者片語）越過科際（−6.237，原廠）。
     enterPinyinFuriousTestEnvironment()
     typeSentence("kj")
     let pinyinValues = testSession.state.candidates.map(\.value)
-    #expect(pinyinValues == ["科技", "科際", "科記"], "實得：\(pinyinValues)")
+    #expect(pinyinValues == ["科技", "科記", "科際"], "實得：\(pinyinValues)")
 
     // ② 注音狂打 `ㄎㄐ`：共同候選之相對順序須與拼音側逐項相同；待確認音節之讀音原字串
     //    回退值（桶釘候選）仍沉於同段數之真詞之後（P261 之裁定不變）。
@@ -501,7 +501,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     enterZhuyinFuriousTestEnvironment()
     typeSentence("dr")
     let zhuyinValues = testSession.state.candidates.map(\.value)
-    #expect(zhuyinValues == ["科技", "科際", "科記", "ㄐ"], "實得：\(zhuyinValues)")
+    #expect(zhuyinValues == ["科技", "科記", "科際", "ㄐ"], "實得：\(zhuyinValues)")
     let pinyinSet = Set(pinyinValues)
     let commonInZhuyin = zhuyinValues.filter { pinyinSet.contains($0) }
     #expect(commonInZhuyin == pinyinValues, "注音：\(commonInZhuyin)；拼音：\(pinyinValues)")
@@ -513,7 +513,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 詞音配對而言，其權重以使用者辭典內的權重為最優先。」通用查詢路徑本即以「使用者片語置前」
   /// 實現此語義，整詞簡拼查詢則否；本靶以測試辭典內既存之兩筆原廠命中（科技 ㄎㄜ-ㄐㄧˋ
   /// −3.311、科際 ㄎㄜ-ㄐㄧˋ −6.237）為雷同配對之對象，驗兩個方向：① **升頻**（科際 ⇒ −0.5）；
-  /// ② **降頻**（科技 ⇒ −12.0）。兩者皆為「可就地選字」之候選 ⇒ 窗內所見即所選。
+  /// ② **降頻**（科技 ⇒ −12.0）。
+  /// - Important: 兩方向之可見效果皆以**分數序**呈現：被降頻之原廠配對必沉於分數更高之
+  ///   使用者片語命中之後（事主 2026-09-28 之裁定），故兩臂之期望序皆為 `科際→科紀→科技`。
   ///
   /// - Important: 兩臂皆另注入一筆**近分競爭者**（科紀，使用者辭典）——否則「明確勝出」條件成立時，
   ///   R3-a 之自動套用會消費本拍並清空注拼槽，窗無從觀察（測試構造之條件，非生產碼之限制）。
@@ -571,8 +573,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let boostedPinyin = pinyinWindowValues()
     #expect(boostedJi == -0.5, "實得：\(boostedJi as Any)")
     #expect(boostedKe == -3.311, "非雷同者不受牽連；實得：\(boostedKe as Any)")
-    #expect(boostedZhuyin == ["科際", "科技", "科紀", "ㄐ"], "實得：\(boostedZhuyin)")
-    #expect(boostedPinyin == ["科際", "科技", "科紀"], "實得：\(boostedPinyin)")
+    #expect(boostedZhuyin == ["科際", "科紀", "科技", "ㄐ"], "實得：\(boostedZhuyin)")
+    #expect(boostedPinyin == ["科際", "科紀", "科技"], "實得：\(boostedPinyin)")
 
     // ② 降頻：改把「科技」壓至 −12.0 ⇒ 沉於「科際」（−6.237）之下（覆寫為雙向）。
     testHandler.currentLM.clearTemporaryData(isFiltering: false)
@@ -586,15 +588,15 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let demotedPinyin = pinyinWindowValues()
     #expect(demotedKe == -12.0, "實得：\(demotedKe as Any)")
     #expect(untouchedJi == -6.237, "實得：\(untouchedJi as Any)")
-    #expect(demotedZhuyin == ["科際", "科技", "科紀", "ㄐ"], "實得：\(demotedZhuyin)")
-    #expect(demotedPinyin == ["科際", "科技", "科紀"], "實得：\(demotedPinyin)")
+    // 降頻之核心斷言：科技（−12.0）沉於科紀（−6.5）之後——分區陳列已不再遮蔽分數序。
+    #expect(demotedZhuyin == ["科際", "科紀", "科技", "ㄐ"], "實得：\(demotedZhuyin)")
+    #expect(demotedPinyin == ["科際", "科紀", "科技"], "實得：\(demotedPinyin)")
   }
 
   /// 「名次」一律**按分數取**，不看清單位置——α 固化（空格／Tab）與 R3-a 自動套用皆然。
   ///
-  /// 本查詢之呈現順序係分區制（原廠命中先、其後使用者片語命中）⇒ 清單首筆未必是分數最高者。
-  /// 本靶以「使用者專有詞（原廠無此詞）之分數高於所有原廠命中、且其讀音與原廠命中互異」
-  /// 之構造，令兩者之判別成為可觀測之別：
+  /// 名次即分數；本靶以「使用者專有詞（原廠無此詞）之分數高於所有原廠命中、且其讀音與
+  /// 原廠命中互異」之構造，令兩者之判別成為可觀測之別（窗內首位即該詞，固化亦取之）：
   /// ① **固化**（空格）：取分數最高者之讀音 ⇒ 顯示該使用者詞；取清單首筆則會插入原廠命中
   ///    之讀音、顯示成原廠詞（修前實錄）；
   /// ② **自動套用**（明確勝出）：頂級候選按分數取——即使該使用者詞在清單末位。
@@ -622,7 +624,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence(" ")
     let keysAfterSolidify = testHandler.assembler.actualKeys
     let displayAfterSolidify = generateDisplayedText()
-    #expect(windowBeforeSolidify == ["科技", "科際", "科吉"], "實得：\(windowBeforeSolidify)")
+    #expect(windowBeforeSolidify == ["科吉", "科技", "科際"], "實得：\(windowBeforeSolidify)")
     #expect(keysAfterSolidify == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterSolidify)")
     #expect(displayAfterSolidify == "科吉", "實得：\(displayAfterSolidify)")
 

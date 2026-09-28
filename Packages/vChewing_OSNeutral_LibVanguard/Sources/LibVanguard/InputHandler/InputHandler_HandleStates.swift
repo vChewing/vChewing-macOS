@@ -202,7 +202,8 @@ extension InputHandlerProtocol {
   /// stable-sort——長詞（含替代切分整詞如「反感」）浮於大量單音節候選之前，避免被擠到
   /// 選字窗末頁；「語境候選」指由已提交鍵／待確認音節推得者（跨邊界雙鍵查詢、前方單音節
   /// 查詢、trail＋注拼槽聯合重切整詞），其內依查詢分數降冪；「簡拼整詞候選」為一個區塊、
-  /// 其內依**語言模組自身之順序**（原廠命中先、其後使用者片語命中），與拼音 α 窗同源同序。
+  /// 其內依**語言模組回傳之分數序**（原廠命中與使用者片語命中合併排序、不再分區陳列），
+  /// 與拼音 α 窗同源同序。
   /// 全程按 value 去重（保留先出現者）。
   private func buildFuriousFrontCandidates(
     from furiousContext: (
@@ -350,7 +351,8 @@ extension InputHandlerProtocol {
         let rhsLength = effectiveSegmentCount(rhs.keyArray)
         guard lhsLength == rhsLength else { return lhsLength > rhsLength }
         // 同段數：語境候選（由已提交鍵／待確認音節推得者）先於簡拼整詞候選；前者依查詢
-        // 分數降冪，後者依語言模組自身之順序——如此簡拼整詞候選之相對順序與拼音 α 窗一致。
+        // 分數降冪，後者依語言模組回傳之分數序（兩來源合併排序）——如此簡拼整詞候選之
+        // 相對順序與拼音 α 窗一致。
         switch (lhs.abbreviationOrder, rhs.abbreviationOrder) {
         case let (lhsOrder?, rhsOrder?): return lhsOrder < rhsOrder
         case (nil, _?): return true
