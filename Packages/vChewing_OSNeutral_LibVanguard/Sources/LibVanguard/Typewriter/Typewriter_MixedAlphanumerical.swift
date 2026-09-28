@@ -47,12 +47,18 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若不提前攔截，Space 將返回 nil，無法走到注音確認路徑。
     // Shift+Space 在 non-empty 狀態下放棄注音處理，
     // 直接遞交 mixed buffer 內容 + ASCII 空格。
-    // 偏好「空格鍵對內文組字區的行為」設為「插入空格」（值 0）時，**混打緩衝非空**者亦比照
-    // 辦理：該偏好即使用者對「空白鍵＝插入空格」之明示，混打路徑不得逕自改判為「遞交尾段
-    // ASCII ＋ 將尾鍵送進注拼槽」。**緩衝區為空者不在此攔截**——仍交還既有流程處置，
-    // 故純中文組字之空白鍵語意不因本偏好而變。
+    // 偏好「空格鍵對內文組字區的行為」設為「插入空格」（值 0）時，**混打緩衝非空且非待調讀音**
+    // 者亦比照辦理：該偏好即使用者對「空白鍵＝插入空格」之明示，混打路徑不得逕自改判為
+    // 「遞交尾段 ASCII ＋ 將尾鍵送進注拼槽」。**緩衝區為空者不在此攔截**——仍交還既有流程
+    // 處置，故純中文組字之空白鍵語意不因本偏好而變。**緩衝恰為一個尚未鍵入聲調之讀音者亦
+    // 不在此攔截**——該狀態下混打緩衝承載的正是中文組字本身（`su`＝ㄋㄧ、`1u,`＝ㄅㄧㄝ、
+    // `s`＝ㄋ），空白鍵之語意為一聲鍵，逕予遞交即令該音節無法完成（見 `isPendingTonelessReading`）。
     let commitsWholeMixedBufferOnSpace = input.isShiftHeld
-      || (!handler.mixedAlphanumericalBuffer.isEmpty && handler.prefs.spaceKeyBehaviorAgainstICB == 0)
+      || (
+        !handler.mixedAlphanumericalBuffer.isEmpty
+          && handler.prefs.spaceKeyBehaviorAgainstICB == 0
+          && !isPendingTonelessReading
+      )
     if input.isSpace, commitsWholeMixedBufferOnSpace {
       guard !handler.isConsideredEmptyForNow else { return nil }
       let chineseText = handler.committableDisplayText(sansReading: true)
@@ -481,6 +487,22 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     case .ofETen26: 5 // 僅一例：`ㄍㄧㄠˊ → vezf`。
     default: 4 // 其餘所有注音排列，無論動態還是靜態排列，最大碼長均為 4。
     }
+  }
+
+  /// 混打緩衝是否為「一個尚未鍵入聲調之讀音」——此時空白鍵之語意為一聲鍵（聲調選字），
+  /// 不得被「插入空格」偏好接走。
+  ///
+  /// 混打模式下，中文組字進行中之按鍵亦棲身於同一緩衝（`su`＝ㄋㄧ、`1u,`＝ㄅㄧㄝ、`s`＝ㄋ），
+  /// 故「緩衝非空」不足以證成英文意圖。本判準只問該緩衝能否作為一個讀音被注拼槽消化，
+  /// 與排列種類及 `MixedAlnumJudgeReadingsBySequentialRawKeyOrder` 開關皆無涉：動態排列之
+  /// 合法編碼本即跨鍵改寫槽值，槽序檢定不適用於此處。
+  private var isPendingTonelessReading: Bool {
+    let buffer = handler.mixedAlphanumericalBuffer
+    guard !buffer.isEmpty, buffer.count <= maxSingleSyllableKeyCount else { return false }
+    var trialComposer = handler.composer
+    trialComposer.clear()
+    trialComposer.receiveSequence(buffer, isRomaji: false)
+    return trialComposer.isPronounceable && trialComposer.intonation.value.isEmpty
   }
 
   /// 英數閂滯開關是否生效（須中英混打模式與閂滯開關兩者皆啟用）。

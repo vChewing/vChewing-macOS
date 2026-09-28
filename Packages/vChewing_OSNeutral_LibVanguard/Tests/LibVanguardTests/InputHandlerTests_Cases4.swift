@@ -2370,4 +2370,109 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(testHandler.assembler.isEmpty)
   }
+
+  // MARK: - 待調讀音之空白鍵語意（`spaceKeyBehaviorAgainstICB == 0` 之界線）
+
+  /// 混打模式下，**尚未鍵入聲調之讀音**棲身於混打緩衝（`su`＝ㄋㄧ）；此時空白鍵之語意為
+  /// 一聲鍵（聲調選字），不得被「插入空格」偏好接走——接走即令該音節之按鍵被當成 ASCII
+  /// 遞交、音節無從完成。
+  @Test
+  func test_IH516_PendingTonelessReadingKeepsSpaceAsToneKey_TwoKeySyllable() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    let cleanup = injectTemporaryGrams(testHandler, "ㄋㄧ 妮 -1")
+    defer {
+      cleanup()
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    typeSentence("su")
+    #expect(testHandler.mixedAlphanumericalBuffer == "su", "`su` 應棲身於混打緩衝以待聲調")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "待調讀音之空白鍵不得遞交 ASCII，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋㄧ"],
+      "空白鍵應作一聲鍵令讀音成字，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  /// 同上，惟徵以三鍵音節（大千 `1u,`＝ㄅㄧㄝ）：判準不得只在兩鍵時成立。
+  @Test
+  func test_IH517_PendingTonelessReadingKeepsSpaceAsToneKey_ThreeKeySyllable() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    let cleanup = injectTemporaryGrams(testHandler, "ㄅㄧㄝ 憋 -1")
+    defer {
+      cleanup()
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    typeSentence("1u,")
+    #expect(testHandler.mixedAlphanumericalBuffer == "1u,", "`1u,` 應棲身於混打緩衝以待聲調")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "待調讀音之空白鍵不得遞交 ASCII，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄅㄧㄝ"],
+      "空白鍵應作一聲鍵令讀音成字，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  /// 同上，惟徵以單鍵聲母（大千 `s`＝ㄋ）：聲母單鍵仍可被注拼槽消化為一個待調讀音。
+  @Test
+  func test_IH518_PendingTonelessReadingKeepsSpaceAsToneKey_SingleConsonant() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    typeSentence("s")
+    #expect(testHandler.mixedAlphanumericalBuffer == "s", "`s` 應棲身於混打緩衝以待聲調")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "待調讀音之空白鍵不得遞交 ASCII，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋ"],
+      "空白鍵應作一聲鍵令讀音成字，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+  }
+
+  /// 對照組：緩衝並非讀音者（`ls`／`tod`／`film`），「插入空格」偏好照舊生效——
+  /// 本 phase 之判準不得把英文詞誤判為待調讀音而令該偏好失效。
+  @Test(arguments: ["ls", "tod", "film"])
+  func test_IH519_NonReadingBufferStillCommitsWholeBufferOnSpace(_ word: String) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    typeSentence(word)
+    #expect(testHandler.mixedAlphanumericalBuffer == word)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == [word + " "],
+      "`\(word)` 並非讀音，應照舊一次遞交整段緩衝加半形空格，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.assembler.isEmpty, "`\(word)` 之尾鍵不得被送進注拼槽")
+  }
 }
