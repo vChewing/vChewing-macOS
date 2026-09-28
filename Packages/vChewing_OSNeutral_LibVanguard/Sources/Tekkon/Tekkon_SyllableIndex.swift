@@ -101,16 +101,16 @@ extension Tekkon {
       prefixSet.contains(reading)
     }
 
-    // MARK: Internal
-
     /// 以該字串為前綴之全部完整讀音（升冪，內容穩定）。
     ///
     /// 以 `allReadings.filter { $0.hasPrefix(prefix) }` 實作——426 條線性掃描，**非熱路徑**
     /// （只在前綴不完整時才需列舉）。
     ///
-    /// - Note: 對外暫緩公開（`internal`）。目前之生產端消費者（自動切音節判準）只用
-    ///   `isPrefix`，故不預先承諾此 API 之形狀；待真有消費者時再升為 `public`。
-    func completions(of prefix: String) -> [String] {
+    /// - Note: **已升為 `public`**——生產端消費者為狂打模式之前方讀音桶（`LibVanguard` 之
+    ///   `furiousFrontContext`）：注音側遇「未完成之合法前綴」（單聲母等）時，以此列舉
+    ///   可補全之完整讀音，與拼音側「由字母流反推可能音節」同構。**不得**以本函式之結果
+    ///   當「可否提交」之依據（見 `isComplete(_:)` 之警告）。
+    public func completions(of prefix: String) -> [String] {
       readings.filter { $0.hasPrefix(prefix) }
     }
 
