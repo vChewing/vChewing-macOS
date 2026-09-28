@@ -5,17 +5,10 @@
 // MARK: - Phonabet Auto-Chop Predicate
 
 extension Tekkon.Composer {
-  /// 本鍵是否應先自動切音節（**規格 v7，六條**；實作即該規格之逐條移植）。
+  /// 本鍵是否應先自動切音節。
   ///
-  /// - Note: 本判準是**注拼槽狀態之純函式**——不讀 handler、不讀 session、不讀偏好，
-  ///   故得零成本驅動數十萬次（自 P261 起其回歸靶住在 `Tests/TekkonTests/`）。
-  ///   **生產側之呼叫者僅 `BPMFFullMatchTypewriter.performPhonabetAutoChopIfNeeded` 一處**：
-  ///   判準在此、只回裁決；執行（寫入組字器／清注拼槽／補回本鍵）在彼。
-  ///
-  /// - Important: 本判準之**權威規格**（逐條理由、四則對照實例、三條已知界線）住在
-  ///   vChewing 開發倉之 `Research/Phase250-ResearchAndNextSurgeryPlan.md` §3.2（v7）——
-  ///   該檔**不在本套件內**，故本檔以摘要自持：任何修訂都不得只動此處之實作而不動該正本，
-  ///   亦不得只動正本而不動此處。摘要：
+  /// 本判準是**注拼槽狀態之純函式**：只讀注拼槽、不做任何提交，故可零成本反覆試探。
+  /// 判準依序如下：
   ///
   /// - **①** 注拼槽非空。
   /// - **②** 本鍵非聲調鍵（以「本鍵施於空槽時是否寫入聲調」判之）。

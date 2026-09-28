@@ -64,7 +64,7 @@ extension Tekkon {
     /// 取得共用之索引。
     ///
     /// 快取範式與 `Tekkon.PinyinTrie.shared(parser:)` 一致：`NSLock` ＋
-    /// `nonisolated(unsafe) private static var`（`Tekkon` 靶不受
+    /// `nonisolated(unsafe) private static var`（本模組不受
     /// `defaultIsolation(MainActor.self)` 規範，故此處為 SE-0412 意義下之全域可變共享狀態，
     /// 必須明示其同步責任在本型別之 `sharedCacheLock`）。
     ///
@@ -91,7 +91,7 @@ extension Tekkon {
     ///
     /// - Warning: **不得**以本函式當作「當前注拼槽可否提交」之依據。單聲母／單韻母乃原廠
     ///   辭典之合法詞條，若以 `isComplete` 為閘則單聲母縮寫打法全滅。「可否提交」之依據是
-    ///   呼叫端之切音節判準（見 `Research/Phase250-ResearchAndNextSurgeryPlan.md` §3.2）。
+    ///   呼叫端之切音節判準（`Composer.shouldAutoChopPhonabets(byTyping:)`）。
     public func isComplete(_ reading: String) -> Bool {
       completeSet.contains(reading)
     }
@@ -106,10 +106,8 @@ extension Tekkon {
     /// 以 `allReadings.filter { $0.hasPrefix(prefix) }` 實作——426 條線性掃描，**非熱路徑**
     /// （只在前綴不完整時才需列舉）。
     ///
-    /// - Note: **已升為 `public`**——生產端消費者為狂打模式之前方讀音桶（`LibVanguard` 之
-    ///   `furiousFrontContext`）：注音側遇「未完成之合法前綴」（單聲母等）時，以此列舉
-    ///   可補全之完整讀音，與拼音側「由字母流反推可能音節」同構。**不得**以本函式之結果
-    ///   當「可否提交」之依據（見 `isComplete(_:)` 之警告）。
+    /// - Note: 遇「未完成之合法前綴」（如單聲母）時，可以此列舉可補全之完整讀音。
+    ///   **不得**以本函式之結果當「可否提交」之依據（見 `isComplete(_:)` 之警告）。
     public func completions(of prefix: String) -> [String] {
       readings.filter { $0.hasPrefix(prefix) }
     }
@@ -117,7 +115,7 @@ extension Tekkon {
     // MARK: Private
 
     private static let sharedCacheLock = NSLock()
-    // `Tekkon` 靶不受 `defaultIsolation(MainActor.self)` 規範，故此處為 SE-0412 意義下的
+    // 本模組不受 `defaultIsolation(MainActor.self)` 規範，故此處為 SE-0412 意義下的
     // 全域可變共享狀態：必須以 `nonisolated(unsafe)` 明示其同步責任在本型別的 `sharedCacheLock`。
     nonisolated(unsafe) private static var sharedCache: Self?
 

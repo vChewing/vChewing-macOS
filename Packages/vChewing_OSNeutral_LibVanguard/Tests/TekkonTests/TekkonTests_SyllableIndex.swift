@@ -4,7 +4,7 @@
 
 // `Tekkon.SyllableIndex` 之行為測試。
 //
-// 索引之語意與兩條紅線見 `Sources/Tekkon/Tekkon_SyllableIndex.swift` 之型別說明。
+// 索引之語意與使用界線見 `Sources/Tekkon/Tekkon_SyllableIndex.swift` 之型別說明。
 // 本檔之斷言分三類：① 資料規模（426／442／16／37 四項可稽核數字）；② 成員資格之正反例；
 // ③ 與引擎既有表（`allowedConsonants` 等）及測試素材之交叉比對。
 
@@ -113,8 +113,7 @@ struct TekkonTestsSyllableIndex {
     )
     // 嚴格單符號則為 14 條：其餘 14 個聲母——**含 `ㄑ`**。`ㄑ` 不是獨立音節（`ㄑㄧ` 才是），
     // 故它只以「`ㄑ` 一族之嚴格前綴」之身分存在。此點曾因 `mapHanyuPinyin` 收有單字母條目
-    // `"q": "ㄑ"` 而失真；該條目已於 2026-09-26 依事主指示自 `mapHanyuPinyin` 與
-    // `LexiconAssembly` 之內嵌 `jsnHanyuPinyinToMPS` 兩表同步刪去。
+    // `"q": "ㄑ"` 而失真；該條目已自表中刪去。
     #expect(!index.isComplete("ㄑ"))
     #expect(index.isPrefix("ㄑ"))
     #expect(!index.completions(of: "ㄑ").isEmpty)

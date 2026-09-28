@@ -123,7 +123,7 @@ struct TekkonTestsPinyin {
     #expect(!composer.isPronounceable)
   }
 
-  // MARK: - 狂拼模式（Furious Typing Mode）基礎：PinyinTrie.zhuyinReadings
+  // MARK: - 簡拼展開：PinyinTrie.zhuyinReadings
 
   /// 完整音節：僅回傳該音節對應的注音，不做前綴展開（即使該音節是其他音節的字串前綴）。
   @Test("[Tekkon] PinyinTrie_zhuyinReadings_ExactCompleteSyllable")
@@ -375,7 +375,7 @@ struct TekkonTestsPinyin {
 
   /// BackSpace 清空拼音緩衝後，聲介韻槽位須同步清空（不得殘留已刪除的讀音）——
   /// 否則 isPronounceable 誤判為真，後續的聲調鍵／空格鍵會把已刪除的讀音重新組回
-  /// （狂拼模式「BackSpace 後按空格」的輪替／重組錯亂由此而來）。
+  /// （「BackSpace 後按空格」之輪替／重組錯亂由此而來）。
   @Test("[Tekkon] Composer_BackSpaceResyncsPhonabetSlots_Pinyin")
   func testBackSpaceResyncsPhonabetSlotsInPinyinMode() async throws {
     var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
@@ -402,7 +402,7 @@ struct TekkonTestsPinyin {
   }
 
   /// 注拼槽 romajiBuffer 的單音節長度上限（預設 6 碼、超出丟棄最早音頭）——
-  /// 狂拼等多音節簡拼字母流需關閉音頭丟棄（`allowsExtendedRomajiBuffer`）：
+  /// 多音節簡拼字母流需關閉音頭丟棄（`allowsExtendedRomajiBuffer`）：
   /// 「slliang」不得被截斷成「lliang」而丟失前導字母。
   @Test("[Tekkon] Composer_ExtendedRomajiBuffer_Pinyin")
   func testExtendedRomajiBufferPreservesLongAbbreviationStream() async throws {
@@ -422,14 +422,12 @@ struct TekkonTestsPinyin {
   /// `mapHanyuPinyin` 之單字母條目：僅餘 `a`／`e`／`o` 三條真音節。
   ///
   /// 該表曾另收 `"q": "ㄑ"`——它是全表**唯一**之單字母聲母條目（其餘 20 個聲母皆無），
-  /// 而 `"q"` 並非合法之漢語拼音音節（`qi` 才是，且另有條目）。該條目使**狂拼模式下**
-  /// `q` ＋ `f` 提前切音節並提交一個 `ㄑ`（緩衝留 `f`），而 `b` ＋ `f` 不會；亦使狂拼之
-  /// **簡拼（α）路徑**在 `q` 起首之緩衝上不可達（`performPinyinAutoChopIfNeeded` 先於
-  /// `autoApplyFuriousAbbreviationIfClearWinner` 執行）。
+  /// 而 `"q"` 並非合法之漢語拼音音節（`qi` 才是，且另有條目）。該條目使 `q` ＋ `f` 提前
+  /// 切音節並提交一個 `ㄑ`（緩衝留 `f`），而 `b` ＋ `f` 不會；亦使**簡拼路徑**在 `q` 起首
+  /// 之緩衝上不可達。
   ///
-  /// 該條目已於 2026-09-26 依事主指示，自 `Tekkon.mapHanyuPinyin` 與 `LexiconAssembly`
-  /// 之內嵌表 `jsnHanyuPinyinToMPS` **兩處同步刪去**。本測試釘住刪除後之契約：`q` 與其餘
-  /// 20 個聲母行為一致（單鍵不寫槽、不觸發自動切音節、片段展開走前綴擴張）。
+  /// 該條目已自 `Tekkon.mapHanyuPinyin` 刪去。本測試釘住刪除後之契約：`q` 與其餘 20 個
+  /// 聲母行為一致（單鍵不寫槽、不觸發自動切音節、片段展開走前綴擴張）。
   @Test("[Tekkon] PinyinSingleLetterEntries_AreRealSyllablesOnly")
   func testSingleLetterEntriesAreRealSyllablesOnly() async throws {
     // 該表之單字母條目恰為三條，且皆為合法之漢語拼音音節。
@@ -451,7 +449,7 @@ struct TekkonTestsPinyin {
       #expect(composer.getComposition() == expected)
     }
 
-    // 狂拼之自動切音節：`q`＋`f` 與 `b`＋`f` 皆不提交（`nil`）——此即刪除該條目之收益：
+    // 自動切音節：`q`＋`f` 與 `b`＋`f` 皆不提交（`nil`）——此即刪除該條目之收益：
     // `q` 起首之簡拼路徑回復可達。
     for first in ["q", "b", "z"] {
       var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
