@@ -183,15 +183,19 @@ extension InputHandlerProtocol {
     retrievePOMSuggestions(apply: true)
   }
 
-  /// 狂拼 α 路徑（R2-α）的前方固化：把整詞簡拼候選之首的實際讀音以單鍵插入組字器。
+  /// 狂拼 α 路徑（R2-α）的前方固化：把整詞簡拼候選之**分數最高者**的實際讀音以單鍵插入組字器。
   ///
   /// 對應單音節前綴的「只插讀音、不覆寫」語義；查無候選時靜默退回（注拼槽保留，
   /// 由呼叫端依 `hasFuriousFrontPending` 決定是否直接消費觸發鍵）。
+  /// - Important: 名次一律**按分數取**，非清單之第一筆——本查詢之呈現順序係分區制
+  ///   （原廠命中先、其後使用者片語命中），清單序≠分數序；取清單首筆即會令分數更高之
+  ///   使用者片語候選（如其讀音互異）永遠無法經空格／Tab 浮現。
   private func solidifyAbbreviatedFrontReading() {
     guard let cells = furiousAbbreviatedCells else { return }
     let romaji = composer.romajiBuffer
     guard !romaji.isEmpty else { return }
-    guard let topCandidate = buildFuriousAbbreviatedCandidates(cells: cells).first else { return }
+    guard let topCandidate = currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: cells)
+      .max(by: { $0.probability < $1.probability }) else { return }
     let readings = topCandidate.keyArray
     guard !readings.isEmpty else { return }
     guard (try? assembler.insertKeys(readings.map { .singleKey($0) })) != nil else { return }
@@ -225,16 +229,18 @@ extension InputHandlerProtocol {
     let romaji = composer.romajiBuffer + inputText
     guard !romaji.isEmpty else { return false }
     guard let cells = furiousAbbreviatedCells(romaji: romaji) else { return false }
+    // 按分數降冪排名後再取頂級與次級——本查詢之呈現順序係分區制（原廠命中先、其後使用者
+    // 片語命中），清單序≠分數序；「次級」於規範中之語義為分數上之次高者。
     let grams = currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: cells)
+      .sorted { $0.probability > $1.probability }
     guard let top = grams.first, !top.current.isEmpty else { return false }
     // 條件 1：整詞完全匹配（讀音數與簡拼段數一致）——查詢端已保證不長於格數，
     // 此處攔截「前綴殘缺」（短於格數）之自動套用。
     guard top.keyArray.count == cells.count else { return false }
-    // 條件 2：唯一匹配或顯著勝出。「次級」取**分數**上之次高者，非清單之第二筆——本查詢之
-    // 呈現順序係分區制（原廠命中先、其後使用者片語命中），清單序不等於分數序；控頻既令
-    // 原廠區塊內亦可出現使用者側之權重，以清單位置取次級即會誤判「明確勝出」（實錄：被降頻
-    // 之原廠條目居清單第二、而真正之近分競爭者居其後，遂誤觸自動套用、把該拍逕行消費）。
-    if let runnerUp = grams.dropFirst().max(by: { $0.probability < $1.probability }) {
+    // 條件 2：唯一匹配或顯著勝出（`grams` 已按分數降冪 ⇒ 次級即其第二筆）。若改以清單位置
+    // 取次級（即分區制之原序），則被降頻之原廠條目居次、真正之近分競爭者反居其後時，
+    // 會誤判「明確勝出」而把該拍逕行消費。
+    if let runnerUp = grams.dropFirst().first {
       guard top.probability - runnerUp.probability >= kFuriousAbbreviationDominanceThreshold else {
         return false
       }

@@ -590,6 +590,59 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(demotedPinyin == ["科際", "科技", "科紀"], "實得：\(demotedPinyin)")
   }
 
+  /// 「名次」一律**按分數取**，不看清單位置——α 固化（空格／Tab）與 R3-a 自動套用皆然。
+  ///
+  /// 本查詢之呈現順序係分區制（原廠命中先、其後使用者片語命中）⇒ 清單首筆未必是分數最高者。
+  /// 本靶以「使用者專有詞（原廠無此詞）之分數高於所有原廠命中、且其讀音與原廠命中互異」
+  /// 之構造，令兩者之判別成為可觀測之別：
+  /// ① **固化**（空格）：取分數最高者之讀音 ⇒ 顯示該使用者詞；取清單首筆則會插入原廠命中
+  ///    之讀音、顯示成原廠詞（修前實錄）；
+  /// ② **自動套用**（明確勝出）：頂級候選按分數取——即使該使用者詞在清單末位。
+  @Test("[IH172] 狂打：α 固化與自動套用之『名次』按分數取")
+  func test_IH172_AbbreviationRankIsScoreBased() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterPinyinFuriousTestEnvironment()
+
+    // ① 固化：使用者專有詞「科吉」（ㄎㄜ-ㄐㄧˊ，−0.5）之分數高於兩筆原廠命中，惟其位置
+    //    在清單末（分區制）；且與次高者（科技 −3.311）之差 < 3.0 ⇒ 不觸發自動套用、留待空格固化。
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
+      isFiltering: false
+    )
+    typeSentence("kj")
+    let windowBeforeSolidify = testSession.state.candidates.map(\.value)
+    typeSentence(" ")
+    let keysAfterSolidify = testHandler.assembler.actualKeys
+    let displayAfterSolidify = generateDisplayedText()
+    #expect(windowBeforeSolidify == ["科技", "科際", "科吉"], "實得：\(windowBeforeSolidify)")
+    #expect(keysAfterSolidify == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterSolidify)")
+    #expect(displayAfterSolidify == "科吉", "實得：\(displayAfterSolidify)")
+
+    // ② 自動套用：把兩筆原廠命中降頻以撐開差距（−8.0／−8.5），使用者詞（−0.5）因而「明確勝出」
+    //    ⇒ 末鍵即自動套用該詞之讀音（即使它在清單末位）。
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科技", score: -8.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科際", score: -8.5),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("kj")
+    let keysAfterAutoApply = testHandler.assembler.actualKeys
+    let displayAfterAutoApply = generateDisplayedText()
+    #expect(testHandler.composer.romajiBuffer.isEmpty, "自動套用應清空注拼槽。")
+    #expect(keysAfterAutoApply == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterAutoApply)")
+    #expect(displayAfterAutoApply == "科吉", "實得：\(displayAfterAutoApply)")
+  }
+
   // MARK: - 中英混合輸入回退對注音狂打之否決（P265）
 
   /// 「中英混合輸入回退」一旦啟用，注音狂打即**一律被視為關閉**（即便其開關仍為真）。
