@@ -1178,7 +1178,8 @@ extension LXAssembly {
     /// 候選分區：置頂整詞猜測（factory 命中詞之首）→ 其餘
     /// factory「&」命中詞（逐位置 byte 前綴、恆為 partial 語義、與 `partialMatchEnabled`
     /// 偏好無關）→ user-phrase 命中詞（多位置前綴交集掃描、有界）。各分區依分數降冪、
-    /// 依詞值去重（保留先出現者＝factory 優先），長於格數者一律剔除。
+    /// 依詞值去重（保留先出現者＝factory 位置優先），長於格數者一律剔除；
+    /// **雷同之詞音配對（同值同讀音）者，其權重以使用者辭典者為最優先**（見下）。
     ///
     /// - Important: **「不得長於格數」即本查詢之上界**。原廠側本即等段
     ///   （`getEntryGroups(keysChopped:…)` 內定 `longerSegment: false` ⇒ 節點讀音段數
@@ -1190,6 +1191,12 @@ extension LXAssembly {
     ///   收斂為**上界**而非等段：短於格數者不在本查詢之拒絕範圍內（今日之兩分區掃描皆要求
     ///   覆蓋全部格，故實際輸出恆等段；「不短於格數」之要求由需要整詞完全匹配之消費端
     ///   自行把守，見 `autoApplyFuriousAbbreviationIfClearWinner`）。
+    ///
+    /// - Note: **控頻**：通用查詢路徑以「使用者片語置前 ＋ `consolidate` 先插入者勝」令使用者
+    ///   辭典之權重優先；本查詢之呈現順序係**分區制**（原廠命中先、其後使用者片語命中），
+    ///   故不搬「置前」之形式，改以使用者側之條目**就地取代**同配對之原廠條目——該配對之
+    ///   位置仍留在原廠區塊內（依覆寫後之分數排序）、權重與讀音皆取使用者側。非雷同者
+    ///   （同值而異讀音）不在覆寫之列。
     func abbreviatedWordCandidates(keysChopped: [String]) -> [Homa.Gram] {
       guard !keysChopped.isEmpty, keysChopped.allSatisfy({ !$0.isEmpty }) else { return [] }
       var factoryGrams: [Homa.Gram] = []
@@ -1213,7 +1220,20 @@ extension LXAssembly {
           )
         }
       }
-      // 依詞值去重（保留先出現者＝factory 優先）、各分區依分數降冪排序；
+      // 控頻：雷同之詞音配對（同值同讀音）者，其權重以使用者辭典者為最優先——見本函式之
+      // `- Note:`。同一配對在使用者辭典內出現多筆時取其中最高分者。
+      if !userGrams.isEmpty {
+        var userGramByPair: [Homa.CandidatePair: Homa.Gram] = [:]
+        for gram in userGrams {
+          let pair = Homa.CandidatePair(keyArray: gram.keyArray, value: gram.current)
+          if let existing = userGramByPair[pair], existing.probability >= gram.probability { continue }
+          userGramByPair[pair] = gram
+        }
+        factoryGrams = factoryGrams.map { gram in
+          userGramByPair[Homa.CandidatePair(keyArray: gram.keyArray, value: gram.current)] ?? gram
+        }
+      }
+      // 依詞值去重（保留先出現者＝factory 位置優先）、各分區依分數降冪排序；
       // 長於格數者剔除——多出的段即使用者從未敲下之音節（見本函式之文件）。
       var seenValues = Set<String>()
       var result: [Homa.Gram] = []

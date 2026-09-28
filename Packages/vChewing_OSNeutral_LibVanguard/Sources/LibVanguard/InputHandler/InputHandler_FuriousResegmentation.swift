@@ -230,9 +230,11 @@ extension InputHandlerProtocol {
     // 條件 1：整詞完全匹配（讀音數與簡拼段數一致）——查詢端已保證不長於格數，
     // 此處攔截「前綴殘缺」（短於格數）之自動套用。
     guard top.keyArray.count == cells.count else { return false }
-    // 條件 2：唯一匹配或顯著勝出。
-    if grams.count >= 2 {
-      let runnerUp = grams[1]
+    // 條件 2：唯一匹配或顯著勝出。「次級」取**分數**上之次高者，非清單之第二筆——本查詢之
+    // 呈現順序係分區制（原廠命中先、其後使用者片語命中），清單序不等於分數序；控頻既令
+    // 原廠區塊內亦可出現使用者側之權重，以清單位置取次級即會誤判「明確勝出」（實錄：被降頻
+    // 之原廠條目居清單第二、而真正之近分競爭者居其後，遂誤觸自動套用、把該拍逕行消費）。
+    if let runnerUp = grams.dropFirst().max(by: { $0.probability < $1.probability }) {
       guard top.probability - runnerUp.probability >= kFuriousAbbreviationDominanceThreshold else {
         return false
       }

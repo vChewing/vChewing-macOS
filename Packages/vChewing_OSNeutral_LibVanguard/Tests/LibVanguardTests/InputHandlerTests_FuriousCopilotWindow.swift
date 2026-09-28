@@ -507,6 +507,89 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(commonInZhuyin == pinyinValues, "注音：\(commonInZhuyin)；拼音：\(pinyinValues)")
   }
 
+  /// 控頻：**雷同之詞音配對**（同值同讀音）之權重以使用者辭典者為最優先——狂打 copilot 窗隨之改序。
+  ///
+  /// 事主 2026-09-28 之指示：「整詞簡拼查詢之同值去重的規則需要對狂打模式也適用：對於雷同的
+  /// 詞音配對而言，其權重以使用者辭典內的權重為最優先。」通用查詢路徑本即以「使用者片語置前」
+  /// 實現此語義，整詞簡拼查詢則否；本靶以測試辭典內既存之兩筆原廠命中（科技 ㄎㄜ-ㄐㄧˋ
+  /// −3.311、科際 ㄎㄜ-ㄐㄧˋ −6.237）為雷同配對之對象，驗兩個方向：① **升頻**（科際 ⇒ −0.5）；
+  /// ② **降頻**（科技 ⇒ −12.0）。兩者皆為「可就地選字」之候選 ⇒ 窗內所見即所選。
+  ///
+  /// - Important: 兩臂皆另注入一筆**近分競爭者**（科紀，使用者辭典）——否則「明確勝出」條件成立時，
+  ///   R3-a 之自動套用會消費本拍並清空注拼槽，窗無從觀察（測試構造之條件，非生產碼之限制）。
+  /// - Important: 有副作用之輔助函式（打鍵、切環境）**不得直接寫進 `#expect` 之運算式**——Swift
+  ///   Testing 於診斷時會二次求值，該式將被執行兩遍（實錄：首遍得窗、次遍得空窗而誤報失敗）。
+  @Test("[IH171] 狂打：控頻——雷同之詞音配對取使用者辭典之權重")
+  func test_IH171_UserPhrasesControlFrequencyInFuriousWindows() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterZhuyinFuriousTestEnvironment()
+
+    /// 以注音狂打 `ㄎㄐ` 取得窗內詞值序（副作用：重置組字狀態後打字）。
+    func zhuyinWindowValues() -> [String] {
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      typeSentence("dr")
+      return testSession.state.candidates.map(\.value)
+    }
+
+    /// 以拼音狂打 `kj` 取得 α 窗之詞值序（副作用：切環境、打字、再切回注音）。
+    func pinyinWindowValues() -> [String] {
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      enterPinyinFuriousTestEnvironment()
+      typeSentence("kj")
+      let result = testSession.state.candidates.map(\.value)
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      enterZhuyinFuriousTestEnvironment()
+      return result
+    }
+
+    /// 以整詞簡拼查詢取得該詞之權重。
+    func weight(of value: String) -> Double? {
+      testHandler.currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ"])
+        .first(where: { $0.current == value })?.probability
+    }
+
+    // ⓪ 基線：無使用者條目時，原廠側之兩筆命中（科技 −3.311 於科際 −6.237 之前）。
+    let baselineZhuyin = zhuyinWindowValues()
+    #expect(baselineZhuyin == ["科技", "科際", "ㄐ"], "實得：\(baselineZhuyin)")
+
+    // ① 升頻：雷同配對（科際 ㄎㄜ-ㄐㄧˋ）之權重改取使用者側（−0.5）⇒ 躍居首位。
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科際", score: -0.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科紀", score: -0.6),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    let boostedJi = weight(of: "科際")
+    let boostedKe = weight(of: "科技")
+    let boostedZhuyin = zhuyinWindowValues()
+    let boostedPinyin = pinyinWindowValues()
+    #expect(boostedJi == -0.5, "實得：\(boostedJi as Any)")
+    #expect(boostedKe == -3.311, "非雷同者不受牽連；實得：\(boostedKe as Any)")
+    #expect(boostedZhuyin == ["科際", "科技", "科紀", "ㄐ"], "實得：\(boostedZhuyin)")
+    #expect(boostedPinyin == ["科際", "科技", "科紀"], "實得：\(boostedPinyin)")
+
+    // ② 降頻：改把「科技」壓至 −12.0 ⇒ 沉於「科際」（−6.237）之下（覆寫為雙向）。
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科技", score: -12.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科紀", score: -6.5),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    let demotedKe = weight(of: "科技")
+    let untouchedJi = weight(of: "科際")
+    let demotedZhuyin = zhuyinWindowValues()
+    let demotedPinyin = pinyinWindowValues()
+    #expect(demotedKe == -12.0, "實得：\(demotedKe as Any)")
+    #expect(untouchedJi == -6.237, "實得：\(untouchedJi as Any)")
+    #expect(demotedZhuyin == ["科際", "科技", "科紀", "ㄐ"], "實得：\(demotedZhuyin)")
+    #expect(demotedPinyin == ["科際", "科技", "科紀"], "實得：\(demotedPinyin)")
+  }
+
   // MARK: - 中英混合輸入回退對注音狂打之否決（P265）
 
   /// 「中英混合輸入回退」一旦啟用，注音狂打即**一律被視為關閉**（即便其開關仍為真）。

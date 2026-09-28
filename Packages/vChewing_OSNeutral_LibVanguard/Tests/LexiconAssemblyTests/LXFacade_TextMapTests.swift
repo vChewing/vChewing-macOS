@@ -859,6 +859,66 @@ struct LXFacadeTextMapTests {
     #expect(!threeCellValues.contains("科記"), "實得：\(threeCellValues)")
   }
 
+  /// 控頻：整詞簡拼查詢內**雷同之詞音配對**（同值同讀音）者，其權重以使用者辭典者為最優先。
+  ///
+  /// 通用查詢路徑以「使用者片語置前 ＋ `consolidate` 先插入者勝」實現此語義；本查詢之呈現
+  /// 順序係分區制，故以使用者側之條目就地取代同配對之原廠條目。本靶驗三事：
+  /// ① 原廠之權重遭使用者側覆寫（升頻）；② 覆寫亦可用於降頻（雙向）；③ 非雷同者
+  /// （同值而異讀音）不在覆寫之列。
+  @Test
+  func testAbbreviatedWordCandidatesUserPhrasesControlFrequency() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = LXAssembly.LXFacade(isCHS: true)
+    let textMap = makeTextMap([
+      ("ㄎㄜ-ㄐㄧˋ", [("科技", -3.0, 5)]),
+      ("ㄎㄜ-ㄐㄧˊ", [("科吉", -6.0, 5)]),
+    ])
+
+    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    instance.setOptions { config in
+      config.bypassUserPhrasesData = false
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.isCNSEnabled = false
+      config.filterNonCNSReadings = false
+      config.partialMatchEnabled = false // 整詞簡拼查詢恆為 partial 語義、與此偏好無關。
+    }
+
+    /// 以給定之使用者造詞重查，回傳「科技」之權重與整份清單之詞值序。
+    func query(userPhrases: String) -> (weight: Double?, values: [String]) {
+      instance.injectTestData(userPhrases: { $0.replaceData(textData: userPhrases) })
+      let grams = instance.lxQuerier.abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ"])
+      return (
+        grams.first(where: { $0.current == "科技" })?.probability,
+        grams.map(\.current)
+      )
+    }
+
+    // ⓪ 基線：原廠之權重（-3.0）居首。
+    let baseline = query(userPhrases: "")
+    #expect(baseline.weight == -3.0, "實得：\(baseline.weight as Any)")
+    #expect(baseline.values == ["科技", "科吉"], "實得：\(baseline.values)")
+
+    // ① 升頻：雷同之詞音配對（同值同讀音）⇒ 權重取使用者側（-0.5）。
+    let boosted = query(userPhrases: "科技 ㄎㄜ-ㄐㄧˋ -0.5\n")
+    #expect(boosted.weight == -0.5, "實得：\(boosted.weight as Any)")
+    #expect(boosted.values == ["科技", "科吉"], "實得：\(boosted.values)")
+
+    // ② 降頻：同一配對之使用者權重低於其他原廠命中 ⇒ 沉於其後（覆寫為雙向）。
+    let demoted = query(userPhrases: "科技 ㄎㄜ-ㄐㄧˋ -9.0\n")
+    #expect(demoted.weight == -9.0, "實得：\(demoted.weight as Any)")
+    #expect(demoted.values == ["科吉", "科技"], "實得：\(demoted.values)")
+
+    // ③ 界線：同值而異讀音（ㄎㄜ-ㄐㄧˊ）者非「雷同之詞音配對」⇒ 不覆寫；
+    //    該使用者條目另因依詞值去重而讓位於原廠條目。
+    let mismatched = query(userPhrases: "科技 ㄎㄜ-ㄐㄧˊ -0.5\n")
+    #expect(mismatched.weight == -3.0, "實得：\(mismatched.weight as Any)")
+    #expect(mismatched.values == ["科技", "科吉"], "實得：\(mismatched.values)")
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable, Hashable {
