@@ -832,6 +832,84 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
+  // MARK: - 未完成前綴之讀音桶展開（P267）
+
+  /// 注音狂打：**單聲母（未完成之合法前綴）之窗與拼音側同構**。
+  ///
+  /// 拼音側敲單字母時，桶由字母流反推之可能音節構成（`zhuyinReadings(forPinyinFragment:)`）⇒
+  /// 窗內是「以該聲母起首之全部完整讀音」的真候選；注音側原逕行展開未完成音節之聲調變體，
+  /// 而單聲母本身不是任何詞條之讀音 ⇒ 桶內全屬無效鍵、窗內只剩讀音回聲（實測：注音 ㄎ 之窗
+  /// 僅一筆「ㄎ」，拼音 `k` 則有 376 筆）。本靶釘三事：① 注音單聲母之窗不再只有回聲、並含
+  /// 真候選；② 兩側之候選集**同一**（同一桶、同一語言模組）、首選亦同；③ **完整音節不展開**
+  /// （ㄎㄜ 之窗不得出現 ㄎㄞ 等更長讀音之字）。
+  @Test("[IH176] 注音狂打：單聲母之窗與拼音側同構")
+  func test_IH176_IncompletePrefixBucketMatchesPinyinSide() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    clearTestPOM()
+
+    // ① 拼音側之基準（`k`）。
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("k")
+    let pinyinValues = testSession.state.candidates.map(\.value)
+    #expect(pinyinValues.count > 100, "實得：\(pinyinValues.count)")
+    #expect(pinyinValues.contains("科"), "實得：\(pinyinValues.prefix(8))")
+
+    // ② 注音側之單聲母（大千 `d` ＝ ㄎ）：候選集與首選皆與拼音側一致。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("d")
+    let zhuyinValues = testSession.state.candidates.map(\.value)
+    #expect(zhuyinValues.count > 100, "實得：\(zhuyinValues.count)")
+    #expect(zhuyinValues != ["ㄎ"], "單聲母不得只給讀音回聲。")
+    #expect(Set(zhuyinValues) == Set(pinyinValues), "兩側之候選集須同一。")
+    #expect(zhuyinValues.first == pinyinValues.first, "實得：\(zhuyinValues.first ?? "nil")")
+
+    // ③ 完整音節不展開：ㄎㄜ（大千 `dk`）之窗不含 ㄎㄞ 等更長讀音之字。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("dk")
+    let completeValues = testSession.state.candidates.map(\.value)
+    #expect(completeValues.contains("科"), "實得：\(completeValues.prefix(8))")
+    #expect(!completeValues.contains("開"), "完整音節不得展開為更長之讀音。")
+    #expect(!completeValues.contains("顆顆"), "完整音節不得展開為更長之讀音。")
+  }
+
+  /// 注音狂打：**單聲母之固化與拼音側同構**——仍可提交，且結果同一。
+  ///
+  /// 桶展開之後，單聲母之固化不再是「插入一批無效鍵」而是「插入該聲母家族之真讀音鍵」⇒
+  /// `Tekkon.SyllableIndex.isComplete(_:)` 之紅線（**不得**以之為「可否提交」之依據）由此靶
+  /// 守住：注音 ㄎ＋方向鍵（交棒固化）與拼音 `k`＋空格（無調確認組字）必須得到同一結果。
+  @Test("[IH177] 注音狂打：單聲母之固化與拼音側同構")
+  func test_IH177_IncompletePrefixSolidifyMatchesPinyinSide() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    clearTestPOM()
+
+    // ① 拼音側之基準：`k` ＋ 空格（無調確認組字）。
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("k")
+    typeSentence(" ")
+    let pinyinKeys = testHandler.assembler.actualKeys
+    let pinyinDisplay = generateDisplayedText()
+
+    // ② 注音側：ㄎ ＋ 無修飾方向鍵（交棒固化）。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("d")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    let zhuyinKeys = testHandler.assembler.actualKeys
+    let zhuyinDisplay = generateDisplayedText()
+    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
+    #expect(zhuyinKeys == ["ㄎㄜ"], "實得：\(zhuyinKeys)")
+    #expect(zhuyinDisplay != "ㄎ", "固化不得停留在讀音原文。")
+    #expect(zhuyinKeys == pinyinKeys, "實得：\(zhuyinKeys) vs \(pinyinKeys)")
+    #expect(zhuyinDisplay == pinyinDisplay, "實得：\(zhuyinDisplay) vs \(pinyinDisplay)")
+  }
+
   // MARK: - 中英混合輸入回退對注音狂打之否決（P265）
 
   /// 「中英混合輸入回退」一旦啟用，注音狂打即**一律被視為關閉**（即便其開關仍為真）。

@@ -27,7 +27,8 @@ extension InputHandlerProtocol {
   /// （`furiousTypingFrontCandidates`）共用同一份閘門與讀音桶，確保兩者行為一致。
   /// 逐字選字模式（SCPC）啟用時狂打完全無效，故在此一併設閘。
   /// **讀音桶之來源依注拼槽之鍵盤家族分流**：拼音側由字母流反推可能之注音音節、
-  /// 再展開聲調；注音側之未完成音節本身即讀音，逕行展開聲調變體即可（見下）。
+  /// 再展開聲調；注音側之未完成音節本身即讀音——惟該音節若僅為**合法前綴**（單聲母等），
+  /// 則先以音節索引補全為完整讀音再展開聲調（與拼音側同構；見下）。
   /// 若 copilot 組句的最後節點橫跨「最後提交鍵＋前方」邊界，一併回傳該節點的完整
   /// 詞音配對（如「世界」[ㄕˋ,ㄐㄧㄝˋ]）；preedit 用的 preview 仍維持越界 suffix。
   /// `assembledMainValues` 為 copilot 全句組句的主段範圍擷取（與前方 suffix 擷取互為
@@ -60,9 +61,28 @@ extension InputHandlerProtocol {
       // 注音側：未完成音節即讀音本體、無須反推；與顯示源共用同一判準（連聲調之有無
       // 一併沿用），以免「窗開了、桶卻空著」或「桶由無讀音之聲調槽生成」。
       guard let zhuyin = furiousFrontUnfinishedReading else { return nil }
-      bucket = composer.intonation.isEmpty
-        ? Tekkon.makeToneInsensitiveVariants(of: zhuyin)
-        : [zhuyin]
+      if composer.intonation.isEmpty {
+        // 「未完成之合法前綴」（單聲母／單介音等，如今日之 16 條嚴格前綴）：其本身非任何
+        // 詞條之讀音 ⇒ 逕行展開聲調變體只會得到一批無效鍵（實測：注音 ㄎ 自成一拍時之窗內
+        // 僅有讀音回聲「ㄎ」，而拼音 k 之窗內有 376 筆真候選）。故**於簡拼路徑不適用時**
+        // 以排列中立之音節索引補全為「以該前綴起首之全部完整讀音」——與拼音側
+        // `zhuyinReadings(forPinyinFragment:)` 同構（實測同一拍之兩側桶同為 100 鍵：
+        // 20 讀音 × 5 聲調），桶內之鍵因而是真讀音、可命中詞條。
+        // - Important: **簡拼路徑（≥ 2 格）適用時不展開**：該情境下整詞候選由簡拼查詢供給、
+        //   尾端之讀音原字串回退值（`rawReadingFallbackWeight`）亦賴此桶（P262）；若一併展開，
+        //   該族之真候選會灌滿窗並埋掉整詞候選（實測：ㄎㄐ 之窗由 `["科技","科記","科際","ㄐ"]`
+        //   變為數百筆 ㄐ 族單字）。
+        // - Note: 此處之 `isComplete` 只判「是否還需要補全」，**不是**「可否提交」之依據
+        //   （見 `Tekkon.SyllableIndex.isComplete(_:)` 之警告）：完整音節照舊只展開自身之
+        //   聲調變體，前綴則補全——兩者之固化語義皆為「只插桶、不覆寫」。
+        let index = Tekkon.SyllableIndex.shared(parser: composer.parser)
+        let expands = furiousZhuyinAbbreviationCells == nil
+          && !index.isComplete(zhuyin) && index.isPrefix(zhuyin)
+        let stems = expands ? index.completions(of: zhuyin) : [zhuyin]
+        bucket = stems.flatMap { Tekkon.makeToneInsensitiveVariants(of: $0) }
+      } else {
+        bucket = [zhuyin]
+      }
     }
     guard !bucket.isEmpty else { return nil }
     // 以組字器副本（copilot）試算前方組句；不影響原組字器。
