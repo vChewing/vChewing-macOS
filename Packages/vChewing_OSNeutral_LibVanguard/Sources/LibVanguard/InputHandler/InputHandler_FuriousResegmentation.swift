@@ -74,7 +74,8 @@ extension InputHandlerProtocol {
   /// - Important: 三者必須保持**拼音專屬**，故一律用本旗子而非 `isFuriousTypingModeEffective`：
   ///   ① `Typewriter_BPMFFullMatch` 之 `allowsExtendedRomajiBuffer`（該旗子只對 `romajiBuffer`
   ///   有意義）；② 同檔之 trail 記錄（trail 是拼音字母 blob）；③ `isPinyinFamilyTypingMode`
-  ///   之語意（見 `InputHandler_CoreProtocol.swift`）。
+  ///   之語意（見 `InputHandler_CoreProtocol.swift`）；④ `retrievePOMSuggestions` 之容錯查詢
+  ///   （讀的是拼音字母流）。
   public var isPinyinFuriousTypingModeEffective: Bool {
     currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
@@ -85,10 +86,28 @@ extension InputHandlerProtocol {
   ///   `Typewriter/` 內與其唯一消費者（自動切音節判準）同檔；判準遷入 `Tekkon` 之後，
   ///   本旗子隨之歸位——它**消費 `typingMode`**，是 Handler 側之模式真值，不是打字機之物。
   ///
-  /// - Important: 本旗子是**注音側各狂打特性之閘門**（自動切音節、copilot 窗之讀音桶、
-  ///   簡拼 cells 等），故一律用本旗子而非 `isFuriousTypingModeEffective`。
+  /// - Important: 本旗子是**注音側「連續注音」各狂打特性之閘門**（自動切音節、簡拼 cells、
+  ///   前方固化），故一律用本旗子而非 `isFuriousCopilotEligible`。**中英混合輸入回退啟用時
+  ///   本旗子恆為假**（P273）：彼時 ASCII 按鍵由回退之打字機接管、讀音逐鍵累積於其緩衝區，
+  ///   而自動切音節與前方固化皆會把該緩衝區提早固化 ⇒ 與回退「先吸收、整段不成立才回退」
+  ///   之語義相衝。此際之狂打只及於**讀音素材之消費**（copilot 候選窗、前方預覽）。
   public var isZhuyinFuriousTypingModeEffective: Bool {
     isFuriousTypingModeEffective && !composer.isPinyinMode
+      && !mixedAlnumZhuyinFuriousInEffect
+  }
+
+  /// copilot 候選窗與前方預覽是否成立——即「狂打之讀音素材確實存在」之閘門。
+  ///
+  /// - Important: 兩條來源**互斥**（依按鍵之接管者分流）：
+  ///   ① **純狂打**（`isFuriousTypingModeEffective`）：素材為注拼槽之未完成拼裝
+  ///      （拼音側 `romajiBuffer`、注音側當前音節）；
+  ///   ② **中英混合輸入回退**（`mixedAlnumZhuyinFuriousInEffect`）：素材為混打之 ASCII
+  ///      緩衝區——它本即「當前注音排列可覆蓋之 ASCII 序列，尚待辨識為英文抑或注音」，
+  ///      故與注拼槽之未完成音節是同一個東西的兩種住處。
+  ///   兩者不得同時成立：回退啟用時 `handleComposition` 一律派給
+  ///   `MixedAlphanumericalTypewriter`，`typingMode` 之狂打值於該情境只承載「素材之語意」。
+  public var isFuriousCopilotEligible: Bool {
+    isFuriousTypingModeEffective || mixedAlnumZhuyinFuriousInEffect
   }
 
   /// 狂打模式有效時，注拼槽內尚未固化之讀音素材（copilot 窗頂部 pane 之資料源）。
@@ -97,8 +116,14 @@ extension InputHandlerProtocol {
   /// 未完成之音節原字串（一鍵一符號，無跨音節字母流可言，故直接取注拼槽之組字結果）。
   /// 註：若注拼槽內只有聲調、尚無任何聲介韻，則「非空」但無讀音可示 —— 本屬性一律回
   /// `nil`，此即「未完成讀音素材」之唯一判準（見 `hasFuriousFrontPending`）。
+  ///
+  /// - Important: **素材之住處與量測分離**（P273）：素材可以住在注拼槽（純狂打），也可以
+  ///   住在混打之 ASCII 緩衝區（中英混合輸入回退 ＋ 注音狂打）——後者之量測即
+  ///   `mixedAlnumPendingReading`（它讀緩衝區，因為該情境下注拼槽只是緩衝區之投影、
+  ///   且該投影可能已被打字機清空）。故本屬性先問「素材住哪裡」，再交該處量測。
   public var furiousFrontUnfinishedReading: String? {
-    guard isFuriousTypingModeEffective else { return nil }
+    guard isFuriousCopilotEligible else { return nil }
+    if mixedAlnumZhuyinFuriousInEffect { return mixedAlnumPendingReading }
     switch typingMode {
     case .pinyinFuriousTyping:
       let romaji = composer.romajiBuffer
@@ -119,6 +144,9 @@ extension InputHandlerProtocol {
   ///   以免出現「旗子說有、顯示源說沒有」之狀態（copilot 窗開了卻無讀音可示）。
   ///   P255 之前本旗子為拼音專屬之 `!romajiBuffer.isEmpty`；注音狂打接入 copilot 窗時
   ///   改為依 `typingMode` 分流，並收斂為此單一判準。
+  ///   **P273 起「素材之住處」不再限於注拼槽**：中英混合輸入回退啟用時，素材住在混打之
+  ///   ASCII 緩衝區（該緩衝區已被投影進注拼槽，故量測處不變）。使用者可見之義為
+  ///   「前方有一個待確認之讀音」，與它住在哪裡無涉。
   public var hasFuriousFrontPending: Bool { furiousFrontUnfinishedReading != nil }
 
   /// 注音狂打：**標準選字窗**用之簡拼整詞候選。
@@ -197,14 +225,26 @@ extension InputHandlerProtocol {
   ///   之窗內雖有「科技獎」，顯示卻為「ㄎㄐㄐ」）。窗層之補救
   ///   （`furiousZhuyinAbbreviationCandidatesForStandardWindow`）只能補候選、改不了組句結果，
   ///   故須在此就鍵鏈層處理。
-  func solidifyFuriousFrontReading() {
+  /// - Note: **中英混合輸入回退之讀音素材**（P273）：素材住混打緩衝區，故固化成功後除清空
+  ///   注拼槽外、**尚須清空該緩衝區**——否則同一批 ASCII 會在其後被當英文再遞交一次。
+  ///   本情境下 `furiousZhuyinAbbreviationCells` 恆為 `nil`（簡拼屬「連續注音」語義，於
+  ///   回退下封印），故固化語義與純狂打之完整音節一致：只插讀音桶、不覆寫。
+  /// - Returns: 本拍是否確實被固化所消費（`true` ⇒ 呼叫端應整拍結束、不再續走分診；
+  ///   `false` ⇒ 本鍵仍屬呼叫端，例如 α 路徑查無候選）。**拼音側與中英混打側之「已消費」
+  ///   語義不同**：前者之判準為「注拼槽是否仍有未完成讀音」，後者為「混打緩衝是否已清空」
+  ///   ——後者之素材住緩衝區，而 `hasFuriousFrontPending` 讀的正是該緩衝，故固化後仍為真。
+  @discardableResult
+  func solidifyFuriousFrontReading() -> Bool {
     guard let furiousContext = furiousFrontContext else {
-      solidifyAbbreviatedFrontReading()
-      return
+      return solidifyAbbreviatedFrontReading()
     }
     let bucket = furiousContext.bucket
     let isPinyin = composer.isPinyinMode
     let romaji = composer.romajiBuffer
+    // 中英混合輸入回退：讀音素材住在混打緩衝區、固化時須一併消費之。
+    // 不消費則「讀音已成為組字器內的節點」與「緩衝區仍留著同一批 ASCII」並存，
+    // 其後任何遞交路徑都會把該批 ASCII 當英文再遞交一次（重複輸入）。
+    let isMixedAlnumReading = mixedAlnumZhuyinFuriousInEffect
     // 完整音節與否須在清空注拼槽之前判定（重切分 trail 不變量所需）。
     // 注音側不寫 trail（§8.6 之 IH163），故整段 trail bookkeeping 為拼音專屬。
     let isCompleteSyllable = isPinyin && composer.parser.mapZhuyinPinyin?[romaji] != nil
@@ -213,10 +253,11 @@ extension InputHandlerProtocol {
       composer.clear()
       furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
       retrievePOMSuggestions(apply: true)
-      return
+      return true
     }
-    guard (try? assembler.insertKeys([.multipleKeys(bucket)])) != nil else { return }
+    guard (try? assembler.insertKeys([.multipleKeys(bucket)])) != nil else { return false }
     composer.clear()
+    if isMixedAlnumReading { mixedAlnumConfig.resetContent() }
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
     if isPinyin {
       if isCompleteSyllable {
@@ -230,6 +271,7 @@ extension InputHandlerProtocol {
       }
     }
     retrievePOMSuggestions(apply: true)
+    return true
   }
 
   /// 注音狂打之交棒（P266）：把組字器尾端之簡拼格鏈換成整詞候選之讀音。
@@ -286,18 +328,20 @@ extension InputHandlerProtocol {
   /// - Important: 名次一律**按分數取**，非清單之第一筆——本查詢之呈現順序係分區制
   ///   （原廠命中先、其後使用者片語命中），清單序≠分數序；取清單首筆即會令分數更高之
   ///   使用者片語候選（如其讀音互異）永遠無法經空格／Tab 浮現。
-  private func solidifyAbbreviatedFrontReading() {
-    guard let cells = furiousAbbreviatedCells else { return }
+  @discardableResult
+  private func solidifyAbbreviatedFrontReading() -> Bool {
+    guard let cells = furiousAbbreviatedCells else { return false }
     let romaji = composer.romajiBuffer
-    guard !romaji.isEmpty else { return }
+    guard !romaji.isEmpty else { return false }
     guard let topCandidate = currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: cells)
-      .max(by: { $0.probability < $1.probability }) else { return }
+      .max(by: { $0.probability < $1.probability }) else { return false }
     let readings = topCandidate.keyArray
-    guard !readings.isEmpty else { return }
-    guard (try? assembler.insertKeys(readings.map { .singleKey($0) })) != nil else { return }
+    guard !readings.isEmpty else { return false }
+    guard (try? assembler.insertKeys(readings.map { .singleKey($0) })) != nil else { return false }
     composer.replacePinyinBuffer(with: "")
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
     invalidateFuriousTrail() // 簡拼前綴非完整音節：trail 失效（同「z」政策）。
+    return true
   }
 
   /// 狂拼 α 路徑（R3-a）的自動套用：注拼槽整段（含本拍字元）無法展開成完整音節

@@ -355,9 +355,11 @@ extension SessionProtocol {
       )
       if !associates.candidates.isEmpty { result = associates }
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
-      // 狂拼模式：前方候選就地選字（滑鼠點選／Shift+選字鍵亦走這裡）。
+      // 狂打 copilot 窗：前方候選就地選字（滑鼠點選／Shift+選字鍵亦走這裡）。
       // 使用者顯式選字＝符合 POM 記憶的明確意志，故傳入 memorizePOM: true。
-      if inputHandler.isFuriousTypingModeEffective {
+      // 用 copilot 之閘而非 `isFuriousTypingModeEffective`：回退與注音狂打並存時後者為真、
+      // 而本窗仍可顯示（見 `isFuriousCopilotEligible`）。
+      if inputHandler.isFuriousCopilotEligible {
         let selectedValue = state.candidates[index]
         inputHandler.confirmFuriousFrontCandidate(selectedValue, memorizePOM: true)
         switchState(inputHandler.generateStateOfInputting())

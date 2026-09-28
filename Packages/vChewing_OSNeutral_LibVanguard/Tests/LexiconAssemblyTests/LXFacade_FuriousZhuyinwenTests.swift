@@ -61,13 +61,13 @@ struct LXFacadeFuriousZhuyinwenTests {
   /// ——只驗 ① 不足以證明旗標接得上下游。
   ///
   /// 期望式即「狂打確實生效中」：**磁帶與 SCPC 下狂打不生效 ⇒ 一律不抑制**（此為事主
-  /// 2026-09-26 之裁定「磁帶與 SCPC 先不要啟用狂打特性」）；**注音側另受中英混合輸入回退
-  /// 否決**（事主 2026-09-26：「如果中英文輸入回退有被啟用的話，哪怕注音狂打模式開關有
-  /// 開啟，注音狂打模式也得被視為關閉」）；其餘看該側之開關。
+  /// 2026-09-26 之裁定「磁帶與 SCPC 先不要啟用狂打特性」）；其餘看該側之開關。
   ///
-  /// - Important: 回退之否決**只及於注音側**：回退本即注音鍵盤專屬（拼音輸入下不可用），
-  ///   若連帶否決拼音側，則一位注音時期遺留該偏好、其後改用拼音之使用者會無故失去狂拼。
-  ///   本靶之 `mixedAlnum` 維度故只參與注音側之期望式——若實作誤加於兩側，拼音側之組合即轉紅。
+  /// - Important: **中英混合輸入回退之維度已撤除**（P273）：P265–P272 期間回退啟用即否決
+  ///   注音狂打（故本表之注音側曾為 `furious4Zhuyin && !mixedAlnum`）；P273 令兩者並存——
+  ///   並存時混打緩衝區即狂打之讀音素材（copilot 候選窗據以顯示）⇒「狂打確實生效中」為真。
+  ///   故 `mixedAlnum` 現為**純對照維度**：它在兩側皆不得影響期望式（本表仍保留該維度，
+  ///   俾「誤把回退當成否決者」之實作轉紅）。
   @Test
   func testZhuyinwenSuppressionTruthTableOverAllModes() throws {
     defer {
@@ -96,10 +96,10 @@ struct LXFacadeFuriousZhuyinwenTests {
                   prefs.mixedAlphanumericalEnabled = mixedAlnum
                   instance.syncPrefs()
 
-                  // 回退之否決只及於注音側（見本靶之說明）。
+                  // 回退之維度已撤（P273）——見本靶之說明。
                   let furiousSideEnabled = isPinyin
                     ? furious4Pinyin
-                    : (furious4Zhuyin && !mixedAlnum)
+                    : furious4Zhuyin
                   let expected = !cassette && !scpc && furiousSideEnabled
                   let context = """
                   拼音打字＝\(isPinyin)、狂拼＝\(furious4Pinyin)、狂注＝\(furious4Zhuyin)\

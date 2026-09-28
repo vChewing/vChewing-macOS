@@ -43,7 +43,8 @@ extension InputHandlerProtocol {
     bucket: [String], preview: String, crossingPair: CandidateInState?,
     assembledMainValues: [String], tailReading: String?
   )? {
-    guard isFuriousTypingModeEffective else { return nil }
+    // 閘門即「狂打之讀音素材確實存在」（純狂打之注拼槽，或中英混合輸入回退之緩衝區）。
+    guard isFuriousCopilotEligible else { return nil }
     guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return nil }
     // 前方讀音桶：拼音側須先由字母流反推可能之注音音節、再展開聲調；注音側之未完成
     // 音節本身即為讀音，逕行展開聲調變體即可（聲調已進注拼槽時即為唯一解）。
@@ -420,6 +421,11 @@ extension InputHandlerProtocol {
     // （比逐欄重建更忠實，且兩側共用同一段碼）。
     let composerBackup = composer
     composer.clear()
+    // 中英混合輸入回退側：讀音素材住混打緩衝區。候選一旦套用，該緩衝即被候選之讀音
+    // 取代（與注拼槽同理）⇒ 一併清空；套用失敗時整段還原（與 `composerBackup` 同構）。
+    let mixedAlnumBackup = mixedAlnumConfig.buffer
+    let clearsMixedAlnumBuffer = mixedAlnumZhuyinFuriousInEffect
+    if clearsMixedAlnumBuffer { mixedAlnumConfig.resetContent() }
     // 三路徑套用（置頂無橫跨／跨邊界／前方單音節）共用於真實確認與高亮預覽。
     var pomObservation: Homa.PerceptionIntel?
     let outcome = applyFuriousFrontCandidate(
@@ -428,8 +434,9 @@ extension InputHandlerProtocol {
     )
     switch outcome {
     case .failed:
-      // 失敗防禦：復原注拼槽暫存，靜默退回。
+      // 失敗防禦：復原注拼槽暫存（與混打緩衝），靜默退回。
       composer = composerBackup
+      if clearsMixedAlnumBuffer { mixedAlnumConfig.buffer = mixedAlnumBackup }
       return
     case .inserted:
       // 覆寫失敗：保留已插入讀音（組句結果與 copilot 預覽一致）。
@@ -561,7 +568,17 @@ extension InputHandlerProtocol {
       cursor = displayTextSegments.joined().count
     }
     let cursorSansReading = cursor
-    let reading: String = noReading ? "" : (furiousPreview ?? readingForDisplay)
+    // ★ 中英混合輸入回退：**組字區之讀音欄顯示混打緩衝之原文**（該緩衝即「當前正在
+    // 組裝的讀音」，故與純注音／拼音之讀音欄語義一致）。此前該原文只以 Tooltip 呈現；
+    // 本調整對混打**全局生效**（與注音狂打之開關無涉）——狂打未啟用時讀音欄同樣顯示之。
+    // 純狂打側不受影響：其素材住注拼槽，`readingForDisplay` 本即取該處。
+    let mixedAlnumReading: String? = {
+      guard prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty else { return nil }
+      return mixedAlphanumericalBuffer
+    }()
+    let reading: String = noReading
+      ? ""
+      : (mixedAlnumReading ?? furiousPreview ?? readingForDisplay)
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -632,13 +649,6 @@ extension InputHandlerProtocol {
     /// 中英混打模式：以 Tooltip 顯示目前 ASCII buffer 的原始內容，方便使用者識別輸入狀態。
     /// 第二行顯示游標最前方正在組裝的注音讀音預覽（注拼槽為空時不附加該行）；
     /// 該讀音之呈現沿用 Tooltip 既有規則，故「以漢語拼音顯示組字區讀音」與直排與否一體適用。
-    if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
-      let readingPreview = inlineReadingPreview
-      result.tooltip = readingPreview.isEmpty
-        ? mixedAlphanumericalBuffer
-        : mixedAlphanumericalBuffer + "\n" + readingPreview
-      result.tooltipDuration = 0 // 設為 0 使 Tooltip 恆久顯示，直到混打模式結束。
-    }
     /// 狂拼模式：預覽啟用時附加前方候選清單，使候選窗常駐顯示。
     if let furiousContext {
       let tailCandidates = buildFuriousFrontCandidates(from: furiousContext)
@@ -650,14 +660,26 @@ extension InputHandlerProtocol {
       let abbreviatedCandidates = buildFuriousAbbreviatedCandidates(cells: abbreviatedCells)
       if !abbreviatedCandidates.isEmpty { result.candidates = abbreviatedCandidates }
     }
-    /// 狂拼模式：候選窗不顯示時，以 Tooltip 顯示注拼槽暫存的原始拼音，
-    /// 讓使用者仍能核對自己實際敲下的字母。候選窗顯示時抑制 tooltip，避免
-    /// 與候選窗重疊（原文拼音的可見性改由固化後正常選字窗的 revlookup 承擔）。
-    /// α 路徑（多音節簡拼）查無命中時亦顯示暫存拼音。
-    if result.tooltip.isEmpty, result.candidates.isEmpty, furiousPreview != nil
-      || (furiousContext == nil && furiousAbbreviatedCells != nil) {
-      result.tooltip = composer.romajiBuffer
-      result.tooltipDuration = 0 // 恆久顯示，直到暫存拼音被確認或清除。
+    /// 讀音原文之落點：**copilot 候選窗在場時由該窗頂端之「未完成讀音」區域承載**
+    /// （見 `unfinishedReading` 之資料源），Tooltip 讓位——兩者本即重疊於畫面同一處，
+    /// 一併顯示即同一段原文說兩次。
+    /// 候選窗缺席時則分兩側：**中英混合輸入回退**以 Tooltip 承載混打之 ASCII 原文
+    /// （含注拼槽之讀音預覽行）；拼音狂打側則以 Tooltip 承載注拼槽暫存之原始拼音，
+    /// 讓使用者仍能核對自己實際敲下的字母（候選窗顯示時抑制之，原文之可見性改由
+    /// 固化後正常選字窗的 revlookup 承擔）。α 路徑查無命中時亦顯示暫存拼音。
+    ///
+    /// - Important: 本段須**置於候選清單生成之後**——混打側之判準即「窗在不在場」，
+    ///   而窗之有無取決於 `result.candidates`，故提前判讀會把「窗將開」誤判為「窗不在場」。
+    if result.tooltip.isEmpty, result.candidates.isEmpty {
+      if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
+        let readingPreview = inlineReadingPreview
+        result.tooltip = readingPreview.isEmpty
+          ? mixedAlphanumericalBuffer
+          : mixedAlphanumericalBuffer + "\n" + readingPreview
+      } else if furiousPreview != nil || (furiousContext == nil && furiousAbbreviatedCells != nil) {
+        result.tooltip = composer.romajiBuffer
+      }
+      result.tooltipDuration = 0 // 設為 0 使 Tooltip 恆久顯示，直到該原文被確認或清除。
     }
     return result
   }

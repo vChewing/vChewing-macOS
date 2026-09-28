@@ -503,6 +503,11 @@ extension InputHandlerProtocol {
       composer = rebuiltComposer
       return
     }
+    // 逐鍵消化時強制聲介韻調之輸入順序：該緩衝即「依槽序鍵入之讀音」之候選，凡槽序倒退
+    // 之鍵即應被拒（`receiveSequence` 於拒絕處 `break`，故槽內只留最長之合法前段）。
+    // 不設此閘則「以別鍵補滿槽位」之殘段會被就地吸納而看似合法（實測：`us` 之投影成
+    // ㄋㄧ、與 `su` 無從分辨），下游遂把非讀音之緩衝當成讀音素材。
+    rebuiltComposer.enforceCSVTOrdering = true
     rebuiltComposer.receiveSequence(mixedAlphanumericalBuffer, isRomaji: false)
     if !rebuiltComposer.isPronounceable {
       rebuiltComposer.clear()
@@ -882,7 +887,7 @@ extension InputHandlerProtocol {
       assembledResult: assembler.assembledSentence,
       cursor: actualNodeCursorPosition,
       timestamp: Date().timeIntervalSince1970,
-      matchMode: isFuriousTypingModeEffective ? .toneInsensitivePrefix : .exact
+      matchMode: isPinyinFuriousTypingModeEffective ? .toneInsensitivePrefix : .exact
     )
     // 以組字器實際返回的候選字詞權重來過濾 POM 建議：
     // 若建議的分數比當前候選的最高權重還低，則忽略以避免覆寫。

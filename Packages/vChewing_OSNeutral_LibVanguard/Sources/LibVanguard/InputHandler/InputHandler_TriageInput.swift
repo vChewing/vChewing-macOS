@@ -33,18 +33,52 @@ extension InputHandlerProtocol {
     // 去聲候選擠下）。拼音側之空格本即「無調確認組字」之鍵（`shouldUseToneInsensitivePinyinLookup`），
     // 語義不變。固化另有 Tab／Enter／標點三條路（見 `handlePunctuation` 與同檔之 kTab 分支、
     // 以及 `Typewriter_BPMFFullMatch` 之 Enter 分支）。
+    // ★ P273：**回退與注音狂打並存時，空格重新成為固化觸發鍵**——惟其理據與拼音側不同。
+    // 注音之空格在此情境下並非「陰平鍵」：讀音素材住混打緩衝區，聲調一律經數字鍵進入
+    // （`su3`＝ㄋㄧˇ），故無「空格被挪作固化即陰平無從指定」之虞；反之若不固化，本鍵
+    // 將落入混打之「整段緩衝 ＋ 半形空格」而令該讀音被當英文遞交（正是 P258 之病灶）。
+    // 故並存時空格＝固化讀音，其後本鍵續走既有流程（讀音已入組字器 ⇒ 得「送字 ＋ 空格」）。
     let spaceSolidifiesFuriousFront = isPinyinFuriousTypingModeEffective
+      || mixedAlnumZhuyinFuriousInEffect
     var spaceSolidifiedFuriousReading = false
     if session.isFuriousCopilotCandidateWindowVisible,
        !input.isHoldingAny([.control, .option, .command]),
        (input.isSpace && spaceSolidifiesFuriousFront) || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
-      solidifyFuriousFrontReading()
-      if input.isSpace, hasFuriousFrontPending {
+      // ★ P273 之修正（事主實機回報）：**混打側之待調讀音不在此固化**。
+      // 注音狂打之空格語義為「以陰平聲調確認前方讀音」（`P258`／`P260`）——惟此前本塊
+      // 對混打側一律先固化（只插**無調**聲調桶），遂令空格之聲調確認失效（實測：`su`
+      // 按空格得 `["ㄋㄧ"]` 之無調桶，而非 `ㄋㄧ`）。故凡緩衝恰為一個待確認之讀音者，
+      // 本塊**讓位**：不固化、不早退，逕交下方之鍵碼分診，由打字機以該讀音之**整組聲調
+      // 變體桶**完成確認（見 `MixedAlphanumericalTypewriter` 之
+      // `confirmMixedAlnumReadingWithLevelTone`）——與純注音狂打之固化同源。
+      // 判準與打字機之該分支**逐字相同**（`mixedAlnumPendingReading != nil`），免兩處漂移。
+      let mixedAlnumSpaceIsToneKey = mixedAlnumZhuyinFuriousInEffect
+        && mixedAlnumPendingReading != nil
+      let solidified = mixedAlnumSpaceIsToneKey ? false : solidifyFuriousFrontReading()
+      // 固化成功之判讀依素材之住處分流：拼音側之素材即注拼槽內之字母流 ⇒ 固化成功即令其
+      // 清空；中英混打側之素材住緩衝區 ⇒ 固化成功即令**緩衝清空**。不可互換：混打側之
+      // `hasFuriousFrontPending` 讀的正是該緩衝，故固化後仍為真。
+      let mixedAlnumConsumedThisBeat = !isPinyinFuriousTypingModeEffective
+        && mixedAlnumZhuyinFuriousInEffect
+      let solidifiedThisBeat = mixedAlnumConsumedThisBeat
+        ? solidified && mixedAlphanumericalBuffer.isEmpty
+        : solidified && !hasFuriousFrontPending
+      if input.isSpace, solidifiedThisBeat {
+        spaceSolidifiedFuriousReading = true
+        if mixedAlnumConsumedThisBeat {
+          // 混打側：讀音既已入組字器（非待調之讀音者），本拍即**整拍結束**——不續走分診，
+          // 否則本鍵會落入 `callCandidateState`（`spaceKeyBehaviorAgainstICB == 1` 時）而
+          // 以讀音桶開出標準選字窗，狀態自此滯留於 `.ofCandidates`（P273 實測實錄）。
+          session.switchState(generateStateOfInputting())
+          return true
+        }
+      }
+      if input.isSpace, !mixedAlnumSpaceIsToneKey, hasFuriousFrontPending {
+        // 固化不成（如 α 查無候選）⇒ 保留本鍵、逕以新狀態刷新，避免空格流入注拼槽。
         session.switchState(generateStateOfInputting())
         return true
       }
-      spaceSolidifiedFuriousReading = input.isSpace
     }
 
     // MARK: - 按鍵碼分診（Triage by KeyCode）
@@ -130,6 +164,9 @@ extension InputHandlerProtocol {
             session.switchState(generateStateOfInputting())
             return true
           }
+          // ★ P273：回退與注音狂打並存時之空格已於本函式早段整拍消費（固化前方讀音），
+          // 故本處所見之緩衝恆空 ⇒ 直落下方之送字邏輯，不繞經
+          // `MixedAlphanumericalTypewriter`（其空白鍵分支會再判一次「整段緩衝 ＋ 半形空格」）。
           // 空格輪替守衛：注拼槽尚有未完成讀音時，停用空格輪替——未完成讀音存在時，
           // 空格語義為「把讀音插入組字器」、不兼任候選輪替。
           // （拼音模式下 composer.isEmpty 涵蓋 romajiBuffer；注音模式涵蓋聲介韻調。）
@@ -169,6 +206,7 @@ extension InputHandlerProtocol {
           // 避免直接進入組字區送字邏輯而將讀音字串以原文 commit。
           // 閂滯於英打時緩衝區恆空，故須另以閂滯旗標為前提——否則該鍵會繞道至
           // 一般組字區送字邏輯（而非即刻遞交半形空格）。
+          // 緩衝區為「待確認之讀音」（回退與注音狂打並存）者已於上方早退，不至此處。
           if currentTypingMethod == .vChewingFactory, prefs.mixedAlphanumericalEnabled,
              !mixedAlphanumericalBuffer.isEmpty || mixedAlnumConfig.isLatchedToAlnum {
             if let result = MixedAlphanumericalTypewriter(self).handle(input) {

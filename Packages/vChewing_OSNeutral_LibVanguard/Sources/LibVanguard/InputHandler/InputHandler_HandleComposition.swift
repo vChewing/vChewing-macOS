@@ -21,18 +21,24 @@ extension InputHandlerProtocol {
     case .haninKeyboardSymbol where [[], .shift].contains(input.keyModifierFlags):
       return HaninSymbolTypewriter(self).handle(input)
     case .vChewingFactory where hardRequirementMet:
-      // 打字模式分派：磁帶走 CassetteTypewriter；注音鍵盤在混輸啟用時走
-      // MixedAlphanumericalTypewriter；拼音鍵盤與狂拼皆走 BPMFFullMatchTypewriter
-      // （狂拼邏輯由型別內部的狂拼閘門處理，不另設型別）。
+      // 分派依兩軸（自 P273 起明確）：
+      // ① **打字模式**：磁帶優先於一切；其餘看狂打開關與注拼槽之鍵盤家族（`typingMode`）。
+      // ② **注音鍵盤家族之接管者**：中英混合輸入回退啟用時，ASCII 按鍵一律由
+      //    `MixedAlphanumericalTypewriter` 逐鍵接管（它本即「該批按鍵之消化器」）。
+      //    此軸**先於**①，故回退與注音狂打並存時——`typingMode` 為 `.zhuyinFuriousTyping`
+      //    亦然——按鍵仍走混輸；該情境之狂打只及於「讀音素材之消費」（copilot 窗、
+      //    前方預覽），而**非**「按鍵之吸收」（見 `isZhuyinFuriousTypingModeEffective`
+      //    與 `mixedAlnumZhuyinFuriousInEffect` 之分野）。拼音側不走此軸：回退本即
+      //    注音鍵盤專屬，且 `MixedAlphanumericalTypewriter` 自身對拼音模式逕轉
+      //    `BPMFFullMatchTypewriter`（見其 `handle` 之首段）。
+      let isZhuyinKeyboardFamily = typingMode != .cassette && !composer.isPinyinMode
+      if isZhuyinKeyboardFamily, prefs.mixedAlphanumericalEnabled {
+        return MixedAlphanumericalTypewriter(self).handle(input)
+      }
       switch typingMode {
       case .cassette:
         return CassetteTypewriter(self).handle(input)
-      case .bopomofoKeyblock:
-        if prefs.mixedAlphanumericalEnabled {
-          return MixedAlphanumericalTypewriter(self).handle(input)
-        }
-        return BPMFFullMatchTypewriter(self).handle(input)
-      case .pinyinFuriousTyping, .pinyinKeyblock, .zhuyinFuriousTyping:
+      case .bopomofoKeyblock, .pinyinFuriousTyping, .pinyinKeyblock, .zhuyinFuriousTyping:
         return BPMFFullMatchTypewriter(self).handle(input)
       }
     default: return nil

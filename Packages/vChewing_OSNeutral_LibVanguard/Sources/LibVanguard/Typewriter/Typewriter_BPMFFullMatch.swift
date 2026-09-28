@@ -86,6 +86,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     if let handled = consumption.handled { return handled }
 
     // 若讀音已備妥，嘗試組字並進入候選或直接提交。
+    if input.isSpace {}
     if let composed = composeReadingIfReady(
       input: input,
       inputText: inputText,

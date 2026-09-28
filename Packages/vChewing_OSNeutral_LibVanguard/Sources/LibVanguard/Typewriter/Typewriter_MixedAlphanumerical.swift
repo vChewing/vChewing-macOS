@@ -31,6 +31,34 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     if handler.mixedAlnumConfig.isLatchedToAlnum {
       return handleLatchedAlnumInput(input, session: session)
     }
+    // 中英混合輸入回退 ＋ 注音狂打：混打緩衝區即狂打之讀音素材（copilot 候選窗之資料源）
+    // ⇒ 空白鍵之語意為「固化該讀音」而非「遞交整段 ASCII」。固化後緩衝區已被消費、為空，
+    // 故本鍵續走既有流程即得「組字區送字 ＋ 半形空格」，與注音狂打側之空白鍵語義一致。
+    // 未啟用注音狂打時本旗子恆假，故本分支不影響回退之既有空白鍵行為。
+    // ★ 中英混合輸入回退 ＋ 注音狂打：**待調讀音之空白鍵＝陰平聲調確認鍵**（與純注音
+    // 狂打看齊，`P258`／`P260`）。凡緩衝恰為一個尚未鍵入聲調之讀音者，本鍵一律**不**由
+    // 混打路徑處置——逕交既有之注音全匹配路徑（`composeReadingIfReady` 之
+    // `confirmCombination` 臂，以空格作陰平鍵完成組字）。此前混打路徑會把該音節固化為
+    // **無調**聲調桶，遂令陰平無從指定（實測：`su` 按空格得 `["ㄋㄧ"]` 之無調桶）。
+    // - Important: 本讓位**只及待調讀音**這一態。其餘各態（ASCII 詞、非讀音之緩衝、
+    //   已帶聲調者）之空白鍵語義一字不動，仍走下方既有之分支。
+    if input.isSpace, let pendingReading = handler.mixedAlnumPendingReading {
+      return confirmMixedAlnumReadingWithLevelTone(pendingReading, session: session)
+    }
+    // 中英混合輸入回退 ＋ 注音狂打：**本拍空格已由分診早段用於固化前方讀音**（見
+    // `InputHandler_TriageInput`），此刻緩衝已空、無物可遞交。
+    // 該情境下不得再讓本鍵落入 `callCandidateState`——那會以方才讀音桶殘留之候選開出
+    // **標準選字窗**，而該窗之選取語義是逐字確認、與狂打之「前方讀音就地確認」不同；
+    // 且狀態自此滯留於 `.ofCandidates`、其後每一鍵都被吸走（P273 實測實錄）。
+    // 故由本型別自行完成本拍：遞交「已組字之中文 ＋ 半形空格」，與本型別在
+    // `commitsWholeMixedBufferOnSpace` 分支及 `.ofEmpty` 分診上之語義一致。
+    if input.isSpace, handler.mixedAlnumZhuyinFuriousInEffect,
+       handler.mixedAlphanumericalBuffer.isEmpty, !handler.isConsideredEmptyForNow {
+      let chineseText = handler.committableDisplayText(sansReading: true)
+      handler.composer.clear()
+      session.switchState(State.ofCommitting(textToCommit: chineseText + " "))
+      return true
+    }
     // 波浪符號鍵（symbol menu physical key）應交還上層分診流程處理。
     // mixed mode 若此時已有可提交內容，先提交全部內容，再放行按鍵事件。
     if input.isSymbolMenuPhysicalKey {
@@ -52,12 +80,13 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 「遞交尾段 ASCII ＋ 將尾鍵送進注拼槽」。**緩衝區為空者不在此攔截**——仍交還既有流程
     // 處置，故純中文組字之空白鍵語意不因本偏好而變。**緩衝恰為一個尚未鍵入聲調之讀音者亦
     // 不在此攔截**——該狀態下混打緩衝承載的正是中文組字本身（`su`＝ㄋㄧ、`1u,`＝ㄅㄧㄝ、
-    // `s`＝ㄋ），空白鍵之語意為一聲鍵，逕予遞交即令該音節無法完成（見 `isPendingTonelessReading`）。
+    // `s`＝ㄋ），空白鍵之語意為一聲鍵，逕予遞交即令該音節無法完成（見 `mixedAlnumBufferIsTonelessReading`）。
+    // 該旗子另兼「回退與注音狂打並存」之閘：並存時空白鍵先固化讀音（見 `handle` 開頭之分支）。
     let commitsWholeMixedBufferOnSpace = input.isShiftHeld
       || (
         !handler.mixedAlphanumericalBuffer.isEmpty
           && handler.prefs.spaceKeyBehaviorAgainstICB == 0
-          && !isPendingTonelessReading
+          && !handler.mixedAlnumBufferIsTonelessReading
       )
     if input.isSpace, commitsWholeMixedBufferOnSpace {
       guard !handler.isConsideredEmptyForNow else { return nil }
@@ -481,28 +510,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   }
 
   // Tekkon 的單一注音音節最多只會佔用 4 個鍵位（聲、介、韻、調）。
+  // 真源住 `InputHandlerProtocol.maxSingleSyllableKeyCount`（狂打側之讀音量測亦用之）。
   private var maxSingleSyllableKeyCount: Int {
-    switch handler.composer.parser {
-    case .ofDachen26: 6 // 這是酷音大千26鍵的顯著缺點。
-    case .ofETen26: 5 // 僅一例：`ㄍㄧㄠˊ → vezf`。
-    default: 4 // 其餘所有注音排列，無論動態還是靜態排列，最大碼長均為 4。
-    }
-  }
-
-  /// 混打緩衝是否為「一個尚未鍵入聲調之讀音」——此時空白鍵之語意為一聲鍵（聲調選字），
-  /// 不得被「插入空格」偏好接走。
-  ///
-  /// 混打模式下，中文組字進行中之按鍵亦棲身於同一緩衝（`su`＝ㄋㄧ、`1u,`＝ㄅㄧㄝ、`s`＝ㄋ），
-  /// 故「緩衝非空」不足以證成英文意圖。本判準只問該緩衝能否作為一個讀音被注拼槽消化，
-  /// 與排列種類及 `MixedAlnumJudgeReadingsBySequentialRawKeyOrder` 開關皆無涉：動態排列之
-  /// 合法編碼本即跨鍵改寫槽值，槽序檢定不適用於此處。
-  private var isPendingTonelessReading: Bool {
-    let buffer = handler.mixedAlphanumericalBuffer
-    guard !buffer.isEmpty, buffer.count <= maxSingleSyllableKeyCount else { return false }
-    var trialComposer = handler.composer
-    trialComposer.clear()
-    trialComposer.receiveSequence(buffer, isRomaji: false)
-    return trialComposer.isPronounceable && trialComposer.intonation.value.isEmpty
+    handler.maxSingleSyllableKeyCount
   }
 
   /// 英數閂滯開關是否生效（須中英混打模式與閂滯開關兩者皆啟用）。
@@ -519,6 +529,36 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   /// 第一項證據（鍵序無以成讀音）一併失效。
   private var judgeReadingsBySequentialRawKeyOrder: Bool {
     handler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder
+  }
+
+  /// 以陰平聲調確認混打之待確認讀音（注音狂打之空白鍵語義）。
+  ///
+  /// 空格即陰平 ⇒ 本函式把該讀音**定為陰平**、寫入組字器，再清空混打緩衝與注拼槽。
+  /// **並非**插入「整組聲調變體桶」：該桶只是「尚未鍵入聲調」時之陳列容器；一旦陰平被
+  /// 確認，該讀音即為單一音節，其餘聲調不應再參與組句——否則預覽所示與遞交所得會脫鉤
+  /// （實測真語料庫：`su ` 之窗內首選為 ㄋㄧˊ 之泥，而插入全桶後由 ㄋㄧˇ 之你勝出）。
+  ///
+  /// - Note: 內部編碼之陰平即「不帶聲調符號」之鍵（`Tekkon.allowedIntonations` 之 `" "`），
+  ///   故「定為陰平」＝以該讀音之單鍵寫入；此即 `hasGrams`／`grams` 之精確匹配語義。
+  /// - Note: `pendingReading` 之來源已由 `canonicalTonelessZhuyinReading` 證其為一個
+  ///   依槽序鍵入之讀音，故其無調形態即該音節之陰平形。
+  private func confirmMixedAlnumReadingWithLevelTone(
+    _ pendingReading: String,
+    session: Session
+  )
+    -> Bool {
+    guard !pendingReading.isEmpty,
+          (try? handler.assembler.insertKeys([.singleKey(pendingReading)])) != nil
+    else { return false }
+    handler.composer.clear()
+    handler.mixedAlnumConfig.resetContent()
+    let textToCommit = handler.commitOverflownComposition
+    handler.retrievePOMSuggestions(apply: true)
+    var inputting = handler.generateStateOfInputting()
+    inputting.textToCommit = textToCommit
+    session.switchState(inputting)
+    handler.handleTypewriterSCPCTasks()
+    return true
   }
 
   @inline(__always)

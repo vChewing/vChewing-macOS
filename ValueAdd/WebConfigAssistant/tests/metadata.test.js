@@ -172,22 +172,31 @@ test('後設資料：文案之術語統一——已停用之舊稱謂不得再�
   }
 });
 
-test('後設資料：注音狂打之警示須置於 description 之首（事主 2026-09-26 裁定）', function () {
+test('後設資料：狂打與混輸回退之相容性敘述（P273 之裁定）', function () {
   const { metadata } = loadCore();
-  // 事主原文：「kFuriousTypingEnabled4Zhuyin 的 description 得在最開頭就顯示
-  // 「⚠︎ 該模式無法在中英文輸入回退模式啟用時起作用。\n」，因為插在其他位置的話不醒目。」
-  // 本靶即「醒目性」之固化物：只驗「在不在」不足以守住該裁定——**位置**才是重點。
+  // P273 令「中英混合輸入回退」與「注音狂打」並存（回退之 ASCII 緩衝即狂打之未完成讀音）
+  // ⇒ P258／P259 那則「兩者不可同時生效」之警示已不成立，其內容與位置皆須清除；
+  // 反之兩條 description 皆須載明並存時之分工（否則文案又會漂回「互斥」之舊敘述）。
   const MARK = '\u26a0\ufe0e';
-  const entry = metadata.entries.filter(function (e) {
-    return e.key === 'kFuriousTypingEnabled4Zhuyin';
-  })[0];
-  assert.ok(entry, '找不到條目：kFuriousTypingEnabled4Zhuyin');
-  for (const loc of ['zh-Hant', 'zh-Hans', 'ja', 'en']) {
-    const desc = entry.labels[loc].description;
-    assert.ok(desc, loc + ' 之 description 為空');
-    assert.ok(desc.indexOf(MARK) === 0,
-      loc + ' 之 description 未以警示符開頭（首 20 字：' + desc.slice(0, 20) + '）');
-    assert.ok(desc.indexOf('\n') > 0,
-      loc + ' 之警示行未與內文分行（缺少換行）');
+  // 各語系「對方」之正式稱謂（逐字，取自該語系之 shortTitle／既有文案）。
+  const otherSide = {
+    'zh-Hant': { kFuriousTypingEnabled4Zhuyin: '回退', kMixedAlphanumericalEnabled: '注音狂打' },
+    'zh-Hans': { kFuriousTypingEnabled4Zhuyin: '回退', kMixedAlphanumericalEnabled: '注音狂打' },
+    ja: { kFuriousTypingEnabled4Zhuyin: 'フォールバック', kMixedAlphanumericalEnabled: '注音狂打ち' },
+    en: { kFuriousTypingEnabled4Zhuyin: 'fallback', kMixedAlphanumericalEnabled: 'Furious Zhuyin' },
+  };
+  const keys = ['kFuriousTypingEnabled4Zhuyin', 'kMixedAlphanumericalEnabled'];
+  for (const key of keys) {
+    const entry = metadata.entries.filter(function (e) { return e.key === key; })[0];
+    assert.ok(entry, '找不到條目：' + key);
+    for (const loc of ['zh-Hant', 'zh-Hans', 'ja', 'en']) {
+      const desc = entry.labels[loc].description;
+      assert.ok(desc, key + '/' + loc + ' 之 description 為空');
+      assert.ok(desc.indexOf(MARK) < 0,
+        key + '/' + loc + ' 之 description 仍載有已失效之警示（首 20 字：' + desc.slice(0, 20) + '）');
+      const token = otherSide[loc][key];
+      assert.ok(desc.indexOf(token) >= 0,
+        key + '/' + loc + ' 之 description 未載明與對方（' + token + '）並存時之分工');
+    }
   }
 });

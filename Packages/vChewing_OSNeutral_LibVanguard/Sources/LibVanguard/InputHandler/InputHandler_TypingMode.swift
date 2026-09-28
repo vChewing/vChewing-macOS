@@ -25,7 +25,9 @@ public enum TypingMode: String, Equatable {
   /// - Important: 本值之可達性由 `prefs.furiousTypingEnabled4Zhuyin` 決定，而該偏好之出廠
   ///   預設為 `false`、且其使用者介面要到 P258 才存在 ⇒ **在 P254／P255 之交付狀態下，
   ///   本值不會出現於任何正式使用情境**（唯一觸及途徑是手改 `UserDefaults` 或匯入配置包）。
-  ///   **P265**：另須 `!prefs.mixedAlphanumericalEnabled`（見下 `typingMode` 之說明）。
+  ///   **中英混合輸入回退不再是本值之否決者**（P273）：兩者可以並存，惟彼時 ASCII 按鍵
+  ///   仍走 `MixedAlphanumericalTypewriter`（見 `handleComposition` 之分派）——本值於該
+  ///   情境之語意為「狂注之讀音素材＝混打緩衝」，而非「ASCII 按鍵逕由狂打吸收」。
   case zhuyinFuriousTyping
 
   // MARK: Public
@@ -43,25 +45,40 @@ extension InputHandlerProtocol {
   /// 其餘以注拼槽是否拼音區分拼音鍵盤／注音鍵盤。
   /// `furiousTypingEnabled4Pinyin` pref 保留為「快速切換」的底層開關，本枚舉是其語義化抽象。
   ///
-  /// - Important: **注音側另受「中英混合輸入回退」否決**（P265）：只要
-  ///   `prefs.mixedAlphanumericalEnabled` 為真，注音狂打即一律被視為關閉（即便其開關仍為真）。
-  ///   兩者對**同一批 ASCII 按鍵**爭奪語義：回退模式要求逐鍵累積 ASCII 緩衝、待整段不再構成
-  ///   讀音時再回退；狂打則要求連續注音即時自動切音節。前者係使用者顯式指定之相容行為，
-  ///   故由前者勝出。否決置於**本屬性**（而非各閘門）之理由：本屬性即「當前處於哪個打字模式」
-  ///   之單一出口，`handleComposition` 之分派、行內模式提示、以及狂打各閘門皆由此推導
-  ///   ⇒ 一處否決即上下游一致，且按鍵自動改走 `MixedAlphanumericalTypewriter`。
-  ///   **拼音側不受此否決**：中英混合輸入回退本即「注音鍵盤專屬」（拼音輸入下不可用，
-  ///   見 `kMixedAlphanumericalEnabled.description`），若連帶否決拼音狂打，則一位注音時期
-  ///   遺留該偏好、其後改用拼音之使用者會無故失去狂拼。
+  /// - Important: **注音側與「中英混合輸入回退」可以並存**（P273 起；P258–P272 期間
+  ///   前者被後者否決）。兩者對**同一批 ASCII 按鍵**各執一義：回退把該批按鍵先當注音、
+  ///   整段不再構成讀音時才回退為原始 ASCII；狂打則要求連續注音即時自動切音節。
+  ///   **分工**：按鍵仍由回退之打字機接管（它本即「同一批按鍵之消化器」），而其 ASCII
+  ///   緩衝區即狂打之「未完成讀音」素材 ⇒ copilot 候選窗據以顯示（見 `furiousFrontContext`
+  ///   之資料源分流）。**純狂打之自動切音節在此情境下不生效**——自動切音節會把逐鍵累積中
+  ///   的緩衝區提早固化，與回退「先吸收、整段不成立才回退」之語義相衝（見
+  ///   `isZhuyinFuriousTypingModeEffective`）。
+  ///   **拼音側不受此議題影響**：中英混合輸入回退本即「注音鍵盤專屬」（拼音輸入下不可用，
+  ///   見 `kMixedAlphanumericalEnabled.description`）。
   public var typingMode: TypingMode {
     if prefs.cassetteEnabled { return .cassette }
     // 狂打開關依注拼槽之鍵盤家族二選一；兩側各自獨立（§7.1）。
     let isFurious = composer.isPinyinMode
       ? prefs.furiousTypingEnabled4Pinyin
-      : (prefs.furiousTypingEnabled4Zhuyin && !prefs.mixedAlphanumericalEnabled)
+      : prefs.furiousTypingEnabled4Zhuyin
     if isFurious, !prefs.useSCPCTypingMode {
       return composer.isPinyinMode ? .pinyinFuriousTyping : .zhuyinFuriousTyping
     }
     return composer.isPinyinMode ? .pinyinKeyblock : .bopomofoKeyblock
+  }
+
+  /// 「中英混合輸入回退」與「注音狂打」並存之合取閘——即「混打緩衝區正充當狂打之讀音素材」。
+  ///
+  /// - Important: 本旗子**不是** `isFuriousTypingModeEffective` 之同義詞，而是它的一個
+  ///   **限定子集**：狂打之模式判定（`typingMode`）與按鍵之接管者（`handleComposition` 之
+  ///   分派）自 P273 起脫鉤 ⇒ 本旗子即「狂打之讀音素材確實存在於混打緩衝區」之唯一判準。
+  ///   凡「以讀音素材為前提」之狂打特性（copilot 候選窗、前方預覽、未完成讀音之顯示源）
+  ///   一律問本旗子；凡「以連續注音之自動切音節為前提」者（簡拼 cells、自動切音節、固化）
+  ///   仍問 `isZhuyinFuriousTypingModeEffective`——彼等會把逐鍵累積中之緩衝區提早固化，
+  ///   與回退「先吸收、整段不成立才回退」之語義相衝。
+  public var mixedAlnumZhuyinFuriousInEffect: Bool {
+    currentTypingMethod == .vChewingFactory
+      && prefs.mixedAlphanumericalEnabled
+      && typingMode == .zhuyinFuriousTyping
   }
 }
