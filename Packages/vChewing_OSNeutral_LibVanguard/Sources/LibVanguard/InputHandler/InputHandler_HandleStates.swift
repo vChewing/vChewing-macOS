@@ -154,9 +154,9 @@ extension InputHandlerProtocol {
     if !pendingReading.isEmpty { cells.append(pendingReading) }
     for key in assembler.keys.reversed() {
       guard cells.count < Self.maxZhuyinAbbreviationCells else { break }
-      // 單注音鍵之連續鏈：鍵須只有一個讀音、且該讀音只有一個注音符號；遇完整音節即停。
-      guard !key.isMultiple, key.first.count == 1 else { break }
-      cells.insert(key.first, at: 0)
+      // 單注音格之連續鏈（含固化後之聲調變體桶）；遇完整音節即停。
+      guard let cell = phonabetCellText(ofKey: key) else { break }
+      cells.insert(cell, at: 0)
     }
     guard cells.count >= 2 else { return nil }
     return cells
@@ -419,10 +419,65 @@ extension InputHandlerProtocol {
     }
     // 僅使用者顯式選字（memorizePOM）才進入 POM 觀察；Enter 固化高亮候選不寫入。
     guard memorizePOM else { return }
-    if let adjustedObservation = Homa.makePerceptionIntel(
+    memorizeFuriousPOMObservation(
+      pomObservation,
       previouslyAssembled: preservedSentenceBeforeConsolidation,
-      currentAssembled: assembler.assembledSentence,
       cursor: preservedCursorPosition
+    )
+  }
+
+  /// 標準選字窗內所選之候選若屬注音狂打之「簡拼整詞候選」，則改走狂打之套用路徑。
+  ///
+  /// copilot 窗交棒至標準選字窗之後，組字器內只有單注音格鍵，而該窗所見之整詞候選係由
+  /// `furiousZhuyinAbbreviationCandidatesForStandardWindow` 併入者（其檢索為逐位置前綴）。
+  /// 該批候選之 keyArray 與組字器鍵鏈**不同源** ⇒ 普通路徑之 `consolidateNode` 會因 `Homa`
+  /// 之守衛（目標節點須已含該 keyArray）而**靜默落空**（P258 已實錄同型之坑），故須改走本路徑：
+  /// 先移除尾段之單注音格鍵、再整段插入該詞之讀音、末了覆寫。
+  /// - Returns: 是否已處理（true＝呼叫端不再走普通候選路徑）。
+  @discardableResult
+  public func confirmFuriousAbbreviatedCandidateFromStandardWindow(_ candidate: CandidateInState) -> Bool {
+    let frontCandidates = furiousZhuyinAbbreviationCandidatesForStandardWindow
+    guard !candidate.value.isEmpty,
+          frontCandidates.contains(where: {
+            $0.keyArray == candidate.keyArray && $0.value == candidate.value
+          })
+    else { return false }
+    invalidateFuriousTrail() // 使用者顯式選字：狂打狀態失效（與 copilot 之就地選字同義）。
+    furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
+    let preservedSentenceBeforeConsolidation = assembler.assembledSentence
+    let preservedCursorPosition = actualNodeCursorPosition
+    var pomObservation: Homa.PerceptionIntel?
+    let outcome = applyFuriousFrontCandidate(
+      candidate, to: assembler, bucket: [],
+      perceptionHandler: { pomObservation = $0 }
+    )
+    switch outcome {
+    case .failed:
+      return false // 靜默退回：交還普通候選路徑（其失敗亦不更動組字器）。
+    case .inserted, .overridden:
+      break
+    }
+    memorizeFuriousPOMObservation(
+      pomObservation,
+      previouslyAssembled: preservedSentenceBeforeConsolidation,
+      cursor: preservedCursorPosition
+    )
+    return true
+  }
+
+  /// 狂打之就地選字（copilot 窗）與標準窗選字所共用之 POM 觀察寫入。
+  ///
+  /// 兩者皆屬「使用者顯式選字」，故共用同一段；Enter 固化高亮候選不經此路徑。
+  private func memorizeFuriousPOMObservation(
+    _ rawObservation: Homa.PerceptionIntel?,
+    previouslyAssembled: [Homa.GramInPath],
+    cursor: Int
+  ) {
+    var pomObservation = rawObservation
+    if let adjustedObservation = Homa.makePerceptionIntel(
+      previouslyAssembled: previouslyAssembled,
+      currentAssembled: assembler.assembledSentence,
+      cursor: cursor
     ) {
       pomObservation = adjustedObservation
     }

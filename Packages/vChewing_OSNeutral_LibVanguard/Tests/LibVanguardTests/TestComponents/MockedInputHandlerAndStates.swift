@@ -233,6 +233,12 @@ public final class MockSession: @MainActor SessionCoreProtocol {
       }
     case .ofCandidates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
+      // 注音狂打：由 copilot 窗交棒後併入之簡拼整詞候選須走狂打之套用路徑——其 keyArray 與
+      // 組字器鍵鏈不同源，普通路徑之 consolidateNode／overrideCandidate 會靜默落空。
+      if inputHandler.confirmFuriousAbbreviatedCandidateFromStandardWindow(selectedValue) {
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
       inputHandler.consolidateNode(
         candidate: selectedValue,
         respectCursorPushing: true,

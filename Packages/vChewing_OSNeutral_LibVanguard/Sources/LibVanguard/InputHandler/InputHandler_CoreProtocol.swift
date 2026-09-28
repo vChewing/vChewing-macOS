@@ -701,6 +701,13 @@ extension InputHandlerProtocol {
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     let rawCandidates = fetchRawQueriedCandidatesFromAssembler()
     var arrCandidates = rawCandidates.map(\.pair)
+    // 注音狂打之簡拼整詞候選：由 copilot 窗交棒至標準選字窗之後，組字器內只剩單注音格鍵，
+    // 該窗之候選係由既成節點推得（full match 之檢索）⇒ 整詞候選會消失。此處以與 copilot 窗
+    // 同源之簡拼查詢（逐位置前綴）補上並置前；其後之去重與段數降冪排序沿用既有管線。
+    let furiousFrontCandidates = furiousZhuyinAbbreviationCandidatesForStandardWindow
+    if !furiousFrontCandidates.isEmpty {
+      arrCandidates = furiousFrontCandidates + arrCandidates
+    }
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。

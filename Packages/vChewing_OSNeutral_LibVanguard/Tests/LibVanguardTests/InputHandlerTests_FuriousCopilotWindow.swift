@@ -645,6 +645,73 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(displayAfterAutoApply == "科吉", "實得：\(displayAfterAutoApply)")
   }
 
+  /// 注音狂打：copilot 交棒至標準選字窗之後，整詞候選仍須可見且可就地選字。
+  ///
+  /// 交棒後組字器內只有單注音格鍵（含固化後之聲調變體桶），而標準窗之候選係由既成節點推得
+  /// （`assembler.fetchCandidates` ⇒ full match 之檢索結果，多為注音文回聲條目）⇒ 整詞候選
+  /// 會消失。本靶釘四事：① 標準窗可見「狗男女」；② 其選取走狂打之套用路徑（鍵鏈換成該詞之
+  /// 讀音、顯示正確）；③ 非前方候選者不受此路由；④ **打字途中組字器鍵鏈不被 partial 候選
+  /// 改寫**（`config.partialMatchEnabled` 恆為假）——此即與「直接開 partial match 旗標」之別。
+  @Test("[IH173] 注音狂打：交棒後之標準選字窗仍見整詞候選")
+  func test_IH173_StandardWindowKeepsAbbreviationCandidates() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterZhuyinFuriousTestEnvironment()
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"], value: "狗男女", score: -6.6),
+      isFiltering: false
+    )
+
+    // ① copilot 窗顯示期間：整詞候選在列，且組字器鍵鏈即所敲之單注音鍵。
+    typeSentence("ess") // ㄍㄋㄋ
+    let copilotValues = testSession.state.candidates.map(\.value)
+    #expect(copilotValues.contains("狗男女"), "實得：\(copilotValues)")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(!testHandler.currentLM.config.partialMatchEnabled, "本 phase 不得開啟 partial match 旗標。")
+
+    // ② 交棒：無修飾方向鍵 ⇒ 固化前方讀音（併入聲調變體桶）＋開出標準選字窗。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
+    let standardValues = testSession.state.candidates.map(\.value)
+    #expect(standardValues.contains("狗男女"), "實得：\(standardValues)")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ", "ㄋ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(!testHandler.currentLM.config.partialMatchEnabled, "鍵鏈不得因 partial 檢索而被改寫。")
+
+    // ③ 非前方候選者不經狂打之路由。
+    #expect(
+      !testHandler.confirmFuriousAbbreviatedCandidateFromStandardWindow(
+        (keyArray: ["ㄋ"], value: "ㄋ")
+      ),
+      "非簡拼整詞候選不得走狂打套用路徑。"
+    )
+
+    // ④ 就地選字：鍵鏈換成該詞之讀音、顯示正確、注拼槽清空。
+    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "狗男女" }) else {
+      Issue.record("標準窗內無「狗男女」：\(standardValues)")
+      return
+    }
+    testSession.candidatePairSelectionConfirmed(at: index)
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.isEmpty)
+  }
+
   // MARK: - 中英混合輸入回退對注音狂打之否決（P265）
 
   /// 「中英混合輸入回退」一旦啟用，注音狂打即**一律被視為關閉**（即便其開關仍為真）。

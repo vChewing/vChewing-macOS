@@ -121,6 +121,24 @@ extension InputHandlerProtocol {
   ///   改為依 `typingMode` 分流，並收斂為此單一判準。
   public var hasFuriousFrontPending: Bool { furiousFrontUnfinishedReading != nil }
 
+  /// 注音狂打：**標準選字窗**用之簡拼整詞候選。
+  ///
+  /// copilot 窗顯示期間，使用者以「會叫出選字窗」之鍵（方向鍵／翻頁鍵等）固化前方讀音之後，
+  /// 焦點即交棒給標準選字窗；彼時組字器內只有**單注音格鍵**（含固化後之聲調變體桶），而該窗
+  /// 之候選係由組字器既成節點推得（`assembler.fetchCandidates`）⇒ 皆為 full match 之檢索結果
+  /// （多為注音文回聲條目），整詞候選遂消失。本屬性以與 copilot 窗同源之簡拼查詢（逐位置
+  /// 前綴＝partial 語義）補上該批候選，供標準窗併入（見 `generateArrayOfCandidates`）。
+  ///
+  /// - Important: 此舉**不**動 `config.partialMatchEnabled`——該旗標是全域查詢閘、含組字器之
+  ///   `gramQuerier`，一開即令 DP 採納「keyArray ≠ 所敲鍵」之元圖而改寫鍵鏈（實測：鍵入
+  ///   ㄍㄋㄋ 之際即顯示成「狗男女年」）。故 partial 語義只施用於**候選清單**、不施於組字。
+  var furiousZhuyinAbbreviationCandidatesForStandardWindow: [Homa.CandidatePair] {
+    guard isZhuyinFuriousTypingModeEffective else { return [] }
+    guard let cells = furiousZhuyinAbbreviationCells else { return [] }
+    return currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: cells)
+      .map { .init(keyArray: $0.keyArray, value: $0.current) }
+  }
+
   /// 清空狂拼 trail。
   ///
   /// 任何使用者顯式干涉（選字、輪替、游標離開組字區最前端、手動確認讀音等）
@@ -128,6 +146,22 @@ extension InputHandlerProtocol {
   /// **本函式為 trail 之唯一清除出口**（`FuriousTypingConfig.resetTrail()`）。
   func invalidateFuriousTrail() {
     furiousConfig.resetTrail()
+  }
+
+  /// 狂打簡拼用之「單注音格」判讀：該鍵是否代表**一個**注音位置，若是則回其格文本。
+  ///
+  /// 兩種形態：① 單注音鍵（非 `isMultiple`、值為單一注音符號）；② **聲調變體桶**——固化
+  /// 前方待確認音節時所插入之 `.multipleKeys`（其值恰為同一單符號之各聲調變體），在狂打
+  /// 語義下即「已固化之單注音」，故同視為一格（格文本取無調形態）。
+  /// 後者為 P265 所補：copilot 交棒至標準選字窗之後，使用者所敲之單注音鏈尾端即此桶。
+  /// 因兩檔案（本檔與 `InputHandler_HandleStates.swift`）之簡拼路徑共用，故不設為 `private`。
+  func phonabetCellText(ofKey key: Homa.PossibleKey) -> String? {
+    if !key.isMultiple {
+      return key.first.count == 1 ? key.first : nil
+    }
+    guard let toneless = key.allValues.first(where: { $0.count == 1 }),
+          key.allValues == Tekkon.makeToneInsensitiveVariants(of: toneless) else { return nil }
+    return toneless
   }
 
   /// 從 trail 尾端移除給定數量的拼音字母 blob。
@@ -331,8 +365,8 @@ extension InputHandlerProtocol {
       let tailLimit = Self.maxZhuyinAbbreviationCells - 1
       for key in targetAssembler.keys.reversed() {
         guard abbreviatedTailKeys.count < tailLimit else { break }
-        guard !key.isMultiple, key.first.count == 1 else { break }
-        abbreviatedTailKeys.insert(key.first, at: 0)
+        guard let cell = phonabetCellText(ofKey: key) else { break }
+        abbreviatedTailKeys.insert(cell, at: 0)
       }
       // 逐位前綴對齊：尾段之每個單注音鍵須為候選對應讀音之起頭（簡拼語義）。
       // 要求「全部尾鍵皆對齊」——若有殘鍵未消費，覆寫 span 會把它留成孤鍵。
