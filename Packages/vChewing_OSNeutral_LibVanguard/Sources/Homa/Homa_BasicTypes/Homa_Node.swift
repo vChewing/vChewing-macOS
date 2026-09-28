@@ -198,7 +198,15 @@ extension Homa.Node {
     switch currentOverrideType {
     case .withSpecified: return overridingScore
     case .withTopGramScore: return firstUnigramProbability
-    default: return currentGram?.probability ?? firstUnigramProbability
+    default:
+      // 無覆寫狀態時以當前選取之元圖計分；惟當前選取若為**帶語境之元圖**（雙元圖／三元圖），
+      // 則語境無從確認（本路徑正是「無前述內容」之情形）⇒ 退回單元圖基線，避免該語境分數
+      // 在無語境處生效。該狀態僅可能出自 `getScore(previous:anterior:)` 之自動語境選取
+      // （見 `adoptGramForContext(keyArray:value:previous:anterior:)`）。
+      if let currentGram, (currentGram.previous ?? "").isEmpty, (currentGram.anterior ?? "").isEmpty {
+        return currentGram.probability
+      }
+      return firstUnigramProbability
     }
   }
 
@@ -263,12 +271,14 @@ extension Homa.Node {
       // （未匹配語境的 top bigram／trigram 不應留駐輸出）。
       if let bestBonus, bestBonus.probability > unigramBaseline {
         do {
-          try selectOverrideGram(
+          // 語境加分是**當次推導**之結果，不得記成覆寫狀態：`withTopGramScore` 之計分臂
+          // 逕以 unigram 基線計分，一旦記上，下一次組句就不會重算加分、該節點隨即退回
+          // 無語境之選取（症狀：記憶詞只出現一拍、下一個按鍵即被詞庫長詞取代）。
+          try adoptGramForContext(
             keyArray: bestBonus.keyArray,
             value: bestBonus.current,
             previous: bestBonus.previous,
-            anterior: bestBonus.anterior,
-            type: .withTopGramScore
+            anterior: bestBonus.anterior
           )
           return bestBonus.probability
         } catch {
@@ -329,6 +339,36 @@ extension Homa.Node {
       if overridingScore < 114_514 {
         overridingScore = 114_514
       }
+      return gram
+    }
+    throw Homa.Exception.nothingOverriddenAtNode
+  }
+
+  /// 依語境選定該節點要展示的元圖（僅移動 `currentGramIndex`），**不改動覆寫狀態**。
+  ///
+  /// 供組句函式於「語境加分（bigram／trigram）命中」時使用。語境加分是**當次推導**之結果，
+  /// 必須於每次組句時重新推導；記成 `.withTopGramScore` 覆寫狀態的話，下一次組句即改走該臂
+  /// 之「以 unigram 基線計分」語義、加分不再重算，該節點遂退回無語境之選取。
+  /// - Parameters:
+  ///   - keyArray: 給定索引鍵陣列。
+  ///   - value: 給定的元圖資料值。
+  ///   - previous: 前述資料。
+  ///   - anterior: 前述資料再往前一格（三元圖用，可選）。
+  /// - Returns: 選定成功的 Gram。
+  @discardableResult
+  internal mutating func adoptGramForContext(
+    keyArray: [String]?,
+    value: String,
+    previous: String? = nil,
+    anterior: String? = nil
+  ) throws
+    -> Homa.Gram {
+    for (i, gram) in grams.enumerated() {
+      if let keyArray, keyArray != gram.keyArray { continue }
+      if value != gram.current { continue }
+      if let previous, !previous.isEmpty, previous != gram.previous { continue }
+      if let anterior, !anterior.isEmpty, anterior != gram.anterior { continue }
+      currentGramIndex = i
       return gram
     }
     throw Homa.Exception.nothingOverriddenAtNode

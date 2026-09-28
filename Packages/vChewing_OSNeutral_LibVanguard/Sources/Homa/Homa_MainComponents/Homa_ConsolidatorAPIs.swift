@@ -14,6 +14,12 @@ extension Homa.Assembler {
   ///
   /// - Remark: 類似的可以拿來測試的詞有「蔡依林」「周杰倫」。
   ///
+  /// **保全者不止於「值」、亦含「詞的節點結構」**：與覆寫範圍相交之節點雖須拆開，但覆寫範圍
+  /// 以外之連續鍵仍優先併回單一節點（辭典內有對應之詞時，見 `overrideNodeContentPreservingValues`）。
+  /// 逐鍵拆散會令該處之詞界消失，而覆寫之後的各下游消費者（漸退記憶之語境觀察、後續組句）
+  /// 正是依節點判讀詞界——實測症狀：「檔案室」被拆成「檔」「案」之後，緊接著選「是」所記下的
+  /// 語境成了「檔 案 是」，該記憶遂對「檔案 是」之語境失效。
+  ///
   /// 測試時請務必也測試「敲長句子、且這種詞在句子中間出現時」的情況。
   /// - Parameters:
   ///   - theCandidate: 要拿來覆寫的詞音配對。
@@ -116,15 +122,76 @@ extension Homa.Assembler {
         continue
       }
 
-      // 節點與覆寫範圍相交且值完整，改以逐鍵覆寫確保最終內容與原值一致。
-      for (subPosition, key) in currentNode.keyArray.enumerated() {
-        guard values.count > subPosition else { break }
-        let pair = Homa.CandidatePair(keyArray: [key], value: values[subPosition])
-        try overrideCandidate(pair, at: nextPosition)
-        nextPosition += 1
-      }
+      // 節點與覆寫範圍相交且值完整：改寫該節點內部各鍵，確保最終內容與原值一致。
+      // 改寫時，覆寫範圍以外之連續鍵優先併為單一節點——「保留原值」不必以「逐鍵拆散」
+      // 為代價，節點的詞結構須盡量留給下游（見該函式之說明）。
+      nextPosition = try overrideNodeContentPreservingValues(
+        currentNode,
+        values: values,
+        at: nodeStart,
+        excluding: candidateRange
+      )
       position = nextPosition
     }
+  }
+
+  /// 以「保留原值」為前提改寫給定節點內部之各鍵。
+  ///
+  /// 覆寫範圍**以外**之連續鍵一律**先嘗試併為單一節點**（由長至短）：節點的詞結構因此
+  /// 得以保留，而該結構即覆寫之後各下游消費者（漸退記憶之語境觀察、後續組句）所見到的
+  /// 分段。整段覆寫不可得（辭典內無對應之詞）時才退回逐鍵覆寫，故原值之保全語義不變。
+  /// 覆寫範圍**之內**之鍵維持逐鍵覆寫（該處隨後由真正選中的候選覆寫）。
+  ///
+  /// - Parameters:
+  ///   - node: 待改寫之節點。
+  ///   - values: 該節點逐鍵之資料值。
+  ///   - startPosition: 該節點在鍵軸上之起點。
+  ///   - overrideRange: 稍後將由候選覆寫之範圍（不得跨越之）。
+  /// - Returns: 改寫完成後之下一個位置。
+  @discardableResult
+  private func overrideNodeContentPreservingValues(
+    _ node: Homa.GramInPath,
+    values: [String],
+    at startPosition: Int,
+    excluding overrideRange: Range<Int>
+  ) throws
+    -> Int {
+    let keyArray = node.keyArray
+    var position = startPosition
+    var cursor = 0
+    while cursor < keyArray.count {
+      // 覆寫範圍之內：逐鍵覆寫（該範圍隨後由真正選中的候選覆寫）。
+      if overrideRange.contains(startPosition + cursor) {
+        try overrideCandidate(
+          .init(keyArray: [keyArray[cursor]], value: values[cursor]), at: position
+        )
+        cursor += 1
+        position += 1
+        continue
+      }
+      // 覆寫範圍之外：取「不跨越覆寫範圍」之最長連續段，由長至短試覆寫。
+      var end = cursor + 1
+      while end < keyArray.count, !overrideRange.contains(startPosition + end) { end += 1 }
+      var didOverride = false
+      while end > cursor + 1 {
+        let keys = Array(keyArray[cursor ..< end])
+        let value = values[cursor ..< end].joined()
+        if (try? overrideCandidate(.init(keyArray: keys, value: value), at: position)) != nil {
+          didOverride = true
+          break
+        }
+        end -= 1
+      }
+      if !didOverride {
+        try overrideCandidate(
+          .init(keyArray: [keyArray[cursor]], value: values[cursor]), at: position
+        )
+        end = cursor + 1
+      }
+      position += end - cursor
+      cursor = end
+    }
+    return position
   }
 
   /// 計算在執行候選字鞏固（consolidate）時需要鎖定的上下文邊界範圍。
