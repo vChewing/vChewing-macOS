@@ -66,8 +66,8 @@ struct TekkonTestsSyllableIndex {
     for symbol in tableUnion { #expect(index.isPrefix(symbol)) }
   }
 
-  @Test("嚴格前綴恰為 15 條，且其全表逐條斷言")
-  func strictPrefixesAreExactlyTheFifteen() {
+  @Test("嚴格前綴恰為 16 條，且其全表逐條斷言")
+  func strictPrefixesAreExactlyTheSixteen() {
     let index = Tekkon.SyllableIndex.shared(parser: .ofDachen)
     var derived: Set<String> = []
     for reading in index.readings {
