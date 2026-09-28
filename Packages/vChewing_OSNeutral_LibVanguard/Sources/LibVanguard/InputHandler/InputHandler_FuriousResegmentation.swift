@@ -189,6 +189,14 @@ extension InputHandlerProtocol {
   /// 改以整詞簡拼候選之首的「實際讀音」單鍵插入組字器（同樣不覆寫、保留 LM 重切分
   /// 自由度），簡拼前綴非完整音節故 trail 失效——固化語義與單音節前綴一致。
   /// 失敗時靜默退回、不主動 switchState（後續正常流程會生成新狀態）。
+  ///
+  /// - Note: **注音狂打之簡拼格鏈**（P266）：若窗內之整詞簡拼候選之首恰對齊整條簡拼格鏈
+  ///   （見 `solidifyZhuyinAbbreviationCells`），則固化時改以**該詞之讀音**取代該批單注音
+  ///   格鍵（同樣不覆寫）——與拼音 α 之固化同構。否則交棒後組字器只剩單注音格鍵，其節點
+  ///   僅有注音文回聲條目可選 ⇒ 組字區之顯示會由 copilot 之預覽退回讀音原文（實測：ㄎㄐㄐ
+  ///   之窗內雖有「科技獎」，顯示卻為「ㄎㄐㄐ」）。窗層之補救
+  ///   （`furiousZhuyinAbbreviationCandidatesForStandardWindow`）只能補候選、改不了組句結果，
+  ///   故須在此就鍵鏈層處理。
   func solidifyFuriousFrontReading() {
     guard let furiousContext = furiousFrontContext else {
       solidifyAbbreviatedFrontReading()
@@ -200,6 +208,13 @@ extension InputHandlerProtocol {
     // 完整音節與否須在清空注拼槽之前判定（重切分 trail 不變量所需）。
     // 注音側不寫 trail（§8.6 之 IH163），故整段 trail bookkeeping 為拼音專屬。
     let isCompleteSyllable = isPinyin && composer.parser.mapZhuyinPinyin?[romaji] != nil
+    // 注音狂打之簡拼格鏈（P266）：以 copilot 之猜測讀音取代格鍵（失敗則照舊插桶）。
+    if !isPinyin, solidifyZhuyinAbbreviationCells() {
+      composer.clear()
+      furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
+      retrievePOMSuggestions(apply: true)
+      return
+    }
     guard (try? assembler.insertKeys([.multipleKeys(bucket)])) != nil else { return }
     composer.clear()
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
@@ -215,6 +230,53 @@ extension InputHandlerProtocol {
       }
     }
     retrievePOMSuggestions(apply: true)
+  }
+
+  /// 注音狂打之交棒（P266）：把組字器尾端之簡拼格鏈換成整詞候選之讀音。
+  ///
+  /// - Important: 適用條件（全部成立才動作）：① 組字器尾端存在已提交之單注音格鍵；② 簡拼
+  ///   查詢有候選（其序即名次）且其首選之讀音數為「格鏈鍵數 ＋ 1」
+  ///   （末格即注拼槽之待確認音節）；③ 該批格鍵逐位為該詞讀音之起頭（簡拼語義）。
+  ///   動作內容：drop 該批格鍵、再以單鍵序列插入該詞之讀音——**不覆寫**，保留 LM 重切分自由度
+  ///   （與拼音 α 之固化語義一致）。
+  ///
+  /// - Note: 此處**不能**改用 copilot 之橫跨節點：簡拼格鏈為單注音鍵，詞條讀音為完整音節，
+  ///   兩者不同源 ⇒ 組字器之查詢（full match）看不到該詞、DP 自然組不出「科技獎」而只組出回聲
+  ///   原文（實測：`crossingPair == nil`、`preview == "ㄐ"`）。故本路徑與拼音 α 同構：直接以
+  ///   **簡拼查詢之結果**入庫。
+  /// - Returns: 是否已處理（false＝交由呼叫端照舊只插聲調桶）。
+  private func solidifyZhuyinAbbreviationCells() -> Bool {
+    guard let cells = furiousZhuyinAbbreviationCells else { return false }
+    // 取查詢之首＝copilot 窗之首選（`abbreviatedWordCandidates` 已按分數降冪）。
+    guard let topCandidate = currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: cells).first,
+          !topCandidate.current.isEmpty
+    else { return false }
+    let wordPair: CandidateInState = (keyArray: topCandidate.keyArray, value: topCandidate.current)
+    var cellKeys: [String] = []
+    for key in assembler.keys.reversed() {
+      guard cellKeys.count < Self.maxZhuyinAbbreviationCells - 1 else { break }
+      guard let cell = phonabetCellText(ofKey: key) else { break }
+      cellKeys.insert(cell, at: 0)
+    }
+    guard !cellKeys.isEmpty,
+          wordPair.keyArray.count == cellKeys.count + 1,
+          zip(cellKeys, wordPair.keyArray).allSatisfy({ $1.hasPrefix($0) })
+    else { return false }
+    let cellKeysToDrop = cellKeys.count
+    var dropped = 0
+    while dropped < cellKeysToDrop, (try? assembler.dropKey(direction: .rear)) != nil {
+      dropped += 1
+    }
+    guard dropped == cellKeysToDrop else {
+      // 失敗防禦：把已 drop 之格鍵補回（單鍵序列），維持原狀。
+      _ = (try? assembler.insertKeys(cellKeys.dropLast(dropped).map { .singleKey($0) }))
+      return false
+    }
+    guard (try? assembler.insertKeys(wordPair.keyArray.map { .singleKey($0) })) != nil else {
+      _ = (try? assembler.insertKeys(cellKeys.map { .singleKey($0) }))
+      return false
+    }
+    return true
   }
 
   /// 狂拼 α 路徑（R2-α）的前方固化：把整詞簡拼候選之**分數最高者**的實際讀音以單鍵插入組字器。
@@ -271,6 +333,13 @@ extension InputHandlerProtocol {
     // 條件 1：整詞完全匹配（讀音數與簡拼段數一致）——查詢端已保證不長於格數，
     // 此處攔截「前綴殘缺」（短於格數）之自動套用。
     guard top.keyArray.count == cells.count else { return false }
+    // 條件 1′（P266）：**控頻覆寫之配對**（使用辭典與原廠同值同音）不得觸發自動套用。
+    // 控頻係使用者為「候選陳列排序」所設之權重偏好，不足以作為「輸入明確」之證據；若不設此閘，
+    // 一經控頻之詞即會在鍵入其簡拼時被靜默套用、連 copilot 窗都不出現（實錄：kjj ⇒ 科技獎）。
+    // 使用者**專有**之詞（原廠無此配對）不受此限。
+    guard !currentLM.isFrequencyControlledPair(
+      (keyArray: top.keyArray, value: top.current)
+    ) else { return false }
     // 條件 2：唯一匹配或顯著勝出（`grams` 已按分數降冪 ⇒ 次級即其第二筆）。若改以清單位置
     // 取次級（即分區制之原序），則被降頻之原廠條目居次、真正之近分競爭者反居其後時，
     // 會誤判「明確勝出」而把該拍逕行消費。

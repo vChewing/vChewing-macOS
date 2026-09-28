@@ -13,6 +13,7 @@
 
 import Foundation
 import Homa
+import LXAssemblyMaterials4Tests
 import Shared
 import Tekkon
 import Testing
@@ -649,9 +650,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///
   /// 交棒後組字器內只有單注音格鍵（含固化後之聲調變體桶），而標準窗之候選係由既成節點推得
   /// （`assembler.fetchCandidates` ⇒ full match 之檢索結果，多為注音文回聲條目）⇒ 整詞候選
-  /// 會消失。本靶釘四事：① 標準窗可見「狗男女」；② 其選取走狂打之套用路徑（鍵鏈換成該詞之
+  /// 會消失。本靶釘五事：① 標準窗可見「狗男女」；② 其選取走狂打之套用路徑（鍵鏈換成該詞之
   /// 讀音、顯示正確）；③ 非前方候選者不受此路由；④ **打字途中組字器鍵鏈不被 partial 候選
-  /// 改寫**（`config.partialMatchEnabled` 恆為假）——此即與「直接開 partial match 旗標」之別。
+  /// 改寫**（`config.partialMatchEnabled` 恆為假）——此即與「直接開 partial match 旗標」之別；
+  /// ⑤ **固化即取該詞之讀音**：交棒之固化改以窗內整詞簡拼候選之首的實際讀音入庫（P266），
+  /// 故鍵鏈與組字區顯示自交棒當拍起即為該詞（修前：鍵鏈為 `ㄍㄋㄋ`、顯示為讀音原文）。
+  ///
+  /// - Note: 對齊不成立時之交棒語義（只併入聲調變體桶）由 IH175 把守。
   @Test("[IH173] 注音狂打：交棒後之標準選字窗仍見整詞候選")
   func test_IH173_StandardWindowKeepsAbbreviationCandidates() throws {
     guard let testHandler, let testSession else {
@@ -679,15 +684,16 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(!testHandler.currentLM.config.partialMatchEnabled, "本 phase 不得開啟 partial match 旗標。")
 
-    // ② 交棒：無修飾方向鍵 ⇒ 固化前方讀音（併入聲調變體桶）＋開出標準選字窗。
+    // ② 交棒：無修飾方向鍵 ⇒ 固化前方讀音（改取窗內整詞簡拼候選之首的讀音）＋開出標準選字窗。
     _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
     #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
     let standardValues = testSession.state.candidates.map(\.value)
     #expect(standardValues.contains("狗男女"), "實得：\(standardValues)")
     #expect(
-      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ", "ㄋ"],
+      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
+    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
     #expect(!testHandler.currentLM.config.partialMatchEnabled, "鍵鏈不得因 partial 檢索而被改寫。")
 
     // ③ 非前方候選者不經狂打之路由。
@@ -710,6 +716,120 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
     #expect(testHandler.composer.isEmpty)
+  }
+
+  // MARK: - 控頻配對與自動套用（P266）
+
+  /// 狂打：**控頻之雷同配對不得自動套用**——copilot 窗改由使用者定奪。
+  ///
+  /// R3-a 之自動套用（明確勝出即於末鍵套用該詞之讀音、清空注拼槽）在 P262～P264 收斂簡拼
+  /// 查詢之後出現了 regression：使用者辭典內與原廠**同值同讀音**之條目（控頻用）經 P263 之
+  /// 權重覆寫與 P264 之分數排序升為首選，其與次高者之差距動輒超過 3.0 ⇒ 自動套用連 copilot
+  /// 窗都來不及開。故新增閘門：該配對兩倉皆有（＝控頻對象）時不自動套用，改為開窗待選。
+  ///
+  /// 本靶釘三事：① 該配對確為控頻對象（兩倉皆有）；② 其為首選且差距遠超門檻時仍**不**自動
+  /// 套用——copilot 窗在列、組字器鍵鏈不動；③ **對照組**：使用者專有詞（原廠無此讀音）之
+  /// 自動套用語義不變（此閘門只管雷同配對，不得變成全域停用）。
+  @Test("[IH174] 狂打：控頻之雷同配對不得自動套用")
+  func test_IH174_FrequencyControlledPairSkipsAutoApply() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let textMap = makeTypingTextMap([
+      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ", [("科技獎", -6.0, factoryTypeID)]),
+      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤ", [("科技江", -6.5, factoryTypeID)]),
+    ])
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    LXAssembly.LXFacade.disconnectFactoryDictionary()
+    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    enterPinyinFuriousTestEnvironment()
+
+    // ① 控頻配對：同值同讀音、兩倉皆有（使用者側權重遠高於原廠側）。
+    let controlledPair: (keyArray: [String], value: String) = (
+      keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎"
+    )
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: controlledPair.keyArray, value: controlledPair.value, score: -0.5),
+      isFiltering: false
+    )
+    #expect(
+      testHandler.currentLM.isFrequencyControlledPair(controlledPair),
+      "同值同讀音且兩倉皆有者即控頻配對。"
+    )
+
+    // ② 末鍵之自動套用：首選（−0.5）與次高者（−6.0）差距 5.5 > 3.0，惟該配對為控頻對象
+    //    ⇒ 不套用：注拼槽保留原文、組字器鍵鏈不動、copilot 窗照常開出。
+    typeSentence("kjj")
+    let windowAfterTyping = testSession.state.candidates.map(\.value)
+    #expect(windowAfterTyping == ["科技獎", "科技江"], "實得：\(windowAfterTyping)")
+    #expect(testHandler.assembler.actualKeys.isEmpty, "實得：\(testHandler.assembler.actualKeys)")
+    #expect(testHandler.composer.romajiBuffer == "kjj", "實得：\(testHandler.composer.romajiBuffer)")
+    #expect(generateDisplayedText().isEmpty, "實得：\(generateDisplayedText())")
+
+    // ③ 對照組：使用者專有詞（讀音 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˋ，原廠無此條目）仍走自動套用。
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    let userOnlyPair: (keyArray: [String], value: String) = (
+      keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˋ"], value: "科記獎"
+    )
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: userOnlyPair.keyArray, value: userOnlyPair.value, score: -0.5),
+      isFiltering: false
+    )
+    #expect(
+      !testHandler.currentLM.isFrequencyControlledPair(userOnlyPair),
+      "原廠無此配對者不是控頻對象。"
+    )
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("kjj")
+    #expect(
+      testHandler.assembler.actualKeys == userOnlyPair.keyArray,
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "科記獎", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.romajiBuffer.isEmpty, "自動套用應清空注拼槽。")
+  }
+
+  /// 注音狂打：**對齊不成立時**之交棒仍只併入聲調變體桶（P266 之退回語義）。
+  ///
+  /// IH173 ② 之交棒固化取「窗內整詞簡拼候選之首」而入庫；若該首選之讀音數與格鏈鍵數不
+  /// 對位（此處：辭典內無 ㄍㄋㄋ 起頭之整詞候選）⇒ 退回既有語義：單注音鍵 ＋ 聲調變體桶。
+  @Test("[IH175] 注音狂打：無對齊整詞候選時之交棒仍只併聲調桶")
+  func test_IH175_HandoverWithoutAlignedWordStillInsertsBucket() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterZhuyinFuriousTestEnvironment()
+
+    typeSentence("ess") // ㄍㄋㄋ
+    #expect(
+      testHandler.currentLM.lxQuerier.abbreviatedWordCandidates(
+        keysChopped: testHandler.furiousZhuyinAbbreviationCells ?? []
+      ).isEmpty,
+      "本靶之辭典內不得有 ㄍㄋㄋ 起頭之整詞候選。"
+    )
+    let copilotValues = testSession.state.candidates.map(\.value)
+    #expect(!copilotValues.contains("狗男女"), "實得：\(copilotValues)")
+
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ", "ㄋ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
   }
 
   // MARK: - 中英混合輸入回退對注音狂打之否決（P265）

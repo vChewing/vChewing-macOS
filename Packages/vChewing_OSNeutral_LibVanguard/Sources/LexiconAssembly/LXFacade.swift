@@ -364,6 +364,27 @@ extension LXAssembly {
       config.shouldSuppressFactoryZhuyinwenData = furiousModeInEffect && furiousSideEnabled
     }
 
+    /// 判斷該「詞值＋讀音」配對是否為**控頻覆寫**之對象（使用辭典與原廠辭典同值同音）。
+    ///
+    /// 供狂拼 α 之自動套用把關：控頻係使用者為「候選陳列排序」所設之權重偏好，不足以作為
+    /// 「輸入明確」之證據——否則一經控頻之詞即會在鍵入其簡拼時被靜默套用、連候選窗都不出現
+    /// （實錄見 P266）。使用者**專有**之詞（原廠無此配對）不受此限，其自動套用語義照舊。
+    public func isFrequencyControlledPair(_ pair: (keyArray: [String], value: String)) -> Bool {
+      guard !pair.value.isEmpty, !pair.keyArray.isEmpty else { return false }
+      guard !config.bypassUserPhrasesData else { return false }
+      let userGrams = lxUserPhrases.unigramsFor(
+        key: pair.keyArray.joined(separator: "-"),
+        keyArray: pair.keyArray,
+        omitNonTemporarySingleCharNonSymbolUnigrams: false
+      )
+      guard userGrams.contains(where: { $0.current == pair.value }) else { return false }
+      let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
+      let factoryGrams = factoryChoppedUnigramsFor(
+        keyArray: pair.keyArray, entryType: entryType, partiallyMatch: false
+      )
+      return factoryGrams.contains(where: { $0.current == pair.value })
+    }
+
     /// 清除 InputToken HashMap。
     /// 注意：此 HashMap 僅記錄由 InputToken（以 "MACRO@" 開頭的特殊標記）生成的 Unigram。
     public func purgeInputTokenHashMap() {
