@@ -77,6 +77,10 @@ namespace VCA {
   /// ——此五者僅見於輸入法選單或其熱鍵開關，設定介面本身並不曝露。
 
   /// 各「原本使用之輸入法」對應之官網文章（`permalink` 之實查值；相對 `DOC_BASE`）。
+  ///
+  /// **未列之來源**（現為 `rimezhuyin`）：官網尚無對應之策展文章 ⇒ **不臆造路徑**，
+  /// 「深入說明 →」落回該步之 `docPath`（`onboarding/`，即該系列之目錄）。俟官網補文，
+  /// 於此表加一行即可。
   export var DOC_PATH_BY_ORIGIN: { [origin: string]: string } = {
     macoszhuyin: "manual/onboarding_macOSZhuyinSinceSnowLeopard.html",
     msnewphonetic: "manual/onboarding_msnewphonetic.html",
@@ -112,9 +116,13 @@ namespace VCA {
   }
 
   /// 「您原本用哪一款輸入法？」之選項值（分支樞紐，本身不輸出任何鍵）。
+  ///
+  /// **本表之次序即畫面之次序**，其分群為「注音系 → 字根系 → 拼音系 → 全新使用者」。
+  /// `rimezhuyin`（Rime 注音／搜狗注音，P271）係第三方**注音**輸入法，故歸於注音系之末
+  /// （`asus` 之後、`cin` 之前）。
   export var ORIGIN_VALUES: string[] = [
     "macoszhuyin", "msnewphonetic", "kimo", "mcbpmf", "ov", "hanin",
-    "goingime", "asus", "cin", "pinyin", "newbie",
+    "goingime", "asus", "rimezhuyin", "cin", "pinyin", "newbie",
   ];
 
   /// 「您主要用哪一種打字方式？」之選項值。
@@ -271,6 +279,26 @@ namespace VCA {
   export var ORIGIN_VETOED_KEYS: { [rawValue: string]: string[] } = {
     "FuriousTypingEnabled4Pinyin": ["newbie"],
     "FuriousTypingEnabled4Zhuyin": ["newbie"],
+  };
+
+  /// **來源級強制**（P271）：少數鍵在特定來源下**一律指名為指定值**——不問打字方式。
+  ///
+  /// **何以需要它**：`kFuriousTypingEnabled4Zhuyin` 之規則住在**打字方式級**
+  ///（`typing: { zhuyin: false, zhuyinmix: false, scpc: false }`，事主 2026-09-26 之裁定
+  /// 「注音各方案一律刻意關閉」），而 `origin` 級之優先序**低於** `typing` 級 ⇒
+  /// 「`rimezhuyin` 此一來源例外」無從以既有兩張表表達。此與 P264 當時立
+  /// `ORIGIN_VETOED_KEYS` 之困境**同構**（彼時是「`newbie` 之否決」無從表達）——故本表
+  /// 即其**鏡像**：一強制、一否決。
+  ///
+  /// **優先序**：強制／否決 ＞ 打字方式 ＞ 來源 ＞ 一般值（見 `effectiveRecommended`）。
+  /// **兩表互斥**：同一鍵不得對同一來源既強制又否決——由測試釘住。
+  /// **本表之鍵仍屬全集**：被強制者即為「指名」，故該鍵仍寫入起始配置。
+  export var ORIGIN_FORCED_KEYS: { [rawValue: string]: { [origin: string]: PrefValue } } = {
+    // 事主 2026-09-29：「新增 `Rime 注音 / 搜狗注音` Preset，該 Preset 需預設啟用
+    // 『注音狂打』。」——其打字方式即便為「還不確定」亦指名開啟（強制表不問打字方式）。
+    // 註：注音狂打在磁帶與逐字選字（SCPC）下**不生效**（見 `LXFacade` 之四維判準），
+    // 故 SCPC 之使用者即便受此強制，該值於當下亦為惰性（惟日後關掉 SCPC 即生效）。
+    "FuriousTypingEnabled4Zhuyin": { rimezhuyin: true },
   };
 
   function recommendationFor(key: string)
@@ -633,8 +661,13 @@ namespace VCA {
 
   /// 該題之有效推薦值（依 profile）。
   export function effectiveRecommended(question: Question, profile: Profile): PrefValue | null {
-    // 來源級否決優先於一切（P264：見 `ORIGIN_VETOED_KEYS` 之說明）。
+    // 來源級之強制與否決同屬最高優先序、優先於一切（P264 之否決、P271 之強制；
+    // 見 `ORIGIN_VETOED_KEYS` 與 `ORIGIN_FORCED_KEYS` 之說明）。二者互斥，由測試釘住。
     if (question.entry) {
+      var forced = ORIGIN_FORCED_KEYS[question.entry.rawValue];
+      if (forced && typeof forced[profile.origin] !== "undefined") {
+        return forced[profile.origin];
+      }
       var vetoed = ORIGIN_VETOED_KEYS[question.entry.rawValue];
       if (vetoed && vetoed.indexOf(profile.origin) >= 0) return false;
     }

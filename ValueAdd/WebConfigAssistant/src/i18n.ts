@@ -115,8 +115,9 @@ namespace VCA {
       "origin.opt.hanin": "漢音輸入法",
       "origin.opt.goingime": "自然輸入法",
       "origin.opt.asus": "華碩／ASUS",
+      "origin.opt.rimezhuyin": "Rime 注音 / 搜狗注音",
       "origin.opt.cin": "行列三十／倉頡／嘸蝦米等字根輸入法",
-      "origin.opt.pinyin": "狂拼流漢語拼音輸入法（微軟拼音／微信輸入法／搜狗拼音／昇陽拼音／智能狂拼／紫光拼音／Rime）",
+      "origin.opt.pinyin": "狂拼流漢語拼音輸入法（微軟拼音／微信輸入法／搜狗拼音／昇陽拼音／智能狂拼／紫光拼音／Rime 拼音）",
       "origin.opt.newbie": "我是全新使用者",
 
       // 自訂題目：打字方式
@@ -276,8 +277,9 @@ namespace VCA {
       "origin.opt.hanin": "汉音输入法",
       "origin.opt.goingime": "自然输入法",
       "origin.opt.asus": "华硕／ASUS",
+      "origin.opt.rimezhuyin": "Rime 注音 / 搜狗注音",
       "origin.opt.cin": "行列三十／仓颉／呒虾米等字根输入法",
-      "origin.opt.pinyin": "狂拼流汉语拼音输入法（微软拼音／微信输入法／搜狗拼音／升阳拼音／智能狂拼／紫光拼音／Rime）",
+      "origin.opt.pinyin": "狂拼流汉语拼音输入法（微软拼音／微信输入法／搜狗拼音／升阳拼音／智能狂拼／紫光拼音／Rime 拼音）",
       "origin.opt.newbie": "我是全新使用者",
 
       // 自订题目：打字方式
@@ -439,8 +441,9 @@ namespace VCA {
       "origin.opt.hanin": "Hanin",
       "origin.opt.goingime": "Going IME",
       "origin.opt.asus": "ASUS",
+      "origin.opt.rimezhuyin": "Rime Zhuyin / Sogou Zhuyin",
       "origin.opt.cin": "CIN tables (Array30, Cangjie, Boshiamy, …)",
-      "origin.opt.pinyin": "Furious-typing Hanyu Pinyin IMEs (Microsoft Pinyin / WeType / Sogou Pinyin / SunPinyin / ChineseStar / Ziguang Pinyin / Rime)",
+      "origin.opt.pinyin": "Furious-typing Hanyu Pinyin IMEs (Microsoft Pinyin / WeType / Sogou Pinyin / SunPinyin / ChineseStar / Ziguang Pinyin / Rime Pinyin)",
       "origin.opt.newbie": "I am a brand-new user",
 
       // Custom question: typing method
@@ -602,8 +605,9 @@ namespace VCA {
       "origin.opt.hanin": "漢音輸入法",
       "origin.opt.goingime": "自然輸入法",
       "origin.opt.asus": "ASUS",
+      "origin.opt.rimezhuyin": "Rime 注音／Sogou 注音",
       "origin.opt.cin": "CIN テーブル（行列三十・倉頡・嘸蝦米など）",
-      "origin.opt.pinyin": "狂拼流の漢語弁音入力（Microsoft Pinyin／WeType／Sogou Pinyin／SunPinyin／ChineseStar／紫光拼音／Rime）",
+      "origin.opt.pinyin": "狂拼流の漢語弁音入力（Microsoft Pinyin／WeType／Sogou Pinyin／SunPinyin／ChineseStar／紫光拼音／Rime 弁音）",
       "origin.opt.newbie": "まったくの初心者です",
 
       // 独自の設問：入力方法

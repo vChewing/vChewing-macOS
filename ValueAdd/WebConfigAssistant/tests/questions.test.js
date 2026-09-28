@@ -572,10 +572,12 @@ test('題庫：起始配置之封閉性——任兩組配置所寫入之鍵集�
 test('題庫：狂拼流來源之並列產品名（四語系）', function () {
   const { VCA } = loadCore();
   const required = {
-    'zh-Hant': ['狂拼流漢語拼音輸入法', '微軟拼音', '微信輸入法', '搜狗拼音', '昇陽拼音', '智能狂拼', '紫光拼音', 'Rime'],
-    'zh-Hans': ['狂拼流汉语拼音输入法', '微软拼音', '微信输入法', '搜狗拼音', '升阳拼音', '智能狂拼', '紫光拼音', 'Rime'],
-    en: ['Furious-typing Hanyu Pinyin IMEs', 'Microsoft Pinyin', 'WeType', 'Sogou Pinyin', 'SunPinyin', 'ChineseStar', 'Ziguang Pinyin', 'Rime'],
-    ja: ['狂拼流の漢語弁音入力', 'Microsoft Pinyin', 'WeType', 'Sogou Pinyin', 'SunPinyin', 'ChineseStar', '紫光拼音', 'Rime'],
+    // P271：末項由「Rime」改稱「Rime 拼音」——本 phase 新增「Rime 注音」一來源之後，
+    // 裸「Rime」在並列清單內即成歧義（拼音方案？抑或整個 Rime 家族？）。
+    'zh-Hant': ['狂拼流漢語拼音輸入法', '微軟拼音', '微信輸入法', '搜狗拼音', '昇陽拼音', '智能狂拼', '紫光拼音', 'Rime 拼音'],
+    'zh-Hans': ['狂拼流汉语拼音输入法', '微软拼音', '微信输入法', '搜狗拼音', '升阳拼音', '智能狂拼', '紫光拼音', 'Rime 拼音'],
+    en: ['Furious-typing Hanyu Pinyin IMEs', 'Microsoft Pinyin', 'WeType', 'Sogou Pinyin', 'SunPinyin', 'ChineseStar', 'Ziguang Pinyin', 'Rime Pinyin'],
+    ja: ['狂拼流の漢語弁音入力', 'Microsoft Pinyin', 'WeType', 'Sogou Pinyin', 'SunPinyin', 'ChineseStar', '紫光拼音', 'Rime 弁音'],
   };
   for (const lang of VCA.LANG_ORDER) {
     const label = VCA.UI_STRINGS[lang]['origin.opt.pinyin'];
@@ -652,12 +654,16 @@ test('schema：系統版本碼之解析（整數編碼，避免 10.9 ＞ 10.15 �
   assert.ok(VCA.osVersionCodeFromDouble(10.15) > VCA.osVersionCodeFromDouble(10.9));
 });
 
-test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉狂注、拼音各方案刻意開啟狂拼', function () {
+test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉狂注（Rime 注音／搜狗注音除外）、拼音各方案刻意開啟狂拼', function () {
   const { VCA } = loadCore();
   const KEY_ZHUYIN = 'FuriousTypingEnabled4Zhuyin';
   const KEY_PINYIN = 'FuriousTypingEnabled4Pinyin';
   const ZHUYIN_TYPINGS = ['zhuyin', 'zhuyinmix', 'scpc'];
-  const ZHUYIN_ORIGINS = ['macoszhuyin', 'msnewphonetic', 'kimo', 'mcbpmf', 'ov', 'goingime', 'hanin', 'asus'];
+  // P271：`rimezhuyin`（Rime 注音／搜狗注音）係**經事主核定之例外**——其狂注開關由
+  // `ORIGIN_FORCED_KEYS`（來源級強制）指名為 true。見同檔之另一支測試。
+  const ZHUYIN_ORIGINS = [
+    'macoszhuyin', 'msnewphonetic', 'kimo', 'mcbpmf', 'ov', 'goingime', 'hanin', 'asus', 'rimezhuyin',
+  ];
 
   // 兩鍵皆須在全集內——否則起始配置**根本不寫它們**，使用者機器上既有的值會殘留。
   const universe = VCA.starterUniverse(2700).map(function (q) { return q.entry.rawValue; });
@@ -670,7 +676,10 @@ test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉�
       const starter = VCA.starterFor({ origin: origin, typing: typing }, 2700);
       const label = origin + '/' + typing;
       assert.ok(starter.namedKeys.indexOf(KEY_ZHUYIN) >= 0, label + '：狂注開關未被指名');
-      assert.strictEqual(starter.values[KEY_ZHUYIN], false, label + '：狂注開關之值非 false');
+      // P271：`rimezhuyin` 為經核定之例外（來源級強制 ⇒ true），餘者一律 false。
+      const expectedZhuyin = origin === 'rimezhuyin';
+      assert.strictEqual(starter.values[KEY_ZHUYIN], expectedZhuyin,
+        label + '：狂注開關之值非 ' + expectedZhuyin);
     }
   }
 
@@ -684,14 +693,16 @@ test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉�
     // 拼音方案之狂注開關：**值恆為 false**（出廠預設）——或由來源級之推薦值指名關閉
     //（如「狂拼流」以外之注音系來源而打字方式為拼音者），或落於「回歸」段；
     // 二者之值相同，故僅斷言值、不限定其段。
-    assert.strictEqual(starter.values[KEY_ZHUYIN], false, origin + '/pinyin：狂注開關之值非 false');
+    // P271：`rimezhuyin` 之強制不問打字方式 ⇒ 其狂注開關即便打字方式為拼音亦指名為 true。
+    assert.strictEqual(starter.values[KEY_ZHUYIN], origin === 'rimezhuyin',
+      origin + '/pinyin：狂注開關之值不符');
   }
 
   // 打字方式「還不確定」時，仍以來源判其派別：注音系來源須指名關閉、狂拼流來源須指名開啟。
   for (const origin of ZHUYIN_ORIGINS) {
     const starter = VCA.starterFor({ origin: origin, typing: 'unsure' }, 2700);
     assert.ok(starter.namedKeys.indexOf(KEY_ZHUYIN) >= 0, origin + '/unsure：狂注開關未被指名');
-    assert.strictEqual(starter.values[KEY_ZHUYIN], false);
+    assert.strictEqual(starter.values[KEY_ZHUYIN], origin === 'rimezhuyin');
   }
   const pinyinUnsure = VCA.starterFor({ origin: 'pinyin', typing: 'unsure' }, 2700);
   assert.ok(pinyinUnsure.namedKeys.indexOf(KEY_PINYIN) >= 0, 'pinyin/unsure：狂拼開關未被指名');
@@ -722,6 +733,116 @@ test('題庫：全新使用者（newbie）現階段刻意停用狂打特性—�
   // 否決之鍵仍屬全集（否決＝指名為 false，而非不予輸出）。
   const universe = VCA.starterUniverse(2700).map(function (q) { return q.entry.rawValue; });
   for (const key of KEYS) assert.ok(universe.indexOf(key) >= 0, key + ' 不在全集內');
+
+
+test('題庫：狂打雙開關之跨層體現（P271 第 1 項之查核固化物）', function () {
+  const { VCA } = loadCore();
+  const nodePath = require('node:path');
+  const readAsset = function (name) {
+    return JSON.parse(require('node:fs').readFileSync(
+      nodePath.join(__dirname, '..', 'assets', name), 'utf8'));
+  };
+  const NEW_KEYS = ['kFuriousTypingEnabled4Pinyin', 'kFuriousTypingEnabled4Zhuyin'];
+  const OLD_KEY = 'kFuriousTypingEnabled';
+
+  // 三層真源：① 設定介面曝露面（掃 SettingsUI 源碼生成）、② 後設資料、③ 題庫。
+  const surface = readAsset('settings-surface.json');
+  const metadata = readAsset('userdef-metadata.json');
+  const metadataKeys = metadata.entries.map(function (e) { return e.key; });
+  const asked = VCA.allQuestionKeys();
+
+  for (const key of NEW_KEYS) {
+    assert.ok(surface.keys.indexOf(key) >= 0, '曝露面缺 ' + key);
+    assert.ok(metadataKeys.indexOf(key) >= 0, '後設資料缺 ' + key);
+    assert.ok(asked.indexOf(key) >= 0, '題庫缺 ' + key);
+    const entry = metadata.entries.filter(function (e) { return e.key === key; })[0];
+    for (const lang of VCA.LANG_ORDER) {
+      const label = entry.labels[lang] && entry.labels[lang].shortTitle;
+      assert.ok(typeof label === 'string' && label.length > 0, lang + ' 之 ' + key + ' 標籤為空');
+    }
+  }
+  // 舊鍵（無 `4` 後綴者）在三層皆不得殘留。
+  assert.strictEqual(surface.keys.indexOf(OLD_KEY), -1, '曝露面仍有舊鍵 ' + OLD_KEY);
+  assert.strictEqual(metadataKeys.indexOf(OLD_KEY), -1, '後設資料仍有舊鍵 ' + OLD_KEY);
+  assert.strictEqual(asked.indexOf(OLD_KEY), -1, '題庫仍有舊鍵 ' + OLD_KEY);
+});
+
+test('題庫：來源級強制——Rime 注音／搜狗注音之狂注一律指名開啟（P271 第 3 項）', function () {
+  const { VCA } = loadCore();
+  const KEY_ZHUYIN = 'FuriousTypingEnabled4Zhuyin';
+  const NEW_ORIGIN = 'rimezhuyin';
+
+  assert.ok(VCA.ORIGIN_VALUES.indexOf(NEW_ORIGIN) >= 0, '新來源不在選項清單內');
+
+  // ① 新來源：**全部**打字方式下皆指名 true（來源級強制不問打字方式）。
+  for (const typing of ALL_TYPING) {
+    const starter = VCA.starterFor({ origin: NEW_ORIGIN, typing: typing }, 2700);
+    const label = NEW_ORIGIN + '/' + typing;
+    assert.ok(starter.namedKeys.indexOf(KEY_ZHUYIN) >= 0, label + '：狂注開關未被指名');
+    assert.strictEqual(starter.values[KEY_ZHUYIN], true, label + '：狂注開關之值非 true');
+  }
+
+  // ② 其餘各來源：注音三種打字方式下仍指名 false——P264 之紀律未鬆動。
+  for (const origin of ALL_ORIGIN) {
+    if (origin === NEW_ORIGIN) continue;
+    for (const typing of ['zhuyin', 'zhuyinmix', 'scpc']) {
+      const starter = VCA.starterFor({ origin: origin, typing: typing }, 2700);
+      const label = origin + '/' + typing;
+      assert.ok(starter.namedKeys.indexOf(KEY_ZHUYIN) >= 0, label + '：狂注開關未被指名');
+      assert.strictEqual(starter.values[KEY_ZHUYIN], false, label + '：狂注開關之值非 false');
+    }
+  }
+
+  // ③ 兩表互斥：同一鍵不得對同一來源既強制又否決。
+  for (const rawValue of Object.keys(VCA.ORIGIN_FORCED_KEYS)) {
+    const vetoed = VCA.ORIGIN_VETOED_KEYS[rawValue] || [];
+    for (const origin of Object.keys(VCA.ORIGIN_FORCED_KEYS[rawValue])) {
+      assert.strictEqual(vetoed.indexOf(origin), -1, rawValue + ' 對 ' + origin + ' 既強制又否決');
+    }
+  }
+
+  // ④ 強制表所載之鍵須存在於後設資料（防手抄漂移），且須在曝露面內
+  //（否則使用者無從自行復原——與 `ORIGIN_VETOED_KEYS` 同一紀律）。
+  const surface = JSON.parse(require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '..', 'assets', 'settings-surface.json'), 'utf8'));
+  for (const rawValue of Object.keys(VCA.ORIGIN_FORCED_KEYS)) {
+    assert.ok(VCA.entryByRawValue(rawValue), '強制表之鍵不存在：' + rawValue);
+    assert.ok(surface.keys.indexOf('k' + rawValue) >= 0, '強制表觸及未曝露之鍵：' + rawValue);
+  }
+
+  // ⑤ 強制之鍵仍屬全集（強制＝指名，而非不予輸出）。
+  const universe = VCA.starterUniverse(2700).map(function (q) { return q.entry.rawValue; });
+  for (const rawValue of Object.keys(VCA.ORIGIN_FORCED_KEYS)) {
+    assert.ok(universe.indexOf(rawValue) >= 0, rawValue + ' 不在全集內');
+  }
+});
+
+test('題庫：新來源之標籤（四語系）與其配置名（P271 第 3 項）', function () {
+  const { VCA } = loadCore();
+  const NEW_ORIGIN = 'rimezhuyin';
+  const key = 'origin.opt.' + NEW_ORIGIN;
+  for (const lang of VCA.LANG_ORDER) {
+    const label = VCA.UI_STRINGS[lang][key];
+    assert.ok(typeof label === 'string' && label.length > 0, lang + ' 缺新來源之標籤');
+    assert.ok(label.indexOf('Rime') >= 0, lang + ' 之標籤未載 Rime：' + label);
+    assert.ok(label.indexOf('注音') >= 0 || /Zhuyin/i.test(label),
+      lang + ' 之標籤未載「注音」：' + label);
+    // 註：不另斷言「四語系互異」——zh-Hant 與 zh-Hans 於本標籤恰同形（漢字無簡繁之別），
+    // 此為正當之結果，非複製貼上之誤。
+  }
+  // 與鄰近各項之標籤互異（免複製貼上之誤）。
+  for (const lang of VCA.LANG_ORDER) {
+    for (const other of ['origin.opt.pinyin', 'origin.opt.newbie', 'origin.opt.cin']) {
+      assert.notStrictEqual(VCA.UI_STRINGS[lang][key], VCA.UI_STRINGS[lang][other],
+        lang + ' 之新標籤與 ' + other + ' 相同');
+    }
+  }
+  // 配置名：新來源無短名 ⇒ 用全名（`ORIGIN_SHORT_NAME_KEY` 不新增條目）。
+  assert.strictEqual(typeof VCA.ORIGIN_SHORT_NAME_KEY[NEW_ORIGIN], 'undefined');
+  const starter = VCA.starterFor({ origin: NEW_ORIGIN, typing: 'zhuyin' }, 2700);
+  assert.strictEqual(starter.origin, NEW_ORIGIN);
+  assert.ok(starter.keys.length > 1);
+});
 
   // 否決表所載之鍵須存在於後設資料（防手抄漂移）。
   const vetoed = Object.keys(VCA.ORIGIN_VETOED_KEYS);

@@ -550,7 +550,7 @@ test('冒煙：「注音組句＋中英混打」帶出混打回退；狂拼流�
   const { dom: dom2 } = bootApp('?lang=zh-Hant');
   clickNext(dom2); // background
   const background = contentOf(dom2).textContent;
-  assert.ok(background.indexOf('狂拼流漢語拼音輸入法（微軟拼音／微信輸入法／搜狗拼音／昇陽拼音／智能狂拼／紫光拼音／Rime）') >= 0,
+  assert.ok(background.indexOf('狂拼流漢語拼音輸入法（微軟拼音／微信輸入法／搜狗拼音／昇陽拼音／智能狂拼／紫光拼音／Rime 拼音）') >= 0,
     '來源一項應並列產品名：' + background.slice(0, 400));
   assert.ok(pickRadioIn(dom2, 'origin', '狂拼流'));
   assert.ok(pickRadioIn(dom2, 'typing', '漢語拼音'));
