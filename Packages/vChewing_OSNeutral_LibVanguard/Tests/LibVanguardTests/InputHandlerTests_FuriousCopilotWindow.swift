@@ -1343,7 +1343,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// copilot 候選窗在場時，混打之注音原文由該窗**頂端之未完成讀音**承載，Tooltip 讓位
-  /// （兩者本即重疊於畫面同一處）；窗不在場時則仍由 Tooltip 承載。
+  /// （兩者本即重疊於畫面同一處）；窗不在場時 Tooltip 只承載讀音——原文自 P273 起已由
+  /// 組字區之讀音欄全局承載，故任何一態下該原文都只出現一次。
   @Test("[IH526] copilot 窗與 Tooltip 之分流：同一段原文只在一處呈現")
   func test_IH526_MixedAlnumReadingGoesToCopilotOrTooltip() throws {
     guard let testHandler, let testSession else {
@@ -1352,12 +1353,16 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     defer { leaveMixedAlnumTestEnvironment() }
 
-    // 群一：狂打關 ⇒ 無 copilot 候選 ⇒ 原文由 Tooltip 承載（既有語義不變）。
+    // 群一：狂打關 ⇒ 無 copilot 候選 ⇒ Tooltip 承載讀音（原文則在讀音欄）。
     enterMixedAlnumOnlyTestEnvironment()
     typeSentence("f")
     let plainState = testHandler.generateStateOfInputting()
     #expect(plainState.candidates.isEmpty)
-    #expect(plainState.tooltip.contains("f"), "實得：\(plainState.tooltip)")
+    #expect(plainState.tooltip == "ㄑ", "Tooltip 應只承載讀音，實得：\(plainState.tooltip)")
+    #expect(
+      plainState.displayedText == "f",
+      "混打原文應由組字區讀音欄承載，實得：\(plainState.displayedText)"
+    )
 
     // 群二：狂打開（並存）⇒ copilot 窗在場 ⇒ 原文改由該窗頂端之 pane 承載、Tooltip 讓位。
     enterMixedAlnumZhuyinFuriousTestEnvironment()
@@ -1707,7 +1712,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "實得：\(testSession.unfinishedReading ?? "nil")"
     )
 
-    // 群四：僅中英混合輸入回退（狂打關）——窗不開，pane 一併無資料。
+    // 群四：僅中英混合輸入回退（狂打關）——窗不開，pane 一併無資料；
+    // 該原文仍見於組字區之讀音欄（Tooltip 自 P277 起只承載讀音、不再重述原文）。
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.clear()
     enterMixedAlnumOnlyTestEnvironment()
@@ -1715,8 +1721,168 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.mixedAlphanumericalBuffer == "f")
     #expect(
       !testSession.isFuriousCopilotCandidateWindowVisible,
-      "狂打關時無 copilot 窗，原文仍由 Tooltip 承載。"
+      "狂打關時無 copilot 窗，原文仍由組字區之讀音欄承載。"
+    )
+    let mixedOnlyState = testHandler.generateStateOfInputting()
+    #expect(
+      mixedOnlyState.displayedText == "f",
+      "混打原文應由組字區讀音欄承載，實得：\(mixedOnlyState.displayedText)"
+    )
+    #expect(
+      !mixedOnlyState.tooltip.contains("f"),
+      "Tooltip 不得重述混打之 ASCII 原文，實得：\(mixedOnlyState.tooltip)"
     )
     #expect(testSession.unfinishedReading == nil, "實得：\(testSession.unfinishedReading ?? "nil")")
+  }
+
+  // MARK: - 「拼音並擊」對未完成讀音之呈現（P277）
+
+  /// 窗頂 pane 之讀音呈現須隨「拼音並擊（組字區內顯示漢語拼音）」偏好：啟用時，注音素材
+  /// 改以漢語拼音教科書式標調呈現；該偏好停用、或素材本即拼音字母流時一律照舊。
+  ///
+  /// - Important: 該 pane 恆由選字窗以單一橫排文字繪製（不隨直排輸入而轉向），故其轉換
+  ///   **不問呈現方向**——此與 Tooltip 之規則（另須問方向）刻意不同。
+  ///   判準屬性（`furiousFrontUnfinishedReading`）一字不動，只有顯示改。
+  /// - Important: 注音素材可能是**前綴**（單聲母）：故轉換**不得補陰平記號**，否則得
+  ///   `g1`` 這類無母音可附調號之殘形（實得：`ㄍ` ⇒ `g`）。
+  @Test("[IH539] 拼音並擊啟用時，窗頂 pane 之注音讀音改以漢語拼音呈現")
+  func test_IH539_PaneReadingFollowsHanyuPinyinPreference() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let originalPinyinDisplay = testHandler.prefs.showHanyuPinyinInCompositionBuffer
+    defer {
+      testHandler.prefs.showHanyuPinyinInCompositionBuffer = originalPinyinDisplay
+      leaveMixedAlnumTestEnvironment()
+    }
+
+    // 群一：純注音狂打（大千：ㄍ＝`e`、ㄠ＝`l`）。
+    enterZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    typeSentence("e")
+    #expect(testSession.unfinishedReading == "ㄍ", "實得：\(testSession.unfinishedReading ?? "nil")")
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    #expect(
+      testSession.unfinishedReading == "g",
+      "單聲母之前綴不得補陰平記號，實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+    #expect(
+      testHandler.furiousFrontUnfinishedReading == "ㄍ",
+      "判準屬性不得隨顯示偏好變動，實得：\(testHandler.furiousFrontUnfinishedReading ?? "nil")"
+    )
+    typeSentence("l")
+    #expect(
+      testHandler.furiousFrontUnfinishedReading == "ㄍㄠ",
+      "實得：\(testHandler.furiousFrontUnfinishedReading ?? "nil")"
+    )
+    #expect(
+      testSession.unfinishedReading == "gao",
+      "無調記之讀音與組字區讀音欄同構（皆不補陰平記號），實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+    // 帶聲調者：該聲調須落在漢語拼音之教科書式標記上。
+    // 註：注音狂打之「聲調鍵」本即音節確認鍵（讀音固化進組字器、注拼槽清空），
+    //     故帶調之未完成讀音無從以打字取得——此處直驅注拼槽（與 `IH218` 同法）。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    var composer = testHandler.composer
+    composer.clear()
+    composer.receiveSequence("ai3", isRomaji: false)
+    #expect(composer.getComposition(isHanyuPinyin: false) == "ㄇㄛˇ")
+    testHandler.composer = composer
+    testSession.switchState(testHandler.generateStateOfInputting())
+    #expect(
+      testHandler.furiousFrontUnfinishedReading == "ㄇㄛˇ",
+      "實得：\(testHandler.furiousFrontUnfinishedReading ?? "nil")"
+    )
+    #expect(
+      testSession.unfinishedReading == "mǒ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+
+    // 群二：並存態——箭頭前之原文不受轉換，箭頭後之讀音方以漢語拼音呈現。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    enterMixedAlnumZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    typeSentence("s")
+    #expect(
+      testSession.unfinishedReading == "s → n",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+    typeSentence("u")
+    #expect(
+      testSession.unfinishedReading == "su → ni",
+      "續鍵後原文與讀音一併延長，實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+
+    // 群三：純拼音狂拼——素材本即拼音字母流，不得再經注音→拼音之轉換。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("gao")
+    #expect(
+      testSession.unfinishedReading == "gao",
+      "拼音素材仍須原樣顯示（不得多添陰平記號），實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+
+    // 群四：偏好停用時，注音素材照舊以注音呈現。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = false
+    // 群三已把鍵盤排列切成漢語拼音，故須顯式切回大千（`enterZhuyinFuriousTestEnvironment`
+    // 只換注拼槽之 parser、不動 `prefs.keyboardParser`）。
+    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+    testHandler.ensureKeyboardParser()
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("el")
+    #expect(
+      testSession.unfinishedReading == "ㄍㄠ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+  }
+
+  /// 中英混打之 Tooltip 讀音亦隨「拼音並擊」偏好：啟用且橫排時改以漢語拼音教科書式標調呈現；
+  /// 直排時退回注音。轉換與窗頂 pane 同源——**不補陰平記號**，故單聲母前綴得 `m`、而非 `m1`。
+  @Test("[IH540] 拼音並擊啟用時，混打 Tooltip 之讀音改以漢語拼音呈現")
+  func test_IH540_MixedTooltipReadingFollowsHanyuPinyinPreference() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let originalPinyinDisplay = testHandler.prefs.showHanyuPinyinInCompositionBuffer
+    let originalAlwaysHorizontal = testHandler.prefs.alwaysShowTooltipTextsHorizontally
+    defer {
+      testHandler.prefs.showHanyuPinyinInCompositionBuffer = originalPinyinDisplay
+      testHandler.prefs.alwaysShowTooltipTextsHorizontally = originalAlwaysHorizontal
+      leaveMixedAlnumTestEnvironment()
+    }
+    enterMixedAlnumOnlyTestEnvironment()
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    // Tooltip 之方向判定走 `InputSession.isVerticalTyping`；本檔之會話為 mock、無從綁定
+    // `InputSession.current`，故逕以「強制橫排」鎖定橫排那一態（方向規則本身由 `IH218` 釘住）。
+    testHandler.prefs.alwaysShowTooltipTextsHorizontally = true
+
+    // 單聲母前綴（大千：`a`＝ㄇ）：不得補陰平記號而得 `m1`。
+    typeSentence("a")
+    let prefixState = testHandler.generateStateOfInputting()
+    #expect(prefixState.tooltip == "m", "實得：\(prefixState.tooltip)")
+
+    // 直驅注拼槽至「ㄇㄛˇ」，避開混輸 auto-split 對鍵序之依賴（與 `IH218` 同法）。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    var composer = testHandler.composer
+    composer.clear()
+    composer.receiveSequence("ai3", isRomaji: false)
+    #expect(composer.getComposition(isHanyuPinyin: false) == "ㄇㄛˇ")
+    testHandler.composer = composer
+    testHandler.mixedAlphanumericalBuffer = "ai3"
+    let tonedState = testHandler.generateStateOfInputting()
+    #expect(tonedState.tooltip == "mǒ", "實得：\(tonedState.tooltip)")
+    #expect(
+      tonedState.displayedText.contains("ai3"),
+      "混打原文應由組字區讀音欄承載，實得：\(tonedState.displayedText)"
+    )
   }
 }

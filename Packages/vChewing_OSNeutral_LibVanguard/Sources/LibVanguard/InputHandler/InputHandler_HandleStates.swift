@@ -663,19 +663,20 @@ extension InputHandlerProtocol {
     /// 讀音原文之落點：**copilot 候選窗在場時由該窗頂端之「未完成讀音」區域承載**
     /// （見 `unfinishedReading` 之資料源），Tooltip 讓位——兩者本即重疊於畫面同一處，
     /// 一併顯示即同一段原文說兩次。
-    /// 候選窗缺席時則分兩側：**中英混合輸入回退**以 Tooltip 承載混打之 ASCII 原文
-    /// （含注拼槽之讀音預覽行）；拼音狂打側則以 Tooltip 承載注拼槽暫存之原始拼音，
-    /// 讓使用者仍能核對自己實際敲下的字母（候選窗顯示時抑制之，原文之可見性改由
-    /// 固化後正常選字窗的 revlookup 承擔）。α 路徑查無命中時亦顯示暫存拼音。
+    /// 候選窗缺席時則分兩側：**中英混合輸入回退**以 Tooltip 承載其讀音（注拼槽之讀音預覽
+    /// 行）；拼音狂打側則以 Tooltip 承載注拼槽暫存之原始拼音，讓使用者仍能核對自己實際
+    /// 敲下的字母（候選窗顯示時抑制之，原文之可見性改由固化後正常選字窗的 revlookup 承擔）。
+    /// α 路徑查無命中時亦顯示暫存拼音。
     ///
+    /// - Important: **混打側之 Tooltip 只承載讀音、不承載其 ASCII 原文**：該原文自 P273 起
+    ///   已由組字區之**讀音欄**全局承載（本檔上方之 `mixedAlnumReading`），而該欄與本 Tooltip
+    ///   同拍並陳於畫面 ⇒ 原文再入 Tooltip 即同一段內容說兩次。讀音則非重複——組字區讀音欄
+    ///   於混打態承載的是原文，讀音本身只另有（狂打並存時之）copilot 窗可示。
     /// - Important: 本段須**置於候選清單生成之後**——混打側之判準即「窗在不在場」，
     ///   而窗之有無取決於 `result.candidates`，故提前判讀會把「窗將開」誤判為「窗不在場」。
     if result.tooltip.isEmpty, result.candidates.isEmpty {
       if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
-        let readingPreview = inlineReadingPreview
-        result.tooltip = readingPreview.isEmpty
-          ? mixedAlphanumericalBuffer
-          : mixedAlphanumericalBuffer + "\n" + readingPreview
+        result.tooltip = inlineReadingPreview
       } else if furiousPreview != nil || (furiousContext == nil && furiousAbbreviatedCells != nil) {
         result.tooltip = composer.romajiBuffer
       }

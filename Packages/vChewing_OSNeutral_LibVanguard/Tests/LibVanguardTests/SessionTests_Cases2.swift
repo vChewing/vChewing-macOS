@@ -775,9 +775,10 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     )
   }
 
-  /// 中英混打模式 Tooltip 第二行之讀音呈現，須沿用 Tooltip 既有規則：
+  /// 中英混打模式 Tooltip 之讀音呈現，須沿用 Tooltip 既有規則：
   /// 注音一律教科書式（輕聲前置）；僅當「以漢語拼音顯示組字區讀音」啟用、
   /// 且該 Tooltip 以橫排呈現時才改為漢語拼音教科書式標調。
+  /// ※ 混打之 ASCII 原文不入 Tooltip（其已由組字區讀音欄承載），故 Tooltip 僅此一項內容。
   /// ※ 組字區自身仍維持原本之數字標調式拼音，兩者刻意不同（見既有 `readingThreadForDisplay`）。
   @Test
   func test218_InputHandler_MixedTooltipReadingPreviewStyle() throws {
@@ -808,26 +809,32 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     testHandler.composer = composer
     testHandler.mixedAlphanumericalBuffer = "ai3"
 
-    // 停用「以漢語拼音顯示組字區讀音」：第二行以教科書式注音呈現。
+    // 停用「以漢語拼音顯示組字區讀音」：以教科書式注音呈現。
     let bpmfPreview = testHandler.generateStateOfInputting().tooltip
-    #expect(bpmfPreview == "ai3\nㄇㄛˇ", "實際得到：\(bpmfPreview)")
+    #expect(bpmfPreview == "ㄇㄛˇ", "實際得到：\(bpmfPreview)")
 
-    // 啟用該偏好且為橫排：第二行改以漢語拼音教科書式標調呈現。
+    // 啟用該偏好且為橫排：改以漢語拼音教科書式標調呈現。
     testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
     let pinyinPreview = testHandler.generateStateOfInputting().tooltip
-    #expect(pinyinPreview == "ai3\nmǒ", "實際得到：\(pinyinPreview)")
+    #expect(pinyinPreview == "mǒ", "實際得到：\(pinyinPreview)")
     // 對照：組字區自身仍為數字標調式，可見 Tooltip 走的是自家既有規則。
     #expect(composer.getComposition(isHanyuPinyin: true) == "mo3")
+    // 混打之 ASCII 原文不入 Tooltip：其已由組字區之讀音欄承載。
+    let stateWithMixBuffer = testHandler.generateStateOfInputting()
+    #expect(
+      stateWithMixBuffer.displayedText.contains("ai3"),
+      "實際得到：\(stateWithMixBuffer.displayedText)"
+    )
 
     // 直排輸入且未強制橫排 Tooltip 時，退回教科書式注音。
     testSession.isVerticalTyping = true
     let verticalPreview = testHandler.generateStateOfInputting().tooltip
-    #expect(verticalPreview == "ai3\nㄇㄛˇ", "實際得到：\(verticalPreview)")
+    #expect(verticalPreview == "ㄇㄛˇ", "實際得到：\(verticalPreview)")
 
     // 直排但強制 Tooltip 橫排時，仍以漢語拼音呈現。
     testHandler.prefs.alwaysShowTooltipTextsHorizontally = true
     let verticalForcedHorizontal = testHandler.generateStateOfInputting().tooltip
-    #expect(verticalForcedHorizontal == "ai3\nmǒ", "實際得到：\(verticalForcedHorizontal)")
+    #expect(verticalForcedHorizontal == "mǒ", "實際得到：\(verticalForcedHorizontal)")
     testHandler.prefs.alwaysShowTooltipTextsHorizontally = false
   }
 
@@ -869,12 +876,16 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = false
   }
 
-  /// 中英混打模式下，內文 Tooltip 須錨在「未完成讀音（此際即 ASCII 緩衝區）後方之游標
-  /// 位置」上——與選字窗之錨定（`u16MarkedRange.lowerBound`）同源，故能跟著該位置
+  /// 中英混打模式下，內文 Tooltip 須錨在「未完成讀音（此際即注拼槽所消化之注音）後方之
+  /// 游標位置」上——與選字窗之錨定（`u16MarkedRange.lowerBound`）同源，故能跟著該位置
   /// 同步移動自身的位置；而非恆錨在組字區最前方（既有行為）。
   ///
   /// 該位置另存於 `IMEState`：`.ofInputting` 狀態的 `marker` 會被 `getMitigatedState(_:)`
   /// 拉平至 `cursor`，故此測試同時釘死「marker 已拉平、錨點資訊仍在」之狀態形制。
+  ///
+  /// - Note: 混打之 Tooltip 只承載讀音、不承載 ASCII 原文（原文由組字區讀音欄承載），
+  ///   故本靶以「進注拼槽之小寫鍵」造出 Tooltip：大寫鍵（如 `T`）不進注拼槽 ⇒ 無讀音可示
+  ///   ⇒ 根本無 Tooltip 可錨（該態另由 `IH435` 釘住）。
   @Test
   func test220_MixedAlnumTooltipAnchorsAtCursorPosBehindReading() throws {
     let tooltipUI = MockTooltipUI()
@@ -907,15 +918,15 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
 
     resetToAbortionAndClear()
 
-    // 先組出中文「你」（注音 ㄋㄧˇ），再鍵入大寫 ASCII「T」
-    // （大寫不進注拼槽，故組字區顯示的就是該 ASCII 原文）。
+    // 先組出中文「你」（注音 ㄋㄧˇ），再鍵入小寫 ASCII「s」（大千排列之 ㄋ，進注拼槽 ⇒
+    // Tooltip 有讀音可示；其 ASCII 原文則由組字區之讀音欄承載）。
     typeSentenceOrCandidates("su3")
     #expect(testSession.state.displayedText == "你", "實際得到：\(testSession.state.displayedText)")
-    typeSentenceOrCandidates("T")
+    typeSentenceOrCandidates("s")
     #expect(testSession.state.type == .ofInputting)
-    #expect(testSession.state.displayedText == "你T", "實際得到：\(testSession.state.displayedText)")
+    #expect(testSession.state.displayedText == "你s", "實際得到：\(testSession.state.displayedText)")
 
-    // 未完成讀音（ASCII 緩衝區）後方之游標位置 = 1（緊隨「你」之後）；marker 已被拉平至 cursor。
+    // 未完成讀音（消化自混打緩衝之注音）後方之游標位置 = 1（緊隨「你」之後）；marker 已被拉平至 cursor。
     #expect(testSession.state.data.cursorPosRightBehindTheUnfinishedReading == 1)
     #expect(testSession.state.data.u16CursorPosRightBehindTheUnfinishedReading == 1)
     #expect(
@@ -924,7 +935,8 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     )
 
     // 錨點：該位置（u16 = 1）之矩形原點為 (10, 100)；若仍錨在組字區最前方則會得到 (0, 0)。
-    #expect(tooltipUI.shownTooltip == "T", "實際得到：\(String(describing: tooltipUI.shownTooltip))")
+    // Tooltip 之內容即該讀音（混打之 ASCII 原文不入 Tooltip）。
+    #expect(tooltipUI.shownTooltip == "ㄋ", "實際得到：\(String(describing: tooltipUI.shownTooltip))")
     expectAnchor(10, 100, "混輸 Tooltip 應錨在未完成讀音後方之游標位置上")
     #expect(
       testClientProxy.queriedU16CursorPositions.contains(1),
@@ -933,7 +945,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     // 次序：錨點之座標量測必須發生在客體收到本狀態之組字區內容之後。
     // 否則客體的內文組字區還是上一個狀態的內容，本狀態的索引對其即屬越界
     // （`clientLineHeightRectForU16CursorPos:` 對越界值會逐位遞減探測），錨點遂落在前者。
-    let markedSetupIdx = testClientProxy.calls.lastIndex(of: .markedTextSetup("你T"))
+    let markedSetupIdx = testClientProxy.calls.lastIndex(of: .markedTextSetup("你s"))
     let anchorQueryIdx = testClientProxy.calls.lastIndex(of: .lineHeightQuery(1))
     #expect(markedSetupIdx != nil && anchorQueryIdx != nil)
     #expect(
@@ -944,9 +956,22 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     // 對照組一：未完成讀音自組字區最前方起算時（空組字區），錨點 = 座標 0 之矩形。
     tooltipUI.hide()
     resetToAbortionAndClear()
-    typeSentenceOrCandidates("T")
+    typeSentenceOrCandidates("s")
     #expect(testSession.state.data.u16CursorPosRightBehindTheUnfinishedReading == 0)
+    #expect(tooltipUI.shownTooltip == "ㄋ", "實際得到：\(String(describing: tooltipUI.shownTooltip))")
     expectAnchor(0, 100, "未完成讀音自組字區最前方起算時應錨在座標 0")
+
+    // 對照組一之二：混打緩衝非空、而注拼槽無讀音可示時（大寫鍵不進注拼槽），
+    // Tooltip 既無內容即整窗收起——原文仍見於組字區之讀音欄。
+    tooltipUI.hide()
+    resetToAbortionAndClear()
+    let showCountBeforeUppercase = tooltipUI.showCount
+    typeSentenceOrCandidates("T")
+    #expect(testSession.state.displayedText == "T", "實際得到：\(testSession.state.displayedText)")
+    #expect(
+      tooltipUI.showCount == showCountBeforeUppercase,
+      "無讀音可示時不得以 ASCII 原文充作 Tooltip 內容"
+    )
 
     // 對照組二：非輸入狀態（標記狀態）之 Tooltip 仍錨在既有錨定（組字區最前方之矩形）
     // ——該類狀態不由 `generateStateOfInputting()` 生成，故不帶「未完成讀音後方之游標位置」。

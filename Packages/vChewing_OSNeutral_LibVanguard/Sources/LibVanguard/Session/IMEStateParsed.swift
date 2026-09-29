@@ -265,6 +265,11 @@ extension IMEStateParsed {
   /// （輕聲前置）；僅當「以漢語拼音顯示組字區讀音」偏好啟用、且該 Tooltip 會以橫排呈現
   /// （`alwaysShowTooltipTextsHorizontally` 或當前非直排輸入）時，才改以漢語拼音教科書式標調呈現。
   /// 磁帶模式不做任何轉換（讀音鍵本身即為組筆序列）。
+  ///
+  /// - Important: 本處之讀音由組字器之既有鍵推得（標記狀態下之完整讀音），故與
+  ///   `convertReadingForHanyuPinyinDisplay(_:isHanyuPinyin:)` **刻意不同**：此處補記陰平
+  ///   （`restoreToneOneInPhona`——該記號正是「完整讀音以無調形態記之」之補正）；
+  ///   未完成之前綴則不得補記。兩者不得互換。
   static func convertReadingForTooltip(_ neta: String) -> String {
     let prefs = SessionHost.shared.prefs()
     guard !prefs.cassetteEnabled else { return neta }
@@ -275,6 +280,29 @@ extension IMEStateParsed {
       return Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: neta)
     }
     return Tekkon.cnvPhonaToTextbookStyle(target: neta)
+  }
+
+  /// 依「以漢語拼音顯示組字區讀音」之判定轉換單一讀音：以漢語拼音教科書式標調呈現。
+  ///
+  /// 本函式專供**未完成讀音**（注拼槽之當前拼裝、混打緩衝之消化結果）之呈現，其消費者有二：
+  /// 組字區讀音欄之對位物——選字窗頂端之「未完成讀音」pane，以及中英混打之 Tooltip 讀音預覽。
+  /// 與 `convertReadingForTooltip(_:)` 之差別有二：
+  /// ① **不問呈現方向**——窗頂 pane 由選字窗以單一橫排文字繪製、不隨直排輸入而轉向，故與
+  ///    組字區讀音欄同語義：只要該偏好啟用即改以漢語拼音呈現（Tooltip 之方向判定由呼叫端自理）。
+  /// ② **不補陰平記號**（不呼 `restoreToneOneInPhona`）——本處之讀音可能只是**前綴**
+  ///    （如單聲母 ㄍ），補上數字 1 會得 `g1` 這種無母音可附調號之殘形；
+  ///    此亦與組字區讀音欄之轉換同構（彼逕以 `cnvPhonaToHanyuPinyin` 轉換注拼槽內容）。
+  /// - Parameter isHanyuPinyin: 假（未啟用該偏好、或處於磁帶模式）時原樣返回；真時轉換。
+  /// - Important: 讀音素材本即**拼音字母流**者（拼音狂拼之 romaji 緩衝）不得傳真進來——
+  ///   該者已屬拼音，再經注音→拼音之轉換只會多添記號。
+  static func convertReadingForHanyuPinyinDisplay(
+    _ neta: String,
+    isHanyuPinyin: Bool
+  )
+    -> String {
+    guard isHanyuPinyin else { return neta }
+    let converted = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: neta)
+    return Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: converted)
   }
 
   public var readingThreadForDisplay: String {

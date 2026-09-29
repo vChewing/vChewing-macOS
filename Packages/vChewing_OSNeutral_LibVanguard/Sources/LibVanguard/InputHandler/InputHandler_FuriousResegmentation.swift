@@ -146,14 +146,24 @@ extension InputHandlerProtocol {
   /// - Note: **中英混合輸入回退與注音狂打並存**時（`mixedAlnumZhuyinFuriousInEffect`），
   ///   素材住在混打之 ASCII 緩衝區，而該緩衝之原文在此之前無從於窗頂顯現（該處只顯示
   ///   消化後之讀音）⇒ 本屬性於該情境顯示「原文 → 消化後之讀音」，俾使用者看得見自己
-  ///   敲下了哪些鍵。其餘情境（純狂拼、純狂注）一律原樣轉發。
+  ///   敲下了哪些鍵。
+  /// - Note: **「拼音並擊（組字區內顯示漢語拼音）」啟用時，注音素材改以漢語拼音呈現**
+  ///   （教科書式標調）——窗頂 pane 與組字區之讀音欄同語義，兩者不得一處注音、一處拼音。
+  ///   該 pane 恆以橫排繪製，故**不問呈現方向**（Tooltip 另問，見 `convertReadingForTooltip`）。
+  ///   拼音素材（romaji 字母流）本即拼音，原樣轉發；磁帶模式亦原樣。
   public var furiousFrontUnfinishedReadingForDisplay: String? {
     guard let reading = furiousFrontUnfinishedReading else { return nil }
-    guard mixedAlnumZhuyinFuriousInEffect else { return reading }
+    let displayed = IMEStateParsed.convertReadingForHanyuPinyinDisplay(
+      reading,
+      isHanyuPinyin: !composer.isPinyinMode
+        && !prefs.cassetteEnabled
+        && prefs.showHanyuPinyinInCompositionBuffer
+    )
+    guard mixedAlnumZhuyinFuriousInEffect else { return displayed }
     let raw = mixedAlphanumericalBuffer
     // 素材住緩衝區者，其成立之必要條件即緩衝非空；此處僅為免於顯示出空原文。
-    guard !raw.isEmpty else { return reading }
-    return "\(raw) → \(reading)"
+    guard !raw.isEmpty else { return displayed }
+    return "\(raw) → \(displayed)"
   }
 
   /// 狂打模式有效且注拼槽尚有未固化之讀音素材（前方待確認讀音）。

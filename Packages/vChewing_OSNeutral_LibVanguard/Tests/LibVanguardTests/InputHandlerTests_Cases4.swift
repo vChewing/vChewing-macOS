@@ -419,8 +419,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
   }
 
-  /// 中英混打模式下，Tooltip 第二行應顯示游標最前方正在組裝的注音讀音預覽：
-  /// 首行恆為 ASCII buffer 原文；注拼槽有內容時附加第二行讀音，為空時不附加該行。
+  /// 中英混打模式下，Tooltip 只承載游標最前方正在組裝的注音讀音預覽：
+  /// 混打之 ASCII 原文**不入** Tooltip（其已由組字區之讀音欄全局承載，見 `IH430` 之
+  /// `displayedText`）；注拼槽為空時無讀音可示 ⇒ Tooltip 為空、不顯示。
   @Test
   func test_IH435_MixedTooltipInlineReadingPreview() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
@@ -430,20 +431,29 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence("a")
     #expect(testHandler.mixedAlphanumericalBuffer == "a")
 
-    let tooltipWithReading = testHandler.generateStateOfInputting().tooltip
-    let lines = tooltipWithReading.components(separatedBy: "\n")
-    #expect(lines.count == 2, "注拼槽有內容時 Tooltip 應為兩行，實際得到：\(tooltipWithReading)")
-    #expect(lines.first == "a", "Tooltip 首行應為 ASCII buffer 原文，實際得到：\(tooltipWithReading)")
-    #expect(lines.last == "ㄇ", "Tooltip 次行應為注音讀音預覽，實際得到：\(tooltipWithReading)")
+    let stateWithReading = testHandler.generateStateOfInputting()
+    #expect(
+      stateWithReading.tooltip == "ㄇ",
+      "Tooltip 應只承載讀音，實際得到：\(stateWithReading.tooltip)"
+    )
+    #expect(
+      stateWithReading.displayedText == "a",
+      "混打之 ASCII 原文應由組字區之讀音欄承載，實際得到：\(stateWithReading.displayedText)"
+    )
 
-    // 大寫字母前導不進注拼槽（見 IH403），故 Tooltip 應僅有 ASCII buffer 一行。
+    // 大寫字母前導不進注拼槽（見 IH403）⇒ 無讀音可示：Tooltip 為空（原文仍見於讀音欄）。
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence("This")
     #expect(testHandler.mixedAlphanumericalBuffer == "This")
+    let stateWithoutReading = testHandler.generateStateOfInputting()
     #expect(
-      testHandler.generateStateOfInputting().tooltip == "This",
-      "注拼槽為空時 Tooltip 不應附加讀音行"
+      stateWithoutReading.tooltip.isEmpty,
+      "注拼槽為空時 Tooltip 無讀音可示、不得回退為 ASCII 原文，實際得到：\(stateWithoutReading.tooltip)"
+    )
+    #expect(
+      stateWithoutReading.displayedText == "This",
+      "無讀音時原文仍須見於組字區讀音欄，實際得到：\(stateWithoutReading.displayedText)"
     )
   }
 

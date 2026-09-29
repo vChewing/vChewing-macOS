@@ -610,13 +610,18 @@ extension InputHandlerProtocol {
     return currentReading.isEmpty ? mixedAlphanumericalBuffer : currentReading
   }
 
-  /// 游標最前方正在組裝的注音讀音預覽。供中英混打模式的 Tooltip 第二行使用。
+  /// 游標最前方正在組裝的注音讀音預覽。供中英混打模式的 Tooltip 使用。
   ///
-  /// 呈現規則沿用 Tooltip 既有之讀音呈現（`IMEStateParsed.convertReadingForTooltip(_:)`）：
-  /// 注音以教科書式呈現（輕聲前置）；僅當「以漢語拼音顯示組字區讀音」偏好啟用、
-  /// 且該 Tooltip 以橫排呈現時，才改以漢語拼音教科書式標調呈現。
-  /// 為此，本值之來源固定為注拼槽的注音原字串（`isHanyuPinyin: false`）——該轉換函式
-  /// 本就以注音為輸入；若改餵組字區那套隨偏好變動的呈現，會把拼音誤當注音再轉一次。
+  /// 呈現規則沿用 Tooltip 既有之讀音呈現：注音以教科書式呈現（輕聲前置）；
+  /// 僅當「以漢語拼音顯示組字區讀音」偏好啟用、且該 Tooltip 以橫排呈現時，
+  /// 才改以漢語拼音教科書式標調呈現。為此，本值之來源固定為注拼槽的注音原字串
+  /// （`isHanyuPinyin: false`）——該轉換函式本就以注音為輸入；若改餵組字區那套隨偏好
+  /// 變動的呈現，會把拼音誤當注音再轉一次。
+  ///
+  /// - Important: 轉換取「**未完成讀音**」專用之版本（`convertReadingForHanyuPinyinDisplay`，
+  ///   不補陰平記號）：注拼槽之內容可能只是單聲母之前綴，補記會得 `m1` 這類無母音可附調號
+  ///   之殘形。該選擇與選字窗頂端之「未完成讀音」pane 同源，兩處不得各養一份判準；
+  ///   標記狀態之完整讀音則另走 `IMEStateParsed.convertReadingForTooltip(_:)`。
   /// 與 `readingForDisplay` 之差別：本值僅取注拼槽（或組筆區）自身的內容，
   /// 不做「注拼槽為空時回退為混輸 ASCII 緩衝區」的處置。
   var inlineReadingPreview: String {
@@ -624,7 +629,11 @@ extension InputHandlerProtocol {
     guard !prefs.cassetteEnabled, !composer.isPinyinMode else {
       return inlineReadingForCompositionBuffer
     }
-    return IMEStateParsed.convertReadingForTooltip(composer.getComposition(isHanyuPinyin: false))
+    return IMEStateParsed.convertReadingForHanyuPinyinDisplay(
+      composer.getComposition(isHanyuPinyin: false),
+      isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer
+        && (prefs.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping)
+    )
   }
 
   /// 注拼槽（磁帶模式下為組筆區）當前內容之原始讀音，供組字區顯示使用。
