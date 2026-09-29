@@ -64,7 +64,7 @@ extension InputHandlerProtocol {
     }
   }
 
-  /// 混打緩衝區所承載之注音讀音，無則 `nil`（回退與注音狂打並存時之「未完成讀音」）。
+  /// 混打緩衝區所承載之注音讀音，無則 `nil`——**不拘狂打開關**之量測。
   ///
   /// **三個必要條件**：
   ///   ① 該緩衝自身**恰為一個依槽序鍵入之無調讀音**（＝打字機之 `enforceCSVTOrdering`
@@ -79,11 +79,13 @@ extension InputHandlerProtocol {
   ///      就地補滿（實測 `us` 之投影為 ㄋㄠ，而該緩衝僅有 ㄧㄡ 一音節之鍵數）；不加此項
   ///      一致性核對，殘段即會被誤認為完整讀音。
   ///   ② 投影已空者 ⇒ 自緩衝重求。此路必要：凡「聲介韻三槽已滿、後續鍵無處可入」者，
-  ///      打字機即清空注拼槽、只把該段留在緩衝（實測 `1u`＝ㄅㄧ、`su`＝ㄋㄧ 之投影皆已清空）。
+  ///      打字機即清空注拼槽、只把該段留在緩衝（實測 `1u`＝ㄅㄧ、`su`／`su;` 之投影皆已清空）。
   ///
+  /// - Important: 凡「該緩衝有讀音可示」之**顯示**路徑（如混打之 Tooltip 讀音預覽）應取本值
+  ///   ——注拼槽之存亡只是打字機逐鍵消化之副作用（整段未被詞庫採納即被清空），不足為憑。
+  ///   狂打之讀音素材則另問併存閘（見 `mixedAlnumPendingReading`）。
   /// 全程以副本求值，**不動任何既有狀態**。
-  public var mixedAlnumPendingReading: String? {
-    guard mixedAlnumZhuyinFuriousInEffect else { return nil }
+  public var mixedAlnumBufferPendingReading: String? {
     let buffer = mixedAlphanumericalBuffer
     // 空緩衝恆不成立、亦免於「以空序列求值」之無謂運算。
     guard !buffer.isEmpty, buffer.count <= maxSingleSyllableKeyCount else { return nil }
@@ -103,6 +105,16 @@ extension InputHandlerProtocol {
     // 讀音之前綴，單憑 `isPrefix` 會漏掉一整類完整音節。惟兩者皆以**整段**為判。
     guard index.isPrefix(candidate) || index.isComplete(candidate) else { return nil }
     return candidate
+  }
+
+  /// 回退與注音狂打並存時之「未完成讀音」（狂打之讀音素材）＝`mixedAlnumBufferPendingReading`
+  /// 加掛併存閘。
+  ///
+  /// - Important: 惟**顯示**路徑不得以本值為唯一來源——狂打關閉時本值恆 `nil`，而混打之
+  ///   Tooltip 仍須示該緩衝之讀音（見 `mixedAlnumBufferPendingReading` 之註）。
+  public var mixedAlnumPendingReading: String? {
+    guard mixedAlnumZhuyinFuriousInEffect else { return nil }
+    return mixedAlnumBufferPendingReading
   }
 
   /// 混打緩衝是否為「**恰為**一個尚未鍵入聲調之讀音」——**不拘狂打開關**之量測。

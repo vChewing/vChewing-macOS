@@ -614,25 +614,35 @@ extension InputHandlerProtocol {
   ///
   /// 呈現規則沿用 Tooltip 既有之讀音呈現：注音以教科書式呈現（輕聲前置）；
   /// 僅當「以漢語拼音顯示組字區讀音」偏好啟用、且該 Tooltip 以橫排呈現時，才改以漢語拼音
-  /// 呈現——而該式即**組字區讀音欄那一式**（數字標調附於尾端、`ü` 作 `v`）。為此，本值之
-  /// 來源固定為注拼槽的注音原字串（`isHanyuPinyin: false`）——該轉換函式本就以注音為輸入；
-  /// 若改餵組字區那套隨偏好變動的呈現，會把拼音誤當注音再轉一次。
+  /// 呈現——而該式即**組字區讀音欄那一式**（數字標調附於尾端、`ü` 作 `v`）。
   ///
+  /// - Important: **讀音之來源優先取混打緩衝之量測**（`mixedAlnumBufferPendingReading`）——
+  ///   混打側之素材住 ASCII 緩衝區，而注拼槽只是其投影，且該投影於「整段未被詞庫採納」時
+  ///   即被打字機清空（實測 `su;`＝ㄋㄧㄤ 之投影已空、緩衝仍在）⇒ 只讀注拼槽者，凡多鍵之
+  ///   混打緩衝皆無讀音可示、Tooltip 遂整窗收起（P277 起「Tooltip 只承載讀音」即顯此病）。
+  ///   緩衝非讀音（殘段）時才退回注拼槽之內容（單鍵起頭者兩者同值）。
   /// - Important: 轉換取「**未完成讀音**」專用之版本（`convertReadingForHanyuPinyinDisplay`，
-  ///   不補陰平記號、**不**轉教材式標調）：注拼槽之內容可能只是單聲母之前綴，補記會得 `m1`
+  ///   不補陰平記號、**不**轉教材式標調）：該讀音可能只是單聲母之前綴，補記會得 `m1`
   ///   這類無母音可附調號之殘形。該選擇與選字窗頂端之「未完成讀音」pane 同源，兩處不得
   ///   各養一份判準；標記狀態之完整讀音則另走 `IMEStateParsed.convertReadingForTooltip(_:)`。
-  /// 與 `readingForDisplay` 之差別：本值僅取注拼槽（或組筆區）自身的內容，
-  /// 不做「注拼槽為空時回退為混輸 ASCII 緩衝區」的處置。
+  /// 與 `readingForDisplay` 之差別：本值不做「注拼槽為空時回退為混輸 ASCII 緩衝**原文**」
+  /// 的處置——回退者僅及該緩衝之**讀音**量測。
   var inlineReadingPreview: String {
     // 磁帶模式之讀音鍵不是注音、拼音模式之顯示來自羅馬字緩衝：兩者皆沿用組字區呈現。
     guard !prefs.cassetteEnabled, !composer.isPinyinMode else {
       return inlineReadingForCompositionBuffer
     }
+    let prefersHanyuPinyin = prefs.showHanyuPinyinInCompositionBuffer
+      && (prefs.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping)
+    if let pending = mixedAlnumBufferPendingReading {
+      return IMEStateParsed.convertReadingForHanyuPinyinDisplay(
+        pending,
+        isHanyuPinyin: prefersHanyuPinyin
+      )
+    }
     return IMEStateParsed.convertReadingForHanyuPinyinDisplay(
       composer.getComposition(isHanyuPinyin: false),
-      isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer
-        && (prefs.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping)
+      isHanyuPinyin: prefersHanyuPinyin
     )
   }
 

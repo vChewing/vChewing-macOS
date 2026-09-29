@@ -1907,4 +1907,90 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "混打原文應由組字區讀音欄承載，實得：\(tonedState.displayedText)"
     )
   }
+
+  /// 混打 Tooltip 之讀音來源須為**緩衝區之量測**、非注拼槽之投影。
+  ///
+  /// - Important: 注拼槽只是混打緩衝之投影，而該投影於「整段未被詞庫採納」時即被打字機
+  ///   清空（大千：`su;`＝ㄋㄧㄤ 之投影已空、緩衝仍在；對照 `1u,`＝ㄅㄧㄝ 之投影倖存）。
+  ///   只讀注拼槽者，凡多鍵之混打緩衝皆無讀音可示 ⇒ P277 起「Tooltip 只承載讀音」之語義
+  ///   退化成「整窗收起」（事主 2026-09-29 回報：`su;` 之 Tooltip 為空、應示 `niang`）。
+  @Test("[IH541] 混打 Tooltip 之讀音取緩衝區之量測（注拼槽投影已空者亦然）")
+  func test_IH541_MixedTooltipReadingComesFromBuffer() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let originalPinyinDisplay = testHandler.prefs.showHanyuPinyinInCompositionBuffer
+    defer {
+      testHandler.prefs.showHanyuPinyinInCompositionBuffer = originalPinyinDisplay
+      leaveMixedAlnumTestEnvironment()
+    }
+
+    // 群一：僅中英混合輸入回退（狂打關）＋「拼音並擊」啟用。
+    enterMixedAlnumOnlyTestEnvironment()
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    typeSentence("su;")
+    #expect(
+      testHandler.mixedAlphanumericalBuffer == "su;",
+      "實得：\(testHandler.mixedAlphanumericalBuffer)"
+    )
+    #expect(
+      testHandler.composer.getComposition(isHanyuPinyin: false).isEmpty,
+      "本靶之前提：該緩衝之注拼槽投影已被打字機清空"
+    )
+    #expect(
+      testHandler.mixedAlnumPendingReading == nil,
+      "狂打關時狂打側之素材量測恆為 nil（併存閘）"
+    )
+    #expect(
+      testHandler.mixedAlnumBufferPendingReading == "ㄋㄧㄤ",
+      "緩衝側之量測不拘狂打開關，實得：\(testHandler.mixedAlnumBufferPendingReading ?? "nil")"
+    )
+    let longState = testHandler.generateStateOfInputting()
+    #expect(longState.tooltip == "niang", "實得：\(longState.tooltip)")
+    #expect(
+      longState.displayedText == "su;",
+      "混打原文仍由組字區讀音欄承載，實得：\(longState.displayedText)"
+    )
+    // 非讀音之緩衝（`fi`＝ㄑㄛ 可發音卻非任何讀音之起頭）：讀音無從示起 ⇒ Tooltip 為空。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    typeSentence("fi")
+    #expect(testHandler.mixedAlnumBufferPendingReading == nil)
+    #expect(
+      testHandler.generateStateOfInputting().tooltip.isEmpty,
+      "非讀音之緩衝不得充作讀音"
+    )
+
+    // 群二：同一情境但「拼音並擊」停用 ⇒ 該讀音以注音呈現。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = false
+    typeSentence("su;")
+    let zhuyinState = testHandler.generateStateOfInputting()
+    #expect(zhuyinState.tooltip == "ㄋㄧㄤ", "實得：\(zhuyinState.tooltip)")
+
+    // 群三：兩者並存 ⇒ 窗在場（Tooltip 讓位）、原文與讀音由窗頂 pane 承載。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    enterMixedAlnumZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    typeSentence("su;")
+    #expect(
+      testHandler.mixedAlnumPendingReading == testHandler.mixedAlnumBufferPendingReading,
+      "併存時狂打側之素材即緩衝側之量測"
+    )
+    #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+    let copilotState = testHandler.generateStateOfInputting()
+    #expect(!copilotState.candidates.isEmpty, "copilot 窗須有候選")
+    #expect(
+      copilotState.tooltip.isEmpty,
+      "窗在場時 Tooltip 讓位，實得：\(copilotState.tooltip)"
+    )
+    #expect(
+      testSession.unfinishedReading == "su; → niang",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+  }
 }
