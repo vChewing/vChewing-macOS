@@ -121,16 +121,19 @@ extension InputHandlerProtocol {
   ///
   /// - Important: 本屬性即 P270 之「待調讀音」判準之原位化身（該 phase 之判準係打字機內之
   ///   `isPendingTonelessReading`）；P273 令其歸位至此，俾狂打側與打字機側共用同一份量測。
+  ///   惟 P273 起該量測一度**無條件**啟用 `enforceCSVTOrdering`，遂令「依槽序鍵入判定讀音」
+  ///   之偏好實質失效（always on）；P274 起該旗標**隨該偏好啟停**——停用即回到舊制之計數式
+  ///   消化，亂序短令牌（`ls`／`us`）照舊被吸納為讀音。
   public var mixedAlnumBufferIsTonelessReading: Bool {
     let buffer = mixedAlphanumericalBuffer
     guard !buffer.isEmpty, buffer.count <= maxSingleSyllableKeyCount else { return false }
     guard let reading = canonicalTonelessZhuyinReading(ofBuffer: buffer) else { return false }
     // 「鍵數 == 聲介韻佔用槽數」＝無冗餘鍵：該緩衝**恰為**一個讀音，而非「以別鍵補滿槽位」
-    // 之殘段（停用 `enforceCSVTOrdering` 時兩者無從分辨，見
-    // `canonicalTonelessZhuyinReading(ofBuffer:)` 之註）。
+    // 之殘段。此核對之 `enforceCSVTOrdering` **隨「依槽序鍵入判定讀音」啟停**（見
+    // `canonicalTonelessZhuyinReading(ofBuffer:)` 之註）：停用者回到舊制、亂序之鍵被就地吸納。
     var trialComposer = composer
     trialComposer.clear()
-    trialComposer.enforceCSVTOrdering = true
+    trialComposer.enforceCSVTOrdering = prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder
     trialComposer.receiveSequence(buffer, isRomaji: false)
     let occupied = [
       trialComposer.consonant.value, trialComposer.semivowel.value, trialComposer.vowel.value,
@@ -140,18 +143,20 @@ extension InputHandlerProtocol {
 
   /// 以試探用之注拼槽副本求「該緩衝**恰為**一個依槽序鍵入之無調讀音」，非者回 `nil`。
   ///
-  /// - Important: **須啟用 `enforceCSVTOrdering`**。`receiveSequence` 於任何一鍵被拒時即
-  ///   `break`，而**不還原已寫入之槽**——故停用該旗標時，「以別鍵補滿槽位」之殘段會被
-  ///   就地吸納而看似合法（實測：`us` 之槽值成 ㄋㄧ、與 `su` 無從分辨）。該旗標使
-  ///   「槽序倒退」之鍵被拒，`break` 後留在槽內者即「該緩衝之最長合法槽序前段」，
-  ///   其鍵數自然小於緩衝 ⇒ 由呼叫端之「鍵數 == 槽數」判準分辨真偽（見
-  ///   `mixedAlnumBufferIsTonelessReading`）。
+  /// - Important: `enforceCSVTOrdering` **隨「依槽序鍵入判定讀音」之偏好啟停**（P274）：
+  ///   - 啟用時（預設），`receiveSequence` 於任何一鍵被拒時即 `break`，而**不還原已寫入之槽**
+  ///     ——故「以別鍵補滿槽位」之殘段會被就地拒收（實測：`us` 之槽值只餘 ㄧ、與 `su`＝ㄋㄧ
+  ///     無從混淆）。「槽序倒退」之鍵被拒後，留在槽內者即「該緩衝之最長合法槽序前段」，
+  ///     其鍵數自然小於緩衝 ⇒ 由呼叫端之「鍵數 == 槽數」判準分辨真偽（見
+  ///     `mixedAlnumBufferIsTonelessReading`）。
+  ///   - 停用時（回到舊制），該旗標**不設**：亂序之鍵就地吸納，「槽序倒退」不復存在
+  ///     （`us` 與 `su` 皆消化為 ㄋㄧ），此即聲韻並擊使用者所仰賴之行為。
   /// - Note: 本函式只回「該緩衝所消化出之讀音」，**不**判其是否為真讀音——後者由呼叫端
   ///   以音節索引（`isPrefix`／`isComplete`）把守。
   public func canonicalTonelessZhuyinReading(ofBuffer buffer: String) -> String? {
     var trialComposer = composer
     trialComposer.clear()
-    trialComposer.enforceCSVTOrdering = true
+    trialComposer.enforceCSVTOrdering = prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder
     trialComposer.receiveSequence(buffer, isRomaji: false)
     guard trialComposer.isPronounceable, trialComposer.intonation.value.isEmpty else { return nil }
     let reading = trialComposer.consonant.value + trialComposer.semivowel.value

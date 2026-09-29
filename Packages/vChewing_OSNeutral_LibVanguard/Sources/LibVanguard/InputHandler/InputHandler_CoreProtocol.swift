@@ -503,11 +503,12 @@ extension InputHandlerProtocol {
       composer = rebuiltComposer
       return
     }
-    // 逐鍵消化時強制聲介韻調之輸入順序：該緩衝即「依槽序鍵入之讀音」之候選，凡槽序倒退
-    // 之鍵即應被拒（`receiveSequence` 於拒絕處 `break`，故槽內只留最長之合法前段）。
-    // 不設此閘則「以別鍵補滿槽位」之殘段會被就地吸納而看似合法（實測：`us` 之投影成
-    // ㄋㄧ、與 `su` 無從分辨），下游遂把非讀音之緩衝當成讀音素材。
-    rebuiltComposer.enforceCSVTOrdering = true
+    // 逐鍵消化時是否強制聲介韻調之輸入順序，**隨「依槽序鍵入判定讀音」之偏好啟停**（P274）：
+    // 啟用時（預設）凡槽序倒退之鍵即應被拒（`receiveSequence` 於拒絕處 `break`，故槽內只留
+    // 最長之合法前段）——不設此閘則「以別鍵補滿槽位」之殘段會被就地吸納而看似合法（實測：
+    // `us` 之投影成 ㄋㄧ、與 `su` 無從分辨），下游遂把非讀音之緩衝當成讀音素材。停用者
+    // 回到舊制，該投影照舊以計數式消化、亂序之鍵就地吸納（聲韻並擊）。
+    rebuiltComposer.enforceCSVTOrdering = prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder
     rebuiltComposer.receiveSequence(mixedAlphanumericalBuffer, isRomaji: false)
     if !rebuiltComposer.isPronounceable {
       rebuiltComposer.clear()

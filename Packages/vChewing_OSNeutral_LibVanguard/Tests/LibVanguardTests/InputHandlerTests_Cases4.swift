@@ -2575,4 +2575,41 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(testHandler.assembler.isEmpty, "`\(word)` 之尾鍵不得被送進注拼槽")
   }
+
+  /// 停用「依槽序鍵入判定讀音」後，「插入空格」偏好（`spaceKeyBehaviorAgainstICB == 0`）
+  /// 不得再把兩字母亂序 token 當英文遞交：該開關之語義即「是否以槽序檢定判定讀音」，
+  /// 停用者回到舊制、亂序之鍵照舊被吸納為讀音（聲韻並擊）。此為 P274 之回歸：
+  /// P273 起 `mixedAlnumBufferIsTonelessReading` 無條件啟用 `enforceCSVTOrdering`，
+  /// 遂令該開關於「插入空格」路徑實質 always on——`ls`／`us` 於兩態皆遞交原文。
+  @Test(arguments: [
+    (token: "ls", reading: "ㄋㄠ", kanji: "腦"),
+    (token: "us", reading: "ㄋㄧ", kanji: "妮"),
+  ])
+  func test_IH535_MixedInsertSpacePrefAbsorbsOutOfSlotOrderTokenWhenJudgeDisabled(
+    _ scenario: (token: String, reading: String, kanji: String)
+  ) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = false
+    let cleanup = injectTemporaryGrams(testHandler, "\(scenario.reading) \(scenario.kanji) -1")
+    defer {
+      cleanup()
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = true
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    typeSentence(scenario.token)
+    #expect(testHandler.mixedAlphanumericalBuffer == scenario.token)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "\(scenario.token): 停用槽序檢定後應被吸收為讀音，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys == [scenario.reading],
+      "\(scenario.token): 應插入讀音 `\(scenario.reading)`，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+  }
 }

@@ -1587,4 +1587,40 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "純狂打之對照，實得：\(testHandler.committableDisplayText(sansReading: true))"
     )
   }
+
+  /// 停用「依槽序鍵入判定讀音」後，混打＋狂打之讀音素材亦須回到舊制：亂序短令牌（`ls`）
+  /// 照舊為讀音（ㄋㄠ）⇒ copilot 窗應顯示、空白鍵為其聲調鍵（不遞交原文）。此為 P274 之
+  /// 回歸：P273 起 `mixedAlnumPendingReading` 之量測無條件以 CSVT 消化，遂令停用者之
+  /// `ls` 不被認作讀音素材（`furiousFrontUnfinishedReading == nil`、窗不開）——
+  /// 該開關於狂打並存態亦應被貫徹，不得受注音狂打特性開關影響。
+  @Test("[IH536] 混打＋狂打：停用槽序檢定後亂序令牌照舊為讀音素材")
+  func test_IH536_SlotOrderSwitchOffRestoresFuriousReadingSource() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = true
+      leaveMixedAlnumTestEnvironment()
+    }
+    enterMixedAlnumZhuyinFuriousTestEnvironment()
+    testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = false
+    let cleanup = insertRealLexiconGrams(
+      testHandler,
+      "ㄋㄠ 腦 -1\nㄋㄧ 妮 -5.314\nㄧㄡ 優 -1"
+    )
+    defer { cleanup() }
+
+    typeSentence("ls")
+    #expect(
+      testHandler.furiousFrontUnfinishedReading == "ㄋㄠ",
+      "停用槽序檢定後 `ls` 應為讀音素材，實得：\(testHandler.furiousFrontUnfinishedReading ?? "nil")"
+    )
+    typeSentence(" ")
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "空白鍵為其聲調鍵、不遞交原文，實得：\(testSession.recentCommissions)"
+    )
+    #expect(testHandler.assembler.actualKeys == ["ㄋㄠ"], "實得：\(testHandler.assembler.actualKeys)")
+  }
 }
