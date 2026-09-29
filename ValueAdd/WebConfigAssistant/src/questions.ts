@@ -118,7 +118,7 @@ namespace VCA {
   /// 「您原本用哪一款輸入法？」之選項值（分支樞紐，本身不輸出任何鍵）。
   ///
   /// **本表之次序即畫面之次序**，其分群為「注音系 → 字根系 → 拼音系 → 全新使用者」。
-  /// `rimezhuyin`（Rime 注音／搜狗注音，P271）係第三方**注音**輸入法，故歸於注音系之末
+  /// `rimezhuyin`（Rime 注音／搜狗注音／超注音；P271 立、P279 擴名）係第三方**注音**輸入法，故歸於注音系之末
   /// （`asus` 之後、`cin` 之前）。
   export var ORIGIN_VALUES: string[] = [
     "macoszhuyin", "msnewphonetic", "kimo", "mcbpmf", "ov", "hanin",
@@ -296,6 +296,7 @@ namespace VCA {
   export var ORIGIN_FORCED_KEYS: { [rawValue: string]: { [origin: string]: PrefValue } } = {
     // 事主 2026-09-29：「新增 `Rime 注音 / 搜狗注音` Preset，該 Preset 需預設啟用
     // 『注音狂打』。」——其打字方式即便為「還不確定」亦指名開啟（強制表不問打字方式）。
+    // （P279：該來源之標籤擴為「Rime 注音 / 搜狗注音 / 超注音」；本表之機制不變。）
     // 註：注音狂打在磁帶與逐字選字（SCPC）下**不生效**（見 `LXFacade` 之四維判準），
     // 故 SCPC 之使用者即便受此強制，該值於當下亦為惰性（惟日後關掉 SCPC 即生效）。
     "FuriousTypingEnabled4Zhuyin": { rimezhuyin: true },

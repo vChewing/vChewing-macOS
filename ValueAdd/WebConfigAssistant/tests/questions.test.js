@@ -654,12 +654,12 @@ test('schema：系統版本碼之解析（整數編碼，避免 10.9 ＞ 10.15 �
   assert.ok(VCA.osVersionCodeFromDouble(10.15) > VCA.osVersionCodeFromDouble(10.9));
 });
 
-test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉狂注（Rime 注音／搜狗注音除外）、拼音各方案刻意開啟狂拼', function () {
+test('題庫：狂打開關之逐方案定值——注音各方案刻意關閉狂注（Rime 注音／搜狗注音／超注音除外）、拼音各方案刻意開啟狂拼', function () {
   const { VCA } = loadCore();
   const KEY_ZHUYIN = 'FuriousTypingEnabled4Zhuyin';
   const KEY_PINYIN = 'FuriousTypingEnabled4Pinyin';
   const ZHUYIN_TYPINGS = ['zhuyin', 'zhuyinmix', 'scpc'];
-  // P271：`rimezhuyin`（Rime 注音／搜狗注音）係**經事主核定之例外**——其狂注開關由
+  // P271：`rimezhuyin`（Rime 注音／搜狗注音／超注音）係**經事主核定之例外**——其狂注開關由
   // `ORIGIN_FORCED_KEYS`（來源級強制）指名為 true。見同檔之另一支測試。
   const ZHUYIN_ORIGINS = [
     'macoszhuyin', 'msnewphonetic', 'kimo', 'mcbpmf', 'ov', 'goingime', 'hanin', 'asus', 'rimezhuyin',
@@ -767,7 +767,7 @@ test('題庫：狂打雙開關之跨層體現（P271 第 1 項之查核固化物
   assert.strictEqual(asked.indexOf(OLD_KEY), -1, '題庫仍有舊鍵 ' + OLD_KEY);
 });
 
-test('題庫：來源級強制——Rime 注音／搜狗注音之狂注一律指名開啟（P271 第 3 項）', function () {
+test('題庫：來源級強制——Rime 注音／搜狗注音／超注音之狂注一律指名開啟（P271 第 3 項）', function () {
   const { VCA } = loadCore();
   const KEY_ZHUYIN = 'FuriousTypingEnabled4Zhuyin';
   const NEW_ORIGIN = 'rimezhuyin';
@@ -821,12 +821,21 @@ test('題庫：新來源之標籤（四語系）與其配置名（P271 第 3 項
   const { VCA } = loadCore();
   const NEW_ORIGIN = 'rimezhuyin';
   const key = 'origin.opt.' + NEW_ORIGIN;
+  // P279：該來源之並列產品名由二擴為三（超注音之 ja 稱謂直接用漢字、en 作 Chaozhuyin）。
+  const required = {
+    'zh-Hant': ['Rime', '搜狗注音', '超注音'],
+    'zh-Hans': ['Rime', '搜狗注音', '超注音'],
+    en: ['Rime', 'Sogou Zhuyin', 'Chaozhuyin'],
+    ja: ['Rime', 'Sogou 注音', '超注音'],
+  };
   for (const lang of VCA.LANG_ORDER) {
     const label = VCA.UI_STRINGS[lang][key];
     assert.ok(typeof label === 'string' && label.length > 0, lang + ' 缺新來源之標籤');
-    assert.ok(label.indexOf('Rime') >= 0, lang + ' 之標籤未載 Rime：' + label);
     assert.ok(label.indexOf('注音') >= 0 || /Zhuyin/i.test(label),
       lang + ' 之標籤未載「注音」：' + label);
+    for (const term of required[lang]) {
+      assert.ok(label.indexOf(term) >= 0, lang + ' 之標籤缺「' + term + '」：' + label);
+    }
     // 註：不另斷言「四語系互異」——zh-Hant 與 zh-Hans 於本標籤恰同形（漢字無簡繁之別），
     // 此為正當之結果，非複製貼上之誤。
   }
