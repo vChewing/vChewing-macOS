@@ -1738,13 +1738,15 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: - 「拼音並擊」對未完成讀音之呈現（P277）
 
   /// 窗頂 pane 之讀音呈現須隨「拼音並擊（組字區內顯示漢語拼音）」偏好：啟用時，注音素材
-  /// 改以漢語拼音教科書式標調呈現；該偏好停用、或素材本即拼音字母流時一律照舊。
+  /// 改以**組字區讀音欄那一式**之漢語拼音呈現（數字標調附於尾端、`ü` 作 `v`、無調者不附）；
+  /// 該偏好停用、或素材本即拼音字母流時一律照舊。
   ///
   /// - Important: 該 pane 恆由選字窗以單一橫排文字繪製（不隨直排輸入而轉向），故其轉換
   ///   **不問呈現方向**——此與 Tooltip 之規則（另須問方向）刻意不同。
   ///   判準屬性（`furiousFrontUnfinishedReading`）一字不動，只有顯示改。
-  /// - Important: 注音素材可能是**前綴**（單聲母）：故轉換**不得補陰平記號**，否則得
-  ///   `g1`` 這類無母音可附調號之殘形（實得：`ㄍ` ⇒ `g`）。
+  /// - Important: 採組字區讀音欄之式，**不**轉教材式標調、**不**補陰平記號：注音素材可能是
+  ///   **前綴**（單聲母），補記即得 `g1` 這類無母音可附調號之殘形；教材式另會把 `nv3` 寫成
+  ///   `nǚ`、與組字區所見不一致（事主 2026-09-29 明示）。
   @Test("[IH539] 拼音並擊啟用時，窗頂 pane 之注音讀音改以漢語拼音呈現")
   func test_IH539_PaneReadingFollowsHanyuPinyinPreference() throws {
     guard let testHandler, let testSession else {
@@ -1778,9 +1780,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(
       testSession.unfinishedReading == "gao",
-      "無調記之讀音與組字區讀音欄同構（皆不補陰平記號），實得：\(testSession.unfinishedReading ?? "nil")"
+      "無調記之讀音與組字區讀音欄同式（皆不補陰平記號），實得：\(testSession.unfinishedReading ?? "nil")"
     )
-    // 帶聲調者：該聲調須落在漢語拼音之教科書式標記上。
+    // 帶聲調者：聲調附於尾端、`ü` 作 `v`（仍與組字區讀音欄逐字同式，非教材式標調）。
     // 註：注音狂打之「聲調鍵」本即音節確認鍵（讀音固化進組字器、注拼槽清空），
     //     故帶調之未完成讀音無從以打字取得——此處直驅注拼槽（與 `IH218` 同法）。
     testSession.resetInputHandler(forceComposerCleanup: true)
@@ -1789,6 +1791,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     composer.clear()
     composer.receiveSequence("ai3", isRomaji: false)
     #expect(composer.getComposition(isHanyuPinyin: false) == "ㄇㄛˇ")
+    #expect(
+      composer.getComposition(isHanyuPinyin: true) == "mo3",
+      "本靶之前提：組字區讀音欄即此式"
+    )
     testHandler.composer = composer
     testSession.switchState(testHandler.generateStateOfInputting())
     #expect(
@@ -1796,7 +1802,21 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "實得：\(testHandler.furiousFrontUnfinishedReading ?? "nil")"
     )
     #expect(
-      testSession.unfinishedReading == "mǒ",
+      testSession.unfinishedReading == "mo3",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+    // ㄩ 一族：`v` 拼法與尾端聲調（教材式會作 `nǚ`，本 phase 不採）。
+    composer = testHandler.composer
+    composer.clear()
+    for scalar in "ㄋㄩˇ".unicodeScalars { composer.receiveKey(fromPhonabet: scalar) }
+    #expect(
+      composer.getComposition(isHanyuPinyin: true) == "nv3",
+      "本靶之前提：組字區讀音欄即此式"
+    )
+    testHandler.composer = composer
+    testSession.switchState(testHandler.generateStateOfInputting())
+    #expect(
+      testSession.unfinishedReading == "nv3",
       "實得：\(testSession.unfinishedReading ?? "nil")"
     )
 
@@ -1843,8 +1863,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// 中英混打之 Tooltip 讀音亦隨「拼音並擊」偏好：啟用且橫排時改以漢語拼音教科書式標調呈現；
-  /// 直排時退回注音。轉換與窗頂 pane 同源——**不補陰平記號**，故單聲母前綴得 `m`、而非 `m1`。
+  /// 中英混打之 Tooltip 讀音亦隨「拼音並擊」偏好：啟用且橫排時改以漢語拼音呈現（**組字區
+  /// 讀音欄那一式**：數字標調附於尾端、`ü` 作 `v`）；直排時退回注音。轉換與窗頂 pane 同源
+  /// ——不轉教材式標調、不補陰平記號，故單聲母前綴得 `m`、而非 `m1`。
   @Test("[IH540] 拼音並擊啟用時，混打 Tooltip 之讀音改以漢語拼音呈現")
   func test_IH540_MixedTooltipReadingFollowsHanyuPinyinPreference() throws {
     guard let testHandler, let testSession else {
@@ -1876,10 +1897,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     composer.clear()
     composer.receiveSequence("ai3", isRomaji: false)
     #expect(composer.getComposition(isHanyuPinyin: false) == "ㄇㄛˇ")
+    #expect(composer.getComposition(isHanyuPinyin: true) == "mo3")
     testHandler.composer = composer
     testHandler.mixedAlphanumericalBuffer = "ai3"
     let tonedState = testHandler.generateStateOfInputting()
-    #expect(tonedState.tooltip == "mǒ", "實得：\(tonedState.tooltip)")
+    #expect(tonedState.tooltip == "mo3", "實得：\(tonedState.tooltip)")
     #expect(
       tonedState.displayedText.contains("ai3"),
       "混打原文應由組字區讀音欄承載，實得：\(tonedState.displayedText)"

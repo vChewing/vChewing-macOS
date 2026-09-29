@@ -775,11 +775,12 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     )
   }
 
-  /// 中英混打模式 Tooltip 之讀音呈現，須沿用 Tooltip 既有規則：
-  /// 注音一律教科書式（輕聲前置）；僅當「以漢語拼音顯示組字區讀音」啟用、
-  /// 且該 Tooltip 以橫排呈現時才改為漢語拼音教科書式標調。
+  /// 中英混打模式 Tooltip 之讀音呈現：注音以教科書式呈現（輕聲前置）；
+  /// 僅當「以漢語拼音顯示組字區讀音」啟用、且該 Tooltip 以橫排呈現時，才改以漢語拼音呈現
+  /// ——而該式即**組字區讀音欄那一式**（數字標調附於尾端、`ü` 作 `v`），兩處所見遂一致。
   /// ※ 混打之 ASCII 原文不入 Tooltip（其已由組字區讀音欄承載），故 Tooltip 僅此一項內容。
-  /// ※ 組字區自身仍維持原本之數字標調式拼音，兩者刻意不同（見既有 `readingThreadForDisplay`）。
+  /// ※ 教材式標調（`mo3` ⇒ `mǒ`）屬**完整讀音**之呈現（如 `readingThreadForDisplay`），
+  ///   未完成讀音側不採（事主 2026-09-29 明示）。
   @Test
   func test218_InputHandler_MixedTooltipReadingPreviewStyle() throws {
     let originalCurrent = InputSession.current
@@ -813,11 +814,11 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     let bpmfPreview = testHandler.generateStateOfInputting().tooltip
     #expect(bpmfPreview == "ㄇㄛˇ", "實際得到：\(bpmfPreview)")
 
-    // 啟用該偏好且為橫排：改以漢語拼音教科書式標調呈現。
+    // 啟用該偏好且為橫排：改以漢語拼音呈現——即組字區讀音欄那一式。
     testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
     let pinyinPreview = testHandler.generateStateOfInputting().tooltip
-    #expect(pinyinPreview == "mǒ", "實際得到：\(pinyinPreview)")
-    // 對照：組字區自身仍為數字標調式，可見 Tooltip 走的是自家既有規則。
+    #expect(pinyinPreview == "mo3", "實際得到：\(pinyinPreview)")
+    // 對照：與組字區自身之呈現逐字相同（同一轉換函式、不經教材式標調）。
     #expect(composer.getComposition(isHanyuPinyin: true) == "mo3")
     // 混打之 ASCII 原文不入 Tooltip：其已由組字區之讀音欄承載。
     let stateWithMixBuffer = testHandler.generateStateOfInputting()
@@ -834,7 +835,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     // 直排但強制 Tooltip 橫排時，仍以漢語拼音呈現。
     testHandler.prefs.alwaysShowTooltipTextsHorizontally = true
     let verticalForcedHorizontal = testHandler.generateStateOfInputting().tooltip
-    #expect(verticalForcedHorizontal == "mǒ", "實際得到：\(verticalForcedHorizontal)")
+    #expect(verticalForcedHorizontal == "mo3", "實際得到：\(verticalForcedHorizontal)")
     testHandler.prefs.alwaysShowTooltipTextsHorizontally = false
   }
 

@@ -148,7 +148,8 @@ extension InputHandlerProtocol {
   ///   消化後之讀音）⇒ 本屬性於該情境顯示「原文 → 消化後之讀音」，俾使用者看得見自己
   ///   敲下了哪些鍵。
   /// - Note: **「拼音並擊（組字區內顯示漢語拼音）」啟用時，注音素材改以漢語拼音呈現**
-  ///   （教科書式標調）——窗頂 pane 與組字區之讀音欄同語義，兩者不得一處注音、一處拼音。
+  ///   （與組字區讀音欄**逐字同式**：數字標調附於尾端、`ü` 作 `v`、無調者不附）
+  ///   ——窗頂 pane 與組字區之讀音欄同語義：兩者不得一處注音、一處拼音，亦不得兩式拼音並陳。
   ///   該 pane 恆以橫排繪製，故**不問呈現方向**（Tooltip 另問，見 `convertReadingForTooltip`）。
   ///   拼音素材（romaji 字母流）本即拼音，原樣轉發；磁帶模式亦原樣。
   public var furiousFrontUnfinishedReadingForDisplay: String? {
