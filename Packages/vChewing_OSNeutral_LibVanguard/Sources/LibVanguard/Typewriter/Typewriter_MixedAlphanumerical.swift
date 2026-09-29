@@ -163,7 +163,13 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
           trialComposer.vowel.value,
           trialComposer.intonation.value,
         ].filter { !$0.isEmpty }.count
-        return buffer.count == occupiedSlotCount
+        guard buffer.count == occupiedSlotCount else { return false }
+        // 靜態排列 ＋ 啟用槽序檢定：計數式把守「無冗餘鍵」，另以引擎層槽序檢定把守「無亂序」
+        // （P275：`oj4` 這類先韻後聲且帶聲調者，計數式無從分辨）。
+        if judgeReadingsBySequentialRawKeyOrder, !handler.composer.parser.isDynamic {
+          return handler.composer.isSequentiallyTypedRawKeyOrder(buffer)
+        }
+        return true
       }()
       // 優先嘗試 BPMF 全匹配：當 buffer 可視為單一注音時，
       // 避免 auto-split 將音節撕裂。若 BPMF 失敗，仍回退到 auto-split。
@@ -423,16 +429,22 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         // 「整段是否為單一讀音」之判準：
         // - 動態注音排列之合法編碼本即跨鍵改寫槽值（大千26 之 "qquu"＝ㄅㄚ 為 4 鍵 2 槽），
         //   「鍵數 == 佔用槽數」對之恆不成立，故啟用槽序檢定時委由引擎層判定。
-        // - 靜態注音排列恆維持「鍵數 == 佔用槽數」：該式即「無冗餘鍵」，而冗餘鍵在混打語境下
-        //   是「ASCII 前綴 + 注音後綴」之分界證據（如 "ai" + "i6"），不得放行。
+        // - 靜態注音排列之「鍵數 == 佔用槽數」即「無冗餘鍵」，而冗餘鍵在混打語境下是
+        //   「ASCII 前綴 + 注音後綴」之分界證據（如 "ai" + "i6"），不得放行。惟該式**無從分辨
+        //   亂序**——先韻後聲且帶聲調者（`oj4`＝ㄟㄨˋ）與依序者（`jo4`＝ㄨㄟˋ）同為三鍵三槽
+        //   （P275 實錄），故啟用槽序檢定時另以引擎層檢定把守「無亂序」。
         // - 停用槽序檢定（舊制）時，動態排列一併退回「鍵數 == 佔用槽數」。
         //   該式之值域恆 ≤ 4（單一讀音最多四槽），故本處無須如上方 buffer 檢查另設大千26 之豁免：
         //   大千26 之跨鍵改寫編碼（`qquu`）本即無法通過該式。
         let fullInputIsSingleReading: Bool = {
-          guard judgeReadingsBySequentialRawKeyOrder, handler.composer.parser.isDynamic else {
-            return fullInput.count == occupiedSlotCount
+          if judgeReadingsBySequentialRawKeyOrder {
+            guard handler.composer.parser.isDynamic else {
+              guard fullInput.count == occupiedSlotCount else { return false }
+              return handler.composer.isSequentiallyTypedRawKeyOrder(fullInput)
+            }
+            return handler.composer.isSequentiallyTypedRawKeyOrder(fullInput)
           }
-          return handler.composer.isSequentiallyTypedRawKeyOrder(fullInput)
+          return fullInput.count == occupiedSlotCount
         }()
 
         if trialComposer.hasIntonation() {

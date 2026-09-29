@@ -2612,4 +2612,51 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "\(scenario.token): 應插入讀音 `\(scenario.reading)`，實際得到 \(testHandler.assembler.actualKeys)"
     )
   }
+
+  /// 啟用「依槽序鍵入判定讀音」時，帶聲調之亂序令牌（`oj4`＝先韻後聲 ㄟㄨˋ）不得被吸收
+  /// 為讀音——其鍵數與槽數皆與依序者（`jo4`＝ㄨㄟˋ）相同，計數式無從分辨，須引擎層槽序
+  /// 檢定攔下（P275 病灶；主路徑 `fullInputIsSingleReading` 與空白鍵路徑
+  /// `bufferIsSingleSyllablePhonetic` 兩處皆補上靜態排列之槽序檢定）。停用時則回到舊制、
+  /// 照舊被吸收（聲韻並擊）。
+  @Test(arguments: [
+    (judge: true, token: "oj4", absorbed: false),
+    (judge: true, token: "jo4", absorbed: true),
+    (judge: false, token: "oj4", absorbed: true),
+  ])
+  func test_IH537_MixedOutOfSlotOrderTokenWithToneFollowsJudge(
+    _ scenario: (judge: Bool, token: String, absorbed: Bool)
+  ) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = scenario.judge
+    let cleanup = injectTemporaryGrams(testHandler, "ㄨㄟˋ 未 -1")
+    defer {
+      cleanup()
+      testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = true
+      testHandler.clear()
+    }
+
+    typeSentence(scenario.token)
+    if scenario.absorbed {
+      #expect(
+        testHandler.mixedAlphanumericalBuffer.isEmpty,
+        "\(scenario.token)（judge=\(scenario.judge)）應已被吸收，實際 buffer=`\(testHandler.mixedAlphanumericalBuffer)`"
+      )
+      #expect(
+        testHandler.assembler.actualKeys == ["ㄨㄟˋ"],
+        "\(scenario.token)（judge=\(scenario.judge)）應得 ㄨㄟˋ，實際 \(testHandler.assembler.actualKeys)"
+      )
+    } else {
+      #expect(
+        testHandler.mixedAlphanumericalBuffer == scenario.token,
+        "\(scenario.token)（judge=\(scenario.judge)）應滯留為 ASCII，實際 buffer=`\(testHandler.mixedAlphanumericalBuffer)`"
+      )
+      #expect(testHandler.assembler.isEmpty, "亂序令牌不得進組字器")
+
+      #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+      #expect(
+        testSession.recentCommissions == ["\(scenario.token) "],
+        "\(scenario.token)（judge=\(scenario.judge)）應遞交原文，實際 \(testSession.recentCommissions)"
+      )
+    }
+  }
 }
