@@ -33,15 +33,25 @@ extension InputHandlerProtocol {
     // 去聲候選擠下）。拼音側之空格本即「無調確認組字」之鍵（`shouldUseToneInsensitivePinyinLookup`），
     // 語義不變。固化另有 Tab／Enter／標點三條路（見 `handlePunctuation` 與同檔之 kTab 分支、
     // 以及 `Typewriter_BPMFFullMatch` 之 Enter 分支）。
-    // ★ P273：**回退與注音狂打並存時，空格重新成為固化觸發鍵**——惟其理據與拼音側不同。
+    // ★ P273：**回退與注音狂打並存時，空白鍵重歸注音語義**——惟其理據與純注音狂打不同。
     // 注音之空格在此情境下並非「陰平鍵」：讀音素材住混打緩衝區，聲調一律經數字鍵進入
-    // （`su3`＝ㄋㄧˇ），故無「空格被挪作固化即陰平無從指定」之虞；反之若不固化，本鍵
+    // （`su3`＝ㄋㄧˇ），故無「空格被挪作固化即陰平無從指定」之虞；反之若不特別處置，本鍵
     // 將落入混打之「整段緩衝 ＋ 半形空格」而令該讀音被當英文遞交（正是 P258 之病灶）。
-    // 故並存時空格＝固化讀音，其後本鍵續走既有流程（讀音已入組字器 ⇒ 得「送字 ＋ 空格」）。
+    // 其歸屬（陰平確認抑或 Shift 之 ASCII 逃生口）一律由 `MixedAlnumSpaceDuty` 判定；
+    // 凡該層已接管本鍵者，本固化塊即整塊讓位（見下）。
     let spaceSolidifiesFuriousFront = isPinyinFuriousTypingModeEffective
       || mixedAlnumZhuyinFuriousInEffect
+    // ★ P280：並存態下之空白鍵**兩種歸屬皆屬混打層**——不帶修飾鍵者為陰平確認鍵、帶 Shift 者
+    // 為「整段 ASCII ＋ 半形空格」之逃生口（見 `MixedAlnumSpaceDuty`）。故凡混打層已接管本鍵者
+    // （`isOwnedByMixedAlnumLayer`），本塊**整塊讓位**：既不固化其讀音、亦不早退，逕交下方之
+    // 鍵碼分診，由打字機完成確認或遞交。若只令 Shift+Space「非陰平鍵」，本塊旋即改以其為固化
+    // 觸發鍵而整拍消費，逃生口仍無從觸發。
+    let spaceDuty: MixedAlnumSpaceDuty = input.isSpace
+      ? mixedAlnumSpaceDuty(isShiftHeld: input.isShiftHeld)
+      : .none
     var spaceSolidifiedFuriousReading = false
     if session.isFuriousCopilotCandidateWindowVisible,
+       !spaceDuty.isOwnedByMixedAlnumLayer,
        !input.isHoldingAny([.control, .option, .command]),
        (input.isSpace && spaceSolidifiesFuriousFront) || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
@@ -52,10 +62,8 @@ extension InputHandlerProtocol {
       // 本塊**讓位**：不固化、不早退，逕交下方之鍵碼分診，由打字機以該讀音之**整組聲調
       // 變體桶**完成確認（見 `MixedAlphanumericalTypewriter` 之
       // `confirmMixedAlnumReadingWithLevelTone`）——與純注音狂打之固化同源。
-      // 判準與打字機之該分支**逐字相同**（`mixedAlnumPendingReading != nil`），免兩處漂移。
-      let mixedAlnumSpaceIsToneKey = mixedAlnumZhuyinFuriousInEffect
-        && mixedAlnumPendingReading != nil
-      let solidified = mixedAlnumSpaceIsToneKey ? false : solidifyFuriousFrontReading()
+      // 讓位之判準即 `MixedAlnumSpaceDuty`（單一正本），免兩處漂移。
+      let solidified = solidifyFuriousFrontReading()
       // 固化成功之判讀依素材之住處分流：拼音側之素材即注拼槽內之字母流 ⇒ 固化成功即令其
       // 清空；中英混打側之素材住緩衝區 ⇒ 固化成功即令**緩衝清空**。不可互換：混打側之
       // `hasFuriousFrontPending` 讀的正是該緩衝，故固化後仍為真。
@@ -74,7 +82,9 @@ extension InputHandlerProtocol {
           return true
         }
       }
-      if input.isSpace, !mixedAlnumSpaceIsToneKey, hasFuriousFrontPending {
+      // 本塊既以 `!spaceDuty.isOwnedByMixedAlnumLayer` 為前提，混打側之待調讀音（與 Shift 之
+      // 逃生口）一概不至此處 ⇒ 本條件無須再問「是否陰平鍵」。
+      if input.isSpace, hasFuriousFrontPending {
         // 固化不成（如 α 查無候選）⇒ 保留本鍵、逕以新狀態刷新，避免空格流入注拼槽。
         session.switchState(generateStateOfInputting())
         return true

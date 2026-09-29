@@ -40,9 +40,15 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 混打路徑處置——逕交既有之注音全匹配路徑（`composeReadingIfReady` 之
     // `confirmCombination` 臂，以空格作陰平鍵完成組字）。此前混打路徑會把該音節固化為
     // **無調**聲調桶，遂令陰平無從指定（實測：`su` 按空格得 `["ㄋㄧ"]` 之無調桶）。
-    // - Important: 本讓位**只及待調讀音**這一態。其餘各態（ASCII 詞、非讀音之緩衝、
-    //   已帶聲調者）之空白鍵語義一字不動，仍走下方既有之分支。
-    if input.isSpace, let pendingReading = handler.mixedAlnumPendingReading {
+    // - Important: 本讓位**只及待調讀音**這一態，且**只及不帶 Shift 之空白鍵**——帶 Shift 者
+    //   為「放棄注音處理、逕遞交整段 ASCII ＋ 半形空格」之逃生口（見下方
+    //   `commitsWholeMixedBufferOnSpace`）。故本審判準一律取 `MixedAlnumSpaceDuty`（單一正本，
+    //   分診早段之固化塊消費同一份），以免「修飾鍵」這一維日後再度漂移。
+    // - Important: 本讓位之其餘各態（ASCII 詞、非讀音之緩衝、已帶聲調者）之空白鍵語義
+    //   一字不動，仍走下方既有之分支。
+    if input.isSpace,
+       handler.mixedAlnumSpaceDuty(isShiftHeld: input.isShiftHeld) == .levelToneConfirmation,
+       let pendingReading = handler.mixedAlnumPendingReading {
       return confirmMixedAlnumReadingWithLevelTone(pendingReading, session: session)
     }
     // 中英混合輸入回退 ＋ 注音狂打：**本拍空格已由分診早段用於固化前方讀音**（見
@@ -74,14 +80,17 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // Space 必須先於 isReservedKey guard 處理：Space 的 keyCode 屬於 reserved key，
     // 若不提前攔截，Space 將返回 nil，無法走到注音確認路徑。
     // Shift+Space 在 non-empty 狀態下放棄注音處理，
-    // 直接遞交 mixed buffer 內容 + ASCII 空格。
+    // 直接遞交 mixed buffer 內容 + ASCII 空格。此即並存態下該逃生口之唯一落點：
+    // `handle` 開頭之陰平確認分支與分診早段之固化塊皆對之讓位（見 `MixedAlnumSpaceDuty`）。
     // 偏好「空格鍵對內文組字區的行為」設為「插入空格」（值 0）時，**混打緩衝非空且非待調讀音**
     // 者亦比照辦理：該偏好即使用者對「空白鍵＝插入空格」之明示，混打路徑不得逕自改判為
     // 「遞交尾段 ASCII ＋ 將尾鍵送進注拼槽」。**緩衝區為空者不在此攔截**——仍交還既有流程
     // 處置，故純中文組字之空白鍵語意不因本偏好而變。**緩衝恰為一個尚未鍵入聲調之讀音者亦
     // 不在此攔截**——該狀態下混打緩衝承載的正是中文組字本身（`su`＝ㄋㄧ、`1u,`＝ㄅㄧㄝ、
     // `s`＝ㄋ），空白鍵之語意為一聲鍵，逕予遞交即令該音節無法完成（見 `mixedAlnumBufferIsTonelessReading`）。
-    // 該旗子另兼「回退與注音狂打並存」之閘：並存時空白鍵先固化讀音（見 `handle` 開頭之分支）。
+    // 該旗子另兼「回退與注音狂打並存」之閘：並存時不帶 Shift 之空白鍵一概不走本分支之第二款
+    // ——待調讀音者由 `handle` 開頭之陰平確認分支處置，其餘各態者由分診早段先固化讀音
+    // （見 `InputHandler_TriageInput`）。
     let commitsWholeMixedBufferOnSpace = input.isShiftHeld
       || (
         !handler.mixedAlphanumericalBuffer.isEmpty
@@ -90,10 +99,14 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       )
     if input.isSpace, commitsWholeMixedBufferOnSpace {
       guard !handler.isConsideredEmptyForNow else { return nil }
-      let chineseText = handler.committableDisplayText(sansReading: true)
+      // ★ 遞交內容取「已組字之中文 ＋ 整段原文 ＋ 半形空格」，其中之原文須**先取出再清空緩衝**
+      // （次序不可顛倒）：`committableDisplayText` 於狂打之前方投機讀音在場時，改回 copilot 之
+      // 整句猜測（主段＋前方預覽）——那是「把緩衝當注音」之投機結果，而本鍵（Shift）之語義
+      // 恰恰是**放棄該投機**。緩衝既清，該投機即無所依附，所取者乃組字器自身之內容。
       let asciiText = handler.mixedAlphanumericalBuffer + " "
-      handler.composer.clear()
       handler.mixedAlphanumericalBuffer.removeAll()
+      let chineseText = handler.committableDisplayText(sansReading: true)
+      handler.composer.clear()
       session.switchState(State.ofCommitting(textToCommit: chineseText + asciiText))
       return true
     }

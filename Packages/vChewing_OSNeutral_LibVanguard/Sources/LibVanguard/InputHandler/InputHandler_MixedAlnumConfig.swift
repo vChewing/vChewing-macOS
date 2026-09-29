@@ -49,6 +49,33 @@ public struct MixedAlnumConfig: Sendable, Equatable {
   }
 }
 
+// MARK: - MixedAlnumSpaceDuty
+
+/// 中英混打（MixedAlnum）＋注音狂打並存時，一顆**空白鍵**在本拍之歸屬。
+///
+/// 並存態下空白鍵有兩種歸屬，二者互斥且**皆屬混打層**（故既有之「固化前方讀音」不得再
+/// 插手其間）：
+///   - `.levelToneConfirmation`：以**陰平**確認該待調讀音（不帶修飾鍵之空白鍵）；
+///   - `.asciiCommitEscape`：放棄注音處理、整段混打緩衝以原文遞交（**Shift+Space**）。
+///
+/// 本型別即該判準之**單一正本**：分診早段（固化塊）與打字機（陰平確認分支）皆消費之。
+/// 該二處原本各持一份「逐字相同」之運算式，於新增「修飾鍵」這一維時即生漂移
+/// （早段讓位、打字機卻搶鍵 ⇒ 逃生口無從觸發）。
+enum MixedAlnumSpaceDuty: Sendable {
+  /// 本鍵非並存態之空白鍵 ⇒ 不屬混打層：交還既有流程處置
+  /// （純狂打之固化、拼音側之無調確認等）。
+  case none
+  /// 混打層以陰平聲調確認該待調讀音（見 `confirmMixedAlnumReadingWithLevelTone`）。
+  case levelToneConfirmation
+  /// 混打層放棄注音處理：整段緩衝以原文遞交、其後附一個半形空格（即 Shift+Space 之逃生口）。
+  case asciiCommitEscape
+
+  // MARK: Internal
+
+  /// 混打層是否已接管本拍之空白鍵（無論以陰平確認抑或以 ASCII 逃生口遞交）。
+  var isOwnedByMixedAlnumLayer: Bool { self != .none }
+}
+
 // MARK: - InputHandlerProtocol（混打緩衝之讀音量測）
 
 extension InputHandlerProtocol {
@@ -115,6 +142,24 @@ extension InputHandlerProtocol {
   public var mixedAlnumPendingReading: String? {
     guard mixedAlnumZhuyinFuriousInEffect else { return nil }
     return mixedAlnumBufferPendingReading
+  }
+
+  /// 本拍之空白鍵於「中英混打＋注音狂打並存態」下之歸屬（判準之單一正本，見 `MixedAlnumSpaceDuty`）。
+  ///
+  /// - Important: **Shift 不在陰平確認之列**——Shift 是使用者明示之英文意圖，並存態下
+  ///   Shift+Space 之既有語義為「放棄注音處理、逕遞交整段 ASCII ＋ 半形空格」（見
+  ///   `MixedAlphanumericalTypewriter`）。若不設此修飾鍵之閘，陰平確認即搶先消費本鍵、
+  ///   該逃生口無從觸發（事主實機回報：`su` 之後按 Shift+Space 得陰平確認，而非遞交 `su `）。
+  /// - Note: 兩態皆以「緩衝非空 ∧ `mixedAlnumZhuyinFuriousInEffect`」為前提；`.none` 者不屬
+  ///   混打層，故分診早段之固化、拼音側之無調確認等一概照舊。判準只問混打緩衝（
+  ///   `mixedAlnumPendingReading`），**不問**注拼槽之投影——理由見該屬性之註。
+  func mixedAlnumSpaceDuty(isShiftHeld: Bool) -> MixedAlnumSpaceDuty {
+    guard mixedAlnumZhuyinFuriousInEffect else { return .none }
+    // Shift+Space 之逃生口只以「並存態」為前提：緩衝縱非讀音（如殘段 `us`）亦得整段遞交，
+    // 該情境本即既有語義（見 `MixedAlphanumericalTypewriter` 之
+    // `commitsWholeMixedBufferOnSpace`）。
+    if isShiftHeld { return .asciiCommitEscape }
+    return mixedAlnumPendingReading != nil ? .levelToneConfirmation : .none
   }
 
   /// 混打緩衝是否為「**恰為**一個尚未鍵入聲調之讀音」——**不拘狂打開關**之量測。

@@ -1993,4 +1993,67 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "實得：\(testSession.unfinishedReading ?? "nil")"
     )
   }
+
+  // MARK: - Shift+Space 之逃生口（P280）
+
+  /// 混打＋注音狂打並存時，**Shift+Space** 之意義為「放棄注音處理」：整段混打緩衝以原文
+  /// 遞交、其後附一個半形空格；待確認之讀音**不得**被固化、亦不得被當成陰平確認鍵。
+  ///
+  /// - Important: 空格之陰平語義（`IH527`／`IH530`）只屬**不帶修飾鍵**之空格。Shift 是使用者
+  ///   明示之「英文意圖」——混打模式下它本即「整段 ASCII ＋ 半形空格」之逃生口
+  ///   （見 `MixedAlphanumericalTypewriter` 之既有語義）；若令陰平確認搶先消費本鍵，該逃生口
+  ///   即無從觸發（事主實機回報：`su` 之後按 Shift+Space 得陰平確認，而非遞交 `su `）。
+  @Test("[IH542] 混打＋注音狂打：Shift+Space 遞交整段 ASCII ＋ 半形空格")
+  func test_IH542_MixedAlnumShiftSpaceCommitsASCII() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveMixedAlnumTestEnvironment() }
+    enterMixedAlnumZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    let cleanup = insertRealLexiconGrams(testHandler)
+    defer { cleanup() }
+
+    let shiftSpaceEvent = KBEvent.KeyEventData(
+      type: .keyDown,
+      flags: .shift,
+      chars: " ",
+      keyCode: KeyCode.kSpace.rawValue
+    ).asEvent
+
+    // 待調讀音（`su`＝ㄋㄧ）：素材成立、copilot 窗在場。
+    typeSentence("su")
+    #expect(testHandler.mixedAlphanumericalBuffer == "su")
+    #expect(testHandler.furiousFrontUnfinishedReading == "ㄋㄧ")
+    #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+
+    // Shift+Space：放棄注音處理 ⇒ 遞交整段原文 ＋ 半形空格，且零固化。
+    #expect(testHandler.triageInput(event: shiftSpaceEvent))
+    #expect(
+      testSession.recentCommissions == ["su "],
+      "Shift+Space 應遞交整段 ASCII ＋ 半形空格，實得：\(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.mixedAlphanumericalBuffer.isEmpty,
+      "實得：\(testHandler.mixedAlphanumericalBuffer)"
+    )
+    #expect(testHandler.composer.isEmpty, "實得：\(testHandler.composer.getComposition())")
+    #expect(testHandler.assembler.isEmpty, "Shift+Space 不得把待調讀音固化進組字器。")
+    #expect(!testHandler.hasFuriousFrontPending, "本拍過後素材即散、窗即收。")
+
+    // 對照組：不帶 Shift 之空格仍為陰平確認鍵（`IH527`／`IH530` 之語義一字不動）。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    typeSentence("su")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == ["su "],
+      "不帶 Shift 之空格不得遞交任何內容（遞交紀錄應與前一組相同），實得：\(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋㄧ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+  }
 }
