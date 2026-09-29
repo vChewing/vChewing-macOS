@@ -138,6 +138,24 @@ extension InputHandlerProtocol {
     }
   }
 
+  /// 選字窗頂部 pane 之「未完成讀音」顯示字串（`unfinishedReading` 之資料源）。
+  ///
+  /// - Important: **顯示與判準分離**——`furiousFrontUnfinishedReading` 是「讀音素材」本身，
+  ///   另有讀音桶生成與語言模型查詢在消費；本屬性只為窗頂 pane 而設。兩者不得互換，
+  ///   否則顯示用之原文會滲進查詢。
+  /// - Note: **中英混合輸入回退與注音狂打並存**時（`mixedAlnumZhuyinFuriousInEffect`），
+  ///   素材住在混打之 ASCII 緩衝區，而該緩衝之原文在此之前無從於窗頂顯現（該處只顯示
+  ///   消化後之讀音）⇒ 本屬性於該情境顯示「原文 → 消化後之讀音」，俾使用者看得見自己
+  ///   敲下了哪些鍵。其餘情境（純狂拼、純狂注）一律原樣轉發。
+  public var furiousFrontUnfinishedReadingForDisplay: String? {
+    guard let reading = furiousFrontUnfinishedReading else { return nil }
+    guard mixedAlnumZhuyinFuriousInEffect else { return reading }
+    let raw = mixedAlphanumericalBuffer
+    // 素材住緩衝區者，其成立之必要條件即緩衝非空；此處僅為免於顯示出空原文。
+    guard !raw.isEmpty else { return reading }
+    return "\(raw) → \(reading)"
+  }
+
   /// 狂打模式有效且注拼槽尚有未固化之讀音素材（前方待確認讀音）。
   ///
   /// - Important: 本旗子即「`furiousFrontUnfinishedReading != nil`」——二者共用同一判準，

@@ -126,10 +126,10 @@ public final class MockSession: @MainActor SessionCoreProtocol {
 
   public var unfinishedReading: String? {
     // 與生產端 InputSession_Delegates 逐字對應：狂打 copilot 窗的未完成讀音
-    // （頂部 pane 資料源）。素材取得一律委由 handler 分流，本處不自行判讀注拼槽，
-    // 以免 mock 與生產之判準各自演化。
+    // （頂部 pane 資料源）。素材取得與其顯示字串之組裝一律委由 handler 分流，
+    // 本處不自行判讀注拼槽或混打緩衝，以免 mock 與生產之判準各自演化。
     guard isFuriousCopilotCandidateWindowVisible else { return nil }
-    return inputHandler?.furiousFrontUnfinishedReading
+    return inputHandler?.furiousFrontUnfinishedReadingForDisplay
   }
 
   public func callError(_ logMessage: String) {

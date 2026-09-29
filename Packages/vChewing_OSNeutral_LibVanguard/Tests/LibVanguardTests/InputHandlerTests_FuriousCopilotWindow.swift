@@ -959,12 +959,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.isFuriousCopilotEligible)
 
     // ③ 行為層：ASCII 序列依序累積於緩衝（回退若失效，這些鍵會被當注音吸收、緩衝恆空）。
-    //    讀音素材隨之住在緩衝：ㄑ 自成一拍時即為素材（單聲母之未完成前綴）。
+    //    讀音素材隨之住在緩衝：ㄑ 自成一拍時即為素材（單聲母之未完成前綴）；窗頂 pane
+    //    兼示該緩衝之原文與其讀音（並存態專有之顯示形式）。
     typeSentence("f")
     #expect(testHandler.mixedAlphanumericalBuffer == "f")
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄑ")
     #expect(testHandler.hasFuriousFrontPending)
-    #expect(testSession.unfinishedReading == "ㄑ")
+    #expect(testSession.unfinishedReading == "f → ㄑ")
     #expect(testSession.isFuriousCopilotCandidateWindowVisible)
     typeSentence("i") // `fi`：ㄑㄛ 非任何讀音之起頭 ⇒ 素材落回 nil、窗不開。
     #expect(testHandler.mixedAlphanumericalBuffer == "fi")
@@ -1073,7 +1074,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     leaveFuriousTestEnvironment()
   }
 
-  /// 混打之 ASCII 緩衝即狂打之讀音素材：窗內須有該讀音之真候選、頂部 pane 須有讀音。
+  /// 混打之 ASCII 緩衝即狂打之讀音素材：窗內須有該讀音之真候選、頂部 pane 須有
+  /// 「原文 → 讀音」。
   ///
   /// 大千排列：ㄋ＝`s`、ㄧ＝`u`、ㄑ＝`f`、ㄛ＝`i`。`s` 為單聲母（合法前綴，桶內展開為該
   /// 聲母起首之全部讀音）、`su` 為完整音節；`fi` 則非任何讀音之起頭 ⇒ 窗即收。
@@ -1092,12 +1094,18 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!testHandler.hasFuriousFrontPending)
     #expect(!testSession.isFuriousCopilotCandidateWindowVisible)
 
-    // 單聲母 `s`（ㄋ）：素材成立、窗可見、頂部 pane 顯示該讀音。
+    // 單聲母 `s`（ㄋ）：素材成立、窗可見、頂部 pane 顯示「原文 → 讀音」。
     typeSentence("s")
     #expect(testHandler.mixedAlphanumericalBuffer == "s")
-    #expect(testHandler.furiousFrontUnfinishedReading == "ㄋ")
+    #expect(
+      testHandler.furiousFrontUnfinishedReading == "ㄋ",
+      "判準本身仍只回讀音——顯示用之原文不得滲入。"
+    )
     #expect(testHandler.hasFuriousFrontPending)
-    #expect(testSession.unfinishedReading == "ㄋ")
+    #expect(
+      testSession.unfinishedReading == "s → ㄋ",
+      "窗頂 pane 須兼示原文與讀音，實得：\(testSession.unfinishedReading ?? "nil")"
+    )
     #expect(
       testSession.isFuriousCopilotCandidateWindowVisible,
       "緩衝為讀音素材時 copilot 窗須可見。"
@@ -1111,6 +1119,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence("u")
     #expect(testHandler.mixedAlphanumericalBuffer == "su")
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄋㄧ")
+    #expect(
+      testSession.unfinishedReading == "su → ㄋㄧ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
     #expect(testSession.isFuriousCopilotCandidateWindowVisible)
 
     // 第三鍵：`sul` 恰為完整讀音 ㄋㄧㄠ（非其聲介韻之原鍵序，惟音節索引認其為完整讀音）
@@ -1118,6 +1130,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence("l")
     #expect(testHandler.mixedAlphanumericalBuffer == "sul")
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄋㄧㄠ")
+    #expect(
+      testSession.unfinishedReading == "sul → ㄋㄧㄠ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
 
     // 窗之關閉即「素材不再是任何讀音之起頭」之鏡像：`fi`＝ㄑㄛ 雖可發音，卻非任何讀音之
     // 起頭（`fi`＝ㄑㄛ 不完整；完整者另有其鍵序）⇒ 素材落回 nil、窗即收。
@@ -1356,8 +1372,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "copilot 窗在場時 Tooltip 應讓位，實得：\(copilotState.tooltip)"
     )
     #expect(
-      testSession.unfinishedReading == "ㄋ",
-      "原文改由該窗頂端之 pane 承載，實得：\(testSession.unfinishedReading ?? "nil")"
+      testSession.unfinishedReading == "s → ㄋ",
+      "原文（`s`）連同其讀音改由該窗頂端之 pane 承載，實得：\(testSession.unfinishedReading ?? "nil")"
     )
 
     // 群三：拼音狂打之讀音來源仍是注拼槽（混打緩衝為空），故該側語義不變。
@@ -1622,5 +1638,85 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "空白鍵為其聲調鍵、不遞交原文，實得：\(testSession.recentCommissions)"
     )
     #expect(testHandler.assembler.actualKeys == ["ㄋㄠ"], "實得：\(testHandler.assembler.actualKeys)")
+  }
+
+  /// 窗頂 pane 之顯示字串：**當且僅當**中英混合輸入回退與注音狂打並存時，於消化後之
+  /// 讀音之前補上混打緩衝之原文（`原文 → 讀音`）。
+  ///
+  /// - Important: 併存時素材住在混打之 ASCII 緩衝區，而窗頂 pane 在此之前只顯示消化後之
+  ///   讀音 ⇒ 使用者敲下的鍵在畫面上無處可尋（實錄：`u` 之後只見 ㄧ、`s` 之後只見 ㄋ）。
+  ///   本屬性只改**顯示**：`furiousFrontUnfinishedReading`（讀音桶生成與語言模型查詢之
+  ///   素材）一字不動，故四組對照之其餘三組（純狂注、純狂拼、僅回退）一律無箭頭。
+  /// - Note: 箭頭前後之原文由本處供給，`✍️ ` 前綴仍由選字窗側（`CandidatePool4AppKit`）統一
+  ///   添加，故本靶只驗到箭頭形式為止。
+  @Test("[IH538] 並存時窗頂 pane 顯示「混打原文 → 讀音」，其餘三態無箭頭")
+  func test_IH538_MixedAlnumPaneTextShowsRawThenReading() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveMixedAlnumTestEnvironment() }
+
+    // 群一：並存態（本 phase 之唯一有效情境）。事主所報之兩例逐鍵實錄。
+    enterMixedAlnumZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    typeSentence("u")
+    #expect(testHandler.mixedAlphanumericalBuffer == "u")
+    #expect(
+      testHandler.furiousFrontUnfinishedReading == "ㄧ",
+      "素材仍只回讀音，實得：\(testHandler.furiousFrontUnfinishedReading ?? "nil")"
+    )
+    #expect(
+      testSession.unfinishedReading == "u → ㄧ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    typeSentence("s")
+    #expect(testHandler.mixedAlphanumericalBuffer == "s")
+    #expect(
+      testSession.unfinishedReading == "s → ㄋ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+    typeSentence("u")
+    #expect(
+      testSession.unfinishedReading == "su → ㄋㄧ",
+      "續鍵後原文亦隨之延長，實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+
+    // 群二：純注音狂打（素材住注拼槽）——讀音即顯示字串、不得出現箭頭。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    // 本檔之純狂注環境 helper 不動回退開關，故須自行關閉（否則仍屬並存態）。
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("e")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "純狂注之素材不住混打緩衝。")
+    #expect(
+      testSession.unfinishedReading == "ㄍ",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+
+    // 群三：純拼音狂拼——字母流原樣顯示、不得出現箭頭。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("gao")
+    #expect(
+      testSession.unfinishedReading == "gao",
+      "實得：\(testSession.unfinishedReading ?? "nil")"
+    )
+
+    // 群四：僅中英混合輸入回退（狂打關）——窗不開，pane 一併無資料。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.clear()
+    enterMixedAlnumOnlyTestEnvironment()
+    typeSentence("f")
+    #expect(testHandler.mixedAlphanumericalBuffer == "f")
+    #expect(
+      !testSession.isFuriousCopilotCandidateWindowVisible,
+      "狂打關時無 copilot 窗，原文仍由 Tooltip 承載。"
+    )
+    #expect(testSession.unfinishedReading == nil, "實得：\(testSession.unfinishedReading ?? "nil")")
   }
 }
