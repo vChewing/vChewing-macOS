@@ -61,7 +61,9 @@ function __installNodeShim(context) {
     },
     mkdirSync: function (path) {
       if (__isDirectory(path)) return;
-      __fm().createDirectoryAtPathWithIntermediateDirectoriesAttributesError(path, true, null, null);
+      // 屬性字典與錯誤指標皆不可傳 `null`：JXA 會把 `null` 橋接成 `NSNull`，而 Foundation
+      // 對它呼叫 `-count` 即拋（`-[NSNull count]: unrecognized selector`）。`$()` 才是空物件。
+      __fm().createDirectoryAtPathWithIntermediateDirectoriesAttributesError(path, true, $(), $());
     },
   };
 
