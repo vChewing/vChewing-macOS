@@ -1,6 +1,6 @@
 # 唯音輸入法配置助手（vChewing Configuration Assistant）
 
-唯音輸入法（vChewing）的偏好設定項目繁多（現有 119 條），初次接觸者往往不知從何調起。本目錄是「**唯音輸入法配置助手**」的原始碼與建置來源：它是一個**單檔自足**的網頁小工具，以分支問卷問出使用者的打字背景與習慣，整理出一份「**配置包**」（JSON）；使用者把配置包匯入唯音，即可一次完成整組偏好的調整。
+唯音輸入法（vChewing）的偏好設定項目繁多（現有約 119 條），初次接觸者往往不知從何調起。本目錄是「**唯音輸入法配置助手**」的原始碼與建置來源：它是一個**單檔自足**的網頁小工具，以分支問卷問出使用者的打字背景與習慣，整理出一份「**配置包**」（JSON）；使用者把配置包匯入唯音，即可一次完成整組偏好的調整。
 
 ## 一、這是什麼
 
@@ -56,9 +56,13 @@
 建置鏈不需要 node，也不需要 npm：JS 宿主改用 macOS 內建的 **JXA**（`osascript -l JavaScript`），`tools/` 本身也是跑在 JXA 上的純 JS。整條鏈唯二的環境要求是：
 
 - **macOS**（JXA 與 Foundation 皆為系統內建）。
-- **`tsc`：TypeScript 7 之原生執行檔**（見下）。
+- **`tsc`：TypeScript 7 之原生執行檔**（見 §三.1）。
 
-取得方式（三條路，皆不需 node／npm）：
+（`surface`／`metadata`／`version-check` 等目標會讀取 `Packages/` 與倉根檔案，故請在完整的 `vChewing-macOS` 檢出內執行本目錄之 Makefile；其中 `metadata*` 另需 Swift 工具鏈——會以 `swift run` 執行 `vChewingSharedCLI`。）
+
+### 三.1 `tsc` 之取得（三條路，皆不需 node／npm）
+
+取得方式：
 
 - **npm registry 的平台套件（推薦）**：純 HTTPS GET，數 MB。
 - **GitHub Releases**：`microsoft/typescript-go` 之 `typescript/v7.0.x` tag，各平台之 `.tgz`。
@@ -82,9 +86,9 @@ tsc --version    # 應印出 7.x
 make check-tsc   # 驗證「執行檔不是以 #! 起頭之啟動器」
 ```
 
-**何以不能用 npm 版**：`npm i -g typescript@7` 裝到的 `bin/tsc` 其實是 `#!/usr/bin/env node` 的啟動器（再由其去找真正的原生編譯器）——**仍需 node 才能啟動**，而本鏈已免除 node。`make check-tsc` 即以「執行檔是否以 `#!` 起頭」判別，並已納入 `typecheck`／`build`。
+### 三.2 何以不能用 npm 版之 `tsc`
 
-另：`surface`／`metadata`／`version-check` 等目標會讀取 `Packages/` 與倉根檔案，故請在完整的 `vChewing-macOS` 檢出內執行本目錄之 Makefile；其中 `metadata*` 另需 Swift 工具鏈（會以 `swift run` 執行 `vChewingSharedCLI`）。
+`npm i -g typescript@7` 裝到的 `bin/tsc` 其實是 `#!/usr/bin/env node` 的啟動器（再由其去找真正的原生編譯器）——**仍需 node 才能啟動**，而本鏈已免除 node。`make check-tsc` 即以「執行檔是否以 `#!` 起頭」判別，並已納入 `typecheck`／`build`。
 
 ## 四、常用指令
 
@@ -261,6 +265,8 @@ osascript -l JavaScript tools/host/run.js --tests
 - SwiftPM 現代側：`Plugins/BundleApps/plugin.swift` 之 `embedAssistant`（`make debug`／`release`／`archive`）。
 - SwiftPM 5.10 legacy 側：`Plugins/BundleAppsLegacy/plugin.swift`（`make debugLegacy`／`releaseLegacy`／`archiveLegacy`）。
 - Xcode：`vChewing.xcodeproj` 之 `vChewing` 目標上的 Run Script phase「Run Script (Embed Configuration Assistant)」。
+
+**何以在 plugin 內呼叫、而非於 `Makefile` 之 plugin 呼叫之後補做**：`--archive` 會在同一趟 plugin 執行內完成組裝與封存，事後補做會漏掉 `.xcarchive`；且上面三條路徑皆恰好落在簽章之前——資源受簽章封印，簽後追加會使簽章失效（實測：收錄後 `codesign --verify --strict` 仍回 `valid on disk` 與 `satisfies its Designated Requirement`）。另：收錄進 IME 之後，安裝程式所內嵌之那份 `vChewing.app` 亦一併帶著它（其組裝在 IME 之後）。
 
 **唯一的閘是 `tsc`**：當且僅當偵測到 `tsc` 時才編譯並收錄；未偵測到、或編譯失敗，一律只印警告、**絕不中斷輸入法之建置**（本步為選配）。
 
