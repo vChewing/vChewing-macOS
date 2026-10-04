@@ -1,7 +1,7 @@
 'use strict';
 // 端到端冒煙測試：以 DOM 替身驅動**完整**之 dist/app.js（含外框、控制項、導覽、摘要與出口）。
 //
-// 驗證：掛載無例外、逐步導覽可走完十二頁、作答會反映到配置包、摘要頁產出合法之 JSON、
+// 驗證：掛載無例外、逐步導覽可走完十三頁、作答會反映到配置包、摘要頁產出合法之 JSON、
 // 語言切換不重置答案、取消對話框可清空作答。
 
 const test = require('node:test');
@@ -64,7 +64,7 @@ test('冒煙：掛載後之 DOM 結構（Win2000 外框）', function () {
   assert.strictEqual(win.textContent.indexOf('唯音配置助手'), -1, '不得再出現舊的簡稱');
   assert.ok(win.textContent.indexOf('歡迎使用唯音輸入法配置助手') >= 0, '首頁應為歡迎頁');
 
-  // 進度字樣與分段方塊：十二頁。
+  // 進度字樣與分段方塊：快速路線之四頁。
   // 類名一律以**逐詞**比對——`.vca-seg-host`（分段方塊之容器）含 `vca-seg` 之前綴，
   // 以 `indexOf` 比對會把它一併算進去。
   const hasClass = function (node, className) {
