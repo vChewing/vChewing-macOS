@@ -12,9 +12,9 @@ update:
 	fi
 
 # ── 鍵盤熱鍵使用手冊（`shortcuts.html`）之產製 ──────────────────────
-# 繁體中文之權威原文住官網倉（`vChewing-HomePage.io/manual/shortcuts.md`），本倉之
-# `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.zh-Hant.md` 為其同步副本；
-# 簡體中文版由該副本推得。詳見 `Scripts/Markdown2HTML/README.md`。
+# 四語系一體產製：繁體中文之權威原文住官網倉（`vChewing-HomePage.io/manual/shortcuts.md`），
+# 本倉之 `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.zh-Hant.md` 為其同步副本；
+# 簡體中文版由該副本推得；英日文為該目錄下之手寫原稿。詳見 `Scripts/Markdown2HTML/README.md`。
 # 產製器為 Swift 腳本，僅需 `swift` 在 PATH（不參與任何建置）。全程不聯網。
 SHORTCUTS_GENERATOR ?= ./Scripts/Markdown2HTML/generate-shortcuts.swift
 SHORTCUTS_HOMEPAGE ?= ../../../vChewing-HomePage.io

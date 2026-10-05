@@ -13,16 +13,51 @@ import Foundation
 // MARK: - 常數
 
 /// 輸入法所搭載的四個語系；`folder` 即 `Resources/` 之下 `.lproj` 之名。
-private let allLocales: [(id: String, folder: String, output: String, source: Source)] = [
-  (
-    "zh-Hant", "zh-Hant", "Sources/vChewingIME_macOS/Resources/zh-Hant.lproj/shortcuts.html",
-    .homePageMarkdown
+private let allLocales: [Locale] = [
+  Locale(
+    id: "zh-Hant",
+    output: "Sources/vChewingIME_macOS/Resources/zh-Hant.lproj/shortcuts.html",
+    source: .homePageMarkdown,
+    subtitleSource: .none
   ),
-  (
-    "zh-Hans", "zh-Hans", "Sources/vChewingIME_macOS/Resources/zh-Hans.lproj/shortcuts.html",
-    .localMarkdown("Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.zh-Hans.md")
+  Locale(
+    id: "zh-Hans",
+    output: "Sources/vChewingIME_macOS/Resources/zh-Hans.lproj/shortcuts.html",
+    source: .localMarkdown(localMarkdownPath(for: "zh-Hans")),
+    subtitleSource: .localMarkdown(localMarkdownPath(for: "zh-Hant"))
+  ),
+  Locale(
+    id: "en",
+    output: "Sources/vChewingIME_macOS/Resources/en.lproj/shortcuts.html",
+    source: .localMarkdown(localMarkdownPath(for: "en")),
+    subtitleSource: .localMarkdown(localMarkdownPath(for: "zh-Hant"))
+  ),
+  Locale(
+    id: "ja",
+    output: "Sources/vChewingIME_macOS/Resources/ja.lproj/shortcuts.html",
+    source: .localMarkdown(localMarkdownPath(for: "ja")),
+    subtitleSource: .localMarkdown(localMarkdownPath(for: "zh-Hant"))
   ),
 ]
+
+// MARK: - Locale
+
+/// 一個語系之出口：產物落點、原文來源、以及「第二列前導段」之來源。
+private struct Locale {
+  let id: String
+  let output: String
+  let source: Source
+  /// 產物第二列（「本文對應至少…」）之來源：`zh-Hans` 為空（其原文自備該列），
+  /// 其餘非繁體語系者自繁體原文抽取——免得同一句版本資訊在四個語系各留一份而各自漂移。
+  let subtitleSource: Source?
+
+  var folder: String { id }
+}
+
+/// 本倉之原文檔案路徑。
+private func localMarkdownPath(for locale: String) -> String {
+  "Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.\(locale).md"
+}
 
 // MARK: - Source
 
@@ -31,10 +66,17 @@ private let allLocales: [(id: String, folder: String, output: String, source: So
 /// - `homePageMarkdown`：官網倉（`vChewing-HomePage.io`）之 `manual/shortcuts.md`——繁體中文之
 ///   權威出處。其內可能帶有 Jekyll 之 YAML front matter，產製時會剔除。官網倉不在手邊時，退回
 ///   本倉之同步副本（`Sources/…/shortcuts-src/shortcuts.zh-Hant.md`）；兩者若有落差，以官網倉者為準。
-/// - `localMarkdown`：本倉之檔案。簡體中文者即由此維護（僅作字元簡化、語彙沿用臺灣用語）。
+/// - `localMarkdown`：本倉之檔案（簡體中文由此維護；`en`／`ja` 為逆推所得之手寫原稿）。
 private enum Source {
   case homePageMarkdown
   case localMarkdown(String)
+
+  // MARK: Internal
+
+  var relativePath: String? {
+    if case let .localMarkdown(path) = self { return path }
+    return nil
+  }
 }
 
 /// 官網倉之預設位置（相對於本倉根）；可用 `--homepage` 或環境變數 `VCHEWING_HOMEPAGE` 覆寫。
@@ -204,13 +246,17 @@ private func isOrderedListItem(_ line: String) -> Bool {
 // MARK: - 行內語法
 
 /// 支援之行內語法：`**粗體**`、`` `程式碼` ``、`<br />`。`&`／`<`／`>` 一律先跳脫。
+/// 支援之行內語法：`**粗體**`、`` `程式碼` ``、`<br />`；`&nbsp;`（單一字元）原樣放行。
+/// 其餘之 `&`／`<`／`>` 一律先跳脫。
 private func renderInline(_ raw: String) -> String {
-  var escaped = raw.replacingOccurrences(of: "&", with: "&amp;")
+  let nbspTag = "\u{0}nbsp\u{0}"
+  var escaped = raw.replacingOccurrences(of: "&nbsp;", with: nbspTag)
+    .replacingOccurrences(of: "&", with: "&amp;")
     .replacingOccurrences(of: "<", with: "&lt;")
     .replacingOccurrences(of: ">", with: "&gt;")
   escaped = replaceCodeSpans(in: escaped)
   escaped = replaceBoldSpans(in: escaped)
-  return escaped
+  return escaped.replacingOccurrences(of: nbspTag, with: "&nbsp;")
 }
 
 private func replaceCodeSpans(in text: String) -> String {
@@ -399,11 +445,24 @@ extension Block {
 
 // MARK: - 產製
 
-private func compile(markdown: String, localeID: String) -> String {
+/// 產製一個語系之 HTML。
+///
+/// `subtitle`：該語系「本文對應至少…」那一列之**成品內文**（已渲染之 HTML 片段）。`en`／`ja`
+/// 之原稿不另寫該列，而由繁體原文抽取後就地改寫，以免同一句版本資訊四處各留一份。
+private func compile(markdown: String, localeID: String, subtitle: String?) -> String {
   let (body, options) = splitFrontMatter(markdown)
-  let blocks = parseBlocks(body)
+  var blocks = parseBlocks(body)
   guard let titleBlock = blocks.first, case let .heading(_, title) = titleBlock else {
     fail("Markdown 之第一個區塊必須是一級標題（`# …`）。")
+  }
+  if let subtitle, blocks.count > 1 {
+    let replacement = Block.paragraph(subtitle)
+    // 第二列若原本是標題，或已是產製器所加之副標題，則逕行取代。
+    if case .paragraph = blocks[1] {
+      blocks[1] = replacement
+    } else {
+      blocks.insert(replacement, at: 1)
+    }
   }
   let rendered = renderBody(blocks, options: options)
   return htmlTemplate
@@ -411,6 +470,57 @@ private func compile(markdown: String, localeID: String) -> String {
     .replacingOccurrences(of: "{TITLE}", with: renderInline(title))
     .replacingOccurrences(of: "{STYLE}", with: htmlStyle)
     .replacingOccurrences(of: "{BODY}", with: reindented(rendered, baseDepth: 2))
+}
+
+/// 該語系「本文對應至少…」那一列之成品內文。
+///
+/// - `zh-Hans` 之原稿自備該列（與繁中逐字對位），故回 `nil`。
+/// - `en`／`ja` 只自繁體原文取**版本號**，其餘就地改寫；`&`／`<`／`>` 先行跳脫、`<br />`
+///   就地還原——如此即成一份**已渲染**之片段，其餘 Markdown 語法於此不再有意義。
+/// - 原文之「請利用滑鼠滾輪檢視該頁面。」一句在此就地寫成各語系之文。
+private func subtitleMarkup(for localeID: String, zhHantMarkdown: String) -> String? {
+  if localeID == "zh-Hans" { return nil }
+  let (body, _) = splitFrontMatter(zhHantMarkdown)
+  let blocks = parseBlocks(body)
+  guard blocks.count > 1, case let .paragraph(text) = blocks[1] else { return nil }
+  let version = firstVersionNumber(in: text) ?? "?"
+  let sentence: String
+  switch localeID {
+  case "en":
+    sentence = "This article describes keyboard shortcuts used as of vChewing \(version) release."
+      + "<br />Please use mouse wheel to scroll this page."
+  case "ja":
+    sentence = "この文章は、唯音入力アプリ v\(version) アップデートのキーボードショートカットの"
+      + "取り扱う方法を説明します。<br />マウスホイールでこの文章をご覧ください。"
+  default:
+    return renderLineBreaks(text)
+  }
+  return sentence
+    .replacingOccurrences(of: "&", with: "&amp;")
+    .replacingOccurrences(of: "<", with: "&lt;")
+    .replacingOccurrences(of: ">", with: "&gt;")
+    .replacingOccurrences(of: "&lt;br /&gt;", with: "<br />")
+}
+
+/// 抽出文中第一個形如 `4.8.6` 之版本號。
+private func firstVersionNumber(in text: String) -> String? {
+  let scalars = Array(text)
+  var index = 0
+  while index < scalars.count {
+    guard scalars[index].isNumber else { index += 1; continue }
+    var end = index
+    while end < scalars.count,
+          scalars[end].isNumber || (
+            scalars[end] == "." && end + 1 < scalars.count
+              && scalars[end + 1].isNumber
+          ) {
+      end += 1
+    }
+    let candidate = String(scalars[index ..< end])
+    if candidate.contains(".") { return candidate }
+    index = end
+  }
+  return nil
 }
 
 // MARK: - Options
@@ -570,6 +680,11 @@ private func main() {
   }
 
   var stale = 0
+  // 非繁體語系之首列版本資訊取自繁體原文（見 `subtitleMarkup(for:zhHantMarkdown:)`）。
+  lazy var zhHantMarkdown: String? = sourceCandidates(
+    .homePageMarkdown, repoRoot: repoRoot, homePageRepo: homePageRepo
+  ).lazy.compactMap { readText(atPath: $0) }.first
+
   for locale in selected {
     let candidates = sourceCandidates(
       locale.source, repoRoot: repoRoot, homePageRepo: homePageRepo
@@ -588,7 +703,14 @@ private func main() {
       note("※ \(locale.id)：官網倉之原文不在手邊，改用本倉之同步副本（\(sourcePath)）。")
     }
     guard let raw = readText(atPath: sourcePath) else { fail("讀不到 `\(sourcePath)`。") }
-    let html = compile(markdown: raw, localeID: locale.id)
+    var subtitle: String?
+    if locale.subtitleSource != nil {
+      guard let zhHant = zhHantMarkdown else {
+        fail("讀不到繁體中文之原文——產製 `\(locale.id)` 時須以之為首列版本資訊之來源。")
+      }
+      subtitle = subtitleMarkup(for: locale.id, zhHantMarkdown: zhHant)
+    }
+    let html = compile(markdown: raw, localeID: locale.id, subtitle: subtitle)
     let outputPath = repoRoot + "/" + locale.output
 
     if options.check {
