@@ -584,4 +584,106 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(!handled, "Fn+字母鍵不屬功能鍵，應維持放行。")
     #expect(testClientProxy.toString().isEmpty, "放行 Fn+字母鍵時，輸入法本身不得遞交內容。")
   }
+
+  // MARK: - Command 系熱鍵之放行（輸入法未認領者不得被終末處理吞掉）
+
+  /// 輸入法自身未認領的 Command 系熱鍵在組字期間必須放行給客體。
+  ///
+  /// 病灶：`InputHandler_TriageInput` 的終末處理是「誰都沒認領」的終點，原本會將它攔下
+  /// 並發蜂鳴碼 `A9BFF20E`。但帶 Command 的按鍵組合一律是選單／熱鍵語意、不是文字資料，
+  /// 攔下來只會讓 Google Chrome 的 `Cmd+Ctrl+C`／`Cmd+Ctrl+W` 之類的客體熱鍵在組字期間
+  /// 無從送達（mozc 的 `handleEvent:client:` 亦只在引擎確有消費時才回 `YES`）。
+  @Test
+  func test520_UnclaimedCommandShortcutsReachClientWhileComposing() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    resetToEmptyAndClear()
+    typeSentenceOrCandidates("su3")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.hasComposition)
+    let compositionBefore = testHandler.assembler.assembledSentence.map(\.value).joined()
+    #expect(compositionBefore == "你")
+
+    func verifyReleased(_ label: String, _ data: KBEvent.KeyEventData) {
+      let handled = testSession.handleEvent(data.asEvent)
+      #expect(!handled, "\(label) 屬輸入法未認領的 Command 系熱鍵，必須放行給客體。")
+      #expect(recordedErrors.isEmpty, "放行 \(label) 不得發蜂鳴碼，實際得到 \(recordedErrors)")
+      #expect(testSession.state.hasComposition, "放行 \(label) 不得摧毀組字狀態。")
+      #expect(
+        testHandler.assembler.assembledSentence.map(\.value).joined() == compositionBefore,
+        "放行 \(label) 不得改動尚未遞交的組字內容。"
+      )
+    }
+
+    verifyReleased("Cmd+Ctrl+W", .init(flags: [.command, .control], chars: "w", keyCode: 13))
+    verifyReleased("Cmd+Ctrl+C", .init(flags: [.command, .control], chars: "c", keyCode: 8))
+    verifyReleased("Cmd+W", .init(flags: [.command], chars: "w", keyCode: 13))
+
+    // 放行熱鍵後，遞交路徑須完好無損。
+    press(.dataEnterReturn)
+    #expect(testClientProxy.toString() == "你")
+  }
+
+  /// 對照組：組字區與注拼槽皆空時，Command 系熱鍵照舊放行（既有行為之回歸保證）。
+  @Test
+  func test521_UnclaimedCommandShortcutsReachClientWhenNothingPending() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    resetToEmptyAndClear()
+    #expect(testSession.state.type == .ofEmpty)
+
+    let chords: [(String, KBEvent.KeyEventData)] = [
+      ("Cmd+Ctrl+W", .init(flags: [.command, .control], chars: "w", keyCode: 13)),
+      ("Cmd+Ctrl+C", .init(flags: [.command, .control], chars: "c", keyCode: 8)),
+      ("Cmd+W", .init(flags: [.command], chars: "w", keyCode: 13)),
+    ]
+    for (label, data) in chords {
+      #expect(!testSession.handleEvent(data.asEvent), "\(label) 應放行給客體。")
+    }
+    #expect(recordedErrors.isEmpty, "放行時不得發蜂鳴碼，實際得到 \(recordedErrors)")
+  }
+
+  /// 界線：**不帶 Command** 的組合鍵仍屬資料鍵，組字期間照舊攔截
+  /// （否則控制字元會漏進客體文件）。
+  @Test
+  func test522_NonCommandChordsAreStillBlockedWhileComposing() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    resetToEmptyAndClear()
+    typeSentenceOrCandidates("su3")
+    #expect(testSession.state.hasComposition)
+
+    let handled = testSession.handleEvent(
+      KBEvent.KeyEventData(flags: [.control], chars: "w", keyCode: 13).asEvent
+    )
+    #expect(handled, "Ctrl+W 不帶 Command，仍屬資料鍵，組字期間不得放行。")
+    #expect(
+      recordedErrors == ["A9BFF20E"],
+      "攔截資料鍵仍須發終末處理之蜂鳴碼，實際得到 \(recordedErrors)"
+    )
+    #expect(testSession.state.hasComposition, "攔截不得摧毀組字狀態。")
+  }
+
+  /// 選字窗內未認領的 Command 系熱鍵同樣放行，且不得發出選字窗那道泛用蜂鳴碼 `172A0F81`。
+  @Test
+  func test523_UnclaimedCommandShortcutsReachClientInCandidateWindow() throws {
+    _ = prepareBasicComposition(sequence: "dk ru4")
+    press(.dataArrowDown)
+    #expect(testSession.state.type == .ofCandidates)
+    syncCandidateControllerCount()
+
+    let handled = testSession.handleEvent(
+      KBEvent.KeyEventData(flags: [.command, .control], chars: "w", keyCode: 13).asEvent
+    )
+    #expect(!handled, "選字窗內未認領的 Cmd+Ctrl+W 必須放行給客體。")
+    #expect(recordedErrors.isEmpty, "放行時不得發蜂鳴碼，實際得到 \(recordedErrors)")
+    #expect(testSession.state.type == .ofCandidates, "放行不得摧毀選字窗狀態。")
+
+    // 對照組：不帶 Command 的未認領按鍵仍走原路徑（蜂鳴 + 攔截）。
+    let stillBlocked = testSession.handleEvent(
+      KBEvent.KeyEventData(flags: [.control], chars: "w", keyCode: 13).asEvent
+    )
+    #expect(stillBlocked, "選字窗內不帶 Command 的未認領按鍵仍須攔截。")
+    #expect(
+      recordedErrors == ["172A0F81"],
+      "選字窗攔截未認領按鍵仍須發該處之蜂鳴碼，實際得到 \(recordedErrors)"
+    )
+  }
 }

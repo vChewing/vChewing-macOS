@@ -357,6 +357,10 @@ extension InputHandlerProtocol {
 
     if state.type == .ofInputting { return false } // `%quick`
 
+    // 選字窗內未認領的 Command 系熱鍵：靜默放行給客體，不發蜂鳴
+    // （理由見 `InputSignalProtocol.isCommandShortcutChord`）。
+    if input.isCommandShortcutChord { return false }
+
     errorCallback?("172A0F81")
     return true
   }

@@ -250,7 +250,10 @@ extension InputHandlerProtocol {
     case .ofAbortion, .ofCommitting, .ofDeactivated: return false
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       let result = handleCandidate(input: input)
-      guard !result, state.type == .ofAssociates else { return true }
+      if result { return true }
+      // 選字窗／符號表未認領者：Command 系熱鍵仍須放行給客體
+      // （理由見 `InputSignalProtocol.isCommandShortcutChord`），其餘照舊攔截。
+      guard state.type == .ofAssociates else { return !input.isCommandShortcutChord }
       session.switchState(State.ofEmpty())
       return triageInput(event: input)
     case .ofMarking:
@@ -362,6 +365,10 @@ extension InputHandlerProtocol {
     // 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     // 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
+      // 既然此處已確認「輸入法自身無任何處理」，則 Command 系熱鍵必須放行給客體：本段是
+      // 「誰都沒認領」的終點，故放行不會奪走輸入法自己的任何功能。攔截的意義只在於不讓
+      // 文字資料漏進客體文件、以免組字區與文件失去同步——Command 系組合鍵沒有這個顧慮。
+      if input.isCommandShortcutChord { return false }
       vCLog(
         "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)"
       )
