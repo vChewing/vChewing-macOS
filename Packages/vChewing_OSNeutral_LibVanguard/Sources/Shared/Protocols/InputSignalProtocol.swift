@@ -179,11 +179,11 @@ extension InputSignalProtocol {
   ///
   /// macOS 上任何帶 Command 的按鍵組合均屬選單／熱鍵語意：客體不會將其中的字元視為輸入
   /// 文字，也不可能藉此改寫輸入法持有的組字區。故輸入法自身未認領的 Command 系組合鍵一律
-  /// 須放行給客體——否則 Google Chrome 的 `Cmd+Ctrl+C`／`Cmd+Ctrl+W` 之類的客體熱鍵在組字
+  /// 須交還客體——否則 Google Chrome 的 `Cmd+Ctrl+C`／`Cmd+Ctrl+W` 之類的客體熱鍵在組字
   /// 期間無從送達。此與 mozc 之 `-[MozcImkInputController handleEvent:client:]` 僅在引擎確有
   /// 消費時才回 `YES` 的行為一致。Ctrl／Option 系組合鍵不在此列：無 Command 時它們仍可能是
   /// 文字資料（控制字元），吃掉才不會污染客體文件。
-  public var isCommandShortcutChord: Bool { isCommandHeld }
+  public var isCommandShortcutChord: Bool { isHoldingAny([.command]) }
 
   // MARK: Validation
 

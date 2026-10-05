@@ -251,11 +251,17 @@ extension InputHandlerProtocol {
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       let result = handleCandidate(input: input)
       if result { return true }
-      // 選字窗／符號表未認領者：Command 系熱鍵仍須放行給客體
-      // （理由見 `InputSignalProtocol.isCommandShortcutChord`），其餘照舊攔截。
-      guard state.type == .ofAssociates else { return !input.isCommandShortcutChord }
-      session.switchState(State.ofEmpty())
-      return triageInput(event: input)
+      if state.type == .ofAssociates {
+        session.switchState(State.ofEmpty())
+        return triageInput(event: input)
+      }
+      // 選字窗／符號表未認領者：Command 系熱鍵仍須交還客體
+      // （其理據見 `releaseUnclaimedCommandChord()`），其餘照舊攔截。
+      if input.isCommandShortcutChord {
+        releaseUnclaimedCommandChord()
+        return false
+      }
+      return true
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
       session.switchState(state.convertedToInputting)
@@ -365,10 +371,14 @@ extension InputHandlerProtocol {
     // 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     // 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
-      // 既然此處已確認「輸入法自身無任何處理」，則 Command 系熱鍵必須放行給客體：本段是
-      // 「誰都沒認領」的終點，故放行不會奪走輸入法自己的任何功能。攔截的意義只在於不讓
+      // 既然此處已確認「輸入法自身無任何處理」，則 Command 系熱鍵必須交還客體：本段是
+      // 「誰都沒認領」的終點，故交還不會奪走輸入法自己的任何功能。攔截的意義只在於不讓
       // 文字資料漏進客體文件、以免組字區與文件失去同步——Command 系組合鍵沒有這個顧慮。
-      if input.isCommandShortcutChord { return false }
+      // 惟交還之前須先遞交既有內容，其理據見 `releaseUnclaimedCommandChord()`。
+      if input.isCommandShortcutChord {
+        releaseUnclaimedCommandChord()
+        return false
+      }
       vCLog(
         "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)"
       )
@@ -377,5 +387,20 @@ extension InputHandlerProtocol {
     }
 
     return false
+  }
+
+  /// 處置「輸入法未認領之 Command 系熱鍵」：先遞交當前未遞交之內容，再把事件交還客體。
+  ///
+  /// **何以不能只交還而不遞交**：客體在輸入法仍持有內文組字區（marked text）期間不會執行
+  /// 自己的 Command 系熱鍵——Chrome 之 `Cmd+Ctrl+C`／`Cmd+Ctrl+W` 即因此收不到（事主實機
+  /// 回報）。先行遞交則客體自此脫離組字態，該熱鍵方得生效。
+  ///
+  /// 遞交走 `resetInputHandler()`：其即 IMK 之 `commitComposition:` 所用的同一條路（遞交
+  /// `committableDisplayText` 與混打緩衝、並收斂至空狀態），故未完成讀音之去留一律照既有偏好
+  /// `trimUnfinishedReadingsOnCommit` 決定，不另立判準。無未遞交內容時本函式不動作。
+  private func releaseUnclaimedCommandChord() {
+    guard let session else { return }
+    guard session.state.hasComposition || !isComposerOrCalligrapherEmpty else { return }
+    session.resetInputHandler()
   }
 }

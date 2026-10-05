@@ -585,45 +585,50 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(testClientProxy.toString().isEmpty, "放行 Fn+字母鍵時，輸入法本身不得遞交內容。")
   }
 
-  // MARK: - Command 系熱鍵之放行（輸入法未認領者不得被終末處理吞掉）
+  // MARK: - 輸入法未認領之 Command 系熱鍵（先遞交、後交還客體）
 
-  /// 輸入法自身未認領的 Command 系熱鍵在組字期間必須放行給客體。
+  /// 輸入法自身未認領的 Command 系熱鍵在組字期間**先遞交既有內容、再把事件交還客體**。
   ///
-  /// 病灶：`InputHandler_TriageInput` 的終末處理是「誰都沒認領」的終點，原本會將它攔下
-  /// 並發蜂鳴碼 `A9BFF20E`。但帶 Command 的按鍵組合一律是選單／熱鍵語意、不是文字資料，
-  /// 攔下來只會讓 Google Chrome 的 `Cmd+Ctrl+C`／`Cmd+Ctrl+W` 之類的客體熱鍵在組字期間
-  /// 無從送達（mozc 的 `handleEvent:client:` 亦只在引擎確有消費時才回 `YES`）。
+  /// 病灶有兩層：① 分診之終末處理是「誰都沒認領」的終點，原本會將它攔下並發蜂鳴碼
+  /// `A9BFF20E`；② **僅交還而不遞交是不夠的**——客體在輸入法仍持有內文組字區（marked text）
+  /// 期間不會執行自己的 Command 系熱鍵（Chrome 之 `Cmd+Ctrl+C`／`Cmd+Ctrl+W` 即因此收不到）。
+  /// 帶 Command 的組合鍵一律是選單／熱鍵語意、不是文字資料，故先行遞交亦不污染客體文件。
   @Test
-  func test520_UnclaimedCommandShortcutsReachClientWhileComposing() throws {
+  func test520_UnclaimedCommandShortcutsCommitThenReachClient() throws {
     testHandler.prefs.useSCPCTypingMode = false
-    resetToEmptyAndClear()
-    typeSentenceOrCandidates("su3")
-    #expect(testSession.state.type == .ofInputting)
-    #expect(testSession.state.hasComposition)
-    let compositionBefore = testHandler.assembler.assembledSentence.map(\.value).joined()
-    #expect(compositionBefore == "你")
 
-    func verifyReleased(_ label: String, _ data: KBEvent.KeyEventData) {
+    func verifyCommitsAndReleases(_ label: String, _ data: KBEvent.KeyEventData) {
+      resetToEmptyAndClear()
+      typeSentenceOrCandidates("su3")
+      #expect(testSession.state.type == .ofInputting)
+      #expect(testSession.state.hasComposition)
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "你")
+
       let handled = testSession.handleEvent(data.asEvent)
-      #expect(!handled, "\(label) 屬輸入法未認領的 Command 系熱鍵，必須放行給客體。")
-      #expect(recordedErrors.isEmpty, "放行 \(label) 不得發蜂鳴碼，實際得到 \(recordedErrors)")
-      #expect(testSession.state.hasComposition, "放行 \(label) 不得摧毀組字狀態。")
+      #expect(!handled, "\(label) 屬輸入法未認領的 Command 系熱鍵，必須交還客體。")
+      #expect(recordedErrors.isEmpty, "交還 \(label) 不得發蜂鳴碼，實際得到 \(recordedErrors)")
       #expect(
-        testHandler.assembler.assembledSentence.map(\.value).joined() == compositionBefore,
-        "放行 \(label) 不得改動尚未遞交的組字內容。"
+        testClientProxy.toString() == "你",
+        "交還 \(label) 之前須先遞交既有組字內容，實際得到 \(testClientProxy.toString())"
       )
+      #expect(
+        testSession.state.type == .ofEmpty,
+        "遞交後應收斂至空狀態（客體方得脫離組字態），實際得到 \(testSession.state.type.rawValue)"
+      )
+      #expect(testHandler.assembler.isEmpty, "遞交後組字器應已清空。")
     }
 
-    verifyReleased("Cmd+Ctrl+W", .init(flags: [.command, .control], chars: "w", keyCode: 13))
-    verifyReleased("Cmd+Ctrl+C", .init(flags: [.command, .control], chars: "c", keyCode: 8))
-    verifyReleased("Cmd+W", .init(flags: [.command], chars: "w", keyCode: 13))
-
-    // 放行熱鍵後，遞交路徑須完好無損。
-    press(.dataEnterReturn)
-    #expect(testClientProxy.toString() == "你")
+    verifyCommitsAndReleases(
+      "Cmd+Ctrl+W", .init(flags: [.command, .control], chars: "w", keyCode: 13)
+    )
+    verifyCommitsAndReleases(
+      "Cmd+Ctrl+C", .init(flags: [.command, .control], chars: "c", keyCode: 8)
+    )
+    verifyCommitsAndReleases("Cmd+W", .init(flags: [.command], chars: "w", keyCode: 13))
   }
 
-  /// 對照組：組字區與注拼槽皆空時，Command 系熱鍵照舊放行（既有行為之回歸保證）。
+  /// 對照組：組字區與注拼槽皆空時，Command 系熱鍵照舊交還，且不遞交任何內容
+  /// （既有行為之回歸保證）。
   @Test
   func test521_UnclaimedCommandShortcutsReachClientWhenNothingPending() throws {
     testHandler.prefs.useSCPCTypingMode = false
@@ -636,9 +641,10 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       ("Cmd+W", .init(flags: [.command], chars: "w", keyCode: 13)),
     ]
     for (label, data) in chords {
-      #expect(!testSession.handleEvent(data.asEvent), "\(label) 應放行給客體。")
+      #expect(!testSession.handleEvent(data.asEvent), "\(label) 應交還客體。")
     }
-    #expect(recordedErrors.isEmpty, "放行時不得發蜂鳴碼，實際得到 \(recordedErrors)")
+    #expect(recordedErrors.isEmpty, "交還時不得發蜂鳴碼，實際得到 \(recordedErrors)")
+    #expect(testClientProxy.toString().isEmpty, "空狀態下不得遞交任何內容。")
   }
 
   /// 界線：**不帶 Command** 的組合鍵仍屬資料鍵，組字期間照舊攔截
@@ -653,30 +659,43 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     let handled = testSession.handleEvent(
       KBEvent.KeyEventData(flags: [.control], chars: "w", keyCode: 13).asEvent
     )
-    #expect(handled, "Ctrl+W 不帶 Command，仍屬資料鍵，組字期間不得放行。")
+    #expect(handled, "Ctrl+W 不帶 Command，仍屬資料鍵，組字期間不得交還。")
     #expect(
       recordedErrors == ["A9BFF20E"],
       "攔截資料鍵仍須發終末處理之蜂鳴碼，實際得到 \(recordedErrors)"
     )
     #expect(testSession.state.hasComposition, "攔截不得摧毀組字狀態。")
+    #expect(testClientProxy.toString().isEmpty, "攔截時不得遞交任何內容。")
   }
 
-  /// 選字窗內未認領的 Command 系熱鍵同樣放行，且不得發出選字窗那道泛用蜂鳴碼 `172A0F81`。
+  /// 選字窗內未認領的 Command 系熱鍵亦先遞交、後交還；且不得發出選字窗那道泛用蜂鳴碼
+  /// `172A0F81`（該碼屬「已認領而落空」，與本情境有別）。
   @Test
-  func test523_UnclaimedCommandShortcutsReachClientInCandidateWindow() throws {
-    _ = prepareBasicComposition(sequence: "dk ru4")
-    press(.dataArrowDown)
-    #expect(testSession.state.type == .ofCandidates)
-    syncCandidateControllerCount()
+  func test523_UnclaimedCommandShortcutsCommitThenReachClientInCandidateWindow() throws {
+    func prepareCandidateWindow() {
+      _ = prepareBasicComposition(sequence: "dk ru4")
+      press(.dataArrowDown)
+      #expect(testSession.state.type == .ofCandidates)
+      syncCandidateControllerCount()
+    }
 
+    prepareCandidateWindow()
     let handled = testSession.handleEvent(
       KBEvent.KeyEventData(flags: [.command, .control], chars: "w", keyCode: 13).asEvent
     )
-    #expect(!handled, "選字窗內未認領的 Cmd+Ctrl+W 必須放行給客體。")
-    #expect(recordedErrors.isEmpty, "放行時不得發蜂鳴碼，實際得到 \(recordedErrors)")
-    #expect(testSession.state.type == .ofCandidates, "放行不得摧毀選字窗狀態。")
+    #expect(!handled, "選字窗內未認領的 Cmd+Ctrl+W 必須交還客體。")
+    #expect(
+      recordedErrors.isEmpty,
+      "交還時不得發蜂鳴碼（含 172A0F81），實際得到 \(recordedErrors)"
+    )
+    #expect(
+      testClientProxy.toString() == "科技",
+      "交還之前須先遞交既有組字內容，實際得到 \(testClientProxy.toString())"
+    )
+    #expect(testSession.state.type == .ofEmpty, "遞交後應收斂至空狀態。")
 
     // 對照組：不帶 Command 的未認領按鍵仍走原路徑（蜂鳴 + 攔截）。
+    prepareCandidateWindow()
     let stillBlocked = testSession.handleEvent(
       KBEvent.KeyEventData(flags: [.control], chars: "w", keyCode: 13).asEvent
     )
@@ -685,5 +704,27 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       recordedErrors == ["172A0F81"],
       "選字窗攔截未認領按鍵仍須發該處之蜂鳴碼，實際得到 \(recordedErrors)"
     )
+    #expect(testSession.state.type == .ofCandidates, "攔截不得摧毀選字窗狀態。")
+  }
+
+  /// 尚在注拼槽、未成音節之讀音不得因交還而變成原文遞交給客體：遞交與 IMK 之強制遞交
+  /// （`commitComposition:`）同源，故未完成讀音之去留照既有偏好 `trimUnfinishedReadingsOnCommit`。
+  @Test
+  func test524_UnfinishedReadingIsTrimmedWhenReleasingCommandShortcut() throws {
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.trimUnfinishedReadingsOnCommit = true
+    resetToEmptyAndClear()
+    typeSentenceOrCandidates("su")
+    #expect(testHandler.composer.value == "ㄋㄧ")
+    #expect(!testHandler.isComposerOrCalligrapherEmpty)
+
+    let handled = testSession.handleEvent(
+      KBEvent.KeyEventData(flags: [.command, .control], chars: "w", keyCode: 13).asEvent
+    )
+    #expect(!handled, "未完成讀音在場時，Cmd+Ctrl+W 仍須交還客體。")
+    #expect(recordedErrors.isEmpty, "交還時不得發蜂鳴碼，實際得到 \(recordedErrors)")
+    #expect(testClientProxy.toString().isEmpty, "未完成之讀音不得以原文遞交。")
+    #expect(testSession.state.type == .ofEmpty, "遞交後應收斂至空狀態。")
+    #expect(testHandler.isComposerOrCalligrapherEmpty, "遞交後注拼槽應已清空。")
   }
 }
