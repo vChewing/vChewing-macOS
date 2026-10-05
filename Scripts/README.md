@@ -46,3 +46,20 @@ $env:DRY_RUN='true'; make gitrelease
 # Run the script (no push to remote by default)
 make gitrelease
 ```
+
+## Markdown2HTML — in-app cheat sheet
+
+`Markdown2HTML/generate-shortcuts.swift` compiles the Markdown source of the in-app keyboard shortcut
+cheat sheet (`Sources/vChewingIME_macOS/Resources/<locale>.lproj/shortcuts.html`) and owns that HTML's
+skeleton, stylesheet and Markdown subset. Traditional Chinese is authored on the website repository
+(`vChewing-HomePage.io/manual/shortcuts.md`) and mirrored here; Simplified Chinese is a character-level
+derivation of that mirror. See `Markdown2HTML/README.md` for the provenance table, the supported
+Markdown subset and the update workflow.
+
+Makefile usage:
+```pwsh
+make shortcuts        # compile every locale this toolchain owns
+make shortcutsCheck   # fail when a product is out of date
+make shortcutsList    # show each locale's source candidates and product
+```
+

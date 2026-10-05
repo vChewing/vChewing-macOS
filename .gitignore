@@ -10,6 +10,8 @@ LegacyZone/[Bb]uild/
 # 刻意入庫之防漂移物資，不在此列。
 ValueAdd/WebConfigAssistant/dist/
 ValueAdd/WebConfigAssistant/tmp/
+# 本倉之暫存目錄（`Scripts/Markdown2HTML` 之一次性轉寫稿、驗證腳本等）。
+tmp/
 $RECYCLE.BIN/
 $tf/
 **/*.DesktopClient/GeneratedArtifacts
