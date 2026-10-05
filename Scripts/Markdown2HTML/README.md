@@ -15,6 +15,8 @@ dependency and is never part of a build (nothing in `Package.swift` or the Xcode
 |-----------|--------------------------------------------------------------------------|------------------------------------------------------------------|
 | `zh-Hant` | `vChewing-HomePage.io/manual/shortcuts.md` (**authoritative**), falling back to the checked-in mirror `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.zh-Hant.md` | `Sources/vChewingIME_macOS/Resources/zh-Hant.lproj/shortcuts.html` |
 | `zh-Hans` | `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.zh-Hans.md` | `Sources/vChewingIME_macOS/Resources/zh-Hans.lproj/shortcuts.html` |
+| `en`      | `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.en.md`      | `Sources/vChewingIME_macOS/Resources/en.lproj/shortcuts.html`    |
+| `ja`      | `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.ja.md`      | `Sources/vChewingIME_macOS/Resources/ja.lproj/shortcuts.html`    |
 
 * Traditional Chinese is authored on the website repository (`vChewing-HomePage.io`), which is where
   the manual's canonical text lives. The mirror inside this repository is kept byte-for-byte identical
@@ -23,8 +25,13 @@ dependency and is never part of a build (nothing in `Package.swift` or the Xcode
 * Simplified Chinese is **derived** from the Traditional mirror: character-level simplification only,
   with Taiwan vocabulary preserved throughout (`設定 → 设定`, never `设置`; `資料 → 资料`, never
   `数据`; `視窗 → 视窗`, never `窗口`). It is a checked-in file, not a build-time transform.
-* `en` and `ja` carry hand-written files of their own and are **not** covered by this toolchain. The
-  script never touches them.
+* English and Japanese were reverse-derived from their hand-written HTML products and then brought up
+  to the current content; from here on they are maintained as Markdown. Their prose is a translation
+  of the Traditional source — **when a row changes upstream, retranslate it here** rather than editing
+  the product.
+* Every locale's second line — the one carrying the version number — is generated from the Traditional
+  source, so the four products cannot disagree about which release they document. `en`/`ja` keep their
+  own sentence, but the version number is read out of `manual/shortcuts.md`.
 
 ## Usage
 
@@ -59,6 +66,7 @@ Only what the cheat sheet actually uses, so that the products stay diff-stable:
 | Pipe table with a `|-:|-|` separator row | `<table>`; the header row is bolded |
 | `<br />` (also accepts `<br>`, `<br/>`, `<br >`) | In a table cell: one `<div>` per segment. Elsewhere: emitted verbatim |
 | `**bold**`, `` `code` `` | `<strong>`, `<code>` |
+| `&nbsp;` | Passed through as the entity (used by the Japanese notes' spacing) |
 
 Every other character is HTML-escaped. YAML front matter is stripped, with one exception: the key
 `note-list: ordered|unordered` is read by the generator and decides whether the leading notes render as
@@ -70,7 +78,7 @@ without changing the website's own rendering.
 
 | Script | Role |
 |---|---|
-| `generate-shortcuts.swift` | Compiles each owned locale's Markdown into its `shortcuts.html`. Reads the website repository directly when it is present and falls back to the checked-in Traditional mirror otherwise. |
+| `generate-shortcuts.swift` | Compiles every locale's Markdown into its `shortcuts.html`. Reads the website repository directly when it is present and falls back to the checked-in Traditional mirror otherwise. |
 | `sync-from-homepage.swift` | Copies `vChewing-HomePage.io/manual/shortcuts.md` (front-matter keys plus body) into the Traditional mirror, adding the mirror's own front-matter comments. |
 | `derive-zh-Hans.swift` | Re-derives the Simplified source from the Traditional mirror by character-level simplification, then restores the front-matter keys and comments verbatim. |
 
@@ -82,7 +90,9 @@ without changing the website's own rendering.
    through that diff by hand: ICU leaves a handful of glyphs unconverted (`鍵`／`冊`／`熱`／`彙`／`體`／
    `網`／`臺`／`灣`／`倉`／`蝨`／`螢` at the time of writing) and the script fixes those up from a table,
    but only a human can tell Taiwan vocabulary from Mainland vocabulary.
-4. Run `Scripts/Markdown2HTML/generate-shortcuts.swift`, then review the `git diff` of both products.
+4. Translate whatever changed into `shortcuts.en.md` and `shortcuts.ja.md` by hand. There is no machine
+   translation step, and none is wanted: the wording of the other three locales is shipping copy.
+5. Run `Scripts/Markdown2HTML/generate-shortcuts.swift`, then review the `git diff` of all four products.
 
 When `vChewing-HomePage.io` is checked out somewhere other than the default sibling directory, point
 the first two steps at it with `VCHEWING_HOMEPAGE=<dir>`.
@@ -93,5 +103,5 @@ the first two steps at it with `VCHEWING_HOMEPAGE=<dir>`.
   file that opens in a browser from inside the app bundle.
 * No CSS or layout changes belong here beyond the stylesheet the script already carries; behaviour of
   the cheat sheet's *content* is out of scope.
-* `en` and `ja` are out of scope. Their products were written by hand and this toolchain neither reads
-  nor writes them; folding them in means first authoring a Markdown source for each.
+* No automatic translation of the Traditional source into `en`／`ja`. Those two are hand-written, and
+  the generator treats them as opaque Markdown apart from the shared version-number line.

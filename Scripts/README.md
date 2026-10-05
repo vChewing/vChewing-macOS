@@ -51,10 +51,11 @@ make gitrelease
 
 `Markdown2HTML/generate-shortcuts.swift` compiles the Markdown source of the in-app keyboard shortcut
 cheat sheet (`Sources/vChewingIME_macOS/Resources/<locale>.lproj/shortcuts.html`) and owns that HTML's
-skeleton, stylesheet and Markdown subset. Traditional Chinese is authored on the website repository
-(`vChewing-HomePage.io/manual/shortcuts.md`) and mirrored here; Simplified Chinese is a character-level
-derivation of that mirror. See `Markdown2HTML/README.md` for the provenance table, the supported
-Markdown subset and the update workflow.
+skeleton, stylesheet and Markdown subset. All four locales are covered: Traditional Chinese is authored
+on the website repository (`vChewing-HomePage.io/manual/shortcuts.md`) and mirrored here, Simplified
+Chinese is a character-level derivation of that mirror, and English / Japanese are hand-written Markdown
+under `Sources/vChewingIME_macOS/Resources/shortcuts-src/`. See `Markdown2HTML/README.md` for the
+provenance table, the supported Markdown subset and the update workflow.
 
 Makefile usage:
 ```pwsh
