@@ -203,7 +203,7 @@ struct TekkonTestsBasic {
     #expect(composer.getComposition() == "ㄩㄝ")
 
     // Testing tool functions
-    #expect(Tekkon.restoreToneOneInPhona(target: "ㄉㄧㄠ") == "ㄉㄧㄠ1")
+    #expect(Tekkon.restoreFirstToneInPhona(target: "ㄉㄧㄠ") == "ㄉㄧㄠ1")
     #expect(Tekkon.cnvPhonaToTextbookStyle(target: "ㄓㄜ˙") == "˙ㄓㄜ")
     #expect(Tekkon.cnvPhonaToHanyuPinyin(targetJoined: "ㄍㄢˋ") == "gan4")
     #expect(Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: "起(qi3)居(ju1)") == "起(qǐ)居(jū)")

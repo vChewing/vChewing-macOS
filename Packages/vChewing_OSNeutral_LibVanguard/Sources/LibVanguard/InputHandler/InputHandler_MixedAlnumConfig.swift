@@ -55,7 +55,7 @@ public struct MixedAlnumConfig: Sendable, Equatable {
 ///
 /// 並存態下空白鍵有兩種歸屬，二者互斥且**皆屬混打層**（故既有之「固化前方讀音」不得再
 /// 插手其間）：
-///   - `.levelToneConfirmation`：以**陰平**確認該待調讀音（不帶修飾鍵之空白鍵）；
+///   - `.firstToneConfirmation`：以**陰平**確認該待調讀音（不帶修飾鍵之空白鍵）；
 ///   - `.asciiCommitEscape`：放棄注音處理、整段混打緩衝以原文遞交（**Shift+Space**）。
 ///
 /// 本型別即該判準之**單一正本**：分診早段（固化塊）與打字機（陰平確認分支）皆消費之。
@@ -65,8 +65,8 @@ enum MixedAlnumSpaceDuty: Sendable {
   /// 本鍵非並存態之空白鍵 ⇒ 不屬混打層：交還既有流程處置
   /// （純狂打之固化、拼音側之無調確認等）。
   case none
-  /// 混打層以陰平聲調確認該待調讀音（見 `confirmMixedAlnumReadingWithLevelTone`）。
-  case levelToneConfirmation
+  /// 混打層以陰平聲調確認該待調讀音（見 `confirmMixedAlnumReadingWithFirstTone`）。
+  case firstToneConfirmation
   /// 混打層放棄注音處理：整段緩衝以原文遞交、其後附一個半形空格（即 Shift+Space 之逃生口）。
   case asciiCommitEscape
 
@@ -159,7 +159,7 @@ extension InputHandlerProtocol {
     // 該情境本即既有語義（見 `MixedAlphanumericalTypewriter` 之
     // `commitsWholeMixedBufferOnSpace`）。
     if isShiftHeld { return .asciiCommitEscape }
-    return mixedAlnumPendingReading != nil ? .levelToneConfirmation : .none
+    return mixedAlnumPendingReading != nil ? .firstToneConfirmation : .none
   }
 
   /// 混打緩衝是否為「**恰為**一個尚未鍵入聲調之讀音」——**不拘狂打開關**之量測。

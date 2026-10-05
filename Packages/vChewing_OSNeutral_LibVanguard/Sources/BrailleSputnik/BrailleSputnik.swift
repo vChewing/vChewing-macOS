@@ -54,7 +54,7 @@ extension BrailleSputnik {
           convertedStack.append(convertPunctuationToBraille(value))
         } else {
           var key = key.description
-          fixToneOne(target: &key)
+          fixFirstTone(target: &key)
           convertedStack.append(convertPhonabetReadingToBraille(key, value: value))
         }
         processedKeysCount += 1
@@ -62,7 +62,7 @@ extension BrailleSputnik {
         // 這種情形就是詞音配對不一致的典型情形，此時僅處理注音讀音。
         subKeys.forEach { subKey in
           var subKey = subKey.description
-          fixToneOne(target: &subKey)
+          fixFirstTone(target: &subKey)
           convertedStack.append(convertPhonabetReadingToBraille(subKey))
           processedKeysCount += 1
         }
@@ -154,7 +154,7 @@ extension BrailleSputnik {
     }.joined()
   }
 
-  private func fixToneOne(target key: inout String) {
+  private func fixFirstTone(target key: inout String) {
     for char in key {
       guard Tekkon.Phonabet(char.description).type != .null else { return }
     }

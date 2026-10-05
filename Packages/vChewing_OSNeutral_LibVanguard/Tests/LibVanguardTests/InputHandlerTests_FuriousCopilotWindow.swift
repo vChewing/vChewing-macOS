@@ -1400,7 +1400,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 得 `["ㄋㄧ"]` ＋ 遞交 `su `），遂令陰平無從指定。修正後之語義與純狂打同源：把該
   /// 讀音之**整組聲調變體桶**插入組字器、不覆寫，故語言模型得於窗內自行挑調。
   @Test("[IH527] 混打＋注音狂打：空格以陰平確認待調讀音")
-  func test_IH527_MixedAlnumSpaceConfirmsPendingReadingWithLevelTone() throws {
+  func test_IH527_MixedAlnumSpaceConfirmsPendingReadingWithFirstTone() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1529,7 +1529,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 本靶只驗「該音節被陰平地消費」與「窗內當前候選未被寫死」；字詞層之取捨見 `IH531`
   /// （該靶以真語料庫之權重為據，測試辭典之 ㄋㄧ 族與真者不同）。
   @Test("[IH530] 注音狂打：空格為陰平鍵、不兼任 copilot 候選之確認")
-  func test_IH530_SpaceIsLevelToneNotCandidateConfirmation() throws {
+  func test_IH530_SpaceIsFirstToneNotCandidateConfirmation() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1568,7 +1568,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 陰平被確認後，組句**只**能在 `ㄋㄧ` 一族內挑字 ⇒ 得妮；若插入整組聲調變體桶，
   /// 則由分數更高之 ㄋㄧˇ 之你勝出（此即修正前之實況）。
   @Test("[IH531] 混打＋注音狂打：`su ` 以真語料庫之陰平單字為準（妮）")
-  func test_IH531_LevelTonePinsReadingToFirstTone() throws {
+  func test_IH531_SpacePinsReadingToFirstTone() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return

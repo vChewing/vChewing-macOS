@@ -149,14 +149,14 @@ struct LXCoreEXTests {
     pureAlnum.convertToPhonabets()
     #expect(pureAlnum == "ba")
 
-    // 空格替換：newToneOne 為空時刪除空格。
+    // 空格替換：newFirstTone 為空時刪除空格。
     var spacedPinyin = "ba shi"
     spacedPinyin.convertToPhonabets()
     #expect(spacedPinyin == "ㄅㄚㄕ")
 
-    // 空格替換：newToneOne 非空時替換——即使字串為純注音亦須生效。
+    // 空格替換：newFirstTone 非空時替換——即使字串為純注音亦須生效。
     var spacedBopomofo = "ㄅㄚ ㄕ"
-    spacedBopomofo.convertToPhonabets(newToneOne: "-")
+    spacedBopomofo.convertToPhonabets(newFirstTone: "-")
     #expect(spacedBopomofo == "ㄅㄚ-ㄕ")
 
     // 下劃線鍵（如 NumPad）：照舊早退。

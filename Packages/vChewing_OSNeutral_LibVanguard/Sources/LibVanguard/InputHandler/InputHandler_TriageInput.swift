@@ -61,7 +61,7 @@ extension InputHandlerProtocol {
       // 按空格得 `["ㄋㄧ"]` 之無調桶，而非 `ㄋㄧ`）。故凡緩衝恰為一個待確認之讀音者，
       // 本塊**讓位**：不固化、不早退，逕交下方之鍵碼分診，由打字機以該讀音之**整組聲調
       // 變體桶**完成確認（見 `MixedAlphanumericalTypewriter` 之
-      // `confirmMixedAlnumReadingWithLevelTone`）——與純注音狂打之固化同源。
+      // `confirmMixedAlnumReadingWithFirstTone`）——與純注音狂打之固化同源。
       // 讓位之判準即 `MixedAlnumSpaceDuty`（單一正本），免兩處漂移。
       let solidified = solidifyFuriousFrontReading()
       // 固化成功之判讀依素材之住處分流：拼音側之素材即注拼槽內之字母流 ⇒ 固化成功即令其

@@ -60,15 +60,15 @@ struct TekkonTestsUtilities {
     #expect("abc".swapping("xyz", with: "b") == "abc")
   }
 
-  @Test("[Tekkon] RestoreToneOneInPhona_EdgeCases")
-  func testRestoreToneOneEdgeCases() async throws {
+  @Test("[Tekkon] RestoreFirstToneInPhona_EdgeCases")
+  func testRestoreFirstToneEdgeCases() async throws {
     // 空字串防呆（先前實作會在取用末字時崩潰）。
-    #expect(Tekkon.restoreToneOneInPhona(target: "") == "")
-    #expect(Tekkon.restoreToneOneInPhona(target: "ㄉㄧㄠ") == "ㄉㄧㄠ1")
-    #expect(Tekkon.restoreToneOneInPhona(target: "ㄉㄧㄠˋ") == "ㄉㄧㄠˋ")
-    #expect(Tekkon.restoreToneOneInPhona(target: "ㄉㄧㄠ˙") == "ㄉㄧㄠ˙")
+    #expect(Tekkon.restoreFirstToneInPhona(target: "") == "")
+    #expect(Tekkon.restoreFirstToneInPhona(target: "ㄉㄧㄠ") == "ㄉㄧㄠ1")
+    #expect(Tekkon.restoreFirstToneInPhona(target: "ㄉㄧㄠˋ") == "ㄉㄧㄠˋ")
+    #expect(Tekkon.restoreFirstToneInPhona(target: "ㄉㄧㄠ˙") == "ㄉㄧㄠ˙")
     // 含底線時不恢復陰平。
-    #expect(Tekkon.restoreToneOneInPhona(target: "ㄉ_ㄠ") == "ㄉ_ㄠ")
+    #expect(Tekkon.restoreFirstToneInPhona(target: "ㄉ_ㄠ") == "ㄉ_ㄠ")
   }
 
   @Test("[Tekkon] CnvPhonaToHanyuPinyin_FullTableSweep")
@@ -92,7 +92,7 @@ struct TekkonTestsUtilities {
   func testPinyinToPhonaCompound() async throws {
     #expect(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "shang4") == "ㄕㄤˋ")
     #expect(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "zhang1") == "ㄓㄤ")
-    #expect(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "zhang1", newToneOne: " ") == "ㄓㄤ ")
+    #expect(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "zhang1", newFirstTone: " ") == "ㄓㄤ ")
     // 含不允許字元（非半形英數）時放棄轉換、原樣回傳。
     #expect(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "nǐ") == "nǐ")
   }

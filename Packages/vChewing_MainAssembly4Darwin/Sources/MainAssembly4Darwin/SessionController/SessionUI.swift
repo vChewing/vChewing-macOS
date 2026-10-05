@@ -52,7 +52,7 @@ public final class SessionUI: SessionUIProtocol {
     { reading in
       guard !PrefMgr.shared.cassetteEnabled,
             PrefMgr.shared.showHanyuPinyinInCompositionBuffer else { return reading }
-      var converted = Tekkon.restoreToneOneInPhona(target: reading)
+      var converted = Tekkon.restoreFirstToneInPhona(target: reading)
       converted = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: converted)
       return Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: converted)
     }

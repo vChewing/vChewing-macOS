@@ -268,14 +268,14 @@ extension IMEStateParsed {
   ///
   /// - Important: 本處之讀音由組字器之既有鍵推得（標記狀態下之完整讀音），故與
   ///   `convertReadingForHanyuPinyinDisplay(_:isHanyuPinyin:)` **刻意不同**：此處補記陰平
-  ///   （`restoreToneOneInPhona`——該記號正是「完整讀音以無調形態記之」之補正）**且**轉
+  ///   （`restoreFirstToneInPhona`——該記號正是「完整讀音以無調形態記之」之補正）**且**轉
   ///   教材式標調（`cnvHanyuPinyinToTextbookStyle`）。未完成讀音側兩者皆不為（見該函式）。
   static func convertReadingForTooltip(_ neta: String) -> String {
     let prefs = SessionHost.shared.prefs()
     guard !prefs.cassetteEnabled else { return neta }
     if prefs.showHanyuPinyinInCompositionBuffer,
        prefs.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
-      var neta = Tekkon.restoreToneOneInPhona(target: neta)
+      var neta = Tekkon.restoreFirstToneInPhona(target: neta)
       neta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: neta)
       return Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: neta)
     }

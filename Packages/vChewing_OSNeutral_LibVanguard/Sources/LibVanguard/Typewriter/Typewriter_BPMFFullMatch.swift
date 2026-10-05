@@ -519,7 +519,7 @@ extension BPMFFullMatchTypewriter {
 
     // 防禦性轉換：若內容含 ASCII 字母（可能是拼音殘留），嘗試轉為注音
     if keyToNarrate.contains(where: { $0.isASCII && $0.isLetter }) {
-      let converted = Tekkon.cnvHanyuPinyinToPhona(targetJoined: keyToNarrate, newToneOne: "")
+      let converted = Tekkon.cnvHanyuPinyinToPhona(targetJoined: keyToNarrate, newFirstTone: "")
       if !converted.contains(where: { $0.isASCII && $0.isLetter }) {
         keyToNarrate = converted
       } else {

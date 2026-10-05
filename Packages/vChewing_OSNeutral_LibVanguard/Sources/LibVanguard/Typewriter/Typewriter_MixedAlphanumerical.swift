@@ -47,9 +47,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // - Important: 本讓位之其餘各態（ASCII 詞、非讀音之緩衝、已帶聲調者）之空白鍵語義
     //   一字不動，仍走下方既有之分支。
     if input.isSpace,
-       handler.mixedAlnumSpaceDuty(isShiftHeld: input.isShiftHeld) == .levelToneConfirmation,
+       handler.mixedAlnumSpaceDuty(isShiftHeld: input.isShiftHeld) == .firstToneConfirmation,
        let pendingReading = handler.mixedAlnumPendingReading {
-      return confirmMixedAlnumReadingWithLevelTone(pendingReading, session: session)
+      return confirmMixedAlnumReadingWithFirstTone(pendingReading, session: session)
     }
     // 中英混合輸入回退 ＋ 注音狂打：**本拍空格已由分診早段用於固化前方讀音**（見
     // `InputHandler_TriageInput`），此刻緩衝已空、無物可遞交。
@@ -567,7 +567,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   ///   故「定為陰平」＝以該讀音之單鍵寫入；此即 `hasGrams`／`grams` 之精確匹配語義。
   /// - Note: `pendingReading` 之來源已由 `canonicalTonelessZhuyinReading` 證其為一個
   ///   依槽序鍵入之讀音，故其無調形態即該音節之陰平形。
-  private func confirmMixedAlnumReadingWithLevelTone(
+  private func confirmMixedAlnumReadingWithFirstTone(
     _ pendingReading: String,
     session: Session
   )

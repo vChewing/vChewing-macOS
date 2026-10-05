@@ -103,7 +103,7 @@ extension Tekkon {
   /// - Parameters:
   ///   - target: 要拿來做轉換處理的讀音。
   /// - Returns: 經過轉換處理的讀音。
-  public static func restoreToneOneInPhona(
+  public static func restoreFirstToneInPhona(
     target: String
   )
     -> String {
@@ -122,11 +122,11 @@ extension Tekkon {
   /// 該函式用來將漢語拼音轉為注音。
   /// - Parameters:
   ///   - targetJoined: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
-  ///   - newToneOne: 對陰平指定新的標記。預設情況下該標記為空字串。
+  ///   - newFirstTone: 對陰平指定新的標記。預設情況下該標記為空字串。
   /// - Returns: 轉換結果。
   public static func cnvHanyuPinyinToPhona(
     targetJoined: String,
-    newToneOne: String = ""
+    newFirstTone: String = ""
   )
     -> String {
     /// 如果當前內容含有底線或包含任何不在允許列表中的字元（英數、空白、Tab、連字號），則放棄轉換。
@@ -139,7 +139,7 @@ extension Tekkon {
     }
     for key in Tekkon.mapArayuruPinyinIntonation.keys {
       guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
-      result = result.swapping(String(key), with: (key == "1") ? newToneOne : String(value))
+      result = result.swapping(String(key), with: (key == "1") ? newFirstTone : String(value))
     }
     return result
   }

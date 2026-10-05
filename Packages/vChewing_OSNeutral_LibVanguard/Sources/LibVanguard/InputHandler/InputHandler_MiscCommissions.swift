@@ -54,7 +54,7 @@ extension InputHandlerProtocol {
         if !assembler.isEmpty {
           var arrDisplayedTextElements = [String]()
           assembler.actualKeys.forEach { key in
-            arrDisplayedTextElements.append(Tekkon.restoreToneOneInPhona(target: key)) // 恢復陰平標記
+            arrDisplayedTextElements.append(Tekkon.restoreFirstToneInPhona(target: key)) // 恢復陰平標記
           }
           displayedText = arrDisplayedTextElements.joined(separator: "\t")
         }
@@ -117,7 +117,7 @@ extension InputHandlerProtocol {
       if !prefs.cassetteEnabled {
         key =
           prefs.inlineDumpPinyinInLieuOfZhuyin
-            ? Tekkon.restoreToneOneInPhona(target: key) // 恢復陰平標記
+            ? Tekkon.restoreFirstToneInPhona(target: key) // 恢復陰平標記
             : Tekkon.cnvPhonaToTextbookStyle(target: key) // 恢復陰平標記
 
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
