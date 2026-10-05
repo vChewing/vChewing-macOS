@@ -11,6 +11,35 @@ update:
 		./Scripts/vchewing-update-lexicon.swift --path .; \
 	fi
 
+# ── 鍵盤熱鍵使用手冊（`shortcuts.html`）之產製 ──────────────────────
+# 繁體中文之權威原文住官網倉（`vChewing-HomePage.io/manual/shortcuts.md`），本倉之
+# `Sources/vChewingIME_macOS/Resources/shortcuts-src/shortcuts.zh-Hant.md` 為其同步副本；
+# 簡體中文版由該副本推得。詳見 `Scripts/Markdown2HTML/README.md`。
+# 產製器為 Swift 腳本，僅需 `swift` 在 PATH（不參與任何建置）。全程不聯網。
+SHORTCUTS_GENERATOR ?= ./Scripts/Markdown2HTML/generate-shortcuts.swift
+SHORTCUTS_HOMEPAGE ?= ../../../vChewing-HomePage.io
+
+.PHONY: shortcuts shortcutsCheck shortcutsList
+shortcuts:
+	@export LC_ALL=C; \
+	if [ -d "$(SHORTCUTS_HOMEPAGE)" ]; then \
+		"$(SHORTCUTS_GENERATOR)" --homepage "$(SHORTCUTS_HOMEPAGE)"; \
+	else \
+		echo "注意：官網倉不在 $(SHORTCUTS_HOMEPAGE)，改用本倉之同步副本。"; \
+		"$(SHORTCUTS_GENERATOR)"; \
+	fi
+
+shortcutsCheck:
+	@export LC_ALL=C; \
+	if [ -d "$(SHORTCUTS_HOMEPAGE)" ]; then \
+		"$(SHORTCUTS_GENERATOR)" --check --homepage "$(SHORTCUTS_HOMEPAGE)"; \
+	else \
+		"$(SHORTCUTS_GENERATOR)" --check; \
+	fi
+
+shortcutsList:
+	@export LC_ALL=C; "$(SHORTCUTS_GENERATOR)" --list
+
 ifdef ARCHS
 BUILD_SETTINGS += ARCHS="$(ARCHS)"
 BUILD_SETTINGS += ONLY_ACTIVE_ARCH=NO
