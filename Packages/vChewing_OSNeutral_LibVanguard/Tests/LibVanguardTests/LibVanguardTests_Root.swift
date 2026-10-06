@@ -29,7 +29,8 @@ import Testing
 ///   不得留下「等等才會落定」的非同步尾巴。生產碼已把它與測試模式綁定
 ///   （`resetSharedResources()`／`applyEnvironmentDefaults()` 皆寫 `= !UserDefaults.pendingUnitTests`，
 ///   故單元測試下恆為 `false`）；**測試若自行改動此開關，必須以 `defer` 還原原值**
-///   （見 `InputHandlerTests_Cases1` 之九處、`LXFacadeTests`、`LXFacade_TextMapTests`、`SessionTests_Basics`）。
+///   （見 `InputHandlerTests_Cassette` 之九處、`InputHandlerTests_MixedAlnum`、
+///   `LXFacadeTests`、`LXFacade_TextMapTests`、`SessionTests_Basics`）。
 ///   **不得**為了「測到非同步路徑」而在單元測試中把它設成 `true`。
 @Suite("LibVanguardTestsRoot", .serialized)
 final class LibVanguardTestsRoot {}

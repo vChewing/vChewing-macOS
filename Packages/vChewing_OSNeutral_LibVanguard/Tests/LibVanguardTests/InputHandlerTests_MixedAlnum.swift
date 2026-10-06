@@ -5,7 +5,6 @@
 import Foundation
 import Homa
 import LXAssemblyMaterials4Tests
-
 import Shared
 import Testing
 
@@ -14,7 +13,9 @@ import HomaSharedTestComponents
 @testable import LibVanguard
 @testable import Tekkon
 
-// MARK: - 測試案例 Vol 4 (Mixed Alphanumerical Mode)
+// 中英混打：緩衝分流、auto-split、標點語義、英數閂滯、空白鍵語義與槽序檢定。
+
+// MARK: - IH.MixedAlnum
 
 extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: - Izanami Tests
@@ -28,11 +29,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///   - thePrefix: 要測試的前綴。
   ///   - parser: 要測試的 Tekkon 注音排列（僅限靜態排列）。
   /// - Warning: This unit test case is not designed for dynamic phonabet layouts.
-  @Test(arguments: ["", "ai", "ello", "cOS"], [
+  @Test("IH-MixedAlnum-001 Mixed alnum kanji input test (Izanami)", arguments: ["", "ai", "ello", "cOS"], [
     ("Dachen", Tekkon.MandarinParser.ofDachen, Tekkon.mapQwertyDachen),
     ("ETen", Tekkon.MandarinParser.ofETen, Tekkon.mapQwertyETenTraditional),
   ])
-  func test_IH400_MixedAlnumKanjiInputTest_Izanami(
+  func test_IH_MixedAlnum_001_MixedAlnumKanjiInputTestIzanami(
     _ thePrefix: String,
     _ parserConfig: (String, Tekkon.MandarinParser, [Unicode.Scalar: Unicode.Scalar])
   ) throws {
@@ -205,48 +206,37 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: Group A — Mixed Buffer Exit Paths
 
-  fileprivate struct MixedBufferExitScenario: Sendable {
-    let id: String
-    let input: String
-    let exitKeyCode: UInt16
-    let expectedBufferAfterInput: String
-    let expectedCommission: String
-    let expectedBufferAfterExit: String
-    let escToCleanInputBuffer: Bool
-    let expectedStateRawValue: String?
-  }
-
-  @Test(arguments: [
+  @Test("IH-MixedAlnum-002 Mixed buffer exit paths", arguments: [
     MixedBufferExitScenario(
-      id: "IH401A", input: "a=",
+      id: "IH-MixedAlnum-002.A", input: "a=",
       exitKeyCode: KeyCode.kLineFeed.rawValue,
       expectedBufferAfterInput: "", expectedCommission: "a＝",
       expectedBufferAfterExit: "", escToCleanInputBuffer: true,
       expectedStateRawValue: .none
     ),
     MixedBufferExitScenario(
-      id: "IH401B", input: "u.",
+      id: "IH-MixedAlnum-002.B", input: "u.",
       exitKeyCode: KeyCode.kBackSpace.rawValue,
       expectedBufferAfterInput: "u.", expectedCommission: "",
       expectedBufferAfterExit: "u", escToCleanInputBuffer: true,
       expectedStateRawValue: .none
     ),
     MixedBufferExitScenario(
-      id: "IH401C", input: "abc",
+      id: "IH-MixedAlnum-002.C", input: "abc",
       exitKeyCode: KeyCode.kEscape.rawValue,
       expectedBufferAfterInput: "abc", expectedCommission: "",
       expectedBufferAfterExit: "", escToCleanInputBuffer: false,
       expectedStateRawValue: "Empty"
     ),
     MixedBufferExitScenario(
-      id: "IH401D", input: "abc",
+      id: "IH-MixedAlnum-002.D", input: "abc",
       exitKeyCode: KeyCode.kLineFeed.rawValue,
       expectedBufferAfterInput: "abc", expectedCommission: "abc",
       expectedBufferAfterExit: "", escToCleanInputBuffer: true,
       expectedStateRawValue: .none
     ),
   ])
-  private func test_IH401_MixedBufferExitPaths(_ s: MixedBufferExitScenario) throws {
+  private func test_IH_MixedAlnum_002_MixedBufferExitPaths(_ s: MixedBufferExitScenario) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.escToCleanInputBuffer = s.escToCleanInputBuffer
 
@@ -266,11 +256,1323 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
   }
 
+  /// 測試中英混打模式下，Space 鍵應走注音提交路徑而非 commit ASCII 讀音字串。
+  /// 驗證修正前的 bug：「ㄐㄧ 」(Dachen: r+u+Space) 會直接 commit "ㄐㄧ " 純讀音字串。
+  /// 修正後：Space 按下時若 composer 有注音內容，應交由 BPMFFullMatchTypewriter 處理，
+  /// 進而 commit 對應漢字，而非 ASCII buffer 原文。
+  @Test("IH-MixedAlnum-003 Mixed Space phonetic commit")
+  func test_IH_MixedAlnum_003_MixedSpacePhoneticCommit() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    typeSentence("ru ")
+
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    let commissioned = testSession.recentCommissions.joined()
+    #expect(!commissioned.contains("ㄐ"), "Space 不應 commit 讀音字串，但得到：\(commissioned)")
+  }
+
+  /// Shift + 英文字開頭（大寫）在混輸模式下應保留 ASCII 大寫，
+  /// 不得被誤送去注音路徑導致如 "This" -> "Tㄘㄛ"。
+  @Test("IH-MixedAlnum-004 Mixed uppercase lead stays ASCII")
+  func test_IH_MixedAlnum_004_MixedUppercaseLeadStaysASCII() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    typeSentence("This")
+
+    #expect(testHandler.mixedAlphanumericalBuffer == "This")
+    #expect(testHandler.generateStateOfInputting().displayedText == "This")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "This")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  /// 中英連打時，若組字區已有中文，
+  /// 應可依觸發鍵（Enter / Space）一次提交「中文 + ASCII」。
+  @Test("IH-MixedAlnum-005 Mixed commit Chinese plus ASCII by Enter or Space", arguments: [
+    (
+      id: "IH-MixedAlnum-005.A",
+      typing: "code",
+      triggerEnter: true,
+      expectedBuffer: "code",
+      expectedCommission: "咱地code"
+    ),
+    (id: "IH-MixedAlnum-005.B", typing: "aq ", triggerEnter: false, expectedBuffer: "", expectedCommission: "咱地aq "),
+  ])
+  func test_IH_MixedAlnum_005_MixedCommitChinesePlusASCIIByEnterOrSpace(
+    _ scenario: (id: String, typing: String, triggerEnter: Bool, expectedBuffer: String, expectedCommission: String)
+  ) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
+    defer { cleanup(); testHandler.clear() }
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    typeSentence(scenario.typing)
+    #expect(testHandler.mixedAlphanumericalBuffer == scenario.expectedBuffer, "\(scenario.id) buffer mismatch")
+
+    if scenario.triggerEnter {
+      #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    }
+
+    #expect(testSession.recentCommissions.joined() == scenario.expectedCommission)
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  /// 英文前綴 + 注音後綴應可自動切分，
+  /// 在後綴成為合法可提交注音時先提交英文前綴，並保留中文於組字區。
+  /// 參數化覆蓋大小寫 ASCII 前綴（`Hellosu3` / `hellosu3`）。
+  @Test("IH-MixedAlnum-006 Mixed auto split ASCII and phonetic suffix", arguments: ["Hellosu3", "hellosu3"])
+  func test_IH_MixedAlnum_006_MixedAutoSplitASCIIAndPhoneticSuffix(_ mixedPrefixInput: String) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let testKanjiData = """
+    ㄋㄧˇ-ㄏㄠˇ 你好 -2
+    ㄋㄧˇ 你 -1
+    ㄋㄧˇ 擬 -1.5
+    ㄧˇ 以 -1
+    ㄏㄠˇ 好 -1
+    ㄏㄠˇ 郝 -1.5
+    """
+    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
+    defer { cleanup(); testHandler.clear() }
+
+    #expect(mixedPrefixInput.hasSuffix("su3"))
+    let expectedASCIIPrefix = String(mixedPrefixInput.dropLast("su3".count))
+
+    typeSentence(mixedPrefixInput)
+
+    #expect(testSession.recentCommissions.joined() == expectedASCIIPrefix)
+    #expect(testHandler.committableDisplayText(sansReading: true) == "你")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    typeSentence("cl3")
+
+    let composedChinese = testHandler.committableDisplayText(sansReading: true)
+    #expect(!composedChinese.isEmpty)
+    #expect(composedChinese == "你好")
+    #expect(testSession.recentCommissions.joined() == expectedASCIIPrefix)
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == expectedASCIIPrefix + composedChinese)
+  }
+
+  /// 純注音雙音節在 mixed mode 下用 Space 確認後，
+  /// displayText 不得殘留 mixed buffer 內容（例如 `呂方z;`）。
+  @Test("IH-MixedAlnum-007 Mixed pure phonetic Space leaves no ASCII residue")
+  func test_IH_MixedAlnum_007_MixedPurePhoneticSpaceLeavesNoASCIIResidue() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let testKanjiData = """
+    ㄐㄧ 機 -1
+    """
+    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("ru ")
+
+    #expect(testSession.state.displayedText == "機")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  // MARK: Group C1 — Auto-Split with Prior Chinese
+
+  @Test("IH-MixedAlnum-008 Auto split with prior Chinese", arguments: [
+    AutoSplitWithPriorChineseScenario(
+      id: "IH-MixedAlnum-008.A", mixedInput: "xu.6u4Hellod93",
+      expectedCommissions: ["留意", "Hello"], expectedComposedText: "凱",
+      followUpInput: "ek ", expectedComposedTextAfterFollowUp: "凱歌"
+    ),
+    AutoSplitWithPriorChineseScenario(
+      id: "IH-MixedAlnum-008.B", mixedInput: "xu.6u4Thisd93",
+      expectedCommissions: ["留意", "This"], expectedComposedText: "凱",
+      followUpInput: nil, expectedComposedTextAfterFollowUp: nil
+    ),
+  ])
+  private func test_IH_MixedAlnum_008_AutoSplitWithPriorChinese(_ s: AutoSplitWithPriorChineseScenario) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let testKanjiData = s.followUpInput != nil
+      ? """
+      ㄌㄧㄡˊ-ㄧˋ 留意 -2
+      ㄌㄧㄡˊ 留 -1
+      ㄧˋ 意 -1
+      ㄎㄞˇ 凱 -1
+      ㄍㄜ 歌 -1
+      ㄎㄞˇ-ㄍㄜ 凱歌 -2
+      """
+      : """
+      ㄌㄧㄡˊ-ㄧˋ 留意 -2
+      ㄌㄧㄡˊ 留 -1
+      ㄧˋ 意 -1
+      ㄎㄞˇ 凱 -1
+      """
+    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence(s.mixedInput)
+
+    #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions")
+    #expect(testHandler.committableDisplayText(sansReading: true) == s.expectedComposedText, "\(s.id) composed")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    if let followUp = s.followUpInput, let expectedAfter = s.expectedComposedTextAfterFollowUp {
+      typeSentence(followUp)
+      #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions after follow-up")
+      #expect(
+        testHandler.committableDisplayText(sansReading: true) == expectedAfter,
+        "\(s.id) composed after follow-up"
+      )
+      #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    }
+  }
+
+  // MARK: Group C2 — Auto-Split Boundary Cases
+
+  @Test("IH-MixedAlnum-009 Mixed auto split boundary cases", arguments: [
+    AutoSplitBoundaryScenario(
+      id: "IH-MixedAlnum-009.A", input: "Twinsu.4",
+      expectedCommissions: ["Twin"], expectedComposedText: "拗",
+      expectedDisplayMustNotContain: .none,
+      gramSpecs: [
+        GramSpec(rawSequence: "su.4", value: "拗", score: 100),
+        GramSpec(rawSequence: "u.4", value: "又", score: 999),
+      ]
+    ),
+    AutoSplitBoundaryScenario(
+      id: "IH-MixedAlnum-009.B", input: "This5jp3",
+      expectedCommissions: ["This"], expectedComposedText: "準",
+      expectedDisplayMustNotContain: .none,
+      gramSpecs: [
+        GramSpec(rawSequence: "5jp3", value: "準", score: 100),
+        GramSpec(rawSequence: "jp3", value: "穩", score: 999),
+      ]
+    ),
+    AutoSplitBoundaryScenario(
+      id: "IH-MixedAlnum-009.C", input: "thisgjo6",
+      expectedCommissions: ["this"], expectedComposedText: "誰",
+      expectedDisplayMustNotContain: .none,
+      gramSpecs: [
+        GramSpec(rawSequence: "gjo6", value: "誰", score: -2),
+        GramSpec(rawSequence: "jo6", value: "為", score: -2),
+      ]
+    ),
+    AutoSplitBoundaryScenario(
+      id: "IH-MixedAlnum-009.D", input: "?c96",
+      expectedCommissions: [], expectedComposedText: "?還",
+      expectedDisplayMustNotContain: "癌",
+      gramSpecs: [
+        GramSpec(rawSequence: "c96", value: "還", score: 100),
+        GramSpec(rawSequence: "96", value: "癌", score: -1),
+      ]
+    ),
+  ])
+  private func test_IH_MixedAlnum_009_MixedAutoSplitBoundaryCases(_ s: AutoSplitBoundaryScenario) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    for spec in s.gramSpecs {
+      guard let gram = makeTemporaryGram(
+        rawSequence: spec.rawSequence,
+        value: spec.value,
+        score: spec.score,
+        using: testHandler
+      ) else {
+        Issue.record("Failed to create gram for \(spec.rawSequence)")
+        return
+      }
+      testHandler.currentLM.insertTemporaryData(unigram: gram, isFiltering: false)
+    }
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false); testHandler.clear() }
+
+    typeSentence(s.input)
+
+    #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions")
+    let currentDisplay = testHandler.committableDisplayText(sansReading: true)
+    #expect([s.expectedComposedText, "？還"].contains(currentDisplay), "\(s.id) composed: got \(currentDisplay)")
+    if let mustNotContain = s.expectedDisplayMustNotContain {
+      #expect(!currentDisplay.contains(mustNotContain), "\(s.id) should not contain \(mustNotContain)")
+    }
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  // MARK: Group B1 — Space Finalize: Auto-Split with Chinese Suffix
+
+  @Test("IH-MixedAlnum-010 Mixed Space finalize auto split", arguments: [
+    SpaceFinalizeAutoSplitScenario(
+      id: "IH-MixedAlnum-010.A", input: "This5j; ",
+      expectedCommissions: ["This"], expectedComposedText: "裝"
+    ),
+    SpaceFinalizeAutoSplitScenario(
+      id: "IH-MixedAlnum-010.B", input: "this5j; ",
+      expectedCommissions: ["this"], expectedComposedText: "裝"
+    ),
+  ])
+  private func test_IH_MixedAlnum_010_MixedSpaceFinalizeAutoSplit(_ s: SpaceFinalizeAutoSplitScenario) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    guard let gram = makeTemporaryGram(rawSequence: "5j; ", value: "裝", score: 999, using: testHandler) else {
+      Issue.record("Failed to create gram for 5j; ")
+      return
+    }
+    testHandler.currentLM.insertTemporaryData(unigram: gram, isFiltering: false)
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false); testHandler.clear() }
+
+    typeSentence(s.input)
+
+    #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions")
+    #expect(testHandler.committableDisplayText(sansReading: true) == s.expectedComposedText, "\(s.id) composed")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  /// `acceptLeadingIntonations = false` 時，mixed mode 的聲調前置路徑應被封鎖。
+  /// 大千排列下 `3su` = ˇ（前置）+ ㄋ + ㄧ = ㄋㄧˇ（你）；
+  /// 啟用時應進入注音路徑（整段可發音），停用時應作為 ASCII 留在 buffer。
+  @Test("IH-MixedAlnum-011 Mixed leading intonation always blocked regardless of pref")
+  func test_IH_MixedAlnum_011_MixedLeadingIntonationAlwaysBlockedRegardlessOfPref() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    // 先推算 3su（聲調前置）的 reading key
+    var composerNi3 = testHandler.composer
+    composerNi3.clear()
+    composerNi3.receiveSequence("3su", isRomaji: false)
+    #expect(composerNi3.isPronounceable)
+    #expect(composerNi3.hasIntonation())
+    guard let readingKeyNi3 = composerNi3.phonabetKeyForQuery(pronounceableOnly: true) else {
+      Issue.record("reading key for 3su (ㄋㄧˇ) is nil")
+      return
+    }
+
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: [readingKeyNi3], value: "你", score: -2),
+      isFiltering: false
+    )
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+      testHandler.prefs.acceptLeadingIntonations = true
+    }
+
+    // MixedAlnum 永遠不接受聲調前置鍵入，無論 acceptLeadingIntonations 偏好設定為何。
+    // 案例 A：acceptLeadingIntonations = true，3su 仍應留在 ASCII buffer。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.acceptLeadingIntonations = true
+
+    typeSentence("3su")
+
+    #expect(testHandler.mixedAlphanumericalBuffer == "3su")
+    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty)
+
+    // 案例 B：acceptLeadingIntonations = false，3su 同樣留在 ASCII buffer。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.acceptLeadingIntonations = false
+
+    typeSentence("3su")
+
+    #expect(testHandler.mixedAlphanumericalBuffer == "3su")
+    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty)
+
+    // Enter 後應提交原始 ASCII
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
+    #expect(testSession.recentCommissions.joined().contains("3su"))
+  }
+
+  // MARK: Group B2 — Space Finalize: Pure ASCII Word
+
+  @Test("IH-MixedAlnum-012 Mixed Space finalize ASCII word", arguments: [
+    SpaceFinalizeASCIIWordScenario(
+      id: "IH-MixedAlnum-012.A", inputSequence: ["tod "], expectedCommission: "tod "
+    ),
+    SpaceFinalizeASCIIWordScenario(
+      id: "IH-MixedAlnum-012.B", inputSequence: ["film "], expectedCommission: "film "
+    ),
+    SpaceFinalizeASCIIWordScenario(
+      id: "IH-MixedAlnum-012.C", inputSequence: ["What ", "the", " "], expectedCommission: "What the "
+    ),
+    SpaceFinalizeASCIIWordScenario(
+      id: "IH-MixedAlnum-012.D", inputSequence: ["What the ", "hell", " "], expectedCommission: "What the hell "
+    ),
+  ])
+  private func test_IH_MixedAlnum_012_MixedSpaceFinalizeASCIIWord(_ s: SpaceFinalizeASCIIWordScenario) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    for step in s.inputSequence {
+      typeSentence(step)
+    }
+    #expect(testSession.recentCommissions.joined() == s.expectedCommission, "\(s.id) commission")
+    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty, "\(s.id) composer should be empty")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "\(s.id) buffer should be empty")
+  }
+
+  /// 符號字元在 mixed mode 下應保留可見字面語義。
+  @Test("IH-MixedAlnum-013 Mixed symbol keeps visible semantics")
+  func test_IH_MixedAlnum_013_MixedSymbolKeepsVisibleSemantics() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("!")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.generateStateOfInputting().displayedText == "！")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "！")
+  }
+
+  /// 符號串在 mixed mode 下應維持 ASCII 提交，不得被誤導到注音路徑。
+  @Test("IH-MixedAlnum-014 Mixed symbol sequence commits as ASCII")
+  func test_IH_MixedAlnum_014_MixedSymbolSequenceCommitsAsASCII() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("!@#$")
+
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "！＠＃＄")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  /// 中英混輸後接符號，Enter 應提交中文 + ASCII（含符號）而不污染 composer。
+  @Test("IH-MixedAlnum-015 Mixed Enter commits Chinese plus symbol ASCII")
+  func test_IH_MixedAlnum_015_MixedEnterCommitsChinesePlusSymbolASCII() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    typeSentence("!")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "咱地！")
+  }
+
+  /// 數字鍵與符號字元應保留不同語義（1 != !）。
+  @Test("IH-MixedAlnum-016 Mixed digit and symbol stay distinct")
+  func test_IH_MixedAlnum_016_MixedDigitAndSymbolStayDistinct() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("1!")
+
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "1！")
+  }
+
+  /// `=` 存在於 ASCII 前綴時，auto-split 仍可在後綴合法注音處觸發。
+  /// 現行行為會剔除該符號，故先以測試鎖住目前結果。
+  @Test("IH-MixedAlnum-017 Mixed auto split keeps ASCII with equals prefix")
+  func test_IH_MixedAlnum_017_MixedAutoSplitKeepsASCIIWithEqualsPrefix() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄋㄧˇ 你 -1
+    ㄋㄧˇ 擬 -1.5
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("Hello=")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    typeSentence("su3")
+    #expect(testSession.recentCommissions.joined() == "Hello")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "＝你")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+  }
+
+  /// US Keyboard + 大千下，`=` 在 mixed mode 應可保留標點語義。
+  @Test("IH-MixedAlnum-018 Mixed equals key commits as ASCII in US Dachen context")
+  func test_IH_MixedAlnum_018_MixedEqualsKeyCommitsAsASCIIInUSDachenContext() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("a=")
+
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.generateStateOfInputting().displayedText == "＝")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "a＝")
+  }
+
+  /// US Keyboard + 大千下，`\\` 在 mixed mode 應可保留標點語義。
+  @Test("IH-MixedAlnum-019 Mixed backslash key commits as ASCII in US Dachen context")
+  func test_IH_MixedAlnum_019_MixedBackslashKeyCommitsAsASCIIInUSDachenContext() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("a\\")
+
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.generateStateOfInputting().displayedText == "、")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "a、")
+  }
+
+  /// ASCII 片段含 `=` / `\\` 時，mixed mode 提交結果應保持字面一致。
+  @Test("IH-MixedAlnum-020 Mixed ASCII chunks with equals and backslash stay literal")
+  func test_IH_MixedAlnum_020_MixedASCIIChunksWithEqualsAndBackslashStayLiteral() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("abc=def")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined().hasSuffix("abc＝def"))
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("abc\\def")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined().hasSuffix("abc、def"))
+  }
+
+  // MARK: Group E — Option/Shift Orthogonal Paths
+
+  @Test("IH-MixedAlnum-021 Mixed Option+Shift orthogonal paths", arguments: [
+    OptionShiftOrthogonalScenario(
+      id: "IH-MixedAlnum-021.A", keyCode: 24, chars: "≠", charsSansModifiers: "=",
+      isOptionShift: false, expectedCommittedChar: "=",
+      needsDynamicLexiconInjection: true, halfWidthPunctuationEnabled: false
+    ),
+    OptionShiftOrthogonalScenario(
+      id: "IH-MixedAlnum-021.B", keyCode: 18, chars: "¡", charsSansModifiers: "1",
+      isOptionShift: false, expectedCommittedChar: "1",
+      needsDynamicLexiconInjection: false, halfWidthPunctuationEnabled: .none
+    ),
+    OptionShiftOrthogonalScenario(
+      id: "IH-MixedAlnum-021.C", keyCode: 0, chars: "Å", charsSansModifiers: "a",
+      isOptionShift: true, expectedCommittedChar: "A",
+      needsDynamicLexiconInjection: false, halfWidthPunctuationEnabled: .none
+    ),
+    OptionShiftOrthogonalScenario(
+      id: "IH-MixedAlnum-021.D", keyCode: 44, chars: "¿", charsSansModifiers: "/",
+      isOptionShift: true, expectedCommittedChar: "?",
+      needsDynamicLexiconInjection: false, halfWidthPunctuationEnabled: false
+    ),
+  ])
+  private func test_IH_MixedAlnum_021_MixedOptionShiftOrthogonalPaths(_ s: OptionShiftOrthogonalScenario) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    if let hwPref = s.halfWidthPunctuationEnabled {
+      testHandler.prefs.halfWidthPunctuationEnabled = hwPref
+    }
+
+    let event = KBEvent.KeyEventData(
+      flags: s.isOptionShift ? [.option, .shift] : .option,
+      chars: s.chars,
+      charsSansModifiers: s.charsSansModifiers,
+      keyCode: s.keyCode
+    ).asEvent
+
+    if s.needsDynamicLexiconInjection {
+      guard let dynamicKeys = testHandler.punctuationQueryStrings(input: event) else {
+        Issue.record("punctuationQueryStrings returned nil unexpectedly for \(s.id)")
+        return
+      }
+      #expect(!dynamicKeys.isEmpty)
+      let target = "〔Alt等號標點測試〕"
+      let customGrams: [Homa.Gram] = dynamicKeys.map {
+        .init(keyArray: [$0], value: target, score: 999)
+      }
+      customGrams.forEach {
+        testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+      }
+      #expect(dynamicKeys.contains { testHandler.currentLM.hasUnigramsFor(keyArray: [$0]) })
+    }
+
+    typeSentence("abc")
+
+    #expect(event.isOptionHeld)
+    if s.isOptionShift {
+      #expect(event.isShiftHeld)
+    }
+    if s.id == "IH-MixedAlnum-021.B" {
+      #expect(event.isMainAreaNumKey)
+      #expect(event.mainAreaNumKeyChar == s.expectedCommittedChar)
+    }
+
+    #expect(testHandler.triageInput(event: event))
+    #expect(testSession.recentCommissions == ["abc", s.expectedCommittedChar], "\(s.id) commissions")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testSession.state.type == .ofEmpty)
+
+    if s.needsDynamicLexiconInjection {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+  }
+
+  /// 新規格：一般（無修飾鍵）標點 key 在詞庫有命中時，
+  /// mixed mode 應依動態生成 key 判定為 CJK 標點輸入。
+  @Test("IH-MixedAlnum-022 Mixed plain punctuation uses dynamic lexicon key")
+  func test_IH_MixedAlnum_022_MixedPlainPunctuationUsesDynamicLexiconKey() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let target = "〔等號標點測試〕"
+    let plainEqual = KBEvent.KeyEventData(chars: "=", keyCode: 24).asEvent
+    guard let dynamicKeys = testHandler.punctuationQueryStrings(input: plainEqual) else {
+      Issue.record("punctuationQueryStrings returned nil unexpectedly for plain equal key")
+      return
+    }
+    #expect(!dynamicKeys.isEmpty)
+    let customGrams: [Homa.Gram] = dynamicKeys.map {
+      .init(keyArray: [$0], value: target, score: 999)
+    }
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    #expect(dynamicKeys.contains { testHandler.currentLM.hasUnigramsFor(keyArray: [$0]) })
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+
+    typeSentence("abc")
+    #expect(dynamicKeys.contains { testHandler.currentLM.hasUnigramsFor(keyArray: [$0]) })
+    #expect(testHandler.triageInput(event: plainEqual))
+
+    #expect(testSession.recentCommissions.joined() == "abc")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.committableDisplayText(sansReading: true) == target)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "abc" + target)
+  }
+
+  // MARK: Group D — CJK Punctuation vs. Phonetic Key
+
+  @Test("IH-MixedAlnum-023 Mixed punctuation vs phonetic key", arguments: [
+    PunctuationVsPhoneticScenario(
+      id: "IH-MixedAlnum-023.A", priorInput: "z; ",
+      keyCode: .none, chars: .none, target: .none,
+      expectedCommission: "", expectedComposedText: "芳"
+    ),
+    PunctuationVsPhoneticScenario(
+      id: "IH-MixedAlnum-023.B", priorInput: "abc",
+      keyCode: 33, chars: "[", target: "「",
+      expectedCommission: "abc", expectedComposedText: "「"
+    ),
+    PunctuationVsPhoneticScenario(
+      id: "IH-MixedAlnum-023.C", priorInput: "abc",
+      keyCode: 30, chars: "]", target: "」",
+      expectedCommission: "abc", expectedComposedText: "」"
+    ),
+  ])
+  private func test_IH_MixedAlnum_023_MixedPunctuationVsPhoneticKey(_ s: PunctuationVsPhoneticScenario) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    if s.id == "IH-MixedAlnum-023.A" {
+      _ = injectTemporaryGrams(testHandler, "ㄈㄤ 芳 -1")
+    } else if let target = s.target, let keyCode = s.keyCode, let chars = s.chars {
+      let event = KBEvent.KeyEventData(chars: chars, keyCode: keyCode).asEvent
+      guard let dynamicKeys = testHandler.punctuationQueryStrings(input: event) else {
+        Issue.record("punctuationQueryStrings returned nil unexpectedly for \(s.id)")
+        return
+      }
+      #expect(!dynamicKeys.isEmpty)
+      let customGrams: [Homa.Gram] = dynamicKeys.map {
+        .init(keyArray: [$0], value: target, score: 999)
+      }
+      customGrams.forEach {
+        testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+      }
+    }
+
+    typeSentence(s.priorInput)
+
+    if let keyCode = s.keyCode, let chars = s.chars {
+      let event = KBEvent.KeyEventData(chars: chars, keyCode: keyCode).asEvent
+      #expect(testHandler.triageInput(event: event), "\(s.id) punctuation should be handled")
+    }
+
+    #expect(testSession.recentCommissions.joined() == s.expectedCommission, "\(s.id) commission")
+    if s.id == "IH-MixedAlnum-023.A" {
+      #expect(testSession.state.displayedText == s.expectedComposedText, "\(s.id) displayedText")
+    } else {
+      #expect(testHandler.committableDisplayText(sansReading: true) == s.expectedComposedText, "\(s.id) composed")
+    }
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+
+    if s.keyCode != nil {
+      #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+      #expect(
+        testSession.recentCommissions.joined() == s.expectedCommission + s.expectedComposedText,
+        "\(s.id) after Enter"
+      )
+    }
+
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    testHandler.clear()
+  }
+
+  /// symbol menu physical key 不得被 mixed handler 攔截。
+  /// 當 mixed 緩衝非空時，應先提交全部內容，再落入符號選單分流。
+  @Test("IH-MixedAlnum-024 Mixed symbol menu physical key flushes then falls through to menu")
+  func test_IH_MixedAlnum_024_MixedSymbolMenuPhysicalKeyFlushesThenFallsThroughToMenu() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("abc")
+    #expect(testHandler.mixedAlphanumericalBuffer == "abc")
+
+    let symbolMenuEvent = KBEvent.KeyEventData.symbolMenuKeyEventIntl.asEvent
+    #expect(symbolMenuEvent.isSymbolMenuPhysicalKey)
+    #expect(testHandler.triageInput(event: symbolMenuEvent))
+
+    #expect(testSession.recentCommissions.joined() == "abc")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testSession.state.type == .ofSymbolTable)
+  }
+
+  /// 若 key event 只帶 base glyph（`/`）但同時有 Shift，
+  /// mixed mode 應仍保留可見語義 `?`，不得退化成 `/`。
+  @Test("IH-MixedAlnum-025 Mixed Shift slash keeps question mark visible semantics")
+  func test_IH_MixedAlnum_025_MixedShiftSlashKeepsQuestionMarkVisibleSemantics() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentence("What")
+    let shiftSlash = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "/",
+      charsSansModifiers: "/",
+      keyCode: 44
+    ).asEvent
+    #expect(shiftSlash.isShiftHeld)
+    #expect(shiftSlash.text == "/")
+    #expect(shiftSlash.inputTextIgnoringModifiers == "/")
+
+    #expect(testHandler.triageInput(event: shiftSlash))
+    #expect(testHandler.mixedAlphanumericalBuffer == "What?")
+    #expect(!testHandler.mixedAlphanumericalBuffer.hasSuffix("/"))
+
+    let displayed = testHandler.generateStateOfInputting().displayedText
+    #expect(displayed.hasSuffix("?") || displayed.hasSuffix("？"))
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    let commissioned = testSession.recentCommissions.joined()
+    #expect(!commissioned.contains("What/"))
+    #expect(commissioned.contains("What?") || commissioned.contains("What？"))
+  }
+
+  // MARK: Group F — Phase 55 Leading Digit / Shift ASCII Block
+
+  /// 純數字鍵在 mixed mode 下不得被 composer 吸收為注音聲調。
+  @Test("IH-MixedAlnum-026 Mixed leading digit blocked from composer")
+  func test_IH_MixedAlnum_026_MixedLeadingDigitBlockedFromComposer() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+
+    let digit4 = KBEvent.KeyEventData(chars: "4", keyCode: 21).asEvent
+    #expect(testHandler.triageInput(event: digit4))
+    #expect(testHandler.mixedAlphanumericalBuffer == "4")
+    #expect(testHandler.composer.isEmpty, "數字 4 不得被 composer 吸收")
+
+    let g = KBEvent.KeyEventData(chars: "g", keyCode: 5).asEvent
+    #expect(testHandler.triageInput(event: g))
+    #expect(testHandler.mixedAlphanumericalBuffer == "4g")
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  /// Shift+數字鍵在 mixed mode 下不得被 composer 吸收。
+  @Test("IH-MixedAlnum-027 Mixed Shift digit blocked from composer")
+  func test_IH_MixedAlnum_027_MixedShiftDigitBlockedFromComposer() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+
+    let shift4 = KBEvent.KeyEventData(
+      flags: .shift, chars: "4", charsSansModifiers: "4", keyCode: 21
+    ).asEvent
+    #expect(testHandler.triageInput(event: shift4))
+    #expect(!testHandler.composer.isEmpty == false, "Shift+數字不得被 composer 吸收")
+    #expect(testHandler.mixedAlphanumericalBuffer == "$" || testHandler.mixedAlphanumericalBuffer == "4")
+  }
+
+  /// 大寫字母在 mixed mode 下不得被 composer 吸收。
+  @Test("IH-MixedAlnum-028 Mixed uppercase blocked from composer")
+  func test_IH_MixedAlnum_028_MixedUppercaseBlockedFromComposer() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+
+    let shiftG = KBEvent.KeyEventData(
+      flags: .shift, chars: "G", charsSansModifiers: "g", keyCode: 5
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftG))
+    #expect(testHandler.mixedAlphanumericalBuffer == "G")
+    #expect(testHandler.composer.isEmpty, "大寫 G 不得被 composer 吸收")
+  }
+
+  /// leading digit 阻斷後，auto-split 應可正確切分「數字前綴 + 注音後綴」。
+  /// 4 + gj;3 → 4 + 爽
+  @Test("IH-MixedAlnum-029 Mixed leading digit auto split with tone")
+  func test_IH_MixedAlnum_029_MixedLeadingDigitAutoSplitWithTone() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄕㄨㄤˇ 爽 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("4gj;3")
+
+    #expect(testSession.recentCommissions.joined() == "4")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "爽")
+  }
+
+  /// leading digit + 大寫字母阻斷後，auto-split 應可正確切分。
+  /// 4G + j;3 → 4G + 往
+  @Test("IH-MixedAlnum-030 Mixed leading digit and uppercase auto split with tone")
+  func test_IH_MixedAlnum_030_MixedLeadingDigitAndUppercaseAutoSplitWithTone() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄨㄤˇ 往 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    // 手動建立事件，模擬 4 → Shift+G → j → ; → 3
+    let events = [
+      KBEvent.KeyEventData(chars: "4", keyCode: 21).asEvent,
+      KBEvent.KeyEventData(flags: .shift, chars: "G", charsSansModifiers: "g", keyCode: 5).asEvent,
+      KBEvent.KeyEventData(chars: "j", keyCode: 38).asEvent,
+      KBEvent.KeyEventData(chars: ";", keyCode: 41).asEvent,
+      KBEvent.KeyEventData(chars: "3", keyCode: 20).asEvent,
+    ]
+    events.forEach { _ = testHandler.triageInput(event: $0) }
+
+    #expect(testSession.recentCommissions.joined() == "4G")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "往")
+  }
+
+  /// 非聲調數字鍵（如大千鍵盤的 5=ㄓ）在 mixed mode 下應被 composer 吸收為注音，
+  /// 不得被誤當 ASCII 前綴阻斷。
+  @Test("IH-MixedAlnum-031 Mixed non-tone digit allowed as phonetic prefix")
+  func test_IH_MixedAlnum_031_MixedNonToneDigitAllowedAsPhoneticPrefix() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄓㄜˋ 這 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("5k4")
+
+    #expect(testSession.recentCommissions.isEmpty, "非聲調數字鍵不應被誤當 ASCII 前綴提交")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "純注音輸入不應殘留 mixed buffer")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "這", "5k4 應為 ㄓㄜˋ=這")
+  }
+
+  // MARK: — camelCase 後綴不得被誤判為注音
+
+  /// camelCase 英文詞中大寫字母不得被 auto-split 誤判為注音後綴。
+  /// 此測試鎖住 bug：`macOS ` 被誤拆成 `ma` + 注音後綴 `OS`。
+  @Test("IH-MixedAlnum-032 Mixed camel case suffix not treated as phonetic")
+  func test_IH_MixedAlnum_032_MixedCamelCaseSuffixNotTreatedAsPhonetic() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    // macOS：大寫後綴 "OS" 不得被當作注音
+    typeSentence("macOS ")
+    #expect(testSession.recentCommissions.joined() == "macOS ")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.composer.isEmpty)
+
+    testHandler.clear()
+    testSession.recentCommissions.removeAll()
+
+    // This：大寫開頭的純 ASCII 單字應維持完整
+    typeSentence("This ")
+    #expect(testSession.recentCommissions.joined() == "This ")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  // MARK: — CamelCase 縮寫作為 ASCII 前綴 + 注音後綴
+
+  /// camelCase 縮寫（如 cOS / macOS）作為 ASCII 前綴時，
+  /// 後續注音輸入應正確拆分，而非整段被當作 ASCII 提交。
+  @Test("IH-MixedAlnum-033 Mixed camel case prefix with phonetic suffix")
+  func test_IH_MixedAlnum_033_MixedCamelCasePrefixWithPhoneticSuffix() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.currentLM.setOptions { cfg in
+      cfg.alwaysSupplyETenDOSUnigrams = true
+    }
+
+    // cOS + ㄆ（Dachen26 鍵序 q ）
+    typeSentence("cOSq ")
+    let allCommissions = testSession.recentCommissions.joined()
+    #expect(allCommissions.contains("cOS"), "cOS prefix should be committed as ASCII")
+    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
+    #expect(testHandler.assembler.actualKeys.last == "ㄆ", "Reading should be ㄆ")
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // macOS + ㄆ（Dachen26 鍵序 q ）
+    typeSentence("macOSq ")
+    let allCommissions2 = testSession.recentCommissions.joined()
+    #expect(allCommissions2.contains("macOS"), "macOS prefix should be committed as ASCII")
+    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
+    #expect(testHandler.assembler.actualKeys.last == "ㄆ", "Reading should be ㄆ")
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // cOS + ㄇㄛ（Dachen26 鍵序 ai ）
+    typeSentence("cOSai ")
+    let allCommissions3 = testSession.recentCommissions.joined()
+    #expect(allCommissions3.contains("cOS"), "cOS prefix should be committed as ASCII")
+    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
+    #expect(testHandler.assembler.actualKeys.last == "ㄇㄛ", "Reading should be ㄇㄛ")
+  }
+
+  /// ETen 傳統佈局下，;、,、. 等符號鍵在 mixed mode 中必須被視為注音鍵，
+  /// 不得被 CJK 標點管線攔截。
+  /// 確認這些按鍵輸入後 assembler 中的讀音完整無損。
+  @Test("IH-MixedAlnum-034 ETen phonetic punctuation keys in mixed mode", arguments: [
+    ("ㄗㄨㄟˋ", ";xq4 "),
+    ("ㄓㄨㄢˇ", ",x83 "),
+    ("ㄔㄨㄢˊ", ".x82 "),
+  ])
+  func test_IH_MixedAlnum_034_EtenPhoneticPunctuationKeysInMixedMode(
+    _ scenario: (reading: String, typing: String)
+  ) throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.keyboardParser = KeyboardParser.ofETen.rawValue
+    testHandler.composer.ensureParser(arrange: .ofETen)
+
+    testHandler.currentLM.setOptions { cfg in
+      cfg.alwaysSupplyETenDOSUnigrams = true
+    }
+    defer { testHandler.clear() }
+
+    typeSentence(scenario.typing)
+
+    // 確認 mixed buffer 為空（標點鍵已被正確當作注音鍵吸收）。
+    #expect(
+      testHandler.mixedAlphanumericalBuffer.isEmpty,
+      "ETen \(scenario.typing.trimmingCharacters(in: .whitespaces)) should not leave ASCII residue"
+    )
+    // 確認 Assembler 中有完整的讀音，未被 auto-split 撕裂。
+    #expect(
+      testHandler.assembler.length == 1,
+      "ETen \(scenario.typing): expected 1 key in assembler, got \(testHandler.assembler.length)"
+    )
+    guard let actualKey = testHandler.assembler.actualKeys.first else {
+      Issue.record("ETen \(scenario.typing): assembler is empty")
+      return
+    }
+    #expect(
+      actualKey == scenario.reading,
+      "ETen \(scenario.typing): expected reading \(scenario.reading), got \(actualKey)"
+    )
+  }
+
+  // MARK: - Ctrl + ASCII pass-through in half-width punctuation mode
+
+  /// 半形標點模式開啓時，Ctrl+ASCII 組合鍵不得被 LibVanguard 攔截。
+  @Test("IH-MixedAlnum-035 Ctrl ASCII passes through in half-width mode")
+  func test_IH_MixedAlnum_035_CtrlASCIIPassesThroughInHalfWidthMode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+
+    // 測試用鍵位：字母、數字、標點、符號各一個
+    let testKeys: [(label: String, chars: String, flags: KBEvent.ModifierFlags)] = [
+      ("Ctrl+A", "A", .control),
+      ("Ctrl+1", "1", .control),
+      ("Ctrl+,", ",", .control),
+      ("Ctrl+.", ".", .control),
+      ("Ctrl+@", "@", .control),
+    ]
+
+    for tc in testKeys {
+      let event = KBEvent.KeyEventData(
+        flags: tc.flags,
+        chars: tc.chars
+      ).asEvent
+      let didConsume = testHandler.triageInput(event: event)
+      #expect(!didConsume, "\(tc.label): Ctrl+ASCII must not be consumed in half-width mode")
+      testSession.switchState(.ofEmpty())
+    }
+
+    // 確保無修飾鍵的普通標點在同樣環境下仍會被處理。
+    let plainComma = KBEvent.KeyEventData(flags: [], chars: ",").asEvent
+    #expect(testHandler.triageInput(event: plainComma), "Plain comma should still be handled")
+    testSession.switchState(.ofEmpty())
+
+    // 半形模式 + 組字進行中時，Ctrl+ASCII 仍必須被攔截（防干擾組字區）。
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+    testSession.switchState(.ofInputting(displayTextSegments: ["a"], cursor: 1))
+    let ctrlCommaDuringComposing = KBEvent.KeyEventData(flags: .control, chars: ",").asEvent
+    #expect(
+      testHandler.triageInput(event: ctrlCommaDuringComposing),
+      "Ctrl+, during composition must be trapped to protect composing buffer"
+    )
+    testSession.switchState(.ofEmpty())
+
+    // 全形模式（非半形）下，Ctrl+Punctuation 應被標點鏈路命中、予以攔截。
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    let ctrlPeriodFW = KBEvent.KeyEventData(flags: .control, chars: ".").asEvent
+    #expect(
+      testHandler.triageInput(event: ctrlPeriodFW),
+      "Ctrl+. in full-width mode should be consumed by punctuation handler"
+    )
+  }
+
+  // MARK: - Option-based punctuation in full-width mode
+
+  /// 全形模式下，Option+標點應正常命中 _alt_punctuation_ 條目。
+  @Test("IH-MixedAlnum-036 Option punctuation works in full-width mode")
+  func test_IH_MixedAlnum_036_OptionPunctuationWorksInFullWidthMode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+
+    // Option+;
+    let optSemicolon = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
+    #expect(
+      testHandler.triageInput(event: optSemicolon),
+      "Option+; should be consumed by punctuation handler in full-width mode"
+    )
+
+    // Option+'
+    testSession.switchState(.ofEmpty())
+    let optQuote = KBEvent.KeyEventData(flags: .option, chars: "'").asEvent
+    #expect(
+      testHandler.triageInput(event: optQuote),
+      "Option+' should be consumed by punctuation handler in full-width mode"
+    )
+
+    // 半形模式下 Option+; 應放行（無對應 lexicon 條目）。
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+    let optSemicolonHW = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
+    #expect(
+      !testHandler.triageInput(event: optSemicolonHW),
+      "Option+; in half-width mode should pass through (no _half_alt_punctuation_ entry)"
+    )
+  }
+
+  // MARK: - ETen Pure-Digit Sequence Stays ASCII
+
+  /// 倚天傳統佈局下，1-4 為聲調鍵、7-9/0 為韻母鍵，
+  /// 導致純數字序列（如 IP 位址 192.168.100.1）被 auto-split 誤拆為
+  /// 「聲調數字前綴 + 純數字注音後綴」（如 1 + 92=ㄣˊ=嗯）。
+  /// 修復後，開頭有被阻斷鍵且後綴全為 ASCII 數字時不拆分。
+  @Test("IH-MixedAlnum-037 Pure digit sequence stays ASCII", arguments: [
+    ("Dachen", Tekkon.MandarinParser.ofDachen, KeyboardParser.ofStandard.rawValue),
+    ("ETen", Tekkon.MandarinParser.ofETen, KeyboardParser.ofETen.rawValue),
+  ])
+  func test_IH_MixedAlnum_037_PureDigitSequenceStaysASCII(
+    _ label: String,
+    _ mandarinParser: Tekkon.MandarinParser,
+    _ keyboardParserRaw: Int
+  ) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.keyboardParser = keyboardParserRaw
+    testHandler.composer.ensureParser(arrange: mandarinParser)
+    defer { testHandler.clear() }
+
+    // 不注入任何臨時辭典條目，模擬真實使用環境。
+    // 輸入 IP 位址，期望整段保持為 ASCII，不被拆分為注音。
+    typeSentence("192.168.100.1")
+
+    // mixed buffer 應保留完整 ASCII 序列。
+    #expect(
+      testHandler.mixedAlphanumericalBuffer == "192.168.100.1",
+      "\(label): expected buffer to stay ASCII '192.168.100.1', got '\(testHandler.mixedAlphanumericalBuffer)'"
+    )
+    // 不應有任何中文被提交或殘留在 assembler。
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "\(label): should not commit any Chinese text, got \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.isEmpty,
+      "\(label): assembler should be empty, got \(testHandler.assembler.actualKeys)"
+    )
+
+    // 按 Enter 提交 ASCII 序列。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(
+      testSession.recentCommissions.joined() == "192.168.100.1",
+      "\(label): Enter should commit ASCII '192.168.100.1', got \(testSession.recentCommissions.joined())"
+    )
+  }
+
+  // MARK: - Half-width punctuation mode bypasses Option+main-area numerals
+
+  /// 半形標點模式啟用時，Alt(+Shift)+主鍵盤區數字鍵不得被「阿拉伯數字輸入」功能攔截，
+  /// 使當下鍵盤佈局（例如 Ukelele 自訂佈局）在 Option 層定義的字元可以透傳出去；
+  /// 全形（非半形）標點模式下該功能維持不變。
+  @Test("IH-MixedAlnum-038 Option main area numerals bypassed in half-width mode")
+  func test_IH_MixedAlnum_038_OptionMainAreaNumeralsBypassedInHalfWidthMode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testSession.switchState(.ofEmpty())
+
+    let optOneEvent = KBEvent.KeyEventData(
+      flags: .option,
+      chars: "1",
+      charsSansModifiers: "1",
+      keyCode: 18
+    ).asEvent
+    let optShiftOneEvent = KBEvent.KeyEventData(
+      flags: [.option, .shift],
+      chars: "1",
+      charsSansModifiers: "1",
+      keyCode: 18
+    ).asEvent
+
+    testSession.recentCommissions.removeAll()
+
+    // 全形標點模式（半形標點關閉）：Alt(+Shift)+數字鍵仍由數字輸入功能攔截。
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    #expect(
+      testHandler.triageInput(event: optOneEvent),
+      "Alt+數字鍵在全形標點模式下應被數字輸入功能攔截"
+    )
+    // Alt+數字鍵：遞交半形數字。
+    #expect(testSession.recentCommissions.last == "1")
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+    testSession.switchState(.ofEmpty())
+    #expect(
+      testHandler.triageInput(event: optShiftOneEvent),
+      "Alt+Shift+數字鍵在全形標點模式下應被數字輸入功能攔截"
+    )
+    // Alt+Shift+數字鍵：遞交全形數字。
+    #expect(testSession.recentCommissions.last == "１")
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+
+    // 半形標點模式：數字輸入功能被 bypass，按鍵不得被攔截（透傳給鍵盤佈局）、亦不得遞交任何字元。
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+    let commitCountBeforeBypass = testSession.recentCommissions.count
+    #expect(
+      !testHandler.triageInput(event: optOneEvent),
+      "半形標點模式下 Alt+數字鍵不得被數字輸入功能攔截"
+    )
+    #expect(testSession.recentCommissions.count == commitCountBeforeBypass)
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+    testSession.switchState(.ofEmpty())
+    #expect(
+      !testHandler.triageInput(event: optShiftOneEvent),
+      "半形標點模式下 Alt+Shift+數字鍵不得被數字輸入功能攔截"
+    )
+    #expect(testSession.recentCommissions.count == commitCountBeforeBypass)
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+  }
+
+  /// 中英混打模式下，Tooltip 只承載游標最前方正在組裝的注音讀音預覽：
+  /// 混打之 ASCII 原文**不入** Tooltip（其已由組字區之讀音欄全局承載，見 `IH-MixedAlnum-034` 之
+  /// `displayedText`）；注拼槽為空時無讀音可示 ⇒ Tooltip 為空、不顯示。
+  @Test("IH-MixedAlnum-039 Mixed tooltip inline reading preview")
+  func test_IH_MixedAlnum_039_MixedTooltipInlineReadingPreview() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    defer { testHandler.clear() }
+
+    // 以單一注音鍵起頭：buffer 原本為空，故注拼槽必然承接該鍵。
+    typeSentence("a")
+    #expect(testHandler.mixedAlphanumericalBuffer == "a")
+
+    let stateWithReading = testHandler.generateStateOfInputting()
+    #expect(
+      stateWithReading.tooltip == "ㄇ",
+      "Tooltip 應只承載讀音，實際得到：\(stateWithReading.tooltip)"
+    )
+    #expect(
+      stateWithReading.displayedText == "a",
+      "混打之 ASCII 原文應由組字區之讀音欄承載，實際得到：\(stateWithReading.displayedText)"
+    )
+
+    // 大寫字母前導不進注拼槽（見 IH-MixedAlnum-004）⇒ 無讀音可示：Tooltip 為空（原文仍見於讀音欄）。
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("This")
+    #expect(testHandler.mixedAlphanumericalBuffer == "This")
+    let stateWithoutReading = testHandler.generateStateOfInputting()
+    #expect(
+      stateWithoutReading.tooltip.isEmpty,
+      "注拼槽為空時 Tooltip 無讀音可示、不得回退為 ASCII 原文，實際得到：\(stateWithoutReading.tooltip)"
+    )
+    #expect(
+      stateWithoutReading.displayedText == "This",
+      "無讀音時原文仍須見於組字區讀音欄，實際得到：\(stateWithoutReading.displayedText)"
+    )
+  }
+
   /// 中英混打模式下，Option+BkSp 應一次清空整個混輸 ASCII 緩衝區
   /// （即「尚待辨識的英文 buffer」的全部內容），而非僅刪除最末字元。
   /// 不帶 Option 的 BkSp 維持既有之單字元刪除；組字區已組好的中文不受波及。
-  @Test
-  func test_IH436_MixedOptionBackspaceClearsWholeBuffer() throws {
+  @Test("IH-MixedAlnum-040 Mixed Option+Backspace clears whole buffer")
+  func test_IH_MixedAlnum_040_MixedOptionBackspaceClearsWholeBuffer() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
 
     // 路徑一：組字區為空、緩衝區有內容——Option+BkSp 清空整段並退回空狀態。
@@ -312,8 +1614,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// `.ofInputting` 狀態的 `marker` 會被 `getMitigatedState(_:)` 拉平至 `cursor`
   /// （IMK 要求 selectionRange 之長度為 0），故該位置資訊於 Session 層無從回收。
   /// Tooltip 之錨定即以此值為準，詳見 Session 層測試。
-  @Test
-  func test_IH437_CursorPosBehindUnfinishedReadingCarriedInState() throws {
+  @Test("IH-MixedAlnum-041 Cursor position behind the unfinished reading is carried in the state")
+  func test_IH_MixedAlnum_041_CursorPosBehindUnfinishedReadingCarriedInState() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
 
     // 路徑一：混輸、組字區無中文——未完成讀音自組字區最前方起算。
@@ -389,1420 +1691,14 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.mixedAlphanumericalEnabled = true
   }
 
-  /// 測試中英混打模式下，Space 鍵應走注音提交路徑而非 commit ASCII 讀音字串。
-  /// 驗證修正前的 bug：「ㄐㄧ 」(Dachen: r+u+Space) 會直接 commit "ㄐㄧ " 純讀音字串。
-  /// 修正後：Space 按下時若 composer 有注音內容，應交由 BPMFFullMatchTypewriter 處理，
-  /// 進而 commit 對應漢字，而非 ASCII buffer 原文。
-  @Test
-  func test_IH402_MixedSpacePhoneticCommit() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-
-    typeSentence("ru ")
-
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    let commissioned = testSession.recentCommissions.joined()
-    #expect(!commissioned.contains("ㄐ"), "Space 不應 commit 讀音字串，但得到：\(commissioned)")
-  }
-
-  /// Shift + 英文字開頭（大寫）在混輸模式下應保留 ASCII 大寫，
-  /// 不得被誤送去注音路徑導致如 "This" -> "Tㄘㄛ"。
-  @Test
-  func test_IH403_MixedUppercaseLeadStaysASCII() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-
-    typeSentence("This")
-
-    #expect(testHandler.mixedAlphanumericalBuffer == "This")
-    #expect(testHandler.generateStateOfInputting().displayedText == "This")
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "This")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  /// 中英混打模式下，Tooltip 只承載游標最前方正在組裝的注音讀音預覽：
-  /// 混打之 ASCII 原文**不入** Tooltip（其已由組字區之讀音欄全局承載，見 `IH430` 之
-  /// `displayedText`）；注拼槽為空時無讀音可示 ⇒ Tooltip 為空、不顯示。
-  @Test
-  func test_IH435_MixedTooltipInlineReadingPreview() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    defer { testHandler.clear() }
-
-    // 以單一注音鍵起頭：buffer 原本為空，故注拼槽必然承接該鍵。
-    typeSentence("a")
-    #expect(testHandler.mixedAlphanumericalBuffer == "a")
-
-    let stateWithReading = testHandler.generateStateOfInputting()
-    #expect(
-      stateWithReading.tooltip == "ㄇ",
-      "Tooltip 應只承載讀音，實際得到：\(stateWithReading.tooltip)"
-    )
-    #expect(
-      stateWithReading.displayedText == "a",
-      "混打之 ASCII 原文應由組字區之讀音欄承載，實際得到：\(stateWithReading.displayedText)"
-    )
-
-    // 大寫字母前導不進注拼槽（見 IH403）⇒ 無讀音可示：Tooltip 為空（原文仍見於讀音欄）。
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("This")
-    #expect(testHandler.mixedAlphanumericalBuffer == "This")
-    let stateWithoutReading = testHandler.generateStateOfInputting()
-    #expect(
-      stateWithoutReading.tooltip.isEmpty,
-      "注拼槽為空時 Tooltip 無讀音可示、不得回退為 ASCII 原文，實際得到：\(stateWithoutReading.tooltip)"
-    )
-    #expect(
-      stateWithoutReading.displayedText == "This",
-      "無讀音時原文仍須見於組字區讀音欄，實際得到：\(stateWithoutReading.displayedText)"
-    )
-  }
-
-  /// 中英連打時，若組字區已有中文，
-  /// 應可依觸發鍵（Enter / Space）一次提交「中文 + ASCII」。
-  @Test(arguments: [
-    (id: "IH404A", typing: "code", triggerEnter: true, expectedBuffer: "code", expectedCommission: "咱地code"),
-    (id: "IH404B", typing: "aq ", triggerEnter: false, expectedBuffer: "", expectedCommission: "咱地aq "),
-  ])
-  func test_IH404_MixedCommitChinesePlusASCIIByEnterOrSpace(
-    _ scenario: (id: String, typing: String, triggerEnter: Bool, expectedBuffer: String, expectedCommission: String)
-  ) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let testKanjiData = """
-    ㄗㄚˊ 咱 -1
-    ㄉㄜ˙ 地 -1
-    """
-    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
-    defer { cleanup(); testHandler.clear() }
-
-    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
-    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testSession.switchState(testHandler.generateStateOfInputting())
-
-    typeSentence(scenario.typing)
-    #expect(testHandler.mixedAlphanumericalBuffer == scenario.expectedBuffer, "\(scenario.id) buffer mismatch")
-
-    if scenario.triggerEnter {
-      #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    }
-
-    #expect(testSession.recentCommissions.joined() == scenario.expectedCommission)
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  /// 英文前綴 + 注音後綴應可自動切分，
-  /// 在後綴成為合法可提交注音時先提交英文前綴，並保留中文於組字區。
-  /// 參數化覆蓋大小寫 ASCII 前綴（`Hellosu3` / `hellosu3`）。
-  @Test(arguments: ["Hellosu3", "hellosu3"])
-  func test_IH405_MixedAutoSplitASCIIAndPhoneticSuffix(_ mixedPrefixInput: String) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let testKanjiData = """
-    ㄋㄧˇ-ㄏㄠˇ 你好 -2
-    ㄋㄧˇ 你 -1
-    ㄋㄧˇ 擬 -1.5
-    ㄧˇ 以 -1
-    ㄏㄠˇ 好 -1
-    ㄏㄠˇ 郝 -1.5
-    """
-    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
-    defer { cleanup(); testHandler.clear() }
-
-    #expect(mixedPrefixInput.hasSuffix("su3"))
-    let expectedASCIIPrefix = String(mixedPrefixInput.dropLast("su3".count))
-
-    typeSentence(mixedPrefixInput)
-
-    #expect(testSession.recentCommissions.joined() == expectedASCIIPrefix)
-    #expect(testHandler.committableDisplayText(sansReading: true) == "你")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-
-    typeSentence("cl3")
-
-    let composedChinese = testHandler.committableDisplayText(sansReading: true)
-    #expect(!composedChinese.isEmpty)
-    #expect(composedChinese == "你好")
-    #expect(testSession.recentCommissions.joined() == expectedASCIIPrefix)
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == expectedASCIIPrefix + composedChinese)
-  }
-
-  /// 純注音雙音節在 mixed mode 下用 Space 確認後，
-  /// displayText 不得殘留 mixed buffer 內容（例如 `呂方z;`）。
-  @Test
-  func test_IH406_MixedPurePhoneticSpaceLeavesNoASCIIResidue() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let testKanjiData = """
-    ㄐㄧ 機 -1
-    """
-    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
-    defer { cleanup(); testHandler.clear() }
-
-    typeSentence("ru ")
-
-    #expect(testSession.state.displayedText == "機")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  // MARK: Group C1 — Auto-Split with Prior Chinese
-
-  private struct AutoSplitWithPriorChineseScenario: Sendable {
-    let id: String
-    let mixedInput: String
-    let expectedCommissions: [String]
-    let expectedComposedText: String
-    let followUpInput: String?
-    let expectedComposedTextAfterFollowUp: String?
-  }
-
-  @Test(arguments: [
-    AutoSplitWithPriorChineseScenario(
-      id: "IH407A", mixedInput: "xu.6u4Hellod93",
-      expectedCommissions: ["留意", "Hello"], expectedComposedText: "凱",
-      followUpInput: "ek ", expectedComposedTextAfterFollowUp: "凱歌"
-    ),
-    AutoSplitWithPriorChineseScenario(
-      id: "IH407B", mixedInput: "xu.6u4Thisd93",
-      expectedCommissions: ["留意", "This"], expectedComposedText: "凱",
-      followUpInput: nil, expectedComposedTextAfterFollowUp: nil
-    ),
-  ])
-  private func test_IH407_AutoSplitWithPriorChinese(_ s: AutoSplitWithPriorChineseScenario) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let testKanjiData = s.followUpInput != nil
-      ? """
-      ㄌㄧㄡˊ-ㄧˋ 留意 -2
-      ㄌㄧㄡˊ 留 -1
-      ㄧˋ 意 -1
-      ㄎㄞˇ 凱 -1
-      ㄍㄜ 歌 -1
-      ㄎㄞˇ-ㄍㄜ 凱歌 -2
-      """
-      : """
-      ㄌㄧㄡˊ-ㄧˋ 留意 -2
-      ㄌㄧㄡˊ 留 -1
-      ㄧˋ 意 -1
-      ㄎㄞˇ 凱 -1
-      """
-    let cleanup = injectTemporaryGrams(testHandler, testKanjiData)
-    defer { cleanup(); testHandler.clear() }
-
-    typeSentence(s.mixedInput)
-
-    #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions")
-    #expect(testHandler.committableDisplayText(sansReading: true) == s.expectedComposedText, "\(s.id) composed")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-
-    if let followUp = s.followUpInput, let expectedAfter = s.expectedComposedTextAfterFollowUp {
-      typeSentence(followUp)
-      #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions after follow-up")
-      #expect(
-        testHandler.committableDisplayText(sansReading: true) == expectedAfter,
-        "\(s.id) composed after follow-up"
-      )
-      #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    }
-  }
-
-  // MARK: Group C2 — Auto-Split Boundary Cases
-
-  private struct GramSpec: Sendable {
-    let rawSequence: String
-    let value: String
-    let score: Double
-  }
-
-  private struct AutoSplitBoundaryScenario: Sendable {
-    let id: String
-    let input: String
-    let expectedCommissions: [String]
-    let expectedComposedText: String
-    let expectedDisplayMustNotContain: String?
-    let gramSpecs: [GramSpec]
-  }
-
-  @Test(arguments: [
-    AutoSplitBoundaryScenario(
-      id: "IH408A", input: "Twinsu.4",
-      expectedCommissions: ["Twin"], expectedComposedText: "拗",
-      expectedDisplayMustNotContain: .none,
-      gramSpecs: [
-        GramSpec(rawSequence: "su.4", value: "拗", score: 100),
-        GramSpec(rawSequence: "u.4", value: "又", score: 999),
-      ]
-    ),
-    AutoSplitBoundaryScenario(
-      id: "IH408B", input: "This5jp3",
-      expectedCommissions: ["This"], expectedComposedText: "準",
-      expectedDisplayMustNotContain: .none,
-      gramSpecs: [
-        GramSpec(rawSequence: "5jp3", value: "準", score: 100),
-        GramSpec(rawSequence: "jp3", value: "穩", score: 999),
-      ]
-    ),
-    AutoSplitBoundaryScenario(
-      id: "IH408C", input: "thisgjo6",
-      expectedCommissions: ["this"], expectedComposedText: "誰",
-      expectedDisplayMustNotContain: .none,
-      gramSpecs: [
-        GramSpec(rawSequence: "gjo6", value: "誰", score: -2),
-        GramSpec(rawSequence: "jo6", value: "為", score: -2),
-      ]
-    ),
-    AutoSplitBoundaryScenario(
-      id: "IH408D", input: "?c96",
-      expectedCommissions: [], expectedComposedText: "?還",
-      expectedDisplayMustNotContain: "癌",
-      gramSpecs: [
-        GramSpec(rawSequence: "c96", value: "還", score: 100),
-        GramSpec(rawSequence: "96", value: "癌", score: -1),
-      ]
-    ),
-  ])
-  private func test_IH408_MixedAutoSplitBoundaryCases(_ s: AutoSplitBoundaryScenario) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    for spec in s.gramSpecs {
-      guard let gram = makeTemporaryGram(
-        rawSequence: spec.rawSequence,
-        value: spec.value,
-        score: spec.score,
-        using: testHandler
-      ) else {
-        Issue.record("Failed to create gram for \(spec.rawSequence)")
-        return
-      }
-      testHandler.currentLM.insertTemporaryData(unigram: gram, isFiltering: false)
-    }
-    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false); testHandler.clear() }
-
-    typeSentence(s.input)
-
-    #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions")
-    let currentDisplay = testHandler.committableDisplayText(sansReading: true)
-    #expect([s.expectedComposedText, "？還"].contains(currentDisplay), "\(s.id) composed: got \(currentDisplay)")
-    if let mustNotContain = s.expectedDisplayMustNotContain {
-      #expect(!currentDisplay.contains(mustNotContain), "\(s.id) should not contain \(mustNotContain)")
-    }
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  // MARK: Group B1 — Space Finalize: Auto-Split with Chinese Suffix
-
-  private struct SpaceFinalizeAutoSplitScenario: Sendable {
-    let id: String
-    let input: String
-    let expectedCommissions: [String]
-    let expectedComposedText: String
-  }
-
-  @Test(arguments: [
-    SpaceFinalizeAutoSplitScenario(
-      id: "IH409A", input: "This5j; ",
-      expectedCommissions: ["This"], expectedComposedText: "裝"
-    ),
-    SpaceFinalizeAutoSplitScenario(
-      id: "IH409B", input: "this5j; ",
-      expectedCommissions: ["this"], expectedComposedText: "裝"
-    ),
-  ])
-  private func test_IH409_MixedSpaceFinalizeAutoSplit(_ s: SpaceFinalizeAutoSplitScenario) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    guard let gram = makeTemporaryGram(rawSequence: "5j; ", value: "裝", score: 999, using: testHandler) else {
-      Issue.record("Failed to create gram for 5j; ")
-      return
-    }
-    testHandler.currentLM.insertTemporaryData(unigram: gram, isFiltering: false)
-    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false); testHandler.clear() }
-
-    typeSentence(s.input)
-
-    #expect(testSession.recentCommissions == s.expectedCommissions, "\(s.id) commissions")
-    #expect(testHandler.committableDisplayText(sansReading: true) == s.expectedComposedText, "\(s.id) composed")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  /// `acceptLeadingIntonations = false` 時，mixed mode 的聲調前置路徑應被封鎖。
-  /// 大千排列下 `3su` = ˇ（前置）+ ㄋ + ㄧ = ㄋㄧˇ（你）；
-  /// 啟用時應進入注音路徑（整段可發音），停用時應作為 ASCII 留在 buffer。
-  @Test
-  func test_IH410_MixedLeadingIntonationAlwaysBlockedRegardlessOfPref() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-
-    // 先推算 3su（聲調前置）的 reading key
-    var composerNi3 = testHandler.composer
-    composerNi3.clear()
-    composerNi3.receiveSequence("3su", isRomaji: false)
-    #expect(composerNi3.isPronounceable)
-    #expect(composerNi3.hasIntonation())
-    guard let readingKeyNi3 = composerNi3.phonabetKeyForQuery(pronounceableOnly: true) else {
-      Issue.record("reading key for 3su (ㄋㄧˇ) is nil")
-      return
-    }
-
-    testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: [readingKeyNi3], value: "你", score: -2),
-      isFiltering: false
-    )
-
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.clear()
-      testHandler.prefs.acceptLeadingIntonations = true
-    }
-
-    // MixedAlnum 永遠不接受聲調前置鍵入，無論 acceptLeadingIntonations 偏好設定為何。
-    // 案例 A：acceptLeadingIntonations = true，3su 仍應留在 ASCII buffer。
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.acceptLeadingIntonations = true
-
-    typeSentence("3su")
-
-    #expect(testHandler.mixedAlphanumericalBuffer == "3su")
-    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty)
-
-    // 案例 B：acceptLeadingIntonations = false，3su 同樣留在 ASCII buffer。
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.acceptLeadingIntonations = false
-
-    typeSentence("3su")
-
-    #expect(testHandler.mixedAlphanumericalBuffer == "3su")
-    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty)
-
-    // Enter 後應提交原始 ASCII
-    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
-    #expect(testSession.recentCommissions.joined().contains("3su"))
-  }
-
-  // MARK: Group B2 — Space Finalize: Pure ASCII Word
-
-  private struct SpaceFinalizeASCIIWordScenario: Sendable {
-    let id: String
-    let inputSequence: [String]
-    let expectedCommission: String
-  }
-
-  @Test(arguments: [
-    SpaceFinalizeASCIIWordScenario(
-      id: "IH411A", inputSequence: ["tod "], expectedCommission: "tod "
-    ),
-    SpaceFinalizeASCIIWordScenario(
-      id: "IH411B", inputSequence: ["film "], expectedCommission: "film "
-    ),
-    SpaceFinalizeASCIIWordScenario(
-      id: "IH411C", inputSequence: ["What ", "the", " "], expectedCommission: "What the "
-    ),
-    SpaceFinalizeASCIIWordScenario(
-      id: "IH411D", inputSequence: ["What the ", "hell", " "], expectedCommission: "What the hell "
-    ),
-  ])
-  private func test_IH411_MixedSpaceFinalizeASCIIWord(_ s: SpaceFinalizeASCIIWordScenario) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    for step in s.inputSequence {
-      typeSentence(step)
-    }
-    #expect(testSession.recentCommissions.joined() == s.expectedCommission, "\(s.id) commission")
-    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty, "\(s.id) composer should be empty")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "\(s.id) buffer should be empty")
-  }
-
-  /// 符號字元在 mixed mode 下應保留可見字面語義。
-  @Test
-  func test_IH412_MixedSymbolKeepsVisibleSemantics() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("!")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.generateStateOfInputting().displayedText == "！")
-
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "！")
-  }
-
-  /// 符號串在 mixed mode 下應維持 ASCII 提交，不得被誤導到注音路徑。
-  @Test
-  func test_IH413_MixedSymbolSequenceCommitsAsASCII() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("!@#$")
-
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "！＠＃＄")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  /// 中英混輸後接符號，Enter 應提交中文 + ASCII（含符號）而不污染 composer。
-  @Test
-  func test_IH414_MixedEnterCommitsChinesePlusSymbolASCII() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    let testKanjiData = """
-    ㄗㄚˊ 咱 -1
-    ㄉㄜ˙ 地 -1
-    """
-    let extractedGrams = extractGrams(from: testKanjiData)
-    extractedGrams.forEach {
-      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.clear()
-    }
-
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
-    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testSession.switchState(testHandler.generateStateOfInputting())
-
-    typeSentence("!")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "咱地！")
-  }
-
-  /// 數字鍵與符號字元應保留不同語義（1 != !）。
-  @Test
-  func test_IH415_MixedDigitAndSymbolStayDistinct() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("1!")
-
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "1！")
-  }
-
-  /// `=` 存在於 ASCII 前綴時，auto-split 仍可在後綴合法注音處觸發。
-  /// 現行行為會剔除該符號，故先以測試鎖住目前結果。
-  @Test
-  func test_IH416_MixedAutoSplitKeepsASCIIWithEqualsPrefix() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    let testKanjiData = """
-    ㄋㄧˇ 你 -1
-    ㄋㄧˇ 擬 -1.5
-    """
-    let extractedGrams = extractGrams(from: testKanjiData)
-    extractedGrams.forEach {
-      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.clear()
-    }
-
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("Hello=")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-
-    typeSentence("su3")
-    #expect(testSession.recentCommissions.joined() == "Hello")
-    #expect(testHandler.committableDisplayText(sansReading: true) == "＝你")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-  }
-
-  /// US Keyboard + 大千下，`=` 在 mixed mode 應可保留標點語義。
-  @Test
-  func test_IH417_MixedEqualsKeyCommitsAsASCIIInUSDachenContext() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("a=")
-
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.generateStateOfInputting().displayedText == "＝")
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "a＝")
-  }
-
-  /// US Keyboard + 大千下，`\\` 在 mixed mode 應可保留標點語義。
-  @Test
-  func test_IH418_MixedBackslashKeyCommitsAsASCIIInUSDachenContext() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("a\\")
-
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.generateStateOfInputting().displayedText == "、")
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "a、")
-  }
-
-  /// ASCII 片段含 `=` / `\\` 時，mixed mode 提交結果應保持字面一致。
-  @Test
-  func test_IH419_MixedASCIIChunksWithEqualsAndBackslashStayLiteral() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("abc=def")
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined().hasSuffix("abc＝def"))
-
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("abc\\def")
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined().hasSuffix("abc、def"))
-  }
-
-  // MARK: Group E — Option/Shift Orthogonal Paths
-
-  private struct OptionShiftOrthogonalScenario: Sendable {
-    let id: String
-    let keyCode: UInt16
-    let chars: String
-    let charsSansModifiers: String
-    let isOptionShift: Bool
-    let expectedCommittedChar: String
-    let needsDynamicLexiconInjection: Bool
-    let halfWidthPunctuationEnabled: Bool?
-  }
-
-  @Test(arguments: [
-    OptionShiftOrthogonalScenario(
-      id: "IH420A", keyCode: 24, chars: "≠", charsSansModifiers: "=",
-      isOptionShift: false, expectedCommittedChar: "=",
-      needsDynamicLexiconInjection: true, halfWidthPunctuationEnabled: false
-    ),
-    OptionShiftOrthogonalScenario(
-      id: "IH420B", keyCode: 18, chars: "¡", charsSansModifiers: "1",
-      isOptionShift: false, expectedCommittedChar: "1",
-      needsDynamicLexiconInjection: false, halfWidthPunctuationEnabled: .none
-    ),
-    OptionShiftOrthogonalScenario(
-      id: "IH420C", keyCode: 0, chars: "Å", charsSansModifiers: "a",
-      isOptionShift: true, expectedCommittedChar: "A",
-      needsDynamicLexiconInjection: false, halfWidthPunctuationEnabled: .none
-    ),
-    OptionShiftOrthogonalScenario(
-      id: "IH420D", keyCode: 44, chars: "¿", charsSansModifiers: "/",
-      isOptionShift: true, expectedCommittedChar: "?",
-      needsDynamicLexiconInjection: false, halfWidthPunctuationEnabled: false
-    ),
-  ])
-  private func test_IH420_MixedOptionShiftOrthogonalPaths(_ s: OptionShiftOrthogonalScenario) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    if let hwPref = s.halfWidthPunctuationEnabled {
-      testHandler.prefs.halfWidthPunctuationEnabled = hwPref
-    }
-
-    let event = KBEvent.KeyEventData(
-      flags: s.isOptionShift ? [.option, .shift] : .option,
-      chars: s.chars,
-      charsSansModifiers: s.charsSansModifiers,
-      keyCode: s.keyCode
-    ).asEvent
-
-    if s.needsDynamicLexiconInjection {
-      guard let dynamicKeys = testHandler.punctuationQueryStrings(input: event) else {
-        Issue.record("punctuationQueryStrings returned nil unexpectedly for \(s.id)")
-        return
-      }
-      #expect(!dynamicKeys.isEmpty)
-      let target = "〔Alt等號標點測試〕"
-      let customGrams: [Homa.Gram] = dynamicKeys.map {
-        .init(keyArray: [$0], value: target, score: 999)
-      }
-      customGrams.forEach {
-        testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
-      }
-      #expect(dynamicKeys.contains { testHandler.currentLM.hasUnigramsFor(keyArray: [$0]) })
-    }
-
-    typeSentence("abc")
-
-    #expect(event.isOptionHeld)
-    if s.isOptionShift {
-      #expect(event.isShiftHeld)
-    }
-    if s.id == "IH420B" {
-      #expect(event.isMainAreaNumKey)
-      #expect(event.mainAreaNumKeyChar == s.expectedCommittedChar)
-    }
-
-    #expect(testHandler.triageInput(event: event))
-    #expect(testSession.recentCommissions == ["abc", s.expectedCommittedChar], "\(s.id) commissions")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testSession.state.type == .ofEmpty)
-
-    if s.needsDynamicLexiconInjection {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.clear()
-    }
-  }
-
-  /// 新規格：一般（無修飾鍵）標點 key 在詞庫有命中時，
-  /// mixed mode 應依動態生成 key 判定為 CJK 標點輸入。
-  @Test
-  func test_IH421_MixedPlainPunctuationUsesDynamicLexiconKey() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    let target = "〔等號標點測試〕"
-    let plainEqual = KBEvent.KeyEventData(chars: "=", keyCode: 24).asEvent
-    guard let dynamicKeys = testHandler.punctuationQueryStrings(input: plainEqual) else {
-      Issue.record("punctuationQueryStrings returned nil unexpectedly for plain equal key")
-      return
-    }
-    #expect(!dynamicKeys.isEmpty)
-    let customGrams: [Homa.Gram] = dynamicKeys.map {
-      .init(keyArray: [$0], value: target, score: 999)
-    }
-    customGrams.forEach {
-      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
-    }
-    #expect(dynamicKeys.contains { testHandler.currentLM.hasUnigramsFor(keyArray: [$0]) })
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      testHandler.clear()
-    }
-
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.halfWidthPunctuationEnabled = false
-
-    typeSentence("abc")
-    #expect(dynamicKeys.contains { testHandler.currentLM.hasUnigramsFor(keyArray: [$0]) })
-    #expect(testHandler.triageInput(event: plainEqual))
-
-    #expect(testSession.recentCommissions.joined() == "abc")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.committableDisplayText(sansReading: true) == target)
-
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(testSession.recentCommissions.joined() == "abc" + target)
-  }
-
-  // MARK: Group D — CJK Punctuation vs. Phonetic Key
-
-  private struct PunctuationVsPhoneticScenario: Sendable {
-    let id: String
-    let priorInput: String
-    let keyCode: UInt16?
-    let chars: String?
-    let target: String?
-    let expectedCommission: String
-    let expectedComposedText: String
-  }
-
-  @Test(arguments: [
-    PunctuationVsPhoneticScenario(
-      id: "IH422A", priorInput: "z; ",
-      keyCode: .none, chars: .none, target: .none,
-      expectedCommission: "", expectedComposedText: "芳"
-    ),
-    PunctuationVsPhoneticScenario(
-      id: "IH422B", priorInput: "abc",
-      keyCode: 33, chars: "[", target: "「",
-      expectedCommission: "abc", expectedComposedText: "「"
-    ),
-    PunctuationVsPhoneticScenario(
-      id: "IH422C", priorInput: "abc",
-      keyCode: 30, chars: "]", target: "」",
-      expectedCommission: "abc", expectedComposedText: "」"
-    ),
-  ])
-  private func test_IH422_MixedPunctuationVsPhoneticKey(_ s: PunctuationVsPhoneticScenario) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-
-    if s.id == "IH422A" {
-      _ = injectTemporaryGrams(testHandler, "ㄈㄤ 芳 -1")
-    } else if let target = s.target, let keyCode = s.keyCode, let chars = s.chars {
-      let event = KBEvent.KeyEventData(chars: chars, keyCode: keyCode).asEvent
-      guard let dynamicKeys = testHandler.punctuationQueryStrings(input: event) else {
-        Issue.record("punctuationQueryStrings returned nil unexpectedly for \(s.id)")
-        return
-      }
-      #expect(!dynamicKeys.isEmpty)
-      let customGrams: [Homa.Gram] = dynamicKeys.map {
-        .init(keyArray: [$0], value: target, score: 999)
-      }
-      customGrams.forEach {
-        testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
-      }
-    }
-
-    typeSentence(s.priorInput)
-
-    if let keyCode = s.keyCode, let chars = s.chars {
-      let event = KBEvent.KeyEventData(chars: chars, keyCode: keyCode).asEvent
-      #expect(testHandler.triageInput(event: event), "\(s.id) punctuation should be handled")
-    }
-
-    #expect(testSession.recentCommissions.joined() == s.expectedCommission, "\(s.id) commission")
-    if s.id == "IH422A" {
-      #expect(testSession.state.displayedText == s.expectedComposedText, "\(s.id) displayedText")
-    } else {
-      #expect(testHandler.committableDisplayText(sansReading: true) == s.expectedComposedText, "\(s.id) composed")
-    }
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-
-    if s.keyCode != nil {
-      #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-      #expect(
-        testSession.recentCommissions.joined() == s.expectedCommission + s.expectedComposedText,
-        "\(s.id) after Enter"
-      )
-    }
-
-    testHandler.currentLM.clearTemporaryData(isFiltering: false)
-    testHandler.clear()
-  }
-
-  /// ETen 傳統佈局下，;、,、. 等符號鍵在 mixed mode 中必須被視為注音鍵，
-  /// 不得被 CJK 標點管線攔截。
-  /// 確認這些按鍵輸入後 assembler 中的讀音完整無損。
-  @Test(arguments: [
-    ("ㄗㄨㄟˋ", ";xq4 "),
-    ("ㄓㄨㄢˇ", ",x83 "),
-    ("ㄔㄨㄢˊ", ".x82 "),
-  ])
-  func test_IH430_EtenPhoneticPunctuationKeysInMixedMode(
-    _ scenario: (reading: String, typing: String)
-  ) throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.keyboardParser = KeyboardParser.ofETen.rawValue
-    testHandler.composer.ensureParser(arrange: .ofETen)
-
-    testHandler.currentLM.setOptions { cfg in
-      cfg.alwaysSupplyETenDOSUnigrams = true
-    }
-    defer { testHandler.clear() }
-
-    typeSentence(scenario.typing)
-
-    // 確認 mixed buffer 為空（標點鍵已被正確當作注音鍵吸收）。
-    #expect(
-      testHandler.mixedAlphanumericalBuffer.isEmpty,
-      "ETen \(scenario.typing.trimmingCharacters(in: .whitespaces)) should not leave ASCII residue"
-    )
-    // 確認 Assembler 中有完整的讀音，未被 auto-split 撕裂。
-    #expect(
-      testHandler.assembler.length == 1,
-      "ETen \(scenario.typing): expected 1 key in assembler, got \(testHandler.assembler.length)"
-    )
-    guard let actualKey = testHandler.assembler.actualKeys.first else {
-      Issue.record("ETen \(scenario.typing): assembler is empty")
-      return
-    }
-    #expect(
-      actualKey == scenario.reading,
-      "ETen \(scenario.typing): expected reading \(scenario.reading), got \(actualKey)"
-    )
-  }
-
-  /// symbol menu physical key 不得被 mixed handler 攔截。
-  /// 當 mixed 緩衝非空時，應先提交全部內容，再落入符號選單分流。
-  @Test
-  func test_IH423_MixedSymbolMenuPhysicalKeyFlushesThenFallsThroughToMenu() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("abc")
-    #expect(testHandler.mixedAlphanumericalBuffer == "abc")
-
-    let symbolMenuEvent = KBEvent.KeyEventData.symbolMenuKeyEventIntl.asEvent
-    #expect(symbolMenuEvent.isSymbolMenuPhysicalKey)
-    #expect(testHandler.triageInput(event: symbolMenuEvent))
-
-    #expect(testSession.recentCommissions.joined() == "abc")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testSession.state.type == .ofSymbolTable)
-  }
-
-  /// 若 key event 只帶 base glyph（`/`）但同時有 Shift，
-  /// mixed mode 應仍保留可見語義 `?`，不得退化成 `/`。
-  @Test
-  func test_IH424_MixedShiftSlashKeepsQuestionMarkVisibleSemantics() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-
-    typeSentence("What")
-    let shiftSlash = KBEvent.KeyEventData(
-      flags: .shift,
-      chars: "/",
-      charsSansModifiers: "/",
-      keyCode: 44
-    ).asEvent
-    #expect(shiftSlash.isShiftHeld)
-    #expect(shiftSlash.text == "/")
-    #expect(shiftSlash.inputTextIgnoringModifiers == "/")
-
-    #expect(testHandler.triageInput(event: shiftSlash))
-    #expect(testHandler.mixedAlphanumericalBuffer == "What?")
-    #expect(!testHandler.mixedAlphanumericalBuffer.hasSuffix("/"))
-
-    let displayed = testHandler.generateStateOfInputting().displayedText
-    #expect(displayed.hasSuffix("?") || displayed.hasSuffix("？"))
-
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    let commissioned = testSession.recentCommissions.joined()
-    #expect(!commissioned.contains("What/"))
-    #expect(commissioned.contains("What?") || commissioned.contains("What？"))
-  }
-
-  // MARK: Group F — Phase 55 Leading Digit / Shift ASCII Block
-
-  /// 純數字鍵在 mixed mode 下不得被 composer 吸收為注音聲調。
-  @Test
-  func test_IH425A_MixedLeadingDigitBlockedFromComposer() throws {
-    let (testHandler, _) = try prepareMixedModeHandler()
-
-    let digit4 = KBEvent.KeyEventData(chars: "4", keyCode: 21).asEvent
-    #expect(testHandler.triageInput(event: digit4))
-    #expect(testHandler.mixedAlphanumericalBuffer == "4")
-    #expect(testHandler.composer.isEmpty, "數字 4 不得被 composer 吸收")
-
-    let g = KBEvent.KeyEventData(chars: "g", keyCode: 5).asEvent
-    #expect(testHandler.triageInput(event: g))
-    #expect(testHandler.mixedAlphanumericalBuffer == "4g")
-    #expect(testHandler.composer.isEmpty)
-  }
-
-  /// Shift+數字鍵在 mixed mode 下不得被 composer 吸收。
-  @Test
-  func test_IH425B_MixedShiftDigitBlockedFromComposer() throws {
-    let (testHandler, _) = try prepareMixedModeHandler()
-
-    let shift4 = KBEvent.KeyEventData(
-      flags: .shift, chars: "4", charsSansModifiers: "4", keyCode: 21
-    ).asEvent
-    #expect(testHandler.triageInput(event: shift4))
-    #expect(!testHandler.composer.isEmpty == false, "Shift+數字不得被 composer 吸收")
-    #expect(testHandler.mixedAlphanumericalBuffer == "$" || testHandler.mixedAlphanumericalBuffer == "4")
-  }
-
-  /// 大寫字母在 mixed mode 下不得被 composer 吸收。
-  @Test
-  func test_IH425C_MixedUppercaseBlockedFromComposer() throws {
-    let (testHandler, _) = try prepareMixedModeHandler()
-
-    let shiftG = KBEvent.KeyEventData(
-      flags: .shift, chars: "G", charsSansModifiers: "g", keyCode: 5
-    ).asEvent
-    #expect(testHandler.triageInput(event: shiftG))
-    #expect(testHandler.mixedAlphanumericalBuffer == "G")
-    #expect(testHandler.composer.isEmpty, "大寫 G 不得被 composer 吸收")
-  }
-
-  /// leading digit 阻斷後，auto-split 應可正確切分「數字前綴 + 注音後綴」。
-  /// 4 + gj;3 → 4 + 爽
-  @Test
-  func test_IH426_MixedLeadingDigitAutoSplitWithTone() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let cleanup = injectTemporaryGrams(testHandler, "ㄕㄨㄤˇ 爽 -1")
-    defer { cleanup(); testHandler.clear() }
-
-    typeSentence("4gj;3")
-
-    #expect(testSession.recentCommissions.joined() == "4")
-    #expect(testHandler.committableDisplayText(sansReading: true) == "爽")
-  }
-
-  /// leading digit + 大寫字母阻斷後，auto-split 應可正確切分。
-  /// 4G + j;3 → 4G + 往
-  @Test
-  func test_IH427_MixedLeadingDigitAndUppercaseAutoSplitWithTone() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let cleanup = injectTemporaryGrams(testHandler, "ㄨㄤˇ 往 -1")
-    defer { cleanup(); testHandler.clear() }
-
-    // 手動建立事件，模擬 4 → Shift+G → j → ; → 3
-    let events = [
-      KBEvent.KeyEventData(chars: "4", keyCode: 21).asEvent,
-      KBEvent.KeyEventData(flags: .shift, chars: "G", charsSansModifiers: "g", keyCode: 5).asEvent,
-      KBEvent.KeyEventData(chars: "j", keyCode: 38).asEvent,
-      KBEvent.KeyEventData(chars: ";", keyCode: 41).asEvent,
-      KBEvent.KeyEventData(chars: "3", keyCode: 20).asEvent,
-    ]
-    events.forEach { _ = testHandler.triageInput(event: $0) }
-
-    #expect(testSession.recentCommissions.joined() == "4G")
-    #expect(testHandler.committableDisplayText(sansReading: true) == "往")
-  }
-
-  /// 非聲調數字鍵（如大千鍵盤的 5=ㄓ）在 mixed mode 下應被 composer 吸收為注音，
-  /// 不得被誤當 ASCII 前綴阻斷。
-  @Test
-  func test_IH428_MixedNonToneDigitAllowedAsPhoneticPrefix() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    let cleanup = injectTemporaryGrams(testHandler, "ㄓㄜˋ 這 -1")
-    defer { cleanup(); testHandler.clear() }
-
-    typeSentence("5k4")
-
-    #expect(testSession.recentCommissions.isEmpty, "非聲調數字鍵不應被誤當 ASCII 前綴提交")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "純注音輸入不應殘留 mixed buffer")
-    #expect(testHandler.committableDisplayText(sansReading: true) == "這", "5k4 應為 ㄓㄜˋ=這")
-  }
-
-  // MARK: — camelCase 後綴不得被誤判為注音
-
-  /// camelCase 英文詞中大寫字母不得被 auto-split 誤判為注音後綴。
-  /// 此測試鎖住 bug：`macOS ` 被誤拆成 `ma` + 注音後綴 `OS`。
-  @Test
-  func test_IH429_MixedCamelCaseSuffixNotTreatedAsPhonetic() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-
-    // macOS：大寫後綴 "OS" 不得被當作注音
-    typeSentence("macOS ")
-    #expect(testSession.recentCommissions.joined() == "macOS ")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.composer.isEmpty)
-
-    testHandler.clear()
-    testSession.recentCommissions.removeAll()
-
-    // This：大寫開頭的純 ASCII 單字應維持完整
-    typeSentence("This ")
-    #expect(testSession.recentCommissions.joined() == "This ")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
-    #expect(testHandler.composer.isEmpty)
-  }
-
-  // MARK: — CamelCase 縮寫作為 ASCII 前綴 + 注音後綴
-
-  /// camelCase 縮寫（如 cOS / macOS）作為 ASCII 前綴時，
-  /// 後續注音輸入應正確拆分，而非整段被當作 ASCII 提交。
-  @Test
-  func test_IH430_MixedCamelCasePrefixWithPhoneticSuffix() throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    testHandler.currentLM.setOptions { cfg in
-      cfg.alwaysSupplyETenDOSUnigrams = true
-    }
-
-    // cOS + ㄆ（Dachen26 鍵序 q ）
-    typeSentence("cOSq ")
-    let allCommissions = testSession.recentCommissions.joined()
-    #expect(allCommissions.contains("cOS"), "cOS prefix should be committed as ASCII")
-    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
-    #expect(testHandler.assembler.actualKeys.last == "ㄆ", "Reading should be ㄆ")
-
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-
-    // macOS + ㄆ（Dachen26 鍵序 q ）
-    typeSentence("macOSq ")
-    let allCommissions2 = testSession.recentCommissions.joined()
-    #expect(allCommissions2.contains("macOS"), "macOS prefix should be committed as ASCII")
-    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
-    #expect(testHandler.assembler.actualKeys.last == "ㄆ", "Reading should be ㄆ")
-
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-
-    // cOS + ㄇㄛ（Dachen26 鍵序 ai ）
-    typeSentence("cOSai ")
-    let allCommissions3 = testSession.recentCommissions.joined()
-    #expect(allCommissions3.contains("cOS"), "cOS prefix should be committed as ASCII")
-    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
-    #expect(testHandler.assembler.actualKeys.last == "ㄇㄛ", "Reading should be ㄇㄛ")
-  }
-
-  // MARK: - Fileprivate Helpers.
-
-  fileprivate func prepareMixedModeHandler() throws -> (handler: MockInputHandler, session: MockSession) {
-    guard let testHandler, let testSession else {
-      struct MissingTestFixture: Error {}
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      throw MissingTestFixture()
-    }
-    testHandler.clear()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
-    // 係行程級偏好、會被其他 suite 留下（實測即然）。
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    return (testHandler, testSession)
-  }
-
-  fileprivate func injectTemporaryGrams(_ handler: MockInputHandler, _ kanjiData: String) -> (() -> ()) {
-    let extractedGrams = extractGrams(from: kanjiData)
-    extractedGrams.forEach {
-      handler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
-    }
-    return { handler.currentLM.clearTemporaryData(isFiltering: false) }
-  }
-
-  /// Helper to build a temporary gram from a raw phonabet sequence using the handler's composer config.
-  fileprivate func makeTemporaryGram(
-    rawSequence: String, value: String, score: Double, using handler: MockInputHandler
-  )
-    -> Homa.Gram? {
-    var composer = handler.composer
-    composer.clear()
-    composer.receiveSequence(rawSequence, isRomaji: false)
-    guard composer.isPronounceable, composer.hasIntonation() else { return nil }
-    guard let key = composer.phonabetKeyForQuery(
-      pronounceableOnly: handler.prefs.acceptLeadingIntonations
-    ) else { return nil }
-    return .init(keyArray: [key], value: value, score: score)
-  }
-
-  // MARK: - Ctrl + ASCII pass-through in half-width punctuation mode
-
-  /// 半形標點模式開啓時，Ctrl+ASCII 組合鍵不得被 LibVanguard 攔截。
-  @Test
-  func test_IH431_CtrlASCIIPassesThroughInHalfWidthMode() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testSession.switchState(.ofEmpty())
-    testHandler.prefs.halfWidthPunctuationEnabled = true
-
-    // 測試用鍵位：字母、數字、標點、符號各一個
-    let testKeys: [(label: String, chars: String, flags: KBEvent.ModifierFlags)] = [
-      ("Ctrl+A", "A", .control),
-      ("Ctrl+1", "1", .control),
-      ("Ctrl+,", ",", .control),
-      ("Ctrl+.", ".", .control),
-      ("Ctrl+@", "@", .control),
-    ]
-
-    for tc in testKeys {
-      let event = KBEvent.KeyEventData(
-        flags: tc.flags,
-        chars: tc.chars
-      ).asEvent
-      let didConsume = testHandler.triageInput(event: event)
-      #expect(!didConsume, "\(tc.label): Ctrl+ASCII must not be consumed in half-width mode")
-      testSession.switchState(.ofEmpty())
-    }
-
-    // 確保無修飾鍵的普通標點在同樣環境下仍會被處理。
-    let plainComma = KBEvent.KeyEventData(flags: [], chars: ",").asEvent
-    #expect(testHandler.triageInput(event: plainComma), "Plain comma should still be handled")
-    testSession.switchState(.ofEmpty())
-
-    // 半形模式 + 組字進行中時，Ctrl+ASCII 仍必須被攔截（防干擾組字區）。
-    testHandler.prefs.halfWidthPunctuationEnabled = true
-    testSession.switchState(.ofInputting(displayTextSegments: ["a"], cursor: 1))
-    let ctrlCommaDuringComposing = KBEvent.KeyEventData(flags: .control, chars: ",").asEvent
-    #expect(
-      testHandler.triageInput(event: ctrlCommaDuringComposing),
-      "Ctrl+, during composition must be trapped to protect composing buffer"
-    )
-    testSession.switchState(.ofEmpty())
-
-    // 全形模式（非半形）下，Ctrl+Punctuation 應被標點鏈路命中、予以攔截。
-    testHandler.prefs.halfWidthPunctuationEnabled = false
-    let ctrlPeriodFW = KBEvent.KeyEventData(flags: .control, chars: ".").asEvent
-    #expect(
-      testHandler.triageInput(event: ctrlPeriodFW),
-      "Ctrl+. in full-width mode should be consumed by punctuation handler"
-    )
-  }
-
-  // MARK: - Option-based punctuation in full-width mode
-
-  /// 全形模式下，Option+標點應正常命中 _alt_punctuation_ 條目。
-  @Test
-  func test_IH432_OptionPunctuationWorksInFullWidthMode() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testSession.switchState(.ofEmpty())
-    testHandler.prefs.halfWidthPunctuationEnabled = false
-
-    // Option+;
-    let optSemicolon = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
-    #expect(
-      testHandler.triageInput(event: optSemicolon),
-      "Option+; should be consumed by punctuation handler in full-width mode"
-    )
-
-    // Option+'
-    testSession.switchState(.ofEmpty())
-    let optQuote = KBEvent.KeyEventData(flags: .option, chars: "'").asEvent
-    #expect(
-      testHandler.triageInput(event: optQuote),
-      "Option+' should be consumed by punctuation handler in full-width mode"
-    )
-
-    // 半形模式下 Option+; 應放行（無對應 lexicon 條目）。
-    testSession.switchState(.ofEmpty())
-    testHandler.prefs.halfWidthPunctuationEnabled = true
-    let optSemicolonHW = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
-    #expect(
-      !testHandler.triageInput(event: optSemicolonHW),
-      "Option+; in half-width mode should pass through (no _half_alt_punctuation_ entry)"
-    )
-  }
-
-  // MARK: - Half-width punctuation mode bypasses Option+main-area numerals
-
-  /// 半形標點模式啟用時，Alt(+Shift)+主鍵盤區數字鍵不得被「阿拉伯數字輸入」功能攔截，
-  /// 使當下鍵盤佈局（例如 Ukelele 自訂佈局）在 Option 層定義的字元可以透傳出去；
-  /// 全形（非半形）標點模式下該功能維持不變。
-  @Test
-  func test_IH434_OptionMainAreaNumeralsBypassedInHalfWidthMode() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    testSession.switchState(.ofEmpty())
-
-    let optOneEvent = KBEvent.KeyEventData(
-      flags: .option,
-      chars: "1",
-      charsSansModifiers: "1",
-      keyCode: 18
-    ).asEvent
-    let optShiftOneEvent = KBEvent.KeyEventData(
-      flags: [.option, .shift],
-      chars: "1",
-      charsSansModifiers: "1",
-      keyCode: 18
-    ).asEvent
-
-    testSession.recentCommissions.removeAll()
-
-    // 全形標點模式（半形標點關閉）：Alt(+Shift)+數字鍵仍由數字輸入功能攔截。
-    testHandler.prefs.halfWidthPunctuationEnabled = false
-    #expect(
-      testHandler.triageInput(event: optOneEvent),
-      "Alt+數字鍵在全形標點模式下應被數字輸入功能攔截"
-    )
-    // Alt+數字鍵：遞交半形數字。
-    #expect(testSession.recentCommissions.last == "1")
-    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
-    testSession.switchState(.ofEmpty())
-    #expect(
-      testHandler.triageInput(event: optShiftOneEvent),
-      "Alt+Shift+數字鍵在全形標點模式下應被數字輸入功能攔截"
-    )
-    // Alt+Shift+數字鍵：遞交全形數字。
-    #expect(testSession.recentCommissions.last == "１")
-    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
-
-    // 半形標點模式：數字輸入功能被 bypass，按鍵不得被攔截（透傳給鍵盤佈局）、亦不得遞交任何字元。
-    testSession.switchState(.ofEmpty())
-    testHandler.prefs.halfWidthPunctuationEnabled = true
-    let commitCountBeforeBypass = testSession.recentCommissions.count
-    #expect(
-      !testHandler.triageInput(event: optOneEvent),
-      "半形標點模式下 Alt+數字鍵不得被數字輸入功能攔截"
-    )
-    #expect(testSession.recentCommissions.count == commitCountBeforeBypass)
-    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
-    testSession.switchState(.ofEmpty())
-    #expect(
-      !testHandler.triageInput(event: optShiftOneEvent),
-      "半形標點模式下 Alt+Shift+數字鍵不得被數字輸入功能攔截"
-    )
-    #expect(testSession.recentCommissions.count == commitCountBeforeBypass)
-    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
-
-    testHandler.prefs.halfWidthPunctuationEnabled = false
-  }
-
-  // MARK: - ETen Pure-Digit Sequence Stays ASCII
-
-  /// 倚天傳統佈局下，1-4 為聲調鍵、7-9/0 為韻母鍵，
-  /// 導致純數字序列（如 IP 位址 192.168.100.1）被 auto-split 誤拆為
-  /// 「聲調數字前綴 + 純數字注音後綴」（如 1 + 92=ㄣˊ=嗯）。
-  /// 修復後，開頭有被阻斷鍵且後綴全為 ASCII 數字時不拆分。
-  @Test(arguments: [
-    ("Dachen", Tekkon.MandarinParser.ofDachen, KeyboardParser.ofStandard.rawValue),
-    ("ETen", Tekkon.MandarinParser.ofETen, KeyboardParser.ofETen.rawValue),
-  ])
-  func test_IH433_PureDigitSequenceStaysASCII(
-    _ label: String,
-    _ mandarinParser: Tekkon.MandarinParser,
-    _ keyboardParserRaw: Int
-  ) throws {
-    let (testHandler, testSession) = try prepareMixedModeHandler()
-    testHandler.prefs.keyboardParser = keyboardParserRaw
-    testHandler.composer.ensureParser(arrange: mandarinParser)
-    defer { testHandler.clear() }
-
-    // 不注入任何臨時辭典條目，模擬真實使用環境。
-    // 輸入 IP 位址，期望整段保持為 ASCII，不被拆分為注音。
-    typeSentence("192.168.100.1")
-
-    // mixed buffer 應保留完整 ASCII 序列。
-    #expect(
-      testHandler.mixedAlphanumericalBuffer == "192.168.100.1",
-      "\(label): expected buffer to stay ASCII '192.168.100.1', got '\(testHandler.mixedAlphanumericalBuffer)'"
-    )
-    // 不應有任何中文被提交或殘留在 assembler。
-    #expect(
-      testSession.recentCommissions.isEmpty,
-      "\(label): should not commit any Chinese text, got \(testSession.recentCommissions)"
-    )
-    #expect(
-      testHandler.assembler.isEmpty,
-      "\(label): assembler should be empty, got \(testHandler.assembler.actualKeys)"
-    )
-
-    // 按 Enter 提交 ASCII 序列。
-    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    #expect(
-      testSession.recentCommissions.joined() == "192.168.100.1",
-      "\(label): Enter should commit ASCII '192.168.100.1', got \(testSession.recentCommissions.joined())"
-    )
-  }
-
   // MARK: - 亂序鍵入之 ASCII 判定（引擎層槽序檢定）
 
   /// 純英文字母緩衝若「不可能是一個依注音槽序鍵入的讀音」（鍵序亂序），
   /// 以 Space 確認時應留在 ASCII 路徑，不得被注音吸收為單一音節。
-  /// 判準之權威為引擎層之槽序檢定；同一組鍵位若依槽序鍵入（見 IH439）則仍走注音路徑
+  /// 判準之權威為引擎層之槽序檢定；同一組鍵位若依槽序鍵入（見 IH-MixedAlnum-043）則仍走注音路徑
   /// ——兩者對照即為本判準之界線。
-  @Test(arguments: ["ls", "ln", "lc", "mv"])
-  func test_IH438_MixedOutOfSlotOrderASCIITokenStaysASCII(_ token: String) throws {
+  @Test("IH-MixedAlnum-042 Mixed out-of-slot-order ASCII token stays ASCII", arguments: ["ls", "ln", "lc", "mv"])
+  func test_IH_MixedAlnum_042_MixedOutOfSlotOrderASCIITokenStaysASCII(_ token: String) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     defer { testHandler.clear() }
 
@@ -1827,8 +1723,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 對照組：同樣為兩鍵的純英文字母，但依槽序鍵入者仍應走注音路徑。
-  @Test
-  func test_IH439_MixedInSlotOrderTwoLetterTokenStaysPhonetic() throws {
+  @Test("IH-MixedAlnum-043 Mixed in-slot-order two-letter token stays phonetic")
+  func test_IH_MixedAlnum_043_MixedInSlotOrderTwoLetterTokenStaysPhonetic() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     let cleanup = injectTemporaryGrams(testHandler, "ㄏㄠ 蒿 -1")
     defer { cleanup(); testHandler.clear() }
@@ -1852,11 +1748,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 倚天26 之 `ge`＝ㄐㄧ：鍵 `g` 先寫ㄓ、鍵 `e` 再觸發糾正為ㄐ），
   /// 故不得以「鍵數 == 佔用槽數」判其非單一音節——否則整段會被誤當成 ASCII 而滯留於緩衝。
   /// 本測項斷言該類編碼被注拼槽吸收，與辭典內容無涉。
-  @Test(arguments: [
-    (id: "IH440A", parser: KeyboardParser.ofDachen26, keys: "qquu", expectedReading: "ㄅㄚ"),
-    (id: "IH440B", parser: KeyboardParser.ofETen26, keys: "ge", expectedReading: "ㄐㄧ"),
+  @Test("IH-MixedAlnum-044 Mixed dynamic layout multi-write keys stay phonetic", arguments: [
+    (id: "IH-MixedAlnum-044.A", parser: KeyboardParser.ofDachen26, keys: "qquu", expectedReading: "ㄅㄚ"),
+    (id: "IH-MixedAlnum-044.B", parser: KeyboardParser.ofETen26, keys: "ge", expectedReading: "ㄐㄧ"),
   ])
-  func test_IH440_MixedDynamicLayoutMultiWriteKeysStayPhonetic(
+  func test_IH_MixedAlnum_044_MixedDynamicLayoutMultiWriteKeysStayPhonetic(
     _ scenario: (id: String, parser: KeyboardParser, keys: String, expectedReading: String)
   ) throws {
     guard let testHandler, let testSession else {
@@ -1895,8 +1791,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 前綴 `ai`（＝ㄇㄛ）之後多按一鍵，即應切分為 `ai` + 尾段讀音。
   /// 此即引擎層槽序檢定容忍「同值重寫」、而混打語境不可容忍之處。
   /// 即使 `ㄇㄛˊ` 本身確為辭典條目（此處以高分之臨時條目強化之），仍應切分。
-  @Test
-  func test_IH441_MixedRedundantKeyDemarcatesASCIISuffix() throws {
+  @Test("IH-MixedAlnum-045 Mixed redundant key demarcates ASCII suffix")
+  func test_IH_MixedAlnum_045_MixedRedundantKeyDemarcatesASCIISuffix() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     let cleanup = injectTemporaryGrams(testHandler, "ㄇㄛˊ 模 -999")
     defer { cleanup(); testHandler.clear() }
@@ -1915,32 +1811,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - 英數閂滯狀態（MixedAlnum latched alnum state）
 
-  /// 中英混打模式與英數閂滯開關皆啟用之 handler。
-  ///
-  /// - Parameter statusUI: 若給定，則連帶一個裝有該替身之 `ui` 一併注入 Session，供觀察
-  ///   閂滯 On／Off 之 StatusUI 提示。不給定時一切照舊（Session 之 `ui` 仍為 nil），
-  ///   故其餘既有個案之行為不受影響。
-  fileprivate func prepareLatchedMixedModeHandler(
-    statusUI: MockTooltipUI? = nil
-  )
-    throws -> (handler: MockInputHandler, session: MockSession) {
-    let result = try prepareMixedModeHandler()
-    result.handler.prefs.enableLatchedAlnumStateInMixedAlnumMode = true
-    if let statusUI {
-      let ui = MockSessionUI()
-      ui.statusUI = statusUI
-      result.session.ui = ui
-    }
-    return result
-  }
-
-  private static let latchedReleaseTooltip = "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateReleased".i18n
-  private static let latchedEnteredTooltip = "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateEntered".i18n
-
   /// 閂滯之上鎖與逐鍵即刻遞交：`ls` 之鍵序不可能是一個依槽序鍵入的讀音，
   /// 故第二鍵即應上鎖、並將整段即刻遞交；其後每一顆 ASCII 皆即刻遞交。
-  @Test
-  func test_IH442_LatchedAlnumLatchesAndCommitsPerKey() throws {
+  @Test("IH-MixedAlnum-046 Latched alnum latches and commits per key")
+  func test_IH_MixedAlnum_046_LatchedAlnumLatchesAndCommitsPerKey() throws {
     let statusUI = MockTooltipUI()
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler(statusUI: statusUI)
     defer {
@@ -1987,8 +1861,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 兩開關之四態：閂滯開關僅在母開關亦啟用時才有作用；母開關關閉時，
   /// 閂滯開關之開與關必須產生**完全一致**之結果（本 phase 之首要不變式）。
-  @Test
-  func test_IH443_LatchedAlnumInertUnlessBothSwitchesOn() throws {
+  @Test("IH-MixedAlnum-047 Latched alnum inert unless both switches on")
+  func test_IH_MixedAlnum_047_LatchedAlnumInertUnlessBothSwitchesOn() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     defer {
       testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
@@ -2028,8 +1902,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 四個解除鍵之攔截語意：Enter 解除後放行；BkSp／Delete／Esc 解除且攔截；
   /// Option+BkSp 解除、不攔截。四者皆以 StatusUI 提示告知已解除。
-  @Test(arguments: ["enter", "backspace", "delete", "escape", "optionBackspace"])
-  func test_IH444_LatchedAlnumReleaseKeys(_ keyID: String) throws {
+  @Test(
+    "IH-MixedAlnum-048 Latched alnum release keys",
+    arguments: ["enter", "backspace", "delete", "escape", "optionBackspace"]
+  )
+  func test_IH_MixedAlnum_048_LatchedAlnumReleaseKeys(_ keyID: String) throws {
     let statusUI = MockTooltipUI()
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler(statusUI: statusUI)
     defer {
@@ -2090,8 +1967,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 閂滯於英打時，標點鍵應作半形 ASCII 即刻遞交（規則置於中文標點查詢之前）。
-  @Test
-  func test_IH445_LatchedAlnumCommitsASCIIPunctuation() throws {
+  @Test("IH-MixedAlnum-049 Latched alnum commits ASCII punctuation")
+  func test_IH_MixedAlnum_049_LatchedAlnumCommitsASCIIPunctuation() throws {
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
     defer {
       testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
@@ -2113,8 +1990,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// `resetInputHandler()` 觸發之解除一律靜默（不發內文提示）。
-  @Test
-  func test_IH446_LatchedAlnumReleasedSilentlyByResetInputHandler() throws {
+  @Test("IH-MixedAlnum-050 Latched alnum released silently by reset input handler")
+  func test_IH_MixedAlnum_050_LatchedAlnumReleasedSilentlyByResetInputHandler() throws {
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
     defer {
       testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
@@ -2139,8 +2016,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 兩者之交集（`hel` 之第三鍵以另一鍵覆寫韻母槽，故於第三鍵即上鎖）。
   /// **此為已知取捨**（事主原話：「複寫修正的優先級本來就該低於英文判定」）；
   /// 若日後調整上鎖條件，本測項須一併修訂。
-  @Test
-  func test_IH447_LatchedAlnumLatchPreemptsSubsequentMixedInput() throws {
+  @Test("IH-MixedAlnum-051 Latched alnum latch preempts subsequent mixed input")
+  func test_IH_MixedAlnum_051_LatchedAlnumLatchPreemptsSubsequentMixedInput() throws {
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
     defer {
       testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
@@ -2159,8 +2036,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 閂滯於英打時，小鍵盤之字元鍵應直接遞交**半形** ASCII，不受 `numPadCharInputBehavior` 影響。
-  @Test
-  func test_IH448_LatchedAlnumCommitsHalfWidthNumPadASCII() throws {
+  @Test("IH-MixedAlnum-052 Latched alnum commits half-width NumPad ASCII")
+  func test_IH_MixedAlnum_052_LatchedAlnumCommitsHalfWidthNumPadASCII() throws {
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
     defer {
       testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
@@ -2191,46 +2068,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// 狂拼執行期狀態之複位粒度：`clear()`（狀態重置）清整批；`invalidateFuriousTrail()`（顯式干涉）只清 trail。
-  ///
-  /// 前者防「上一輪殘留之高亮／重切 offers 跨過重置邊界、被下一輪當成當拍狀態消費」；
-  /// 後者則須保留當拍尚在消費週期內之高亮與 offers（否則 copilot 窗之預覽與聯合重切會失效）。
-  @Test
-  func test_IH449_FuriousConfigResetGranularity() throws {
-    let (testHandler, _) = try prepareMixedModeHandler()
-    defer { testHandler.clear() }
-
-    let perPassOffer = FuriousCoSegmentedOffer(
-      keyArray: ["ㄈㄢ", "ㄍㄢ"],
-      value: "反感",
-      blobs: ["fan", "gan"],
-      weight: 1.0
-    )
-
-    func seedPerPassState() {
-      testHandler.furiousConfig.trail = ["fan", "gan"]
-      testHandler.furiousHighlightOverride = (["ㄈㄢ"], "反")
-      testHandler.furiousConfig.coSegmentedOffers = [perPassOffer]
-    }
-
-    seedPerPassState()
-    testHandler.invalidateFuriousTrail()
-    #expect(testHandler.furiousConfig.trail.isEmpty, "顯式干涉應清空 trail")
-    #expect(testHandler.furiousHighlightOverride?.value == "反", "顯式干涉不應清當拍高亮")
-    #expect(testHandler.furiousConfig.coSegmentedOffers.count == 1, "顯式干涉不應清當拍重切 offers")
-
-    testHandler.clear()
-    #expect(
-      testHandler.furiousConfig == FuriousTypingConfig(),
-      "`clear()` 應將狂拼之整批執行期狀態複位（trail＋當拍狀態）"
-    )
-  }
-
   // MARK: - 槽序檢定之偏好開關（MixedAlnumJudgeReadingsBySequentialRawKeyOrder）
 
-  /// 該偏好之預設值為 true；且預設狀態下之行為與 IH438 所釘者一致（亂序 token 走 ASCII 路徑）。
-  @Test
-  func test_IH450_MixedSequentialOrderJudgeDefaultsOn() throws {
+  /// 該偏好之預設值為 true；且預設狀態下之行為與 IH-MixedAlnum-042 所釘者一致（亂序 token 走 ASCII 路徑）。
+  @Test("IH-MixedAlnum-053 Mixed sequential order judge defaults on")
+  func test_IH_MixedAlnum_053_MixedSequentialOrderJudgeDefaultsOn() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     defer { testHandler.clear() }
 
@@ -2250,15 +2092,15 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// 停用槽序檢定後，兩字母亂序 token 不再被視為英文意圖（與 IH438 為對照組）：
+  /// 停用槽序檢定後，兩字母亂序 token 不再被視為英文意圖（與 IH-MixedAlnum-042 為對照組）：
   /// 該段回到「鍵數 == 佔用槽數」之計數式判準，即被吸收為單一讀音、而非遞交 ASCII。
-  @Test(arguments: [
+  @Test("IH-MixedAlnum-054 Mixed out-of-slot-order token stays phonetic when judge disabled", arguments: [
     (token: "ls", reading: "ㄋㄠ", kanji: "腦"),
     (token: "ln", reading: "ㄙㄠ", kanji: "艘"),
     (token: "lc", reading: "ㄏㄠ", kanji: "蒿"),
     (token: "mv", reading: "ㄒㄩ", kanji: "須"),
   ])
-  func test_IH451_MixedOutOfSlotOrderTokenStaysPhoneticWhenJudgeDisabled(
+  func test_IH_MixedAlnum_054_MixedOutOfSlotOrderTokenStaysPhoneticWhenJudgeDisabled(
     _ scenario: (token: String, reading: String, kanji: String)
   ) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
@@ -2292,13 +2134,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// 停用槽序檢定後之動態排列行為（與 IH440 為對照組）：
+  /// 停用槽序檢定後之動態排列行為（與 IH-MixedAlnum-044 為對照組）：
   /// ①大千26 之 `qquu`（跨鍵改寫槽值之合法編碼）不再被吸收為單一讀音——舊制對大千26
   ///   整條停用該檢定，故該段滯留於 ASCII 緩衝、於按下空白鍵時以 `qquu ` 遞交；
   /// ②倚天26 之 `ge`（ㄐㄧ）不受影響——舊制之豁免僅及大千26，其餘動態排列本就採
   ///   「鍵數 == 佔用槽數」判定（`ge` 為 2 鍵 2 槽，故仍成立）。
-  @Test
-  func test_IH452_MixedDynamicLayoutMultiWriteKeysWhenJudgeDisabled() throws {
+  @Test("IH-MixedAlnum-055 Mixed dynamic layout multi-write keys when judge disabled")
+  func test_IH_MixedAlnum_055_MixedDynamicLayoutMultiWriteKeysWhenJudgeDisabled() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -2343,8 +2185,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 閂滯之上鎖點係以引擎層槽序檢定為定義，不受本開關影響：
   /// 停用槽序檢定者，閂滯仍於 `ls` 之第二鍵上鎖、並將整段即刻遞交。
-  @Test
-  func test_IH453_LatchedAlnumLatchPointUnaffectedBySequentialOrderJudgeSwitch() throws {
+  @Test("IH-MixedAlnum-056 Latched alnum latch point unaffected by sequential order judge switch")
+  func test_IH_MixedAlnum_056_LatchedAlnumLatchPointUnaffectedBySequentialOrderJudgeSwitch() throws {
     let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
     testHandler.prefs.mixedAlnumJudgeReadingsBySequentialRawKeyOrder = false
     defer {
@@ -2363,18 +2205,6 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - 空白鍵行為偏好於混打路徑之貫徹（`spaceKeyBehaviorAgainstICB`）
 
-  /// 供本節測項使用：注入足以令 auto-split 命中單鍵尾綴之讀音。
-  ///
-  /// 測試辭典僅收少量讀音，若不注入，`tryAutoSplitASCIIAndPhoneticSuffix` 會因詞庫
-  /// 查無結果而自然落回「整段 ASCII ＋ 空格」，測項遂失去判別力。
-  fileprivate func injectSingleKeySuffixReadings(_ handler: MockInputHandler) {
-    ["ㄍ", "ㄠ", "ㄇ", "ㄌ", "ㄟ"].forEach {
-      handler.currentLM.insertTemporaryData(
-        unigram: .init(keyArray: [$0], value: "◉", score: -1), isFiltering: false
-      )
-    }
-  }
-
   /// 偏好「空格鍵對內文組字區的行為」為「插入空格」（`spaceKeyBehaviorAgainstICB == 0`）時，
   /// 中英混打之空白鍵語意必須與 Shift+Space 一致：整段緩衝加一個半形空格、**一次遞交**，
   /// 不得把尾鍵送進注拼槽。
@@ -2382,8 +2212,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 病灶原委：混打路徑自始未讀該偏好——`apple` / `school` 之緩衝長度達 5 字元以上時，
   /// 空白鍵會繞過 `shouldPreferASCIIWordPath` 之英文判定而強行走 auto-split，
   /// 遂遞交 `appl` 並把 `e`（＝ㄍ）留在注拼槽，與使用者「空白鍵＝插入空格」之明示相衝。
-  @Test(arguments: ["apple", "school", "schema", "personal", "hello"])
-  func test_IH512_MixedSpacePrefInsertSpaceCommitsWholeBuffer(_ word: String) throws {
+  @Test(
+    "IH-MixedAlnum-057 Mixed Space pref insert Space commits whole buffer",
+    arguments: ["apple", "school", "schema", "personal", "hello"]
+  )
+  func test_IH_MixedAlnum_057_MixedSpacePrefInsertSpaceCommitsWholeBuffer(_ word: String) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     injectSingleKeySuffixReadings(testHandler)
@@ -2408,8 +2241,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 對照組：偏好維持預設「呼出選字窗」（1）或「輪替候選字」（2）時，混打空白鍵行為**不動**
   /// ——同一組字仍走 auto-split（遞交 ASCII 前綴、尾鍵成讀音）。
-  @Test(arguments: [1, 2])
-  func test_IH513_MixedSpaceKeepsStatusQuoUnderDefaultAndRevolvePreferences(_ behavior: Int) throws {
+  @Test("IH-MixedAlnum-058 Mixed Space keeps status quo under default and revolve preferences", arguments: [1, 2])
+  func test_IH_MixedAlnum_058_MixedSpaceKeepsStatusQuoUnderDefaultAndRevolvePreferences(_ behavior: Int) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = behavior
     injectSingleKeySuffixReadings(testHandler)
@@ -2435,8 +2268,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// Shift+Space 於預設偏好下仍為「整段緩衝加半形空格」，不受本 phase 影響。
-  @Test
-  func test_IH514_MixedShiftSpaceStillCommitsWholeBufferUnderDefaultPreference() throws {
+  @Test("IH-MixedAlnum-059 Mixed Shift+Space still commits whole buffer under default preference")
+  func test_IH_MixedAlnum_059_MixedShiftSpaceStillCommitsWholeBufferUnderDefaultPreference() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     injectSingleKeySuffixReadings(testHandler)
     defer {
@@ -2455,8 +2288,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 偏好「插入空格」**不**及於合法注音：`su3` 於按下聲調鍵時即已令混打緩衝區清空、讀音
   /// 成字，空白鍵所見之混打緩衝區為空 ⇒ 混打路徑不得攔截，仍歸既有之組字區送字邏輯處置。
-  @Test
-  func test_IH515_MixedSpacePrefInsertSpaceDoesNotAffectPhoneticFlow() throws {
+  @Test("IH-MixedAlnum-060 Mixed Space pref insert Space does not affect phonetic flow")
+  func test_IH_MixedAlnum_060_MixedSpacePrefInsertSpaceDoesNotAffectPhoneticFlow() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     let testKanjiData = """
@@ -2486,8 +2319,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 混打模式下，**尚未鍵入聲調之讀音**棲身於混打緩衝（`su`＝ㄋㄧ）；此時空白鍵之語意為
   /// 一聲鍵（聲調選字），不得被「插入空格」偏好接走——接走即令該音節之按鍵被當成 ASCII
   /// 遞交、音節無從完成。
-  @Test
-  func test_IH516_PendingTonelessReadingKeepsSpaceAsToneKey_TwoKeySyllable() throws {
+  @Test("IH-MixedAlnum-061 A pending toneless reading keeps Space as the tone key (two-key syllable)")
+  func test_IH_MixedAlnum_061_PendingTonelessReadingKeepsSpaceAsToneKeyTwoKeySyllable() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     let cleanup = injectTemporaryGrams(testHandler, "ㄋㄧ 妮 -1")
@@ -2514,8 +2347,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 同上，惟徵以三鍵音節（大千 `1u,`＝ㄅㄧㄝ）：判準不得只在兩鍵時成立。
-  @Test
-  func test_IH517_PendingTonelessReadingKeepsSpaceAsToneKey_ThreeKeySyllable() throws {
+  @Test("IH-MixedAlnum-062 A pending toneless reading keeps Space as the tone key (three-key syllable)")
+  func test_IH_MixedAlnum_062_PendingTonelessReadingKeepsSpaceAsToneKeyThreeKeySyllable() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     let cleanup = injectTemporaryGrams(testHandler, "ㄅㄧㄝ 憋 -1")
@@ -2541,8 +2374,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 同上，惟徵以單鍵聲母（大千 `s`＝ㄋ）：聲母單鍵仍可被注拼槽消化為一個待調讀音。
-  @Test
-  func test_IH518_PendingTonelessReadingKeepsSpaceAsToneKey_SingleConsonant() throws {
+  @Test("IH-MixedAlnum-063 A pending toneless reading keeps Space as the tone key (single consonant)")
+  func test_IH_MixedAlnum_063_PendingTonelessReadingKeepsSpaceAsToneKeySingleConsonant() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     defer {
@@ -2566,8 +2399,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 對照組：緩衝並非讀音者（`ls`／`tod`／`film`），「插入空格」偏好照舊生效——
   /// 本 phase 之判準不得把英文詞誤判為待調讀音而令該偏好失效。
-  @Test(arguments: ["ls", "tod", "film"])
-  func test_IH519_NonReadingBufferStillCommitsWholeBufferOnSpace(_ word: String) throws {
+  @Test("IH-MixedAlnum-064 Non-reading buffer still commits whole buffer on Space", arguments: ["ls", "tod", "film"])
+  func test_IH_MixedAlnum_064_NonReadingBufferStillCommitsWholeBufferOnSpace(_ word: String) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
     testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     defer {
@@ -2591,11 +2424,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 停用者回到舊制、亂序之鍵照舊被吸納為讀音（聲韻並擊）。此為 P274 之回歸：
   /// P273 起 `mixedAlnumBufferIsTonelessReading` 無條件啟用 `enforceCSVTOrdering`，
   /// 遂令該開關於「插入空格」路徑實質 always on——`ls`／`us` 於兩態皆遞交原文。
-  @Test(arguments: [
+  @Test("IH-MixedAlnum-065 Mixed insert Space pref absorbs out-of-slot-order token when judge disabled", arguments: [
     (token: "ls", reading: "ㄋㄠ", kanji: "腦"),
     (token: "us", reading: "ㄋㄧ", kanji: "妮"),
   ])
-  func test_IH535_MixedInsertSpacePrefAbsorbsOutOfSlotOrderTokenWhenJudgeDisabled(
+  func test_IH_MixedAlnum_065_MixedInsertSpacePrefAbsorbsOutOfSlotOrderTokenWhenJudgeDisabled(
     _ scenario: (token: String, reading: String, kanji: String)
   ) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
@@ -2628,12 +2461,12 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 檢定攔下（P275 病灶；主路徑 `fullInputIsSingleReading` 與空白鍵路徑
   /// `bufferIsSingleSyllablePhonetic` 兩處皆補上靜態排列之槽序檢定）。停用時則回到舊制、
   /// 照舊被吸收（聲韻並擊）。
-  @Test(arguments: [
+  @Test("IH-MixedAlnum-066 Mixed out-of-slot-order token with tone follows judge", arguments: [
     (judge: true, token: "oj4", absorbed: false),
     (judge: true, token: "jo4", absorbed: true),
     (judge: false, token: "oj4", absorbed: true),
   ])
-  func test_IH537_MixedOutOfSlotOrderTokenWithToneFollowsJudge(
+  func test_IH_MixedAlnum_066_MixedOutOfSlotOrderTokenWithToneFollowsJudge(
     _ scenario: (judge: Bool, token: String, absorbed: Bool)
   ) throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
@@ -2666,6 +2499,152 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       #expect(
         testSession.recentCommissions == ["\(scenario.token) "],
         "\(scenario.token)（judge=\(scenario.judge)）應遞交原文，實際 \(testSession.recentCommissions)"
+      )
+    }
+  }
+
+  // MARK: - Test harness
+
+  private struct MixedBufferExitScenario: Sendable {
+    let id: String
+    let input: String
+    let exitKeyCode: UInt16
+    let expectedBufferAfterInput: String
+    let expectedCommission: String
+    let expectedBufferAfterExit: String
+    let escToCleanInputBuffer: Bool
+    let expectedStateRawValue: String?
+  }
+
+  private struct AutoSplitWithPriorChineseScenario: Sendable {
+    let id: String
+    let mixedInput: String
+    let expectedCommissions: [String]
+    let expectedComposedText: String
+    let followUpInput: String?
+    let expectedComposedTextAfterFollowUp: String?
+  }
+
+  private struct GramSpec: Sendable {
+    let rawSequence: String
+    let value: String
+    let score: Double
+  }
+
+  private struct AutoSplitBoundaryScenario: Sendable {
+    let id: String
+    let input: String
+    let expectedCommissions: [String]
+    let expectedComposedText: String
+    let expectedDisplayMustNotContain: String?
+    let gramSpecs: [GramSpec]
+  }
+
+  private struct SpaceFinalizeAutoSplitScenario: Sendable {
+    let id: String
+    let input: String
+    let expectedCommissions: [String]
+    let expectedComposedText: String
+  }
+
+  private struct SpaceFinalizeASCIIWordScenario: Sendable {
+    let id: String
+    let inputSequence: [String]
+    let expectedCommission: String
+  }
+
+  private struct OptionShiftOrthogonalScenario: Sendable {
+    let id: String
+    let keyCode: UInt16
+    let chars: String
+    let charsSansModifiers: String
+    let isOptionShift: Bool
+    let expectedCommittedChar: String
+    let needsDynamicLexiconInjection: Bool
+    let halfWidthPunctuationEnabled: Bool?
+  }
+
+  private struct PunctuationVsPhoneticScenario: Sendable {
+    let id: String
+    let priorInput: String
+    let keyCode: UInt16?
+    let chars: String?
+    let target: String?
+    let expectedCommission: String
+    let expectedComposedText: String
+  }
+
+  func prepareMixedModeHandler() throws -> (handler: MockInputHandler, session: MockSession) {
+    guard let testHandler, let testSession else {
+      struct MissingTestFixture: Error {}
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      throw MissingTestFixture()
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
+    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 係行程級偏好、會被其他 suite 留下（實測即然）。
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    return (testHandler, testSession)
+  }
+
+  private func injectTemporaryGrams(_ handler: MockInputHandler, _ kanjiData: String) -> (() -> ()) {
+    let extractedGrams = extractGrams(from: kanjiData)
+    extractedGrams.forEach {
+      handler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    return { handler.currentLM.clearTemporaryData(isFiltering: false) }
+  }
+
+  /// Helper to build a temporary gram from a raw phonabet sequence using the handler's composer config.
+  private func makeTemporaryGram(
+    rawSequence: String, value: String, score: Double, using handler: MockInputHandler
+  )
+    -> Homa.Gram? {
+    var composer = handler.composer
+    composer.clear()
+    composer.receiveSequence(rawSequence, isRomaji: false)
+    guard composer.isPronounceable, composer.hasIntonation() else { return nil }
+    guard let key = composer.phonabetKeyForQuery(
+      pronounceableOnly: handler.prefs.acceptLeadingIntonations
+    ) else { return nil }
+    return .init(keyArray: [key], value: value, score: score)
+  }
+
+  /// 中英混打模式與英數閂滯開關皆啟用之 handler。
+  ///
+  /// - Parameter statusUI: 若給定，則連帶一個裝有該替身之 `ui` 一併注入 Session，供觀察
+  ///   閂滯 On／Off 之 StatusUI 提示。不給定時一切照舊（Session 之 `ui` 仍為 nil），
+  ///   故其餘既有個案之行為不受影響。
+  private func prepareLatchedMixedModeHandler(
+    statusUI: MockTooltipUI? = nil
+  )
+    throws -> (handler: MockInputHandler, session: MockSession) {
+    let result = try prepareMixedModeHandler()
+    result.handler.prefs.enableLatchedAlnumStateInMixedAlnumMode = true
+    if let statusUI {
+      let ui = MockSessionUI()
+      ui.statusUI = statusUI
+      result.session.ui = ui
+    }
+    return result
+  }
+
+  private static let latchedReleaseTooltip = "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateReleased".i18n
+
+  private static let latchedEnteredTooltip = "i18n:StateOfInputting.Tooltip.MixedAlnumLatchedStateEntered".i18n
+
+  /// 供本節測項使用：注入足以令 auto-split 命中單鍵尾綴之讀音。
+  ///
+  /// 測試辭典僅收少量讀音，若不注入，`tryAutoSplitASCIIAndPhoneticSuffix` 會因詞庫
+  /// 查無結果而自然落回「整段 ASCII ＋ 空格」，測項遂失去判別力。
+  private func injectSingleKeySuffixReadings(_ handler: MockInputHandler) {
+    ["ㄍ", "ㄠ", "ㄇ", "ㄌ", "ㄟ"].forEach {
+      handler.currentLM.insertTemporaryData(
+        unigram: .init(keyArray: [$0], value: "◉", score: -1), isFiltering: false
       )
     }
   }

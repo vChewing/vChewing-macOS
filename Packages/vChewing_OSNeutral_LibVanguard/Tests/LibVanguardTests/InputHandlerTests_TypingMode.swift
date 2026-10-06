@@ -2,27 +2,31 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// 打字模式閘門層之測試（`typingMode` 之真值表 ＋ 兩顆狂打閘門之家族歸屬）。
-//
-// 本檔只驗「閘門」，不驗任何狂打行為——後者見 `InputHandlerTests_Cases1.swift` 之
-// IH155 以降。此處之四支測試即「本 phase 之行為變動為零」之主要證據：
-// ① 五值真值表（含新值之可達條件）；② `isPinyinFamilyTypingMode` 於注音側**仍為假**；
-// ③ 兩顆閘門之家族歸屬（拼音專屬 vs 通用）；④ 注音側新偏好之出廠預設為 `false`。
-
 import Foundation
+import Homa
+import LXAssemblyMaterials4Tests
 import Shared
-import Tekkon
 import Testing
 
+import HomaSharedTestComponents
+@testable import LexiconAssembly
 @testable import LibVanguard
+@testable import Tekkon
+
+// 打字模式閘門層之測試（`typingMode` 之真值表 ＋ 兩顆狂打閘門之家族歸屬）。
+//
+// 此處只驗「閘門」，不驗任何狂打行為——後者見 `InputHandlerTests_FuriousPinyin.swift` 與
+// `InputHandlerTests_FuriousZhuyin.swift`。
+
+// MARK: - IH.TypingMode
 
 extension LibVanguardTestsRoot.InputHandlerTests {
   /// 逐格走 `typingMode` 之真值表。
   ///
   /// 維度：注拼槽之鍵盤家族（拼音／注音）× 兩顆狂打開關（各 2）× 逐字選字（2）× 磁帶（2）。
   /// 磁帶優先於一切，故磁帶為真時其餘維度皆無關。
-  @Test("[IH701] TypingMode 真值表")
-  func test_IH701_TypingModeTruthTable() throws {
+  @Test("IH-TypingMode-001 Typing mode truth table")
+  func test_IH_TypingMode_001_TypingModeTruthTable() throws {
     guard let testHandler else {
       Issue.record("testHandler 為 nil。")
       return
@@ -70,8 +74,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// **紅線之固化物**：`isPinyinFamilyTypingMode` 之語意恆為「注拼槽是否為拼音」，
   /// **不因狂打開關而變**。此為鍵盤佈局翻譯之守衛——一破即注音完全打不出字。
-  @Test("[IH702] isPinyinFamilyTypingMode 於注音側恆為假（含狂注開啟時）")
-  func test_IH702_IsPinyinFamilyTypingModeStaysFalseForZhuyin() throws {
+  @Test("IH-TypingMode-002 Pinyin-family typing mode stays false for zhuyin")
+  func test_IH_TypingMode_002_IsPinyinFamilyTypingModeStaysFalseForZhuyin() throws {
     guard let testHandler else {
       Issue.record("testHandler 為 nil。")
       return
@@ -109,8 +113,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 兩顆閘門之家族歸屬：`isPinyinFuriousTypingModeEffective` 必須**拼音專屬**。
-  @Test("[IH703] 兩顆閘門之家族歸屬")
-  func test_IH703_GateFamilyMembership() throws {
+  @Test("IH-TypingMode-003 Gate family membership")
+  func test_IH_TypingMode_003_GateFamilyMembership() throws {
     guard let testHandler else {
       Issue.record("testHandler 為 nil。")
       return
@@ -160,8 +164,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 注音側新偏好之出廠預設為 `false` ⇒ `zhuyinFuriousTyping` 於正式情境不可達；
   /// 但該值一旦被手工觸及，其「前方待確認讀音」閘門**與拼音側同構**（P256 交付）——
   /// 注拼槽內有未完成音節即成立。
-  @Test("[IH704] 注音狂打之出廠不可達性與前方待確認讀音閘門")
-  func test_IH704_ZhuyinFuriousIsUnreachableButPendingGateWorks() throws {
+  @Test("IH-TypingMode-004 Zhuyin furious is unreachable but pending gate works")
+  func test_IH_TypingMode_004_ZhuyinFuriousIsUnreachableButPendingGateWorks() throws {
     guard let testHandler else {
       Issue.record("testHandler 為 nil。")
       return
@@ -216,8 +220,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///
   /// 測資令兩側狂打開關**相反**，故旗標必然隨熱鍵反向翻轉——若實作誤認「當前打字方式」
   /// 或只看拼音側，本靶即轉紅。
-  @Test("[IH705] 打字方式熱鍵於下一拍即反映進注音文抑制旗標")
-  func test_IH705_TypingModeHotKeyReflectsOnNextBeat() throws {
+  @Test("IH-TypingMode-005 Typing mode hotkey reflects on next beat")
+  func test_IH_TypingMode_005_TypingModeHotKeyReflectsOnNextBeat() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -265,8 +269,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 拼音側因歷史緣故無閘門，此即該閘之固化物）。磁帶不經本型別
   /// （`handleComposition` 之打字模式分派：`.cassette` → `CassetteTypewriter`），
   /// 故無從在同一個靶內驅動，僅以註解記之。
-  @Test("[IH706] SCPC 下拼音不自動切音節")
-  func test_IH706_SCPCDisablesPinyinAutoChop() throws {
+  @Test("IH-TypingMode-006 SCPC disables pinyin auto chop")
+  func test_IH_TypingMode_006_SCPCDisablesPinyinAutoChop() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
