@@ -2087,6 +2087,62 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
+  // MARK: - 並存態之遞交內容（P287）
+
+  /// 混打＋注音狂打並存時，**任何遞交路徑之內容皆為「已組字之中文 ＋ 混打緩衝之原文」**：
+  /// copilot 對該待確認讀音之**投機預覽**（語言模型之猜測）一概不得進入遞交——該讀音未經
+  /// 使用者確認（確認只走空格之陰平、固化與顯式選字三途），且組字區讀音欄所示者本即緩衝
+  /// 原文，故遞交內容與顯示同源。
+  ///
+  /// - Important: 三條路徑皆曾把投機預覽連同原文一併遞交（實測 `你你泥su`）：① 符號選單
+  ///   實體鍵；② `resetInputHandler()`（IME 切換、`commitComposition` 之同一條路）；
+  ///   ③ 未認領之 Command 系熱鍵（P282 之 `releaseUnclaimedCommandChord()` 亦走②）。
+  @Test("IH-FuriousZhuyin-042 Mixed alnum exit paths drop the speculating preview")
+  func test_IH_FuriousZhuyin_042_MixedAlnumExitPathsDropSpeculatingPreview() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveMixedAlnumTestEnvironment() }
+    let symbolMenuEvent = KBEvent.KeyEventData.symbolMenuKeyEventIntl.asEvent
+    let cmdChordEvent = KBEvent.KeyEventData(flags: [.command, .control], chars: "c").asEvent
+    let exits: [(tag: String, act: () -> ())] = [
+      ("符號選單實體鍵", { _ = testHandler.triageInput(event: symbolMenuEvent) }),
+      ("resetInputHandler", { testSession.resetInputHandler() }),
+      ("未認領之 Command 熱鍵", { _ = testHandler.triageInput(event: cmdChordEvent) }),
+    ]
+    for (tag, act) in exits {
+      enterMixedAlnumZhuyinFuriousTestEnvironment()
+      clearTestPOM()
+      testSession.recentCommissions.removeAll()
+      typeSentence("su3su3")
+      typeSentence("su")
+      let mainText = testHandler.assembler.assembledSentence.values.joined()
+      let speculation = testHandler.furiousTypingPreviewedReading ?? ""
+      // 前提：待確認讀音在場、投機預覽確有其值（否則本靶無從判別其去留）。
+      #expect(
+        testHandler.mixedAlphanumericalBuffer == "su",
+        "\(tag)：實得 `\(testHandler.mixedAlphanumericalBuffer)`。"
+      )
+      #expect(
+        testHandler.furiousFrontUnfinishedReading == "ㄋㄧ",
+        "\(tag)：實得 `\(testHandler.furiousFrontUnfinishedReading ?? "nil")`。"
+      )
+      #expect(testSession.isFuriousCopilotCandidateWindowVisible, "\(tag)：copilot 窗應在場。")
+      #expect(!speculation.isEmpty, "\(tag)：投機預覽應在場。")
+      #expect(
+        testSession.state.displayedTextConverted == mainText + "su",
+        "\(tag)：讀音欄應顯示緩衝原文，實得 `\(testSession.state.displayedTextConverted)`。"
+      )
+      act()
+      #expect(
+        testSession.recentCommissions == [mainText + "su"],
+        "\(tag)：並存態之遞交內容應恰為「已組字之中文 ＋ 緩衝原文」，實得 \(testSession.recentCommissions)。"
+      )
+      #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "\(tag)：緩衝應已清空。")
+    }
+  }
+
   // MARK: - Test harness
 
   /// 把測試環境切成注音狂打（其餘輸入法一律關閉），並重置組字狀態。

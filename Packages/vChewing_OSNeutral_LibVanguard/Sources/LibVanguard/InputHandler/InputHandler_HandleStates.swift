@@ -745,6 +745,11 @@ extension InputHandlerProtocol {
     displayTextSegments = displayTextSegments.map { $0.trimmingCharacters(in: .newlines) }
     var displayedText = displayTextSegments.joined()
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
+    // ★ 中英混打緩衝之原文**不屬本存取器**：該原文一律由呼叫端自行追加（P280 之語義
+    // ——逃生口先取出原文、再清空緩衝、最後取已組字之中文），故 `reading` 不得再把它
+    // 當成「未完成讀音」插入，否則同一段原文會被遞交兩次（實測：關閉
+    // `trimUnfinishedReadingsOnCommit` 後，`su` 之遞交得 `susu`）。
+    let hasPendingMixedAlnumBuffer = !mixedAlphanumericalBuffer.isEmpty
     // 狂拼模式：遞交內容與 composition buffer 顯示同源於 copilot 全句組句
     // （主段＋前方預覽），確保 IMK 強制遞交（CpLk 等）與所見一致。狂拼的前方
     // 預覽是 copilot 組句後的中文文字、並非未完成拼寫的原文拼音，故 sansReading
@@ -753,9 +758,16 @@ extension InputHandlerProtocol {
     // （Enter 直遞已定案為「固化＋停留」，不再走此全句遞交路徑。）
     if let furiousContext = [.codePoint, .romanNumerals].contains(currentTypingMethod)
       ? nil : furiousFrontContext {
-      return furiousContext.assembledMainValues.joined() + furiousContext.preview
+      let mainText = furiousContext.assembledMainValues.joined()
+      // ★ 中英混打＋注音狂打並存時，前方讀音素材住**混打緩衝區**、非 copilot 之投機預覽
+      // ——該情境下組字區讀音欄所示即緩衝原文，故遞交內容只取 copilot 之主段，原文由
+      // 呼叫端追加（上述語義）。純狂打側照舊：該側之顯示與遞交同為前方預覽。
+      if mixedAlnumZhuyinFuriousInEffect { return mainText }
+      return mainText + furiousContext.preview
     }
-    let reading: String = noReading ? "" : (furiousTypingPreviewedReading ?? readingForDisplay)
+    let reading: String = (noReading || hasPendingMixedAlnumBuffer)
+      ? ""
+      : (furiousTypingPreviewedReading ?? readingForDisplay)
     guard !reading.isEmpty else { return displayedText }
     let cursor = max(min(convertCursorForDisplay(assembler.cursor), displayedText.count), 0)
     let insertionIndex = displayedText.index(displayedText.startIndex, offsetBy: cursor)
