@@ -2503,6 +2503,39 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
   }
 
+  // MARK: - 緩衝原文之遞交次數（P287）
+
+  /// 中英混打之緩衝原文在一拍遞交中**恰出現一次**：該原文之遞交一律由呼叫端追加
+  /// （`resetInputHandler()` 之尾段即然），故 `committableDisplayText(sansReading:)` 不得
+  /// 再把它當作「未完成讀音」插入——否則「在遞交時清理未完成拼寫的讀音或字根」一關，
+  /// 同一段原文即遞交兩次（實測 `abcabc`）。
+  @Test("IH-MixedAlnum-067 Pending buffer is committed exactly once")
+  func test_IH_MixedAlnum_067_PendingBufferCommitsExactlyOnce() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let originalTrim = testHandler.prefs.trimUnfinishedReadingsOnCommit
+    defer { testHandler.prefs.trimUnfinishedReadingsOnCommit = originalTrim }
+
+    for trim in [true, false] {
+      for pending in ["abc", "su"] {
+        testHandler.prefs.trimUnfinishedReadingsOnCommit = trim
+        testHandler.clear()
+        testSession.recentCommissions.removeAll()
+        testSession.resetInputHandler(forceComposerCleanup: true)
+        typeSentence(pending)
+        #expect(
+          testHandler.mixedAlphanumericalBuffer == pending,
+          "實得 `\(testHandler.mixedAlphanumericalBuffer)`。"
+        )
+        testSession.resetInputHandler()
+        #expect(
+          testSession.recentCommissions == [pending],
+          "trim=\(trim)、緩衝 `\(pending)`：原文應恰遞交一次，實得 \(testSession.recentCommissions)。"
+        )
+        #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+      }
+    }
+  }
+
   // MARK: - Test harness
 
   private struct MixedBufferExitScenario: Sendable {
