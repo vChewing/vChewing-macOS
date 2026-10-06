@@ -25,7 +25,7 @@ public final class MainSputnik4IME {
       exit(varArgsResult)
     }
     guard let theServer = Self.handleIMKConnection() else {
-      Process.consoleLog(
+      OSUtils.consoleLog(
         "vChewingDebug: Fatal error: Cannot initialize input method server with connection name retrieved from the plist, or there's no connection name in the plist."
       )
       exit(1)

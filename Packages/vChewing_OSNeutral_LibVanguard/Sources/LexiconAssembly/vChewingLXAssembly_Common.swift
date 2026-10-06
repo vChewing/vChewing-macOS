@@ -152,7 +152,7 @@ func vCLMLog(_ strPrint: StringLiteralType) {
   }
   let toLog = UserDefaults.standard.object(forKey: "_DebugMode") as? Bool ?? true
   if toLog {
-    Process.consoleLog("vChewingDebug: \(strPrint)")
+    OSUtils.consoleLog("vChewingDebug: \(strPrint)")
   }
 }
 

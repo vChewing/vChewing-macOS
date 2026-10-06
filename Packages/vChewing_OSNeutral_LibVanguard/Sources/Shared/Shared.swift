@@ -19,7 +19,7 @@ public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
     return
   }
   guard forced || UserDefaults.current.bool(forKey: "_DebugMode") else { return }
-  Process.consoleLog("vChewingDebug: \(strPrint)")
+  OSUtils.consoleLog("vChewingDebug: \(strPrint)")
 }
 
 /// 偵測目前程序是否帶有測試過濾參數（例如 `swift test --filter ...`、`--skip ...` 或 XCTest 的 `-XCTest ...`）。

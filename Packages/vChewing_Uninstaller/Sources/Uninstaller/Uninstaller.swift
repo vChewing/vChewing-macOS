@@ -55,7 +55,7 @@ public enum Uninstaller {
     realHomeDir = realHomeDir.standardizedFileURL
     // 輸入法自毀處理。這裡不用「Bundle.main.bundleURL」是為了方便使用者以 sudo 身分來移除被錯誤安裝到系統目錄內的輸入法。
     guard let bundleID = Bundle.main.bundleIdentifier else {
-      Process.consoleLog("Failed to ensure the bundle identifier.")
+      OSUtils.consoleLog("Failed to ensure the bundle identifier.")
       return -1
     }
 
@@ -131,10 +131,10 @@ extension FileManager {
           at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
         )
       } else {
-        Process.consoleLog("Item doesn't exist: \(path)")
+        OSUtils.consoleLog("Item doesn't exist: \(path)")
       }
     } catch let error as NSError {
-      Process.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
+      OSUtils.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
       return false
     }
     return true

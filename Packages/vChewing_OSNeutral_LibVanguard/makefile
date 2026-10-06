@@ -1,5 +1,5 @@
 # Pin LC_ALL so CJK collation stays identical regardless of the machine's locale settings.
-.PHONY: lint format lintFormat lintFormatUncommitted spmClean test dockertest test-debug dockertest-debug build510 build510SwiftExtension clean510
+.PHONY: lint format lintFormat lintFormatUncommitted spmClean test dockertest test-debug dockertest-debug build510 build510SwiftExtension clean510 iOS clean-iOS
 
 # ---- Swift 5.10 側（macOS 10.9 / x86_64，靜態產物）----
 #
@@ -74,12 +74,52 @@ build510SwiftExtension:
 clean510:
 	@rm -rf "$(LEGACY_SCRATCH)" "$(LEGACY_SCRATCH_SWIFTEXTENSION)"
 
+# ---- iOS 側（iOS 27+，release）----
+#
+# 同一個 `Sources/` 於 iOS 側之建置入口：產物為 `libVanguard.dylib`（`platform IOS`、`minos 27.0`）。
+# 支援帶自 iOS 27 起（免去 iOS 18 為止之 non-liquid-glass 時代鍵盤邊框樣式之相容勞力），故
+# triple 之版本段一律 27.0、兩份 manifest（聚合體與巢狀子套件 `Deps/VanguardSwiftExtension`）
+# 亦宣告 `.iOS(.v27)`；`#if os(iOS) && compiler(>=6.4)` 一類條件編譯即本側專屬路徑之落點。
+# SDK 一律以 `xcrun` 現算，不寫死路徑。
+#
+# **只出 `Vanguard` 這一個產品**：另兩個 library 產品（`LXAssemblyMaterials4Tests`、
+# `HomaSharedTestComponents`）是測試素材靶，而後者對 `Homa` 之 `@testable import` 只在
+# `-enable-testing` 之下成立——該旗標於 debug 由 SwiftPM 自動施加、於 release 則否，故
+# `swift build -c release` 於**任何平台**都建不出它（與 iOS 無涉）；而 iOS 之單元測試本即無法以
+# `swift test` 於裝置上跑（須宿主 app）。故 iOS 入口一律只出貨動態庫。
+#
+# 模擬器另走一組變數（建議連 scratch 一併換開，免與裝置側互相踩）：
+#   make iOS IOS_SDK=iphonesimulator IOS_TRIPLE=arm64-apple-ios27.0-simulator IOS_SCRATCH=.build/.ios-sim
+#
+# 本機 harness 之沙箱會擋 SwiftPM 自帶的 `sandbox-exec`（純屬 harness、與本倉無涉），故於
+# harness 內實跑時補 `IOS_FLAGS=--disable-sandbox`；該旗標刻意不寫死於本檔。
+IOS_SDK ?= iphoneos
+IOS_TRIPLE ?= arm64-apple-ios27.0
+IOS_PRODUCT ?= Vanguard
+IOS_SCRATCH ?= .build/.ios
+IOS_FLAGS ?=
+
+iOS:
+	@export LC_ALL=C; \
+	echo "Building $(IOS_PRODUCT) for $(IOS_TRIPLE) with SDK $$(xcrun --sdk $(IOS_SDK) --show-sdk-version)…"; \
+	swift build \
+		--configuration release \
+		--product "$(IOS_PRODUCT)" \
+		--triple "$(IOS_TRIPLE)" \
+		--sdk "$$(xcrun --sdk $(IOS_SDK) --show-sdk-path)" \
+		--scratch-path "$(IOS_SCRATCH)" \
+		$(IOS_FLAGS)
+
+clean-iOS:
+	@rm -rf "$(IOS_SCRATCH)"
+
 # 清建置快取。本倉為倉根套件（聚合體），其巢狀子套件另置於 `Deps/` 之下——
 # 僅在「直接對子套件建置」時才會生成獨立 .build，故須一併清掃，否則殘留物件
-# 會在下一次建置造成 `Undefined symbols` 之假失敗。另清 5.10 側的兩條 scratch path。
+# 會在下一次建置造成 `Undefined symbols` 之假失敗。另清 5.10 側的兩條 scratch path
+# 與 iOS 側的 scratch path（`swift package clean` 只管 `.build` 內自己那批、不掃自訂路徑）。
 spmClean:
 	swift package clean
-	@rm -rf "$(LEGACY_SCRATCH)" "$(LEGACY_SCRATCH_SWIFTEXTENSION)"
+	@rm -rf "$(LEGACY_SCRATCH)" "$(LEGACY_SCRATCH_SWIFTEXTENSION)" "$(IOS_SCRATCH)"
 	@for nestedDep in ./Deps/*; do \
 		if [ -f "$$nestedDep/Package.swift" ]; then \
 			echo "processing nested dep $$nestedDep"; \
