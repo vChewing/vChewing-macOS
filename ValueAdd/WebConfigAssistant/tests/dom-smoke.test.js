@@ -985,6 +985,44 @@ test('靜態產物：dist/index.html 自動跳轉至 assistant.html', function (
   assert.ok(html.indexOf('唯音輸入法配置助手') >= 0, '入口頁之標題應為助手之全稱');
 });
 
+test('靜態產物：助手頁與入口頁皆附分享預覽（Open Graph）之標籤', function () {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  // 兩支各須自備：爬蟲不執行 JavaScript、亦不跟隨入口頁之 meta refresh。
+  const artifacts = {
+    'assistant.html': 'https://vchewing.github.io/assistant/assistant.html',
+    'index.html': 'https://vchewing.github.io/assistant/',
+  };
+  const required = [
+    'name="description"',
+    'property="og:type"',
+    'property="og:site_name"',
+    'property="og:title"',
+    'property="og:description"',
+    'property="og:url"',
+    'property="og:image"',
+    'property="og:image:width"',
+    'property="og:image:height"',
+    'property="og:image:alt"',
+    'property="og:locale"',
+    'name="twitter:card"',
+  ];
+  Object.keys(artifacts).forEach(function (name) {
+    const file = path.join(__dirname, '..', 'dist', name);
+    assert.ok(fs.existsSync(file), 'make bundle 應生 dist/' + name);
+    const html = fs.readFileSync(file, 'utf8');
+    required.forEach(function (tag) {
+      assert.ok(html.indexOf('<meta ' + tag + ' ') >= 0, name + ' 缺 ' + tag);
+    });
+    // 圖與網址皆須為絕對位址：爬蟲在站外取用，相對路徑對它毫無意義。
+    assert.ok(html.indexOf('content="https://vchewing.github.io/site_logo@2x.png"') >= 0,
+      name + ' 之 og:image 應為官網之絕對位址');
+    assert.ok(html.indexOf('content="' + artifacts[name] + '"') >= 0,
+      name + ' 之 og:url 應為該檔自身之絕對位址');
+    assert.strictEqual(html.indexOf('{{OG}}'), -1, name + ' 不得殘留未替換之 {{OG}} 佔位符');
+  });
+});
+
 test('靜態樣式：內容區為固定高度（窗體不隨頁面內容變動）', function () {
   const fs = require('node:fs');
   const path = require('node:path');
