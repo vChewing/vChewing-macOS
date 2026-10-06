@@ -4,5 +4,5 @@
 # 於首頁以 #114514 之小字顯示「適配唯音輸入法 <version> (<build>)」（即本檔之兩值）。
 # 其值須與倉根之 `Release-Version.plist`（本倉版本之 SSOT）一致：
 # `make version-check`（已納入 `make audit`）會逐值比對，不一致即失敗。
-version=4.8.6
-build=4860
+version=4.8.7
+build=4870
