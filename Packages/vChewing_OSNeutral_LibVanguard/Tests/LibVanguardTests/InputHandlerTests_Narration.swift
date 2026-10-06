@@ -4,19 +4,24 @@
 
 import Foundation
 import Homa
-import LexiconAssembly
-@testable import LibVanguard
+import LXAssemblyMaterials4Tests
 import Shared
-import Tekkon
 import Testing
 
-// MARK: - NarrationTests
+import HomaSharedTestComponents
+@testable import LexiconAssembly
+@testable import LibVanguard
+@testable import Tekkon
+
+// 朗讀（旁白）之行為層測試：防禦性注音轉換、實際按鍵、後置聲調覆寫。
+
+// MARK: - IH.Narration
 
 extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: A) 防禦性注音轉換
 
-  @Test
-  func test_IH501_NarrationDefensivePinyinToBopomofo() throws {
+  @Test("IH-Narration-001 Narration defensive pinyin to bopomofo")
+  func test_IH_Narration_001_NarrationDefensivePinyinToBopomofo() throws {
     guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
@@ -56,8 +61,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: B) 正常組字路徑改以 actualKeys
 
-  @Test
-  func test_IH502_NarrationUsesActualKeysOnComposition() throws {
+  @Test("IH-Narration-002 Narration uses actual keys on composition")
+  func test_IH_Narration_002_NarrationUsesActualKeysOnComposition() throws {
     guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
@@ -94,8 +99,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: C) 後置聲調覆寫補朗讀
 
-  @Test
-  func test_IH503_RearIntonationOverrideTriggersNarration() throws {
+  @Test("IH-Narration-003 Rear intonation override triggers narration")
+  func test_IH_Narration_003_RearIntonationOverrideTriggersNarration() throws {
     guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
@@ -141,8 +146,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: D) 後置聲調覆寫的內文提示抑制
 
-  @Test
-  func test_IH511_RearIntonationOverrideTooltipSuppression() throws {
+  @Test("IH-Narration-004 Rear intonation override tooltip suppression")
+  func test_IH_Narration_004_RearIntonationOverrideTooltipSuppression() throws {
     guard let testHandler, let testSession else {
       Issue.record("Test handler or session is nil.")
       return

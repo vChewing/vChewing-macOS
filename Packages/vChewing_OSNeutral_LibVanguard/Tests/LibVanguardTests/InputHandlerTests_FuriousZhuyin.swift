@@ -2,62 +2,131 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// 狂打（狂拼／狂注）copilot 候選窗之閘門與「未完成讀音」顯示源：行為層測試。
-//
-// 本檔驗的是「注音狂打接入 copilot 窗」這條線：`hasFuriousFrontPending` 之兩側分流、
-// `unfinishedReading` 之分流、以及既有 6 個前方讀取點在注音下之語義。
-// 判準（何時自動切音節）之測試在 `InputHandlerTests_ZhuyinFurious.swift` 與
-// `TekkonTests_PhonabetAutoChopPredicate.swift`（自 P261 起住 `Tests/TekkonTests/`）。
-//
-// - Note: 大千排列之鍵位：ㄍ＝`e`、ㄠ＝`l`。測試辭典內 `ㄍㄠ`＝高（同音 12 條）。
-
 import Foundation
 import Homa
 import LXAssemblyMaterials4Tests
 import Shared
-import Tekkon
 import Testing
 
+import HomaSharedTestComponents
+@testable import LexiconAssembly
 @testable import LibVanguard
+@testable import Tekkon
+
+// 狂注（注音狂打）之行為層測試：自動切音節、簡拼整詞候選、未完成讀音之顯示源，
+// 乃至其與中英混輸回退並存時之語義。
+//
+// 判準（何時自動切音節）本身之逐條移植與全排列實測見 `TekkonTests_PhonabetAutoChopPredicate.swift`
+// （自 P261 起住 `Tests/TekkonTests/`）；此處驗的是「判準接上 Handler 之後」之行為。
+// 所用讀音一律取自**測試辭典素材自身**（`vanguardTextMap_test.txtMap` 內確有之詞條）。
+//
+// - Note: 大千排列之鍵位：ㄍ＝`e`、ㄠ＝`l`、ㄨ＝`j`、ㄥ＝`/`、ㄅ＝`1`、ㄧ＝`u`、ㄢ＝`0`。
+
+// MARK: - IH.FuriousZhuyin
 
 extension LibVanguardTestsRoot.InputHandlerTests {
-  // MARK: - 環境設置
+  /// **本 phase 之功能底線**：注音狂打下連續鍵入兩個完整音節，**不必敲聲調、不必按空格**，
+  /// 即應各自成鍵入組字器。
+  @Test("IH-FuriousZhuyin-001 Zhuyin furious auto-chops two consecutive syllables")
+  func test_IH_FuriousZhuyin_001_ZhuyinFuriousAutoChopsConsecutiveSyllables() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testSession.resetInputHandler(forceComposerCleanup: true) }
 
-  /// 把測試環境切成注音狂打（其餘輸入法一律關閉），並重置組字狀態。
-  private func enterZhuyinFuriousTestEnvironment(
-    parser: Tekkon.MandarinParser = .ofDachen
-  ) {
-    guard let testHandler, let testSession else { return }
+    // `el`＝ㄍㄠ；再敲 `e`（ㄍ）時，`ㄍㄠ` 已不可能再延伸 ⇒ 應自動固化，注拼槽重設為 `ㄍ`；
+    // 續敲 `j/`＝ㄨㄥ ⇒ 第二音節 `ㄍㄨㄥ`。全程未敲聲調、未按空格。
+    var keys = typeZhuyinAndCollectReadingKeys("elej/", zhuyinFurious: true)
+    // 第三拍（`e`）時 `ㄍㄠ` 已不可能再延伸 ⇒ 已固化；第二音節 `ㄍㄨㄥ` 尚在注拼槽內
+    // （末音節之固化須待下一拍或空格——此與拼音狂拼之末端語義一致）。
+    #expect(keys == ["ㄍㄠ"], "實得：\(keys)")
+    #expect(testHandler.composer.getComposition() == "ㄍㄨㄥ", "實得：\(testHandler.composer.getComposition())")
+    #expect(generateDisplayedText().contains("高"), "組字結果：\(generateDisplayedText())")
+
+    // 以空格固化末音節 ⇒ 兩音節皆入組字器。
+    typeSentence(" ")
+    keys = testHandler.assembler.actualKeys
+    #expect(keys == ["ㄍㄠ", "ㄍㄨㄥ"], "實得：\(keys)")
+    let displayed = generateDisplayedText()
+    #expect(displayed.contains("高"), "組字結果：\(displayed)")
+    #expect(!testSession.recentCommissions.isEmpty || !displayed.isEmpty)
+  }
+
+  /// 完整音節之逐鍵不得被誤切：`ㄅㄧ` ＋ `ㄢ` 須續接為 `ㄅㄧㄢ`（§3.2 之條件 ③）。
+  @Test("IH-FuriousZhuyin-002 Incomplete syllable is not chopped")
+  func test_IH_FuriousZhuyin_002_IncompleteSyllableIsNotChopped() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testSession.resetInputHandler(forceComposerCleanup: true) }
+
+    // `1`＝ㄅ、`u`＝ㄧ、`0`＝ㄢ。三拍皆不得觸發切音節。
+    let keys = typeZhuyinAndCollectReadingKeys("1u0", zhuyinFurious: true)
+    #expect(keys.isEmpty, "實得：\(keys)")
+    #expect(testHandler.composer.getComposition() == "ㄅㄧㄢ", "實得：\(testHandler.composer.getComposition())")
+  }
+
+  /// 動態排列之逐槽覆寫不得被誤切：大千26 之 `qquu`＝ㄅㄚ（§3.2 之 ④d）。
+  @Test("IH-FuriousZhuyin-003 Dynamic layout slot overwrite is not chopped")
+  func test_IH_FuriousZhuyin_003_DynamicLayoutSlotOverwriteIsNotChopped() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testSession.resetInputHandler(forceComposerCleanup: true) }
+
+    let keys = typeZhuyinAndCollectReadingKeys("qquu", zhuyinFurious: true, parser: .ofDachen26)
+    #expect(keys.isEmpty, "實得：\(keys)")
+    #expect(testHandler.composer.getComposition() == "ㄅㄚ", "實得：\(testHandler.composer.getComposition())")
+  }
+
+  /// 聲調鍵之語義不變：判準**永不**對聲調鍵切音節（§3.2 之條件 ②）。
+  @Test("IH-FuriousZhuyin-004 Tone keys never trigger auto-chop")
+  func test_IH_FuriousZhuyin_004_ToneKeysNeverTriggerAutoChop() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testSession.resetInputHandler(forceComposerCleanup: true) }
     testHandler.prefs.cassetteEnabled = false
     testHandler.prefs.useSCPCTypingMode = false
-    testHandler.prefs.furiousTypingEnabled4Pinyin = false
     testHandler.prefs.furiousTypingEnabled4Zhuyin = true
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false // 免 POM 擾動置頂序。
-    testHandler.composer.ensureParser(arrange: parser)
-    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.composer.ensureParser(arrange: .ofDachen)
+    // 先令注拼槽非空（ㄍㄠ），否則 ① 會先擋掉。
+    testHandler.composer.receiveKey(fromString: "e")
+    testHandler.composer.receiveKey(fromString: "l")
+    #expect(testHandler.composer.getComposition() == "ㄍㄠ")
+    // 大千排列之五個聲調鍵：3＝ˇ、4＝ˋ、6＝ˊ、7＝˙、空格＝陰平。
+    for tone in ["3", "4", "6", "7", " "] {
+      #expect(
+        !testHandler.composer.shouldAutoChopPhonabets(byTyping: Character(tone)),
+        "聲調鍵 \(tone) 誤判為切"
+      )
+    }
   }
 
-  /// 把測試環境切成拼音狂拼（其餘輸入法一律關閉），並重置組字狀態。
-  private func enterPinyinFuriousTestEnvironment() {
-    guard let testHandler, let testSession else { return }
+  /// SCPC（逐字選字）下注音狂打不生效（沿用既有之 `!prefs.useSCPCTypingMode` 條件）。
+  @Test("IH-FuriousZhuyin-005 Zhuyin furious is inactive under SCPC")
+  func test_IH_FuriousZhuyin_005_ZhuyinFuriousIsInactiveUnderSCPC() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.prefs.useSCPCTypingMode = false
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
     testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = true
+    testHandler.composer.ensureParser(arrange: .ofDachen)
     testHandler.prefs.useSCPCTypingMode = false
-    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
-    testHandler.prefs.furiousTypingEnabled4Pinyin = true
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.ensureKeyboardParser()
-    testSession.resetInputHandler(forceComposerCleanup: true)
-  }
-
-  /// 還原環境：兩側狂打開關歸零、鍵盤排列回標準注音。
-  private func leaveFuriousTestEnvironment() {
-    guard let testHandler, let testSession else { return }
-    testHandler.prefs.furiousTypingEnabled4Pinyin = false
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
-    testHandler.ensureKeyboardParser()
-    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(testHandler.typingMode == .zhuyinFuriousTyping)
+    #expect(testHandler.isZhuyinFuriousTypingModeEffective)
+    testHandler.prefs.useSCPCTypingMode = true
+    #expect(testHandler.typingMode == .bopomofoKeyblock)
+    #expect(!testHandler.isZhuyinFuriousTypingModeEffective)
   }
 
   // MARK: - 未完成讀音之分流
@@ -66,8 +135,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///
   /// 並釘住判準之單一性：`hasFuriousFrontPending` 與 `furiousFrontUnfinishedReading != nil`
   /// 必須恆等（否則會出現「copilot 窗開了、頂部 pane 卻無讀音可示」之狀態）。
-  @Test("[IH160] 注音狂打：未完成讀音之分流與判準一致性")
-  func test_IH160_UnfinishedReadingIsTheComposerSyllableInZhuyinFurious() throws {
+  @Test("IH-FuriousZhuyin-006 Unfinished reading is the composer syllable in zhuyin furious")
+  func test_IH_FuriousZhuyin_006_UnfinishedReadingIsTheComposerSyllableInZhuyinFurious() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -110,47 +179,12 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.unfinishedReading == nil)
   }
 
-  /// 拼音狂拼之 `hasFuriousFrontPending` 語意**不得**因注音側之分流而改變。
-  @Test("[IH165] 拼音狂拼：未完成讀音語意不變（回歸護欄）")
-  func test_IH165_PinyinFuriousPendingSemanticsUnchanged() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer { leaveFuriousTestEnvironment() }
-    enterPinyinFuriousTestEnvironment()
-    #expect(testHandler.typingMode == .pinyinFuriousTyping)
-
-    // 狂拼停用時：字母流非空亦不得視為「前方待確認讀音」（沿用舊語意）。
-    testHandler.prefs.furiousTypingEnabled4Pinyin = false
-    typeSentence("gao")
-    #expect(testHandler.composer.romajiBuffer == "gao")
-    #expect(testHandler.furiousFrontUnfinishedReading == nil)
-    #expect(!testHandler.hasFuriousFrontPending)
-    testSession.resetInputHandler(forceComposerCleanup: true)
-
-    // 狂拼啟用時：字母流即顯示源。
-    testHandler.prefs.furiousTypingEnabled4Pinyin = true
-    #expect(testHandler.furiousFrontUnfinishedReading == nil)
-    typeSentence("gao")
-    #expect(testHandler.composer.romajiBuffer == "gao")
-    #expect(testHandler.furiousFrontUnfinishedReading == "gao")
-    #expect(testHandler.hasFuriousFrontPending)
-    #expect(testSession.unfinishedReading == "gao")
-
-    // 固化後（空格）旗子落回。
-    typeSentence(" ")
-    #expect(testHandler.composer.romajiBuffer.isEmpty)
-    #expect(!testHandler.hasFuriousFrontPending)
-    #expect(testSession.unfinishedReading == nil)
-  }
-
   // MARK: - copilot 窗與就地選字
 
   /// 注音狂打且有未完成音節時，copilot 候選窗成立、置頂為該音節之組句預覽；
   /// 就地選字（滑鼠點選／Shift＋選字鍵同此路徑）把該音節以所選值寫入組字器。
-  @Test("[IH161] 注音狂打：copilot 窗成立與就地選字")
-  func test_IH161_ZhuyinFuriousCopilotWindowAndInPlaceSelection() throws {
+  @Test("IH-FuriousZhuyin-007 Zhuyin furious copilot window and in-place selection")
+  func test_IH_FuriousZhuyin_007_ZhuyinFuriousCopilotWindowAndInPlaceSelection() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -193,8 +227,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// Tab／Enter／標點／方向鍵皆為「先固化前方讀音，再走各自既有語義」——注音側悉數沿用。
   /// **空格不在此列**（P260）：注音之五個聲調鍵為 `3`／`4`／`6`／`7` 與**空格**（陰平），
   /// 空格若被挪作固化之用則陰平無從指定 ⇒ 空格照常送入注拼槽當陰平（見 ①）。
-  @Test("[IH162] 注音狂打：空格／Tab／Enter／標點／方向鍵之語義")
-  func test_IH162_FrontReadPointsUnderZhuyinFurious() throws {
+  @Test("IH-FuriousZhuyin-008 Front read points under zhuyin furious")
+  func test_IH_FuriousZhuyin_008_FrontReadPointsUnderZhuyinFurious() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -277,17 +311,78 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "實得：\(testHandler.composer.getComposition())"
     )
   }
-}
 
-// MARK: - 注音簡拼（P260）
+  /// 注音狂打**不**寫 `furiousTrail`——trail 是拼音字母 blob，注音鍵流無此概念。
+  @Test("IH-FuriousZhuyin-009 Zhuyin furious does not record trail")
+  func test_IH_FuriousZhuyin_009_ZhuyinFuriousDoesNotRecordTrail() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testSession.resetInputHandler(forceComposerCleanup: true) }
 
-extension LibVanguardTestsRoot.InputHandlerTests {
+    _ = typeZhuyinAndCollectReadingKeys("elej/", zhuyinFurious: true)
+    #expect(testHandler.furiousTrail.isEmpty, "實得：\(testHandler.furiousTrail)")
+  }
+
+  /// 註音狂打**關閉**時，行為須與今日完全一致：連打兩音節不會自動切音節。
+  @Test("IH-FuriousZhuyin-010 Behaviour unchanged when zhuyin furious is off")
+  func test_IH_FuriousZhuyin_010_BehaviourUnchangedWhenZhuyinFuriousIsOff() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testSession.resetInputHandler(forceComposerCleanup: true) }
+
+    let keys = typeZhuyinAndCollectReadingKeys("elej/", zhuyinFurious: false)
+    // 未開狂打 ⇒ 不自動切音節；`e` 覆寫聲母（同值，無觀測變化）、`j` 覆寫介母、`/` 覆寫韻母
+    // ⇒ 組字器一個鍵都沒有，且注拼槽停在最後一組按鍵之合成（ㄍㄨㄥ）。
+    #expect(keys.isEmpty, "實得：\(keys)")
+    // 且注拼槽停在最後一組按鍵之內容（ㄍ 被覆寫為 ㄍ、韻母由 ㄠ 變 ㄥ）。
+    #expect(testHandler.composer.getComposition() == "ㄍㄨㄥ", "實得：\(testHandler.composer.getComposition())")
+  }
+
+  /// 拼音狂拼之 `hasFuriousFrontPending` 語意**不得**因注音側之分流而改變。
+  @Test("IH-FuriousZhuyin-011 Pinyin furious pending semantics unchanged")
+  func test_IH_FuriousZhuyin_011_PinyinFuriousPendingSemanticsUnchanged() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    enterPinyinFuriousTestEnvironment()
+    #expect(testHandler.typingMode == .pinyinFuriousTyping)
+
+    // 狂拼停用時：字母流非空亦不得視為「前方待確認讀音」（沿用舊語意）。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    typeSentence("gao")
+    #expect(testHandler.composer.romajiBuffer == "gao")
+    #expect(testHandler.furiousFrontUnfinishedReading == nil)
+    #expect(!testHandler.hasFuriousFrontPending)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 狂拼啟用時：字母流即顯示源。
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
+    #expect(testHandler.furiousFrontUnfinishedReading == nil)
+    typeSentence("gao")
+    #expect(testHandler.composer.romajiBuffer == "gao")
+    #expect(testHandler.furiousFrontUnfinishedReading == "gao")
+    #expect(testHandler.hasFuriousFrontPending)
+    #expect(testSession.unfinishedReading == "gao")
+
+    // 固化後（空格）旗子落回。
+    typeSentence(" ")
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(!testHandler.hasFuriousFrontPending)
+    #expect(testSession.unfinishedReading == nil)
+  }
+
   /// 注音簡拼之 cells ＝「組字器尾段之單注音鍵（至多 3）＋ 注拼槽之當前讀音」。
   ///
   /// 三條界線同時釘住：① 少於 2 格不成立（單一格即整個聲母家族）；② 序列跨「已自動切出
   /// 之單注音」與「注拼槽內待確認者」；③ **遇完整音節即停**（該鍵不是任何讀音之起頭候選）。
-  @Test("[IH166] 注音狂打：簡拼 cells 之還原與界線")
-  func test_IH166_ZhuyinAbbreviationCells() throws {
+  @Test("IH-FuriousZhuyin-012 Zhuyin abbreviation cells")
+  func test_IH_FuriousZhuyin_012_ZhuyinAbbreviationCells() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -341,8 +436,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 注音簡拼之整詞候選：`ㄍㄋㄋ` ⇒ copilot 窗得 `狗男女`，就地選字後三段讀音與詞值一次就位。
   ///
   /// 此即事主之原始用例（「打 ㄍㄋㄋ 可以預覽到狗男女」）在**注音側**之落地。
-  @Test("[IH167] 注音狂打：簡拼整詞候選與就地選字")
-  func test_IH167_ZhuyinAbbreviationCandidatesAndInPlaceSelection() throws {
+  @Test("IH-FuriousZhuyin-013 Zhuyin abbreviation candidates and in-place selection")
+  func test_IH_FuriousZhuyin_013_ZhuyinAbbreviationCandidatesAndInPlaceSelection() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -382,534 +477,6 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.composer.isEmpty)
   }
 
-  /// 簡拼整詞候選**不得長於**當前 furious reading 所配對之格數（上界；P262）。
-  ///
-  /// 事主 2026-09-28 之實機：使用者語彙資料內有「科技獎 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ」時，
-  /// 注音狂打之 `ㄎㄐ`（大千 `dr`）與拼音狂打之 `kj` 皆為**兩格**，而 copilot 窗會出現
-  /// **三音節**之「科技獎」——注音側居首（排序鍵為段數降冪）、拼音側居末（α 路徑照
-  /// 語言模組序）。根因在使用者片語側之多位置前綴掃描忽略多出的段：簡拼查詢之兩分區
-  /// 本應受同一上界約束（原廠側之 trie 查詢恆為等段）。
-  ///
-  /// 本靶四臂：兩模式 × （兩格＝不得出現／三格＝須出現），並以就地選字證明三格者確實
-  /// 可套用（兩格情境下若仍顯示，選中即會寫入使用者從未敲下之音節）。
-  @Test("[IH169] 狂打：簡拼整詞候選之等段界線（注音／拼音兩側）")
-  func test_IH169_AbbreviationCandidatesStayWithinPairedSegmentCount() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    // 三音節者（＝事主所見之洩漏源）＋兩音節者（等段之正對照）＋近分競爭者
-    // （後者令拼音側之 α 自動套用因「非明確勝出」而不觸發，窗與注拼槽得以留存）。
-    [
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎", score: -6.0),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤ"], value: "科技江", score: -6.5),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
-    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
-
-    // ① 注音狂打 `ㄎㄐ`（兩格）：兩音節者入窗、三音節者不得入窗。
-    enterZhuyinFuriousTestEnvironment()
-    typeSentence("dr")
-    #expect(
-      testHandler.furiousZhuyinAbbreviationCells == ["ㄎ", "ㄐ"],
-      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
-    )
-    var values = testSession.state.candidates.map(\.value)
-    #expect(values.contains("科記"), "實得：\(values)")
-    #expect(!values.contains("科技獎"), "實得：\(values)")
-
-    // ② 注音狂打 `ㄎㄐㄐ`（三格）：三音節者入窗、兩音節者退場；就地選字三段讀音一次就位。
-    typeSentence("r")
-    #expect(
-      testHandler.furiousZhuyinAbbreviationCells == ["ㄎ", "ㄐ", "ㄐ"],
-      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
-    )
-    values = testSession.state.candidates.map(\.value)
-    #expect(values.contains("科技獎"), "實得：\(values)")
-    #expect(!values.contains("科記"), "實得：\(values)")
-    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "科技獎" }) else {
-      Issue.record("簡拼候選「科技獎」未入 copilot 窗：\(values)")
-      return
-    }
-    testSession.candidatePairSelectionConfirmed(at: index)
-    #expect(
-      testHandler.assembler.actualKeys == ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"],
-      "實得：\(testHandler.assembler.actualKeys)"
-    )
-    #expect(generateDisplayedText() == "科技獎", "實得：\(generateDisplayedText())")
-    #expect(testHandler.composer.isEmpty)
-
-    // ③ 拼音狂打 `kj`（兩格）：同上之界線（α 路徑之窗）。
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    enterPinyinFuriousTestEnvironment()
-    typeSentence("kj")
-    #expect(
-      testHandler.furiousAbbreviatedCells == ["ㄎ", "ㄐ"],
-      "實得：\(testHandler.furiousAbbreviatedCells ?? [])"
-    )
-    values = testSession.state.candidates.map(\.value)
-    #expect(values.contains("科記"), "實得：\(values)")
-    #expect(!values.contains("科技獎"), "實得：\(values)")
-
-    // ④ 拼音狂打 `kjj`（三格）：三音節者入窗（近分競爭者使之不觸發 α 自動套用）。
-    typeSentence("j")
-    #expect(
-      testHandler.furiousAbbreviatedCells == ["ㄎ", "ㄐ", "ㄐ"],
-      "實得：\(testHandler.furiousAbbreviatedCells ?? [])"
-    )
-    values = testSession.state.candidates.map(\.value)
-    #expect(values.contains("科技獎"), "實得：\(values)")
-    #expect(!values.contains("科記"), "實得：\(values)")
-  }
-
-  /// 簡拼整詞候選之順序與拼音 α 窗一致；該序即**分數序**（跨原廠與使用者片語兩來源合併）。
-  ///
-  /// 窗內同段數時：**語境候選**（由已提交鍵／待確認音節推得者）先於**簡拼整詞候選**；
-  /// 簡拼整詞候選為一個區塊、其內依**語言模組回傳之分數序**——查詢已跨來源合併排序，
-  /// 故分數更高之使用者片語命中得越過分數較低之原廠命中（事主 2026-09-28 之裁定）。
-  /// 本靶以同一組語料驅動兩模式、比對共同候選之相對順序；拼音側（α 路徑＝單一來源）即基準。
-  @Test("[IH170] 狂打：簡拼整詞候選之順序與拼音 α 窗一致")
-  func test_IH170_AbbreviationCandidateOrderMatchesPinyinAlphaWindow() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    // 兩音節之使用者片語（與測試辭典內之原廠命中「科技」「科際」同讀音）＋三音節者。
-    [
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎", score: -6.0),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤ"], value: "科技江", score: -6.5),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
-    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
-
-    // ① 拼音狂打 `kj`（α 路徑）：分數序——科記（−6.2，使用者片語）越過科際（−6.237，原廠）。
-    enterPinyinFuriousTestEnvironment()
-    typeSentence("kj")
-    let pinyinValues = testSession.state.candidates.map(\.value)
-    #expect(pinyinValues == ["科技", "科記", "科際"], "實得：\(pinyinValues)")
-
-    // ② 注音狂打 `ㄎㄐ`：共同候選之相對順序須與拼音側逐項相同；待確認音節之讀音原字串
-    //    回退值（桶釘候選）仍沉於同段數之真詞之後（P261 之裁定不變）。
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    enterZhuyinFuriousTestEnvironment()
-    typeSentence("dr")
-    let zhuyinValues = testSession.state.candidates.map(\.value)
-    #expect(zhuyinValues == ["科技", "科記", "科際", "ㄐ"], "實得：\(zhuyinValues)")
-    let pinyinSet = Set(pinyinValues)
-    let commonInZhuyin = zhuyinValues.filter { pinyinSet.contains($0) }
-    #expect(commonInZhuyin == pinyinValues, "注音：\(commonInZhuyin)；拼音：\(pinyinValues)")
-  }
-
-  /// 控頻：**雷同之詞音配對**（同值同讀音）之權重以使用者辭典者為最優先——狂打 copilot 窗隨之改序。
-  ///
-  /// 事主 2026-09-28 之指示：「整詞簡拼查詢之同值去重的規則需要對狂打模式也適用：對於雷同的
-  /// 詞音配對而言，其權重以使用者辭典內的權重為最優先。」通用查詢路徑本即以「使用者片語置前」
-  /// 實現此語義，整詞簡拼查詢則否；本靶以測試辭典內既存之兩筆原廠命中（科技 ㄎㄜ-ㄐㄧˋ
-  /// −3.311、科際 ㄎㄜ-ㄐㄧˋ −6.237）為雷同配對之對象，驗兩個方向：① **升頻**（科際 ⇒ −0.5）；
-  /// ② **降頻**（科技 ⇒ −12.0）。
-  /// - Important: 兩方向之可見效果皆以**分數序**呈現：被降頻之原廠配對必沉於分數更高之
-  ///   使用者片語命中之後（事主 2026-09-28 之裁定），故兩臂之期望序皆為 `科際→科紀→科技`。
-  ///
-  /// - Important: 兩臂皆另注入一筆**近分競爭者**（科紀，使用者辭典）——否則「明確勝出」條件成立時，
-  ///   R3-a 之自動套用會消費本拍並清空注拼槽，窗無從觀察（測試構造之條件，非生產碼之限制）。
-  /// - Important: 有副作用之輔助函式（打鍵、切環境）**不得直接寫進 `#expect` 之運算式**——Swift
-  ///   Testing 於診斷時會二次求值，該式將被執行兩遍（實錄：首遍得窗、次遍得空窗而誤報失敗）。
-  @Test("[IH171] 狂打：控頻——雷同之詞音配對取使用者辭典之權重")
-  func test_IH171_UserPhrasesControlFrequencyInFuriousWindows() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    enterZhuyinFuriousTestEnvironment()
-
-    /// 以注音狂打 `ㄎㄐ` 取得窗內詞值序（副作用：重置組字狀態後打字）。
-    func zhuyinWindowValues() -> [String] {
-      testSession.resetInputHandler(forceComposerCleanup: true)
-      typeSentence("dr")
-      return testSession.state.candidates.map(\.value)
-    }
-
-    /// 以拼音狂打 `kj` 取得 α 窗之詞值序（副作用：切環境、打字、再切回注音）。
-    func pinyinWindowValues() -> [String] {
-      testSession.resetInputHandler(forceComposerCleanup: true)
-      enterPinyinFuriousTestEnvironment()
-      typeSentence("kj")
-      let result = testSession.state.candidates.map(\.value)
-      testSession.resetInputHandler(forceComposerCleanup: true)
-      enterZhuyinFuriousTestEnvironment()
-      return result
-    }
-
-    /// 以整詞簡拼查詢取得該詞之權重。
-    func weight(of value: String) -> Double? {
-      testHandler.currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ"])
-        .first(where: { $0.current == value })?.probability
-    }
-
-    // ⓪ 基線：無使用者條目時，原廠側之兩筆命中（科技 −3.311 於科際 −6.237 之前）。
-    let baselineZhuyin = zhuyinWindowValues()
-    #expect(baselineZhuyin == ["科技", "科際", "ㄐ"], "實得：\(baselineZhuyin)")
-
-    // ① 升頻：雷同配對（科際 ㄎㄜ-ㄐㄧˋ）之權重改取使用者側（−0.5）⇒ 躍居首位。
-    [
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科際", score: -0.5),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科紀", score: -0.6),
-    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
-    let boostedJi = weight(of: "科際")
-    let boostedKe = weight(of: "科技")
-    let boostedZhuyin = zhuyinWindowValues()
-    let boostedPinyin = pinyinWindowValues()
-    #expect(boostedJi == -0.5, "實得：\(boostedJi as Any)")
-    #expect(boostedKe == -3.311, "非雷同者不受牽連；實得：\(boostedKe as Any)")
-    #expect(boostedZhuyin == ["科際", "科紀", "科技", "ㄐ"], "實得：\(boostedZhuyin)")
-    #expect(boostedPinyin == ["科際", "科紀", "科技"], "實得：\(boostedPinyin)")
-
-    // ② 降頻：改把「科技」壓至 −12.0 ⇒ 沉於「科際」（−6.237）之下（覆寫為雙向）。
-    testHandler.currentLM.clearTemporaryData(isFiltering: false)
-    [
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科技", score: -12.0),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科紀", score: -6.5),
-    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
-    let demotedKe = weight(of: "科技")
-    let untouchedJi = weight(of: "科際")
-    let demotedZhuyin = zhuyinWindowValues()
-    let demotedPinyin = pinyinWindowValues()
-    #expect(demotedKe == -12.0, "實得：\(demotedKe as Any)")
-    #expect(untouchedJi == -6.237, "實得：\(untouchedJi as Any)")
-    // 降頻之核心斷言：科技（−12.0）沉於科紀（−6.5）之後——分區陳列已不再遮蔽分數序。
-    #expect(demotedZhuyin == ["科際", "科紀", "科技", "ㄐ"], "實得：\(demotedZhuyin)")
-    #expect(demotedPinyin == ["科際", "科紀", "科技"], "實得：\(demotedPinyin)")
-  }
-
-  /// 「名次」一律**按分數取**，不看清單位置——α 固化（空格／Tab）與 R3-a 自動套用皆然。
-  ///
-  /// 名次即分數；本靶以「使用者專有詞（原廠無此詞）之分數高於所有原廠命中、且其讀音與
-  /// 原廠命中互異」之構造，令兩者之判別成為可觀測之別（窗內首位即該詞，固化亦取之）：
-  /// ① **固化**（空格）：取分數最高者之讀音 ⇒ 顯示該使用者詞；取清單首筆則會插入原廠命中
-  ///    之讀音、顯示成原廠詞（修前實錄）；
-  /// ② **自動套用**（明確勝出）：頂級候選按分數取——即使該使用者詞在清單末位。
-  @Test("[IH172] 狂打：α 固化與自動套用之『名次』按分數取")
-  func test_IH172_AbbreviationRankIsScoreBased() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    enterPinyinFuriousTestEnvironment()
-
-    // ① 固化：使用者專有詞「科吉」（ㄎㄜ-ㄐㄧˊ，−0.5）之分數高於兩筆原廠命中，惟其位置
-    //    在清單末（分區制）；且與次高者（科技 −3.311）之差 < 3.0 ⇒ 不觸發自動套用、留待空格固化。
-    testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
-      isFiltering: false
-    )
-    typeSentence("kj")
-    let windowBeforeSolidify = testSession.state.candidates.map(\.value)
-    typeSentence(" ")
-    let keysAfterSolidify = testHandler.assembler.actualKeys
-    let displayAfterSolidify = generateDisplayedText()
-    #expect(windowBeforeSolidify == ["科吉", "科技", "科際"], "實得：\(windowBeforeSolidify)")
-    #expect(keysAfterSolidify == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterSolidify)")
-    #expect(displayAfterSolidify == "科吉", "實得：\(displayAfterSolidify)")
-
-    // ② 自動套用：把兩筆原廠命中降頻以撐開差距（−8.0／−8.5），使用者詞（−0.5）因而「明確勝出」
-    //    ⇒ 末鍵即自動套用該詞之讀音（即使它在清單末位）。
-    testHandler.currentLM.clearTemporaryData(isFiltering: false)
-    [
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科技", score: -8.0),
-      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科際", score: -8.5),
-    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("kj")
-    let keysAfterAutoApply = testHandler.assembler.actualKeys
-    let displayAfterAutoApply = generateDisplayedText()
-    #expect(testHandler.composer.romajiBuffer.isEmpty, "自動套用應清空注拼槽。")
-    #expect(keysAfterAutoApply == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterAutoApply)")
-    #expect(displayAfterAutoApply == "科吉", "實得：\(displayAfterAutoApply)")
-  }
-
-  /// 注音狂打：copilot 交棒至標準選字窗之後，整詞候選仍須可見且可就地選字。
-  ///
-  /// 交棒後組字器內只有單注音格鍵（含固化後之聲調變體桶），而標準窗之候選係由既成節點推得
-  /// （`assembler.fetchCandidates` ⇒ full match 之檢索結果，多為注音文回聲條目）⇒ 整詞候選
-  /// 會消失。本靶釘五事：① 標準窗可見「狗男女」；② 其選取走狂打之套用路徑（鍵鏈換成該詞之
-  /// 讀音、顯示正確）；③ 非前方候選者不受此路由；④ **打字途中組字器鍵鏈不被 partial 候選
-  /// 改寫**（`config.partialMatchEnabled` 恆為假）——此即與「直接開 partial match 旗標」之別；
-  /// ⑤ **固化即取該詞之讀音**：交棒之固化改以窗內整詞簡拼候選之首的實際讀音入庫（P266），
-  /// 故鍵鏈與組字區顯示自交棒當拍起即為該詞（修前：鍵鏈為 `ㄍㄋㄋ`、顯示為讀音原文）。
-  ///
-  /// - Note: 對齊不成立時之交棒語義（只併入聲調變體桶）由 IH175 把守。
-  @Test("[IH173] 注音狂打：交棒後之標準選字窗仍見整詞候選")
-  func test_IH173_StandardWindowKeepsAbbreviationCandidates() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    enterZhuyinFuriousTestEnvironment()
-    testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"], value: "狗男女", score: -6.6),
-      isFiltering: false
-    )
-
-    // ① copilot 窗顯示期間：整詞候選在列，且組字器鍵鏈即所敲之單注音鍵。
-    typeSentence("ess") // ㄍㄋㄋ
-    let copilotValues = testSession.state.candidates.map(\.value)
-    #expect(copilotValues.contains("狗男女"), "實得：\(copilotValues)")
-    #expect(
-      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ"],
-      "實得：\(testHandler.assembler.actualKeys)"
-    )
-    #expect(!testHandler.currentLM.config.partialMatchEnabled, "本 phase 不得開啟 partial match 旗標。")
-
-    // ② 交棒：無修飾方向鍵 ⇒ 固化前方讀音（改取窗內整詞簡拼候選之首的讀音）＋開出標準選字窗。
-    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
-    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
-    let standardValues = testSession.state.candidates.map(\.value)
-    #expect(standardValues.contains("狗男女"), "實得：\(standardValues)")
-    #expect(
-      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
-      "實得：\(testHandler.assembler.actualKeys)"
-    )
-    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
-    #expect(!testHandler.currentLM.config.partialMatchEnabled, "鍵鏈不得因 partial 檢索而被改寫。")
-
-    // ③ 非前方候選者不經狂打之路由。
-    #expect(
-      !testHandler.confirmFuriousAbbreviatedCandidateFromStandardWindow(
-        (keyArray: ["ㄋ"], value: "ㄋ")
-      ),
-      "非簡拼整詞候選不得走狂打套用路徑。"
-    )
-
-    // ④ 就地選字：鍵鏈換成該詞之讀音、顯示正確、注拼槽清空。
-    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "狗男女" }) else {
-      Issue.record("標準窗內無「狗男女」：\(standardValues)")
-      return
-    }
-    testSession.candidatePairSelectionConfirmed(at: index)
-    #expect(
-      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
-      "實得：\(testHandler.assembler.actualKeys)"
-    )
-    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
-    #expect(testHandler.composer.isEmpty)
-  }
-
-  // MARK: - 控頻配對與自動套用（P266）
-
-  /// 狂打：**控頻之雷同配對不得自動套用**——copilot 窗改由使用者定奪。
-  ///
-  /// R3-a 之自動套用（明確勝出即於末鍵套用該詞之讀音、清空注拼槽）在 P262～P264 收斂簡拼
-  /// 查詢之後出現了 regression：使用者辭典內與原廠**同值同讀音**之條目（控頻用）經 P263 之
-  /// 權重覆寫與 P264 之分數排序升為首選，其與次高者之差距動輒超過 3.0 ⇒ 自動套用連 copilot
-  /// 窗都來不及開。故新增閘門：該配對兩倉皆有（＝控頻對象）時不自動套用，改為開窗待選。
-  ///
-  /// 本靶釘三事：① 該配對確為控頻對象（兩倉皆有）；② 其為首選且差距遠超門檻時仍**不**自動
-  /// 套用——copilot 窗在列、組字器鍵鏈不動；③ **對照組**：使用者專有詞（原廠無此讀音）之
-  /// 自動套用語義不變（此閘門只管雷同配對，不得變成全域停用）。
-  @Test("[IH174] 狂打：控頻之雷同配對不得自動套用")
-  func test_IH174_FrequencyControlledPairSkipsAutoApply() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
-    let textMap = makeTypingTextMap([
-      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ", [("科技獎", -6.0, factoryTypeID)]),
-      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤ", [("科技江", -6.5, factoryTypeID)]),
-    ])
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
-    enterPinyinFuriousTestEnvironment()
-
-    // ① 控頻配對：同值同讀音、兩倉皆有（使用者側權重遠高於原廠側）。
-    let controlledPair: (keyArray: [String], value: String) = (
-      keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎"
-    )
-    testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: controlledPair.keyArray, value: controlledPair.value, score: -0.5),
-      isFiltering: false
-    )
-    #expect(
-      testHandler.currentLM.isFrequencyControlledPair(controlledPair),
-      "同值同讀音且兩倉皆有者即控頻配對。"
-    )
-
-    // ② 末鍵之自動套用：首選（−0.5）與次高者（−6.0）差距 5.5 > 3.0，惟該配對為控頻對象
-    //    ⇒ 不套用：注拼槽保留原文、組字器鍵鏈不動、copilot 窗照常開出。
-    typeSentence("kjj")
-    let windowAfterTyping = testSession.state.candidates.map(\.value)
-    #expect(windowAfterTyping == ["科技獎", "科技江"], "實得：\(windowAfterTyping)")
-    #expect(testHandler.assembler.actualKeys.isEmpty, "實得：\(testHandler.assembler.actualKeys)")
-    #expect(testHandler.composer.romajiBuffer == "kjj", "實得：\(testHandler.composer.romajiBuffer)")
-    #expect(generateDisplayedText().isEmpty, "實得：\(generateDisplayedText())")
-
-    // ③ 對照組：使用者專有詞（讀音 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˋ，原廠無此條目）仍走自動套用。
-    testHandler.currentLM.clearTemporaryData(isFiltering: false)
-    let userOnlyPair: (keyArray: [String], value: String) = (
-      keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˋ"], value: "科記獎"
-    )
-    testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: userOnlyPair.keyArray, value: userOnlyPair.value, score: -0.5),
-      isFiltering: false
-    )
-    #expect(
-      !testHandler.currentLM.isFrequencyControlledPair(userOnlyPair),
-      "原廠無此配對者不是控頻對象。"
-    )
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("kjj")
-    #expect(
-      testHandler.assembler.actualKeys == userOnlyPair.keyArray,
-      "實得：\(testHandler.assembler.actualKeys)"
-    )
-    #expect(generateDisplayedText() == "科記獎", "實得：\(generateDisplayedText())")
-    #expect(testHandler.composer.romajiBuffer.isEmpty, "自動套用應清空注拼槽。")
-  }
-
-  /// 注音狂打：**對齊不成立時**之交棒仍只併入聲調變體桶（P266 之退回語義）。
-  ///
-  /// IH173 ② 之交棒固化取「窗內整詞簡拼候選之首」而入庫；若該首選之讀音數與格鏈鍵數不
-  /// 對位（此處：辭典內無 ㄍㄋㄋ 起頭之整詞候選）⇒ 退回既有語義：單注音鍵 ＋ 聲調變體桶。
-  @Test("[IH175] 注音狂打：無對齊整詞候選時之交棒仍只併聲調桶")
-  func test_IH175_HandoverWithoutAlignedWordStillInsertsBucket() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      leaveFuriousTestEnvironment()
-    }
-    clearTestPOM()
-    enterZhuyinFuriousTestEnvironment()
-
-    typeSentence("ess") // ㄍㄋㄋ
-    #expect(
-      testHandler.currentLM.lxQuerier.abbreviatedWordCandidates(
-        keysChopped: testHandler.furiousZhuyinAbbreviationCells ?? []
-      ).isEmpty,
-      "本靶之辭典內不得有 ㄍㄋㄋ 起頭之整詞候選。"
-    )
-    let copilotValues = testSession.state.candidates.map(\.value)
-    #expect(!copilotValues.contains("狗男女"), "實得：\(copilotValues)")
-
-    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
-    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
-    #expect(
-      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ", "ㄋ"],
-      "實得：\(testHandler.assembler.actualKeys)"
-    )
-  }
-
-  // MARK: - 未完成前綴之讀音桶展開（P267）
-
-  /// 注音狂打：**單聲母（未完成之合法前綴）之窗與拼音側同構**。
-  ///
-  /// 拼音側敲單字母時，桶由字母流反推之可能音節構成（`zhuyinReadings(forPinyinFragment:)`）⇒
-  /// 窗內是「以該聲母起首之全部完整讀音」的真候選；注音側原逕行展開未完成音節之聲調變體，
-  /// 而單聲母本身不是任何詞條之讀音 ⇒ 桶內全屬無效鍵、窗內只剩讀音回聲（實測：注音 ㄎ 之窗
-  /// 僅一筆「ㄎ」，拼音 `k` 則有 376 筆）。本靶釘三事：① 注音單聲母之窗不再只有回聲、並含
-  /// 真候選；② 兩側之候選集**同一**（同一桶、同一語言模組）、首選亦同；③ **完整音節不展開**
-  /// （ㄎㄜ 之窗不得出現 ㄎㄞ 等更長讀音之字）。
-  @Test("[IH176] 注音狂打：單聲母之窗與拼音側同構")
-  func test_IH176_IncompletePrefixBucketMatchesPinyinSide() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer { leaveFuriousTestEnvironment() }
-    clearTestPOM()
-
-    // ① 拼音側之基準（`k`）。
-    enterPinyinFuriousTestEnvironment()
-    typeSentence("k")
-    let pinyinValues = testSession.state.candidates.map(\.value)
-    #expect(pinyinValues.count > 100, "實得：\(pinyinValues.count)")
-    #expect(pinyinValues.contains("科"), "實得：\(pinyinValues.prefix(8))")
-
-    // ② 注音側之單聲母（大千 `d` ＝ ㄎ）：候選集與首選皆與拼音側一致。
-    enterZhuyinFuriousTestEnvironment()
-    typeSentence("d")
-    let zhuyinValues = testSession.state.candidates.map(\.value)
-    #expect(zhuyinValues.count > 100, "實得：\(zhuyinValues.count)")
-    #expect(zhuyinValues != ["ㄎ"], "單聲母不得只給讀音回聲。")
-    #expect(Set(zhuyinValues) == Set(pinyinValues), "兩側之候選集須同一。")
-    #expect(zhuyinValues.first == pinyinValues.first, "實得：\(zhuyinValues.first ?? "nil")")
-
-    // ③ 完整音節不展開：ㄎㄜ（大千 `dk`）之窗不含 ㄎㄞ 等更長讀音之字。
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("dk")
-    let completeValues = testSession.state.candidates.map(\.value)
-    #expect(completeValues.contains("科"), "實得：\(completeValues.prefix(8))")
-    #expect(!completeValues.contains("開"), "完整音節不得展開為更長之讀音。")
-    #expect(!completeValues.contains("顆顆"), "完整音節不得展開為更長之讀音。")
-  }
-
-  /// 注音狂打：**單聲母之固化與拼音側同構**——仍可提交，且結果同一。
-  ///
-  /// 桶展開之後，單聲母之固化不再是「插入一批無效鍵」而是「插入該聲母家族之真讀音鍵」⇒
-  /// `Tekkon.SyllableIndex.isComplete(_:)` 之紅線（**不得**以之為「可否提交」之依據）由此靶
-  /// 守住：注音 ㄎ＋方向鍵（交棒固化）與拼音 `k`＋空格（無調確認組字）必須得到同一結果。
-  @Test("[IH177] 注音狂打：單聲母之固化與拼音側同構")
-  func test_IH177_IncompletePrefixSolidifyMatchesPinyinSide() throws {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler and testSession at least one of them is nil.")
-      return
-    }
-    defer { leaveFuriousTestEnvironment() }
-    clearTestPOM()
-
-    // ① 拼音側之基準：`k` ＋ 空格（無調確認組字）。
-    enterPinyinFuriousTestEnvironment()
-    typeSentence("k")
-    typeSentence(" ")
-    let pinyinKeys = testHandler.assembler.actualKeys
-    let pinyinDisplay = generateDisplayedText()
-
-    // ② 注音側：ㄎ ＋ 無修飾方向鍵（交棒固化）。
-    enterZhuyinFuriousTestEnvironment()
-    typeSentence("d")
-    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
-    let zhuyinKeys = testHandler.assembler.actualKeys
-    let zhuyinDisplay = generateDisplayedText()
-    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
-    #expect(zhuyinKeys == ["ㄎㄜ"], "實得：\(zhuyinKeys)")
-    #expect(zhuyinDisplay != "ㄎ", "固化不得停留在讀音原文。")
-    #expect(zhuyinKeys == pinyinKeys, "實得：\(zhuyinKeys) vs \(pinyinKeys)")
-    #expect(zhuyinDisplay == pinyinDisplay, "實得：\(zhuyinDisplay) vs \(pinyinDisplay)")
-  }
-
   // MARK: - 中英混合輸入回退與注音狂打之相容（P273）
 
   /// 「中英混合輸入回退」與「注音狂打」自 P273 起**並存**：回退之 ASCII 緩衝區即狂打之
@@ -923,8 +490,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///   「按鍵確實改走 `MixedAlphanumericalTypewriter`」之鐵證，勝於斷言型別）；
   /// ④ 撤除可逆：關掉回退後狂打即刻恢復「讀音素材住注拼槽」之形態；
   /// ⑤ **拼音側不受牽連**：回退本即注音鍵盤專屬，故 `4Pinyin` 與之無涉。
-  @Test("[IH168] 中英混合輸入回退與注音狂打並存（拼音側不受牽連）")
-  func test_IH168_MixedAlnumCoexistsWithZhuyinFurious() throws {
+  @Test("IH-FuriousZhuyin-014 Mixed alnum coexists with zhuyin furious")
+  func test_IH_FuriousZhuyin_014_MixedAlnumCoexistsWithZhuyinFurious() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1007,80 +574,543 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!testHandler.mixedAlnumZhuyinFuriousInEffect, "回退本即注音鍵盤專屬。")
   }
 
-  // MARK: - 中英混合輸入回退之 copilot 候選窗（P273）
-
-  /// 進入「中英混合輸入回退 ＋ 注音狂打」之測試環境：兩顆偏好皆開、狂拼關、POM 關
-  /// （免置頂序被擾動）、鍵盤排列為大千，並重置組字狀態。
-  private func enterMixedAlnumZhuyinFuriousTestEnvironment() {
-    guard let testHandler, let testSession else { return }
-    testHandler.prefs.cassetteEnabled = false
-    testHandler.prefs.useSCPCTypingMode = false
-    testHandler.prefs.furiousTypingEnabled4Pinyin = false
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = true
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
-    testHandler.composer.ensureParser(arrange: .ofDachen)
-    testSession.resetInputHandler(forceComposerCleanup: true)
-  }
-
-  /// 進入「**僅**中英混合輸入回退」之測試環境：回退開、兩側狂打皆關、POM 關、排列為大千。
+  /// 簡拼整詞候選**不得長於**當前 furious reading 所配對之格數（上界；P262）。
   ///
-  /// 與 `enterMixedAlnumZhuyinFuriousTestEnvironment` 成對：本檔驗混打之顯示語義時，
-  /// 須能單獨取「狂打關」那一態（`InputHandlerTests_Cases4` 之同名環境為 fileprivate）。
-  private func enterMixedAlnumOnlyTestEnvironment() {
-    guard let testHandler, let testSession else { return }
-    testHandler.prefs.cassetteEnabled = false
-    testHandler.prefs.useSCPCTypingMode = false
-    testHandler.prefs.furiousTypingEnabled4Pinyin = false
-    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
-    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
-    testHandler.composer.ensureParser(arrange: .ofDachen)
-    testSession.resetInputHandler(forceComposerCleanup: true)
-  }
-
-  /// 以真語料庫之實錄（`vChewing-VanguardLexicon` 之 `data-v4.8.5.txt`）注入臨時元圖。
+  /// 事主 2026-09-28 之實機：使用者語彙資料內有「科技獎 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ」時，
+  /// 注音狂打之 `ㄎㄐ`（大千 `dr`）與拼音狂打之 `kj` 皆為**兩格**，而 copilot 窗會出現
+  /// **三音節**之「科技獎」——注音側居首（排序鍵為段數降冪）、拼音側居末（α 路徑照
+  /// 語言模組序）。根因在使用者片語側之多位置前綴掃描忽略多出的段：簡拼查詢之兩分區
+  /// 本應受同一上界約束（原廠側之 trie 查詢恆為等段）。
   ///
-  /// - Parameter kanjiData: 逐行 `<帶調讀音鍵>\t或空格<詞值><分數>`；供靶以**真辭典之權重**
-  ///   驗字詞之取捨（測試辭典之 ㄋㄧ 族與真者不同，見 `IH531`）。
-  /// 逐字取自真語料庫之 ㄋㄧ 族（`data-v4.8.5.txt`）：`ㄋㄧ`（妮 −5.314）／`ㄋㄧˊ`（泥 −5.23）／
-  /// `ㄋㄧˇ`（你 −5.074）／`ㄋㄧˋ`（膩 −5.26）。**測試辭典無 `ㄋㄧ` 之陰平條目**（實查：該族
-  /// 條目之聲調標記不含陰平形），故凡驗「陰平確認」之靶皆須自備之。
-  private static let realLexiconNiFamily = """
-  ㄋㄧ 妮 -5.314
-  ㄋㄧˊ 泥 -5.23
-  ㄋㄧˇ 你 -5.074
-  ㄋㄧˋ 膩 -5.26
-  """
-
-  private func insertRealLexiconGrams(
-    _ handler: MockInputHandler,
-    _ kanjiData: String = realLexiconNiFamily
-  )
-    -> () -> () {
-    extractGrams(from: kanjiData).forEach {
-      handler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+  /// 本靶四臂：兩模式 × （兩格＝不得出現／三格＝須出現），並以就地選字證明三格者確實
+  /// 可套用（兩格情境下若仍顯示，選中即會寫入使用者從未敲下之音節）。
+  @Test("IH-FuriousZhuyin-015 Abbreviation candidates stay within paired segment count")
+  func test_IH_FuriousZhuyin_015_AbbreviationCandidatesStayWithinPairedSegmentCount() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
     }
-    return { handler.currentLM.clearTemporaryData(isFiltering: false) }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    // 三音節者（＝事主所見之洩漏源）＋兩音節者（等段之正對照）＋近分競爭者
+    // （後者令拼音側之 α 自動套用因「非明確勝出」而不觸發，窗與注拼槽得以留存）。
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎", score: -6.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤ"], value: "科技江", score: -6.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+
+    // ① 注音狂打 `ㄎㄐ`（兩格）：兩音節者入窗、三音節者不得入窗。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("dr")
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄎ", "ㄐ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+    var values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科記"), "實得：\(values)")
+    #expect(!values.contains("科技獎"), "實得：\(values)")
+
+    // ② 注音狂打 `ㄎㄐㄐ`（三格）：三音節者入窗、兩音節者退場；就地選字三段讀音一次就位。
+    typeSentence("r")
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄎ", "ㄐ", "ㄐ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+    values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科技獎"), "實得：\(values)")
+    #expect(!values.contains("科記"), "實得：\(values)")
+    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "科技獎" }) else {
+      Issue.record("簡拼候選「科技獎」未入 copilot 窗：\(values)")
+      return
+    }
+    testSession.candidatePairSelectionConfirmed(at: index)
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "科技獎", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.isEmpty)
+
+    // ③ 拼音狂打 `kj`（兩格）：同上之界線（α 路徑之窗）。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("kj")
+    #expect(
+      testHandler.furiousAbbreviatedCells == ["ㄎ", "ㄐ"],
+      "實得：\(testHandler.furiousAbbreviatedCells ?? [])"
+    )
+    values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科記"), "實得：\(values)")
+    #expect(!values.contains("科技獎"), "實得：\(values)")
+
+    // ④ 拼音狂打 `kjj`（三格）：三音節者入窗（近分競爭者使之不觸發 α 自動套用）。
+    typeSentence("j")
+    #expect(
+      testHandler.furiousAbbreviatedCells == ["ㄎ", "ㄐ", "ㄐ"],
+      "實得：\(testHandler.furiousAbbreviatedCells ?? [])"
+    )
+    values = testSession.state.candidates.map(\.value)
+    #expect(values.contains("科技獎"), "實得：\(values)")
+    #expect(!values.contains("科記"), "實得：\(values)")
   }
 
-  /// 還原：回退關、兩側狂打關、排列回標準注音、POM 回出廠。
-  private func leaveMixedAlnumTestEnvironment() {
-    guard let testHandler, let testSession else { return }
-    testHandler.prefs.mixedAlphanumericalEnabled = false
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-    leaveFuriousTestEnvironment()
+  /// 簡拼整詞候選之順序與拼音 α 窗一致；該序即**分數序**（跨原廠與使用者片語兩來源合併）。
+  ///
+  /// 窗內同段數時：**語境候選**（由已提交鍵／待確認音節推得者）先於**簡拼整詞候選**；
+  /// 簡拼整詞候選為一個區塊、其內依**語言模組回傳之分數序**——查詢已跨來源合併排序，
+  /// 故分數更高之使用者片語命中得越過分數較低之原廠命中（事主 2026-09-28 之裁定）。
+  /// 本靶以同一組語料驅動兩模式、比對共同候選之相對順序；拼音側（α 路徑＝單一來源）即基準。
+  @Test("IH-FuriousZhuyin-016 Abbreviation candidate order matches pinyin alpha window")
+  func test_IH_FuriousZhuyin_016_AbbreviationCandidateOrderMatchesPinyinAlphaWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    // 兩音節之使用者片語（與測試辭典內之原廠命中「科技」「科際」同讀音）＋三音節者。
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎", score: -6.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤ"], value: "科技江", score: -6.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科記", score: -6.2),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+
+    // ① 拼音狂打 `kj`（α 路徑）：分數序——科記（−6.2，使用者片語）越過科際（−6.237，原廠）。
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("kj")
+    let pinyinValues = testSession.state.candidates.map(\.value)
+    #expect(pinyinValues == ["科技", "科記", "科際"], "實得：\(pinyinValues)")
+
+    // ② 注音狂打 `ㄎㄐ`：共同候選之相對順序須與拼音側逐項相同；待確認音節之讀音原字串
+    //    回退值（桶釘候選）仍沉於同段數之真詞之後（P261 之裁定不變）。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("dr")
+    let zhuyinValues = testSession.state.candidates.map(\.value)
+    #expect(zhuyinValues == ["科技", "科記", "科際", "ㄐ"], "實得：\(zhuyinValues)")
+    let pinyinSet = Set(pinyinValues)
+    let commonInZhuyin = zhuyinValues.filter { pinyinSet.contains($0) }
+    #expect(commonInZhuyin == pinyinValues, "注音：\(commonInZhuyin)；拼音：\(pinyinValues)")
   }
+
+  /// 控頻：**雷同之詞音配對**（同值同讀音）之權重以使用者辭典者為最優先——狂打 copilot 窗隨之改序。
+  ///
+  /// 事主 2026-09-28 之指示：「整詞簡拼查詢之同值去重的規則需要對狂打模式也適用：對於雷同的
+  /// 詞音配對而言，其權重以使用者辭典內的權重為最優先。」通用查詢路徑本即以「使用者片語置前」
+  /// 實現此語義，整詞簡拼查詢則否；本靶以測試辭典內既存之兩筆原廠命中（科技 ㄎㄜ-ㄐㄧˋ
+  /// −3.311、科際 ㄎㄜ-ㄐㄧˋ −6.237）為雷同配對之對象，驗兩個方向：① **升頻**（科際 ⇒ −0.5）；
+  /// ② **降頻**（科技 ⇒ −12.0）。
+  /// - Important: 兩方向之可見效果皆以**分數序**呈現：被降頻之原廠配對必沉於分數更高之
+  ///   使用者片語命中之後（事主 2026-09-28 之裁定），故兩臂之期望序皆為 `科際→科紀→科技`。
+  ///
+  /// - Important: 兩臂皆另注入一筆**近分競爭者**（科紀，使用者辭典）——否則「明確勝出」條件成立時，
+  ///   R3-a 之自動套用會消費本拍並清空注拼槽，窗無從觀察（測試構造之條件，非生產碼之限制）。
+  /// - Important: 有副作用之輔助函式（打鍵、切環境）**不得直接寫進 `#expect` 之運算式**——Swift
+  ///   Testing 於診斷時會二次求值，該式將被執行兩遍（實錄：首遍得窗、次遍得空窗而誤報失敗）。
+  @Test("IH-FuriousZhuyin-017 User phrases control frequency in furious windows")
+  func test_IH_FuriousZhuyin_017_UserPhrasesControlFrequencyInFuriousWindows() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterZhuyinFuriousTestEnvironment()
+
+    /// 以注音狂打 `ㄎㄐ` 取得窗內詞值序（副作用：重置組字狀態後打字）。
+    func zhuyinWindowValues() -> [String] {
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      typeSentence("dr")
+      return testSession.state.candidates.map(\.value)
+    }
+
+    /// 以拼音狂打 `kj` 取得 α 窗之詞值序（副作用：切環境、打字、再切回注音）。
+    func pinyinWindowValues() -> [String] {
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      enterPinyinFuriousTestEnvironment()
+      typeSentence("kj")
+      let result = testSession.state.candidates.map(\.value)
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      enterZhuyinFuriousTestEnvironment()
+      return result
+    }
+
+    /// 以整詞簡拼查詢取得該詞之權重。
+    func weight(of value: String) -> Double? {
+      testHandler.currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: ["ㄎ", "ㄐ"])
+        .first(where: { $0.current == value })?.probability
+    }
+
+    // ⓪ 基線：無使用者條目時，原廠側之兩筆命中（科技 −3.311 於科際 −6.237 之前）。
+    let baselineZhuyin = zhuyinWindowValues()
+    #expect(baselineZhuyin == ["科技", "科際", "ㄐ"], "實得：\(baselineZhuyin)")
+
+    // ① 升頻：雷同配對（科際 ㄎㄜ-ㄐㄧˋ）之權重改取使用者側（−0.5）⇒ 躍居首位。
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科際", score: -0.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科紀", score: -0.6),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    let boostedJi = weight(of: "科際")
+    let boostedKe = weight(of: "科技")
+    let boostedZhuyin = zhuyinWindowValues()
+    let boostedPinyin = pinyinWindowValues()
+    #expect(boostedJi == -0.5, "實得：\(boostedJi as Any)")
+    #expect(boostedKe == -3.311, "非雷同者不受牽連；實得：\(boostedKe as Any)")
+    #expect(boostedZhuyin == ["科際", "科紀", "科技", "ㄐ"], "實得：\(boostedZhuyin)")
+    #expect(boostedPinyin == ["科際", "科紀", "科技"], "實得：\(boostedPinyin)")
+
+    // ② 降頻：改把「科技」壓至 −12.0 ⇒ 沉於「科際」（−6.237）之下（覆寫為雙向）。
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科技", score: -12.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科紀", score: -6.5),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    let demotedKe = weight(of: "科技")
+    let untouchedJi = weight(of: "科際")
+    let demotedZhuyin = zhuyinWindowValues()
+    let demotedPinyin = pinyinWindowValues()
+    #expect(demotedKe == -12.0, "實得：\(demotedKe as Any)")
+    #expect(untouchedJi == -6.237, "實得：\(untouchedJi as Any)")
+    // 降頻之核心斷言：科技（−12.0）沉於科紀（−6.5）之後——分區陳列已不再遮蔽分數序。
+    #expect(demotedZhuyin == ["科際", "科紀", "科技", "ㄐ"], "實得：\(demotedZhuyin)")
+    #expect(demotedPinyin == ["科際", "科紀", "科技"], "實得：\(demotedPinyin)")
+  }
+
+  /// 「名次」一律**按分數取**，不看清單位置——α 固化（空格／Tab）與 R3-a 自動套用皆然。
+  ///
+  /// 名次即分數；本靶以「使用者專有詞（原廠無此詞）之分數高於所有原廠命中、且其讀音與
+  /// 原廠命中互異」之構造，令兩者之判別成為可觀測之別（窗內首位即該詞，固化亦取之）：
+  /// ① **固化**（空格）：取分數最高者之讀音 ⇒ 顯示該使用者詞；取清單首筆則會插入原廠命中
+  ///    之讀音、顯示成原廠詞（修前實錄）；
+  /// ② **自動套用**（明確勝出）：頂級候選按分數取——即使該使用者詞在清單末位。
+  @Test("IH-FuriousZhuyin-018 Abbreviation rank is score-based")
+  func test_IH_FuriousZhuyin_018_AbbreviationRankIsScoreBased() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterPinyinFuriousTestEnvironment()
+
+    // ① 固化：使用者專有詞「科吉」（ㄎㄜ-ㄐㄧˊ，−0.5）之分數高於兩筆原廠命中，惟其位置
+    //    在清單末（分區制）；且與次高者（科技 −3.311）之差 < 3.0 ⇒ 不觸發自動套用、留待空格固化。
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
+      isFiltering: false
+    )
+    typeSentence("kj")
+    let windowBeforeSolidify = testSession.state.candidates.map(\.value)
+    typeSentence(" ")
+    let keysAfterSolidify = testHandler.assembler.actualKeys
+    let displayAfterSolidify = generateDisplayedText()
+    #expect(windowBeforeSolidify == ["科吉", "科技", "科際"], "實得：\(windowBeforeSolidify)")
+    #expect(keysAfterSolidify == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterSolidify)")
+    #expect(displayAfterSolidify == "科吉", "實得：\(displayAfterSolidify)")
+
+    // ② 自動套用：把兩筆原廠命中降頻以撐開差距（−8.0／−8.5），使用者詞（−0.5）因而「明確勝出」
+    //    ⇒ 末鍵即自動套用該詞之讀音（即使它在清單末位）。
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    [
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科技", score: -8.0),
+      Homa.Gram(keyArray: ["ㄎㄜ", "ㄐㄧˋ"], value: "科際", score: -8.5),
+    ].forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("kj")
+    let keysAfterAutoApply = testHandler.assembler.actualKeys
+    let displayAfterAutoApply = generateDisplayedText()
+    #expect(testHandler.composer.romajiBuffer.isEmpty, "自動套用應清空注拼槽。")
+    #expect(keysAfterAutoApply == ["ㄎㄜ", "ㄐㄧˊ"], "實得：\(keysAfterAutoApply)")
+    #expect(displayAfterAutoApply == "科吉", "實得：\(displayAfterAutoApply)")
+  }
+
+  /// 注音狂打：copilot 交棒至標準選字窗之後，整詞候選仍須可見且可就地選字。
+  ///
+  /// 交棒後組字器內只有單注音格鍵（含固化後之聲調變體桶），而標準窗之候選係由既成節點推得
+  /// （`assembler.fetchCandidates` ⇒ full match 之檢索結果，多為注音文回聲條目）⇒ 整詞候選
+  /// 會消失。本靶釘五事：① 標準窗可見「狗男女」；② 其選取走狂打之套用路徑（鍵鏈換成該詞之
+  /// 讀音、顯示正確）；③ 非前方候選者不受此路由；④ **打字途中組字器鍵鏈不被 partial 候選
+  /// 改寫**（`config.partialMatchEnabled` 恆為假）——此即與「直接開 partial match 旗標」之別；
+  /// ⑤ **固化即取該詞之讀音**：交棒之固化改以窗內整詞簡拼候選之首的實際讀音入庫（P266），
+  /// 故鍵鏈與組字區顯示自交棒當拍起即為該詞（修前：鍵鏈為 `ㄍㄋㄋ`、顯示為讀音原文）。
+  ///
+  /// - Note: 對齊不成立時之交棒語義（只併入聲調變體桶）由 IH-FuriousZhuyin-021 把守。
+  @Test("IH-FuriousZhuyin-019 Standard window keeps abbreviation candidates")
+  func test_IH_FuriousZhuyin_019_StandardWindowKeepsAbbreviationCandidates() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterZhuyinFuriousTestEnvironment()
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"], value: "狗男女", score: -6.6),
+      isFiltering: false
+    )
+
+    // ① copilot 窗顯示期間：整詞候選在列，且組字器鍵鏈即所敲之單注音鍵。
+    typeSentence("ess") // ㄍㄋㄋ
+    let copilotValues = testSession.state.candidates.map(\.value)
+    #expect(copilotValues.contains("狗男女"), "實得：\(copilotValues)")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(!testHandler.currentLM.config.partialMatchEnabled, "本 phase 不得開啟 partial match 旗標。")
+
+    // ② 交棒：無修飾方向鍵 ⇒ 固化前方讀音（改取窗內整詞簡拼候選之首的讀音）＋開出標準選字窗。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
+    let standardValues = testSession.state.candidates.map(\.value)
+    #expect(standardValues.contains("狗男女"), "實得：\(standardValues)")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
+    #expect(!testHandler.currentLM.config.partialMatchEnabled, "鍵鏈不得因 partial 檢索而被改寫。")
+
+    // ③ 非前方候選者不經狂打之路由。
+    #expect(
+      !testHandler.confirmFuriousAbbreviatedCandidateFromStandardWindow(
+        (keyArray: ["ㄋ"], value: "ㄋ")
+      ),
+      "非簡拼整詞候選不得走狂打套用路徑。"
+    )
+
+    // ④ 就地選字：鍵鏈換成該詞之讀音、顯示正確、注拼槽清空。
+    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "狗男女" }) else {
+      Issue.record("標準窗內無「狗男女」：\(standardValues)")
+      return
+    }
+    testSession.candidatePairSelectionConfirmed(at: index)
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍㄡˇ", "ㄋㄢˊ", "ㄋㄩˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "狗男女", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  // MARK: - 控頻配對與自動套用（P266）
+
+  /// 狂打：**控頻之雷同配對不得自動套用**——copilot 窗改由使用者定奪。
+  ///
+  /// R3-a 之自動套用（明確勝出即於末鍵套用該詞之讀音、清空注拼槽）在 P262～P264 收斂簡拼
+  /// 查詢之後出現了 regression：使用者辭典內與原廠**同值同讀音**之條目（控頻用）經 P263 之
+  /// 權重覆寫與 P264 之分數排序升為首選，其與次高者之差距動輒超過 3.0 ⇒ 自動套用連 copilot
+  /// 窗都來不及開。故新增閘門：該配對兩倉皆有（＝控頻對象）時不自動套用，改為開窗待選。
+  ///
+  /// 本靶釘三事：① 該配對確為控頻對象（兩倉皆有）；② 其為首選且差距遠超門檻時仍**不**自動
+  /// 套用——copilot 窗在列、組字器鍵鏈不動；③ **對照組**：使用者專有詞（原廠無此讀音）之
+  /// 自動套用語義不變（此閘門只管雷同配對，不得變成全域停用）。
+  @Test("IH-FuriousZhuyin-020 Frequency controlled pair skips auto apply")
+  func test_IH_FuriousZhuyin_020_FrequencyControlledPairSkipsAutoApply() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let textMap = makeTypingTextMap([
+      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˇ", [("科技獎", -6.0, factoryTypeID)]),
+      ("ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤ", [("科技江", -6.5, factoryTypeID)]),
+    ])
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    LXAssembly.LXFacade.disconnectFactoryDictionary()
+    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    enterPinyinFuriousTestEnvironment()
+
+    // ① 控頻配對：同值同讀音、兩倉皆有（使用者側權重遠高於原廠側）。
+    let controlledPair: (keyArray: [String], value: String) = (
+      keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˇ"], value: "科技獎"
+    )
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: controlledPair.keyArray, value: controlledPair.value, score: -0.5),
+      isFiltering: false
+    )
+    #expect(
+      testHandler.currentLM.isFrequencyControlledPair(controlledPair),
+      "同值同讀音且兩倉皆有者即控頻配對。"
+    )
+
+    // ② 末鍵之自動套用：首選（−0.5）與次高者（−6.0）差距 5.5 > 3.0，惟該配對為控頻對象
+    //    ⇒ 不套用：注拼槽保留原文、組字器鍵鏈不動、copilot 窗照常開出。
+    typeSentence("kjj")
+    let windowAfterTyping = testSession.state.candidates.map(\.value)
+    #expect(windowAfterTyping == ["科技獎", "科技江"], "實得：\(windowAfterTyping)")
+    #expect(testHandler.assembler.actualKeys.isEmpty, "實得：\(testHandler.assembler.actualKeys)")
+    #expect(testHandler.composer.romajiBuffer == "kjj", "實得：\(testHandler.composer.romajiBuffer)")
+    #expect(generateDisplayedText().isEmpty, "實得：\(generateDisplayedText())")
+
+    // ③ 對照組：使用者專有詞（讀音 ㄎㄜ-ㄐㄧˋ-ㄐㄧㄤˋ，原廠無此條目）仍走自動套用。
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    let userOnlyPair: (keyArray: [String], value: String) = (
+      keyArray: ["ㄎㄜ", "ㄐㄧˋ", "ㄐㄧㄤˋ"], value: "科記獎"
+    )
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: userOnlyPair.keyArray, value: userOnlyPair.value, score: -0.5),
+      isFiltering: false
+    )
+    #expect(
+      !testHandler.currentLM.isFrequencyControlledPair(userOnlyPair),
+      "原廠無此配對者不是控頻對象。"
+    )
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("kjj")
+    #expect(
+      testHandler.assembler.actualKeys == userOnlyPair.keyArray,
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "科記獎", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.romajiBuffer.isEmpty, "自動套用應清空注拼槽。")
+  }
+
+  /// 注音狂打：**對齊不成立時**之交棒仍只併入聲調變體桶（P266 之退回語義）。
+  ///
+  /// IH-FuriousZhuyin-019 ② 之交棒固化取「窗內整詞簡拼候選之首」而入庫；若該首選之讀音數與格鏈鍵數不
+  /// 對位（此處：辭典內無 ㄍㄋㄋ 起頭之整詞候選）⇒ 退回既有語義：單注音鍵 ＋ 聲調變體桶。
+  @Test("IH-FuriousZhuyin-021 Handover without aligned word still inserts bucket")
+  func test_IH_FuriousZhuyin_021_HandoverWithoutAlignedWordStillInsertsBucket() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    clearTestPOM()
+    enterZhuyinFuriousTestEnvironment()
+
+    typeSentence("ess") // ㄍㄋㄋ
+    #expect(
+      testHandler.currentLM.lxQuerier.abbreviatedWordCandidates(
+        keysChopped: testHandler.furiousZhuyinAbbreviationCells ?? []
+      ).isEmpty,
+      "本靶之辭典內不得有 ㄍㄋㄋ 起頭之整詞候選。"
+    )
+    let copilotValues = testSession.state.candidates.map(\.value)
+    #expect(!copilotValues.contains("狗男女"), "實得：\(copilotValues)")
+
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄍ", "ㄋ", "ㄋ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+  }
+
+  // MARK: - 未完成前綴之讀音桶展開（P267）
+
+  /// 注音狂打：**單聲母（未完成之合法前綴）之窗與拼音側同構**。
+  ///
+  /// 拼音側敲單字母時，桶由字母流反推之可能音節構成（`zhuyinReadings(forPinyinFragment:)`）⇒
+  /// 窗內是「以該聲母起首之全部完整讀音」的真候選；注音側原逕行展開未完成音節之聲調變體，
+  /// 而單聲母本身不是任何詞條之讀音 ⇒ 桶內全屬無效鍵、窗內只剩讀音回聲（實測：注音 ㄎ 之窗
+  /// 僅一筆「ㄎ」，拼音 `k` 則有 376 筆）。本靶釘三事：① 注音單聲母之窗不再只有回聲、並含
+  /// 真候選；② 兩側之候選集**同一**（同一桶、同一語言模組）、首選亦同；③ **完整音節不展開**
+  /// （ㄎㄜ 之窗不得出現 ㄎㄞ 等更長讀音之字）。
+  @Test("IH-FuriousZhuyin-022 Incomplete prefix bucket matches pinyin side")
+  func test_IH_FuriousZhuyin_022_IncompletePrefixBucketMatchesPinyinSide() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    clearTestPOM()
+
+    // ① 拼音側之基準（`k`）。
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("k")
+    let pinyinValues = testSession.state.candidates.map(\.value)
+    #expect(pinyinValues.count > 100, "實得：\(pinyinValues.count)")
+    #expect(pinyinValues.contains("科"), "實得：\(pinyinValues.prefix(8))")
+
+    // ② 注音側之單聲母（大千 `d` ＝ ㄎ）：候選集與首選皆與拼音側一致。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("d")
+    let zhuyinValues = testSession.state.candidates.map(\.value)
+    #expect(zhuyinValues.count > 100, "實得：\(zhuyinValues.count)")
+    #expect(zhuyinValues != ["ㄎ"], "單聲母不得只給讀音回聲。")
+    #expect(Set(zhuyinValues) == Set(pinyinValues), "兩側之候選集須同一。")
+    #expect(zhuyinValues.first == pinyinValues.first, "實得：\(zhuyinValues.first ?? "nil")")
+
+    // ③ 完整音節不展開：ㄎㄜ（大千 `dk`）之窗不含 ㄎㄞ 等更長讀音之字。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("dk")
+    let completeValues = testSession.state.candidates.map(\.value)
+    #expect(completeValues.contains("科"), "實得：\(completeValues.prefix(8))")
+    #expect(!completeValues.contains("開"), "完整音節不得展開為更長之讀音。")
+    #expect(!completeValues.contains("顆顆"), "完整音節不得展開為更長之讀音。")
+  }
+
+  /// 注音狂打：**單聲母之固化與拼音側同構**——仍可提交，且結果同一。
+  ///
+  /// 桶展開之後，單聲母之固化不再是「插入一批無效鍵」而是「插入該聲母家族之真讀音鍵」⇒
+  /// `Tekkon.SyllableIndex.isComplete(_:)` 之紅線（**不得**以之為「可否提交」之依據）由此靶
+  /// 守住：注音 ㄎ＋方向鍵（交棒固化）與拼音 `k`＋空格（無調確認組字）必須得到同一結果。
+  @Test("IH-FuriousZhuyin-023 Incomplete prefix solidify matches pinyin side")
+  func test_IH_FuriousZhuyin_023_IncompletePrefixSolidifyMatchesPinyinSide() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { leaveFuriousTestEnvironment() }
+    clearTestPOM()
+
+    // ① 拼音側之基準：`k` ＋ 空格（無調確認組字）。
+    enterPinyinFuriousTestEnvironment()
+    typeSentence("k")
+    typeSentence(" ")
+    let pinyinKeys = testHandler.assembler.actualKeys
+    let pinyinDisplay = generateDisplayedText()
+
+    // ② 注音側：ㄎ ＋ 無修飾方向鍵（交棒固化）。
+    enterZhuyinFuriousTestEnvironment()
+    typeSentence("d")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    let zhuyinKeys = testHandler.assembler.actualKeys
+    let zhuyinDisplay = generateDisplayedText()
+    #expect(testSession.state.isCandidateContainer, "實得：\(testSession.state.type)")
+    #expect(zhuyinKeys == ["ㄎㄜ"], "實得：\(zhuyinKeys)")
+    #expect(zhuyinDisplay != "ㄎ", "固化不得停留在讀音原文。")
+    #expect(zhuyinKeys == pinyinKeys, "實得：\(zhuyinKeys) vs \(pinyinKeys)")
+    #expect(zhuyinDisplay == pinyinDisplay, "實得：\(zhuyinDisplay) vs \(pinyinDisplay)")
+  }
+
+  // MARK: - 中英混合輸入回退之 copilot 候選窗（P273）
 
   /// 混打之 ASCII 緩衝即狂打之讀音素材：窗內須有該讀音之真候選、頂部 pane 須有
   /// 「原文 → 讀音」。
   ///
   /// 大千排列：ㄋ＝`s`、ㄧ＝`u`、ㄑ＝`f`、ㄛ＝`i`。`s` 為單聲母（合法前綴，桶內展開為該
   /// 聲母起首之全部讀音）、`su` 為完整音節；`fi` 則非任何讀音之起頭 ⇒ 窗即收。
-  @Test("[IH520] 中英混輸回退 ＋ 注音狂打：ASCII 緩衝即 copilot 之未完成讀音")
-  func test_IH520_MixedAlnumBufferServesAsUnfinishedReading() throws {
+  @Test("IH-FuriousZhuyin-024 Mixed alnum buffer serves as unfinished reading")
+  func test_IH_FuriousZhuyin_024_MixedAlnumBufferServesAsUnfinishedReading() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1154,8 +1184,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// - Important: 純注音狂打之空白鍵為陰平鍵（P260），本情境**不適用**——素材住混打緩衝、
   ///   聲調一律經數字鍵（`su3`）進入，故空格無「挪用即陰平無從指定」之虞；反之若不固化，
   ///   本鍵會落入混打之「整段緩衝 ＋ 半形空格」而把讀音當英文遞交（正是 P258 之病灶）。
-  @Test("[IH521] 中英混輸回退 ＋ 注音狂打：空格固化讀音")
-  func test_IH521_SpaceSolidifiesMixedAlnumReading() throws {
+  @Test("IH-FuriousZhuyin-025 Space solidifies mixed alnum reading")
+  func test_IH_FuriousZhuyin_025_SpaceSolidifiesMixedAlnumReading() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1218,8 +1248,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// copilot 窗之首選可循標準候選路徑就地套用（該窗為唯讀顯示、選取走選字窗之路由）。
-  @Test("[IH522] 中英混輸回退 ＋ 注音狂打：窗內候選之就地套用")
-  func test_IH522_MixedAlnumCopilotCandidateAppliesInPlace() throws {
+  @Test("IH-FuriousZhuyin-026 Mixed alnum copilot candidate applies in-place")
+  func test_IH_FuriousZhuyin_026_MixedAlnumCopilotCandidateAppliesInPlace() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1255,8 +1285,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 回退之下「連續注音」之狂打特性**仍封印**：不得自動切音節。
   ///
   /// 對照組即純注音狂打（同一組按鍵會於第二鍵自動切出前一音節）。
-  @Test("[IH523] 中英混輸回退 ＋ 注音狂打：自動切音節仍封印")
-  func test_IH523_AutoChopRemainsSealedUnderMixedAlnum() throws {
+  @Test("IH-FuriousZhuyin-027 Auto chop remains sealed under mixed alnum")
+  func test_IH_FuriousZhuyin_027_AutoChopRemainsSealedUnderMixedAlnum() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1277,8 +1307,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   }
 
   /// 對照組：純注音狂打（回退關）之下同一組按鍵**必須**自動切音節。
-  @Test("[IH524] 對照組：回退關閉時同一組按鍵照常自動切音節")
-  func test_IH524_AutoChopStillWorksWithoutMixedAlnum() throws {
+  @Test("IH-FuriousZhuyin-028 Auto chop still works without mixed alnum")
+  func test_IH_FuriousZhuyin_028_AutoChopStillWorksWithoutMixedAlnum() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1306,8 +1336,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 讀音欄之語義因而與純注音／拼音一致：它顯示「當前正在組裝的讀音」——混打側就是那段
   /// ASCII。顯示本即 `readingForDisplay` 對「注拼槽為空」之既有兜底，故本項只把該兜底
   /// 由「僅 Tooltip」改為「讀音欄優先」。
-  @Test("[IH525] 混打之 pending alnum 顯示於組字區讀音欄（狂打開關無涉）")
-  func test_IH525_MixedAlnumBufferShowsInCompositionReadingArea() throws {
+  @Test("IH-FuriousZhuyin-029 Mixed alnum buffer shows in composition reading area")
+  func test_IH_FuriousZhuyin_029_MixedAlnumBufferShowsInCompositionReadingArea() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1345,8 +1375,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// copilot 候選窗在場時，混打之注音原文由該窗**頂端之未完成讀音**承載，Tooltip 讓位
   /// （兩者本即重疊於畫面同一處）；窗不在場時 Tooltip 只承載讀音——原文自 P273 起已由
   /// 組字區之讀音欄全局承載，故任何一態下該原文都只出現一次。
-  @Test("[IH526] copilot 窗與 Tooltip 之分流：同一段原文只在一處呈現")
-  func test_IH526_MixedAlnumReadingGoesToCopilotOrTooltip() throws {
+  @Test("IH-FuriousZhuyin-030 Mixed alnum reading goes to the copilot window or the tooltip")
+  func test_IH_FuriousZhuyin_030_MixedAlnumReadingGoesToCopilotOrTooltip() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1399,8 +1429,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 此前混打路徑會把該待調音節固化為**無調**聲調桶而後遞交 ASCII（實測：`su` 按空格
   /// 得 `["ㄋㄧ"]` ＋ 遞交 `su `），遂令陰平無從指定。修正後之語義與純狂打同源：把該
   /// 讀音之**整組聲調變體桶**插入組字器、不覆寫，故語言模型得於窗內自行挑調。
-  @Test("[IH527] 混打＋注音狂打：空格以陰平確認待調讀音")
-  func test_IH527_MixedAlnumSpaceConfirmsPendingReadingWithFirstTone() throws {
+  @Test("IH-FuriousZhuyin-031 Mixed alnum Space confirms pending reading with first tone")
+  func test_IH_FuriousZhuyin_031_MixedAlnumSpaceConfirmsPendingReadingWithFirstTone() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1454,8 +1484,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 已帶聲調者之空白鍵語義不變：聲調一旦進入，讀音即為唯一解，空格照舊為「送字 ＋ 空格」。
   ///
   /// 此即「本修正只及待調讀音那一態」之護欄。
-  @Test("[IH528] 混打＋注音狂打：已帶聲調者之空白鍵語義不變")
-  func test_IH528_TonedReadingKeepsSpaceAsCommit() throws {
+  @Test("IH-FuriousZhuyin-032 A toned reading keeps Space as the commit key")
+  func test_IH_FuriousZhuyin_032_TonedReadingKeepsSpaceAsCommit() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1484,8 +1514,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 未強制槽序，遂把「以另一鍵補滿槽位」之殘段就地吸納（`us` 之槽值成 ㄋㄧ，與 `su` 無從
   /// 分辨）；② 讀音素材之判準只問「可發音 ∧ 是某讀音之起頭」，未問「該緩衝是否**恰為**
   /// 一個讀音」。兩者皆已收緊：前者強制 CSVT 順序、後者加「鍵數 == 佔用槽數」之核對。
-  @Test("[IH529] 混打＋注音狂打：殘段不得充作讀音素材（空白鍵照舊遞交 ASCII）")
-  func test_IH529_FragmentBufferIsNotAReading() throws {
+  @Test("IH-FuriousZhuyin-033 Fragment buffer is not a reading")
+  func test_IH_FuriousZhuyin_033_FragmentBufferIsNotAReading() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1526,10 +1556,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 事主原文：「注音狂打模式的空格不要觸發 copilot 的 confirm current candidate 的動作。
   /// 這是注音狂打與拼音狂打的行為差異之一，因為空格鍵是陰平。」故空格之語義為「把該讀音
   /// **定為陰平**、寫入組字器」；候選之選定仍歸 `Shift+選字鍵` 等明示路徑。
-  /// 本靶只驗「該音節被陰平地消費」與「窗內當前候選未被寫死」；字詞層之取捨見 `IH531`
+  /// 本靶只驗「該音節被陰平地消費」與「窗內當前候選未被寫死」；字詞層之取捨見 `IH-FuriousZhuyin-035`
   /// （該靶以真語料庫之權重為據，測試辭典之 ㄋㄧ 族與真者不同）。
-  @Test("[IH530] 注音狂打：空格為陰平鍵、不兼任 copilot 候選之確認")
-  func test_IH530_SpaceIsFirstToneNotCandidateConfirmation() throws {
+  @Test("IH-FuriousZhuyin-034 Space is the first-tone key, not candidate confirmation")
+  func test_IH_FuriousZhuyin_034_SpaceIsFirstToneNotCandidateConfirmation() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1567,8 +1597,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// `ㄋㄧ`（妮 −5.314）、`ㄋㄧˊ`（泥 −5.23）、`ㄋㄧˇ`（你 −5.074）、`ㄋㄧˋ`（膩 −5.26）。
   /// 陰平被確認後，組句**只**能在 `ㄋㄧ` 一族內挑字 ⇒ 得妮；若插入整組聲調變體桶，
   /// 則由分數更高之 ㄋㄧˇ 之你勝出（此即修正前之實況）。
-  @Test("[IH531] 混打＋注音狂打：`su ` 以真語料庫之陰平單字為準（妮）")
-  func test_IH531_SpacePinsReadingToFirstTone() throws {
+  @Test("IH-FuriousZhuyin-035 Space pins reading to first tone")
+  func test_IH_FuriousZhuyin_035_SpacePinsReadingToFirstTone() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1614,8 +1644,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 回歸：P273 起 `mixedAlnumPendingReading` 之量測無條件以 CSVT 消化，遂令停用者之
   /// `ls` 不被認作讀音素材（`furiousFrontUnfinishedReading == nil`、窗不開）——
   /// 該開關於狂打並存態亦應被貫徹，不得受注音狂打特性開關影響。
-  @Test("[IH536] 混打＋狂打：停用槽序檢定後亂序令牌照舊為讀音素材")
-  func test_IH536_SlotOrderSwitchOffRestoresFuriousReadingSource() throws {
+  @Test("IH-FuriousZhuyin-036 Slot order switch off restores furious reading source")
+  func test_IH_FuriousZhuyin_036_SlotOrderSwitchOffRestoresFuriousReadingSource() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1654,8 +1684,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///   素材）一字不動，故四組對照之其餘三組（純狂注、純狂拼、僅回退）一律無箭頭。
   /// - Note: 箭頭前後之原文由本處供給，`✍️ ` 前綴仍由選字窗側（`CandidatePool4AppKit`）統一
   ///   添加，故本靶只驗到箭頭形式為止。
-  @Test("[IH538] 並存時窗頂 pane 顯示「混打原文 → 讀音」，其餘三態無箭頭")
-  func test_IH538_MixedAlnumPaneTextShowsRawThenReading() throws {
+  @Test("IH-FuriousZhuyin-037 Mixed alnum pane text shows raw then reading")
+  func test_IH_FuriousZhuyin_037_MixedAlnumPaneTextShowsRawThenReading() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1747,8 +1777,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// - Important: 採組字區讀音欄之式，**不**轉教材式標調、**不**補陰平記號：注音素材可能是
   ///   **前綴**（單聲母），補記即得 `g1` 這類無母音可附調號之殘形；教材式另會把 `nv3` 寫成
   ///   `nǚ`、與組字區所見不一致（事主 2026-09-29 明示）。
-  @Test("[IH539] 拼音並擊啟用時，窗頂 pane 之注音讀音改以漢語拼音呈現")
-  func test_IH539_PaneReadingFollowsHanyuPinyinPreference() throws {
+  @Test("IH-FuriousZhuyin-038 Pane reading follows Hanyu pinyin preference")
+  func test_IH_FuriousZhuyin_038_PaneReadingFollowsHanyuPinyinPreference() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1784,7 +1814,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     // 帶聲調者：聲調附於尾端、`ü` 作 `v`（仍與組字區讀音欄逐字同式，非教材式標調）。
     // 註：注音狂打之「聲調鍵」本即音節確認鍵（讀音固化進組字器、注拼槽清空），
-    //     故帶調之未完成讀音無從以打字取得——此處直驅注拼槽（與 `IH218` 同法）。
+    //     故帶調之未完成讀音無從以打字取得——此處直驅注拼槽（與 `SS-TooltipAndMarking-002` 同法）。
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.clear()
     var composer = testHandler.composer
@@ -1866,8 +1896,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 中英混打之 Tooltip 讀音亦隨「拼音並擊」偏好：啟用且橫排時改以漢語拼音呈現（**組字區
   /// 讀音欄那一式**：數字標調附於尾端、`ü` 作 `v`）；直排時退回注音。轉換與窗頂 pane 同源
   /// ——不轉教材式標調、不補陰平記號，故單聲母前綴得 `m`、而非 `m1`。
-  @Test("[IH540] 拼音並擊啟用時，混打 Tooltip 之讀音改以漢語拼音呈現")
-  func test_IH540_MixedTooltipReadingFollowsHanyuPinyinPreference() throws {
+  @Test("IH-FuriousZhuyin-039 Mixed tooltip reading follows Hanyu pinyin preference")
+  func test_IH_FuriousZhuyin_039_MixedTooltipReadingFollowsHanyuPinyinPreference() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1882,7 +1912,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     enterMixedAlnumOnlyTestEnvironment()
     testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
     // Tooltip 之方向判定走 `InputSession.isVerticalTyping`；本檔之會話為 mock、無從綁定
-    // `InputSession.current`，故逕以「強制橫排」鎖定橫排那一態（方向規則本身由 `IH218` 釘住）。
+    // `InputSession.current`，故逕以「強制橫排」鎖定橫排那一態（方向規則本身由 `SS-TooltipAndMarking-002` 釘住）。
     testHandler.prefs.alwaysShowTooltipTextsHorizontally = true
 
     // 單聲母前綴（大千：`a`＝ㄇ）：不得補陰平記號而得 `m1`。
@@ -1890,7 +1920,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let prefixState = testHandler.generateStateOfInputting()
     #expect(prefixState.tooltip == "m", "實得：\(prefixState.tooltip)")
 
-    // 直驅注拼槽至「ㄇㄛˇ」，避開混輸 auto-split 對鍵序之依賴（與 `IH218` 同法）。
+    // 直驅注拼槽至「ㄇㄛˇ」，避開混輸 auto-split 對鍵序之依賴（與 `SS-TooltipAndMarking-002` 同法）。
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
     var composer = testHandler.composer
@@ -1914,8 +1944,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///   清空（大千：`su;`＝ㄋㄧㄤ 之投影已空、緩衝仍在；對照 `1u,`＝ㄅㄧㄝ 之投影倖存）。
   ///   只讀注拼槽者，凡多鍵之混打緩衝皆無讀音可示 ⇒ P277 起「Tooltip 只承載讀音」之語義
   ///   退化成「整窗收起」（事主 2026-09-29 回報：`su;` 之 Tooltip 為空、應示 `niang`）。
-  @Test("[IH541] 混打 Tooltip 之讀音取緩衝區之量測（注拼槽投影已空者亦然）")
-  func test_IH541_MixedTooltipReadingComesFromBuffer() throws {
+  @Test("IH-FuriousZhuyin-040 Mixed tooltip reading comes from buffer")
+  func test_IH_FuriousZhuyin_040_MixedTooltipReadingComesFromBuffer() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1999,12 +2029,12 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 混打＋注音狂打並存時，**Shift+Space** 之意義為「放棄注音處理」：整段混打緩衝以原文
   /// 遞交、其後附一個半形空格；待確認之讀音**不得**被固化、亦不得被當成陰平確認鍵。
   ///
-  /// - Important: 空格之陰平語義（`IH527`／`IH530`）只屬**不帶修飾鍵**之空格。Shift 是使用者
+  /// - Important: 空格之陰平語義（`IH-FuriousZhuyin-031`／`IH-FuriousZhuyin-034`）只屬**不帶修飾鍵**之空格。Shift 是使用者
   ///   明示之「英文意圖」——混打模式下它本即「整段 ASCII ＋ 半形空格」之逃生口
   ///   （見 `MixedAlphanumericalTypewriter` 之既有語義）；若令陰平確認搶先消費本鍵，該逃生口
   ///   即無從觸發（事主實機回報：`su` 之後按 Shift+Space 得陰平確認，而非遞交 `su `）。
-  @Test("[IH542] 混打＋注音狂打：Shift+Space 遞交整段 ASCII ＋ 半形空格")
-  func test_IH542_MixedAlnumShiftSpaceCommitsASCII() throws {
+  @Test("IH-FuriousZhuyin-041 Mixed alnum Shift+Space commits ASCII")
+  func test_IH_FuriousZhuyin_041_MixedAlnumShiftSpaceCommitsASCII() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -2042,7 +2072,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.isEmpty, "Shift+Space 不得把待調讀音固化進組字器。")
     #expect(!testHandler.hasFuriousFrontPending, "本拍過後素材即散、窗即收。")
 
-    // 對照組：不帶 Shift 之空格仍為陰平確認鍵（`IH527`／`IH530` 之語義一字不動）。
+    // 對照組：不帶 Shift 之空格仍為陰平確認鍵（`IH-FuriousZhuyin-031`／`IH-FuriousZhuyin-034` 之語義一字不動）。
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.clear()
     typeSentence("su")
@@ -2055,5 +2085,132 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.assembler.actualKeys == ["ㄋㄧ"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
+  }
+
+  // MARK: - Test harness
+
+  /// 把測試環境切成注音狂打（其餘輸入法一律關閉），並重置組字狀態。
+  private func enterZhuyinFuriousTestEnvironment(
+    parser: Tekkon.MandarinParser = .ofDachen
+  ) {
+    guard let testHandler, let testSession else { return }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false // 免 POM 擾動置頂序。
+    testHandler.composer.ensureParser(arrange: parser)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+  }
+
+  /// 把測試環境切成拼音狂拼（其餘輸入法一律關閉），並重置組字狀態。
+  private func enterPinyinFuriousTestEnvironment() {
+    guard let testHandler, let testSession else { return }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.ensureKeyboardParser()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+  }
+
+  /// 還原環境：兩側狂打開關歸零、鍵盤排列回標準注音。
+  private func leaveFuriousTestEnvironment() {
+    guard let testHandler, let testSession else { return }
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+    testHandler.ensureKeyboardParser()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+  }
+
+  /// 進入「中英混合輸入回退 ＋ 注音狂打」之測試環境：兩顆偏好皆開、狂拼關、POM 關
+  /// （免置頂序被擾動）、鍵盤排列為大千，並重置組字狀態。
+  private func enterMixedAlnumZhuyinFuriousTestEnvironment() {
+    guard let testHandler, let testSession else { return }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = true
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+    testHandler.composer.ensureParser(arrange: .ofDachen)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+  }
+
+  /// 進入「**僅**中英混合輸入回退」之測試環境：回退開、兩側狂打皆關、POM 關、排列為大千。
+  ///
+  /// 與 `enterMixedAlnumZhuyinFuriousTestEnvironment` 成對：本檔驗混打之顯示語義時，
+  /// 須能單獨取「狂打關」那一態（`InputHandlerTests_MixedAlnum` 之同名環境為 fileprivate）。
+  private func enterMixedAlnumOnlyTestEnvironment() {
+    guard let testHandler, let testSession else { return }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+    testHandler.composer.ensureParser(arrange: .ofDachen)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+  }
+
+  /// 以真語料庫之實錄（`vChewing-VanguardLexicon` 之 `data-v4.8.5.txt`）注入臨時元圖。
+  ///
+  /// - Parameter kanjiData: 逐行 `<帶調讀音鍵>\t或空格<詞值><分數>`；供靶以**真辭典之權重**
+  ///   驗字詞之取捨（測試辭典之 ㄋㄧ 族與真者不同，見 `IH-FuriousZhuyin-035`）。
+  /// 逐字取自真語料庫之 ㄋㄧ 族（`data-v4.8.5.txt`）：`ㄋㄧ`（妮 −5.314）／`ㄋㄧˊ`（泥 −5.23）／
+  /// `ㄋㄧˇ`（你 −5.074）／`ㄋㄧˋ`（膩 −5.26）。**測試辭典無 `ㄋㄧ` 之陰平條目**（實查：該族
+  /// 條目之聲調標記不含陰平形），故凡驗「陰平確認」之靶皆須自備之。
+  private static let realLexiconNiFamily = """
+  ㄋㄧ 妮 -5.314
+  ㄋㄧˊ 泥 -5.23
+  ㄋㄧˇ 你 -5.074
+  ㄋㄧˋ 膩 -5.26
+  """
+
+  private func insertRealLexiconGrams(
+    _ handler: MockInputHandler,
+    _ kanjiData: String = realLexiconNiFamily
+  )
+    -> () -> () {
+    extractGrams(from: kanjiData).forEach {
+      handler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    return { handler.currentLM.clearTemporaryData(isFiltering: false) }
+  }
+
+  /// 還原：回退關、兩側狂打關、排列回標準注音、POM 回出廠。
+  private func leaveMixedAlnumTestEnvironment() {
+    guard let testHandler, let testSession else { return }
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    leaveFuriousTestEnvironment()
+  }
+
+  /// 以注音狂打鍵入，回傳「組字器實際收到之讀音鍵」。
+  ///
+  /// - Parameters:
+  ///   - keys: 鍵序（大千排列）。
+  ///   - zhuyinFurious: 是否開啟注音狂打。
+  ///   - parser: 注音排列。
+  private func typeZhuyinAndCollectReadingKeys(
+    _ keys: String,
+    zhuyinFurious: Bool,
+    parser: Tekkon.MandarinParser = .ofDachen
+  )
+    -> [String] {
+    guard let testHandler, let testSession else { return [] }
+    testHandler.prefs.cassetteEnabled = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = zhuyinFurious
+    testHandler.composer.ensureParser(arrange: parser)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence(keys)
+    return testHandler.assembler.actualKeys
   }
 }
