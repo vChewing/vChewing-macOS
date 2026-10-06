@@ -106,7 +106,7 @@ public final class UpdateSputnik {
       return
     }
 
-    Process.consoleLog("update check plist: \(plist)")
+    OSUtils.consoleLog("update check plist: \(plist)")
 
     guard let intRemoteVersion = Int(plist[kCFBundleVersionKey] as? String ?? ""),
           let strRemoteVersionShortened = plist["CFBundleShortVersionString"] as? String
@@ -235,7 +235,7 @@ public final class UpdateSputnik {
   }
 
   private func showError(message: String = "") {
-    Process.consoleLog("Update check: plist error, forced check: \(isCurrentCheckForced)")
+    OSUtils.consoleLog("Update check: plist error, forced check: \(isCurrentCheckForced)")
     if !isCurrentCheckForced { return }
     let alert = NSAlert()
     let content = message

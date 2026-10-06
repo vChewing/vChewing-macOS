@@ -33,7 +33,7 @@
         &code
       )
       guard status4Code == 0, let code = code else {
-        Process.consoleLog("Error from getCodeSignedDate(): Failed from retrieving status4Code.")
+        OSUtils.consoleLog("Error from getCodeSignedDate(): Failed from retrieving status4Code.")
         return nil
       }
       let status = SecCodeCopySigningInformation(
@@ -42,19 +42,18 @@
         &information
       )
       guard status == noErr else {
-        Process
-          .consoleLog(
-            "Error from getCodeSignedDate(): Failed from retrieving code signing intelligence."
-          )
+        OSUtils.consoleLog(
+          "Error from getCodeSignedDate(): Failed from retrieving code signing intelligence."
+        )
         return nil
       }
       guard let dictionary = information as? [String: NSObject] else { return nil }
       guard dictionary[kSecCodeInfoIdentifier as String] != nil else {
-        Process.consoleLog("Error from getCodeSignedDate(): Target not signed.")
+        OSUtils.consoleLog("Error from getCodeSignedDate(): Target not signed.")
         return nil
       }
       guard let infoDate = dictionary[kSecCodeInfoTimestamp as String] as? Date else {
-        Process.consoleLog("Error from getCodeSignedDate(): Target signing timestamp is missing.")
+        OSUtils.consoleLog("Error from getCodeSignedDate(): Target signing timestamp is missing.")
         return nil
       }
       return infoDate as Date
@@ -475,7 +474,7 @@
 
   extension NSApplication {
     public static var isAppleSilicon: Bool {
-      Process.isAppleSilicon
+      OSUtils.isAppleSilicon
     }
   }
 
@@ -564,7 +563,7 @@
     }
 
     public static var uxLevel: UXLevel {
-      switch (Process.isAppleSilicon, Process.totalMemoryGiB) {
+      switch (OSUtils.isAppleSilicon, OSUtils.totalMemoryGiB) {
       case (true, 16...):
         if #available(macOS 26, *) {
           if let infoDict = Bundle.main.infoDictionary {

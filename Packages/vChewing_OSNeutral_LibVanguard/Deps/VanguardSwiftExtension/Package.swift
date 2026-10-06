@@ -21,7 +21,8 @@ import PackageDescription
 #endif
 
 #if canImport(Darwin)
-  let supportedPlatforms: [SupportedPlatform]? = [.macOS(.v12)]
+  // iOS 側之支援帶自 iOS 27 起，與聚合體一致。
+  let supportedPlatforms: [SupportedPlatform]? = [.macOS(.v12), .iOS(.v27)]
 #else
   let supportedPlatforms: [SupportedPlatform]? = nil
 #endif

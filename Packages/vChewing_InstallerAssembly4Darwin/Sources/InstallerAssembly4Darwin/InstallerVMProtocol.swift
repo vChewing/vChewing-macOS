@@ -5,6 +5,7 @@
 import AppKit
 import Foundation
 import InputMethodKit
+import SwiftExtension
 
 // MARK: - InstallerVMProtocol
 
@@ -173,7 +174,7 @@ extension InstallerVMProtocol {
     let imeBundleURL = theBundle.bundleURL
 
     if allRegisteredInstancesOfThisInputMethod.isEmpty {
-      Process.consoleLog(
+      OSUtils.consoleLog(
         "Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString)."
       )
       let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
@@ -189,7 +190,7 @@ extension InstallerVMProtocol {
           ) + "(#D41J0U8U)",
           imeIdentifier
         )
-        Process.consoleLog(message)
+        OSUtils.consoleLog(message)
       }
     }
 
@@ -216,9 +217,9 @@ extension InstallerVMProtocol {
         if isActivated { return }
         // 警告：macOS 12 可能回傳 false positive，因此採取強制啟用。
         if neta.activate() {
-          Process.consoleLog("Input method enabled: \(imeIdentifier)")
+          OSUtils.consoleLog("Input method enabled: \(imeIdentifier)")
         } else {
-          Process.consoleLog("Failed to enable input method: \(imeIdentifier)")
+          OSUtils.consoleLog("Failed to enable input method: \(imeIdentifier)")
         }
       }
 
@@ -334,7 +335,7 @@ private func moveAppToTrashWithRename(_ fileURL: URL, fileManager: FileManager) 
     // 再嘗試將改名後的檔案丟到垃圾桶（失敗也無妨，已不影響 cp）
     try? fileManager.trashItem(at: trashedURL, resultingItemURL: nil)
   } catch let error as NSError {
-    Process.consoleLog("Failed to trash old bundle at \(fileURL.path): \(error)")
+    OSUtils.consoleLog("Failed to trash old bundle at \(fileURL.path): \(error)")
   }
 }
 
@@ -386,7 +387,7 @@ private func adminRenameBundles(_ bundleURLs: [URL]) -> [String] {
 
   if task.terminationStatus != 0 {
     // 整個對話框被取消或任一 mv 失敗：保守起見，將所有目標路徑視為需要手動處理
-    Process.consoleLog("Admin rename operation failed with status \(task.terminationStatus)")
+    OSUtils.consoleLog("Admin rename operation failed with status \(task.terminationStatus)")
     return bundleURLs.map(\.path)
   }
 

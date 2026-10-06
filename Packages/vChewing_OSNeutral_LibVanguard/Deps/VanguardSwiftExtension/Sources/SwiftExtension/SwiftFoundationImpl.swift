@@ -18,11 +18,50 @@ import Foundation
   import OSLog
 #endif
 
-extension Process {
+// MARK: - OSUtils
+
+/// 當前行程所處之作業系統環境的公用介面：系統記錄的寫入點、與兩項機器事實。
+///
+/// 這三項原以 `extension Process` 掛在 Foundation 的 `Process` 上，然兩者本無語意關係——`Process`
+/// 在 iOS 上更**根本不存在**（該型別專供 macOS 生成與管理子行程），遂逼出一個與 macOS 側形制分歧的
+/// 同名命名空間。現一律收歸本中立的命名空間：宣告只此一份、不分平台，`Process` 亦還原為
+/// Foundation 的那個型別（下游對 `Process()` 之使用即不再與本模組的擴充混為一談）。
+public enum OSUtils {
+  nonisolated public static let totalMemoryGiB: Int = {
+    let rawBytes = Double(ProcessInfo.processInfo.physicalMemory)
+    return Int((rawBytes / pow(1_024.0, 3)).rounded(.down))
+  }()
+
+  /// 當前行程所處之 CPU 是否為 Apple Silicon。
+  nonisolated public static let isAppleSilicon: Bool = {
+    #if os(iOS) && compiler(>=6.4)
+      // iOS 上之 `uname` 回報的是機型代號（如 `iPhone17,1`）而非 `arm64`，故不可沿用下式；
+      // 而能建置 iOS 27 側者必為 Apple Silicon，裝置與模擬器遂一律為真。
+      return true
+    #elseif canImport(Darwin) || canImport(Glibc) || canImport(Musl)
+      var systeminfo = utsname()
+      uname(&systeminfo)
+      let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
+        let data = Data(bufPtr)
+        if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
+          return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
+        } else {
+          return String(data: data, encoding: .isoLatin1) ?? "x86_64"
+        }
+      }
+      return machine == "arm64"
+    #else
+      // On platforms without uname/utsname (e.g., Windows), assume not Apple Silicon
+      return false
+    #endif
+  }()
+
+  /// 將訊息寫進當前行程之系統記錄：Apple 平台自 macOS／iOS 26 起走 OSLog（`Logger`），
+  /// 更舊的系統與其餘平台走 `NSLog`／`print`。
   nonisolated public static func consoleLog<S: StringProtocol>(_ msg: S) {
     let msgStr = msg.description
     #if canImport(Darwin)
-      if #available(macOS 26.0, *) {
+      if #available(iOS 26.0, macOS 26.0, *) {
         #if canImport(OSLog)
           let logger = Logger(subsystem: "vChewing", category: "Log")
           logger.log(level: .default, "\(msgStr, privacy: .public)")
@@ -445,34 +484,6 @@ public nonisolated func isOnMainQueue() -> Bool {
     return try DispatchQueue.main.sync(execute: work)
   }
 #endif
-
-// MARK: - Total RAM Size.
-
-extension Process {
-  nonisolated public static let totalMemoryGiB: Int = {
-    let rawBytes = Double(ProcessInfo.processInfo.physicalMemory)
-    return Int((rawBytes / pow(1_024.0, 3)).rounded(.down))
-  }()
-
-  nonisolated public static let isAppleSilicon: Bool = {
-    #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
-      var systeminfo = utsname()
-      uname(&systeminfo)
-      let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
-        let data = Data(bufPtr)
-        if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
-          return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
-        } else {
-          return String(data: data, encoding: .isoLatin1) ?? "x86_64"
-        }
-      }
-      return machine == "arm64"
-    #else
-      // On platforms without uname/utsname (e.g., Windows), assume not Apple Silicon
-      return false
-    #endif
-  }()
-}
 
 // MARK: - Debouncer
 

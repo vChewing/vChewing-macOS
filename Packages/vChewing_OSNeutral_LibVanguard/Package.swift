@@ -25,7 +25,11 @@ let package = Package(
   platforms: buildSupportedPlatform {
     #if canImport(Darwin)
       // `Observation` 等跨平台特性在 Apple 平台上會被系統版本所限，故最低支援版本須明列。
+      //
+      // iOS 側之支援帶自 iOS 27 起（免去 iOS 18 為止之 non-liquid-glass 時代鍵盤邊框相容勞力），
+      // 故宣告 `.v27` 而非更低之版本。此宣告不影響 macOS 側之 `.v12` 地板。
       SupportedPlatform.macOS(.v12)
+      SupportedPlatform.iOS(.v27)
     #endif
   },
   products: buildProducts {
@@ -160,7 +164,7 @@ let package = Package(
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
       },
       linkerSettings: buildLinkerSettings {
-        LinkerSetting.linkedLibrary("iconv", .when(platforms: [.macOS]))
+        LinkerSetting.linkedLibrary("iconv", .when(platforms: [.macOS, .iOS]))
       }
     )
 
@@ -286,7 +290,7 @@ let package = Package(
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
       },
       linkerSettings: buildLinkerSettings {
-        LinkerSetting.linkedLibrary("iconv", .when(platforms: [.macOS]))
+        LinkerSetting.linkedLibrary("iconv", .when(platforms: [.macOS, .iOS]))
       }
     )
   },
