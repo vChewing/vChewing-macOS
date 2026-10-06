@@ -40,6 +40,36 @@ const LINK_TEXT = {
   ja: '自動で移動しない場合はこちらを押してください。',
 };
 
+// 分享預覽（Open Graph）。爬蟲不執行 JavaScript、亦不跟隨 `<meta http-equiv="refresh">`，
+// 故助手頁與入口頁各須自備一份——兩者共用 `ogTags()`，文案只有一處。
+// 圖與網址一律取官網站根之絕對位址：爬蟲在站外取用，相對路徑對它毫無意義。
+const SITE_ROOT = 'https://vchewing.github.io/';
+const SHARE_IMAGE = SITE_ROOT + 'site_logo@2x.png';
+// 站徽之實際像素（載入時不必再猜，社群平台可先排版、免於重排）。
+const SHARE_IMAGE_WIDTH = '576';
+const SHARE_IMAGE_HEIGHT = '196';
+const OG_URL_ASSISTANT = SITE_ROOT + 'assistant/assistant.html';
+const OG_URL_ENTRY = SITE_ROOT + 'assistant/';
+const SITE_NAME = {
+  'zh-Hant': '唯音輸入法',
+  'zh-Hans': '唯音输入法',
+  en: 'vChewing',
+  ja: '唯音入力アプリ',
+};
+// 僅供分享預覽之一句話：助手介面內不出現此句，故與 src/i18n.ts 無涉（沿 UI_LEAD 之例）。
+const OG_DESCRIPTION = {
+  'zh-Hant': '回答幾個問題，取得一份為您整理的唯音配置包。',
+  'zh-Hans': '回答几个问题，取得一份为您整理的唯音配置包。',
+  en: 'Answer a few questions and get a vChewing configuration profile fitted to how you type.',
+  ja: 'いくつかの質問に答えると、お使いの入力に合わせた唯音の配置データを作成します。',
+};
+const OG_LOCALE = {
+  'zh-Hant': 'zh_TW',
+  'zh-Hans': 'zh_CN',
+  en: 'en_US',
+  ja: 'ja_JP',
+};
+
 const CORE_ORDER = ['globals', 'model', 'i18n', 'schema', 'questions', 'starter', 'preset'];
 const APP_ORDER = ['widgets', 'shell', 'exits', 'main'];
 
@@ -148,11 +178,43 @@ function buildMetadataJs(docBase) {
   };
 }
 
+function pick(table, lang) {
+  return Object.prototype.hasOwnProperty.call(table, lang) ? table[lang] : table['zh-Hant'];
+}
+
+/// 分享預覽之標籤。`ogUrl` 為該檔自身之絕對位址（助手頁與入口頁各一）。
+function ogTags(lang, ogUrl) {
+  const esc = function (s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+  const siteName = pick(SITE_NAME, lang);
+  const description = pick(OG_DESCRIPTION, lang);
+  const meta = function (attr, key, value) {
+    return '<meta ' + attr + '="' + key + '" content="' + esc(value) + '">';
+  };
+  return [
+    meta('name', 'description', description),
+    meta('property', 'og:type', 'website'),
+    meta('property', 'og:site_name', siteName),
+    meta('property', 'og:title', pick(UI_TITLE, lang)),
+    meta('property', 'og:description', description),
+    meta('property', 'og:url', ogUrl),
+    meta('property', 'og:image', SHARE_IMAGE),
+    meta('property', 'og:image:width', SHARE_IMAGE_WIDTH),
+    meta('property', 'og:image:height', SHARE_IMAGE_HEIGHT),
+    meta('property', 'og:image:alt', siteName),
+    meta('property', 'og:locale', pick(OG_LOCALE, lang)),
+    meta('name', 'twitter:card', 'summary_large_image'),
+  ].join('\n');
+}
+
 // 產物之入口頁：`dist/` 整個目錄丟上網即可用（`/assistant/` 之目錄索引）。
 //
 // 何以用 `<meta http-equiv="refresh">`：它自 HTML 4.01 起即有、Safari 7（目標環境）亦支援，
 // 不勞 JavaScript；並附一個普通連結作後備（不支援 meta refresh 者仍可手動進入）。
-// 標題與說明取助手之全稱與首頁第一句，使分享出去之網址預覽不至空白。
+// 標題與說明取助手之全稱與一句自述，並附分享預覽之標籤（`ogTags()`），
+// 使分享出去之網址預覽不至空白——尤其是本頁：爬蟲不跟隨 meta refresh，它看到的就是這一支。
 function buildRedirectHtml(stamp, lang) {
   const title = UI_TITLE[lang] || UI_TITLE['zh-Hant'];
   const lead = UI_LEAD[lang] || UI_LEAD['zh-Hant'];
@@ -163,6 +225,7 @@ function buildRedirectHtml(stamp, lang) {
     '<meta charset="utf-8">',
     '<meta http-equiv="refresh" content="0; url=assistant.html">',
     '<title>' + title + '</title>',
+    ogTags(lang, OG_URL_ENTRY),
     '<style>',
     'body { background: #3B6EA5; color: #000; font-family: Tahoma, "Helvetica Neue", sans-serif;',
     '  font-size: 12px; margin: 0; padding: 40px 0; }',
@@ -188,6 +251,7 @@ function buildHtml(style, script, stamp, lang) {
   const template = readText(path.join(ROOT, 'index.html'));
   return template
     .replace('{{LANG}}', lang)
+    .replace('{{OG}}', ogTags(lang, OG_URL_ASSISTANT))
     .replace('{{STYLE}}', style)
     .replace('{{SCRIPT}}', script)
     .replace('{{BUILD_STAMP}}', stamp);
