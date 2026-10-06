@@ -75,7 +75,7 @@ extension GSI4AppKit {
     // MARK: - Cached Paths (invalidate when geometry changes)
 
     private var cachedBackgroundPath: NSBezierPath?
-    private var lastBackgroundFittingSize: CGSize = .zero
+    private var lastBackgroundBoundsSize: CGSize = .zero
     private var lastBackgroundWindowRadius: CGFloat = 0
 
     private var cachedClipPath: NSBezierPath?
@@ -114,6 +114,14 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
       height: pad + topPaneShift + page.height + extraHeight + bottom.height
     )
   }
+
+  /// 背景（填色）於當前這一拍所涵蓋之矩形。
+  ///
+  /// **一律取視圖當下之 `bounds`**，不得取 `fittingSize`：後者是本次版面配置之**終值**，
+  /// 而窗體縮放動畫期間 `bounds` 尚在途中——取終值即令背景提前收至終尺寸，窗體右端
+  /// （橫向）／下端（縱向）在其下之 effectiveView（含 glass）露出破口。
+  /// 靜態時 `bounds.size` 與 `fittingSize` 相等，故非動畫場合之行為不變。
+  var backgroundRect: CGRect { CGRect(origin: .zero, size: bounds.size) }
 
   // MARK: - 頂部 pane（未完成讀音）之幾何
 
@@ -157,7 +165,7 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
     }
 
     // Fill background for whole view.
-    let bgRect = CGRect(origin: .zero, size: fittingSize)
+    let bgRect = backgroundRect
     if #available(macOS 10.13, *) {
       Self.candidateListBackground
         .withAlphaComponent(NSApplication.uxLevel == .none ? 1 : 0.5)
@@ -166,12 +174,12 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
       Self.candidateListBackground.setFill()
     }
     if cachedBackgroundPath == nil
-      || lastBackgroundFittingSize != bgRect.size
+      || lastBackgroundBoundsSize != bgRect.size
       || lastBackgroundWindowRadius != thePool.windowRadius {
       cachedBackgroundPath = NSBezierPath(
         roundedRect: bgRect, xRadius: thePool.windowRadius, yRadius: thePool.windowRadius
       )
-      lastBackgroundFittingSize = bgRect.size
+      lastBackgroundBoundsSize = bgRect.size
       lastBackgroundWindowRadius = thePool.windowRadius
     }
     cachedBackgroundPath?.fill()

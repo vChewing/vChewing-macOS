@@ -71,6 +71,14 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
 
   override var fittingSize: CGSize { thePool.metrics.fittingSize }
 
+  /// 背景（填色）於當前這一拍所涵蓋之矩形。
+  ///
+  /// **一律取視圖當下之 `bounds`**，不得取 `fittingSize`：後者是本次版面配置之**終值**，
+  /// 而窗體縮放動畫期間 `bounds` 尚在途中——取終值即令背景提前收至終尺寸，窗體右端
+  /// （橫向）／下端（縱向）在其下之 effectiveView（含 glass）露出破口。
+  /// 靜態時 `bounds.size` 與 `fittingSize` 相等，故非動畫場合之行為不變。
+  var backgroundRect: CGRect { CGRect(origin: .zero, size: bounds.size) }
+
   static var candidateListBackground: NSColor {
     let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
     let darkBackground = NSColor(red: 0.13, green: 0.13, blue: 0.14, alpha: 1.00)
@@ -100,7 +108,7 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
     } else {
       Self.candidateListBackground.setFill()
     }
-    let allRect = CGRect(origin: .zero, size: sizesCalculated.fittingSize)
+    let allRect = backgroundRect
     NSBezierPath(roundedRect: allRect, xRadius: windowRadius, yRadius: windowRadius).fill()
     // 繪製高亮行背景與高亮候選字詞背景
     lineBackground(isCurrentLine: true, isMatrix: isMatrix).setFill()

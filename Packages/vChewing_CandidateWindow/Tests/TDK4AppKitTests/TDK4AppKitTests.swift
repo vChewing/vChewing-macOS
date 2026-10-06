@@ -12,6 +12,8 @@ import Testing
 
 @Suite(.serialized)
 struct TDK4AppKitTests {
+  // MARK: Internal
+
   let variableCandidatesINMU: [CandidateInState] = [
     "二十四歲是學生", "二十四歲", "昏睡紅茶", "食雪漢", "意味深", "學生", "便乗",
     "迫真", "驚愕", "論證", "正論", "惱", "悲", "屑", "食", "雪", "漢", "意", "味",
@@ -913,6 +915,123 @@ struct TDK4AppKitTests {
     pool.updateReadingDisambiguation()
     // 任一讀音 cell 以 "_" 開頭 → 整段不顯示。
     #expect(pool.readingDisambiguationResult == nil)
+  }
+
+  /// 驗證：背景（填色）恆隨窗體**當下**之內容尺寸，而非版面配置之終值。
+  ///
+  /// 窗體縮放動畫期間，視圖之 frame 尚在途中，而 `pool.metrics`（＝`fittingSize`）已是終值。
+  /// 背景若取終值，窗體右端（橫向縮小）／下端（縱向縮小）就會留下一條未著色之破口。
+  /// 本靶以「frame 大於 metrics」重現動畫途中之狀態，逐端查驗背景之涵蓋範圍。
+  @Test
+  func testBackgroundTracksCurrentBoundsInsteadOfLayoutMetrics() throws {
+    let candidates: [CandidateInState] = ["我", "好", "的"].map {
+      (keyArray: [String](repeating: "", count: $0.count), value: $0)
+    }
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: candidates, lines: 1, isExpanded: true, selectionKeys: "123456",
+      layout: .horizontal
+    )
+    pool.updateMetrics()
+    let metrics = pool.metrics.fittingSize
+    #expect(metrics.width >= 1 && metrics.height >= 1)
+
+    let tdk = TDK4AppKit.VwrCandidateTDK4AppKit(thePool: pool)
+    assertBackgroundTracksBounds(
+      "TDK", metrics: metrics, view: tdk, backgroundRect: { tdk.backgroundRect }
+    )
+
+    let gsi = GSI4AppKit.VwrCandidateGSI4AppKit(thePool: pool)
+    assertBackgroundTracksBounds(
+      "GSI", metrics: metrics, view: gsi, backgroundRect: { gsi.backgroundRect }
+    )
+  }
+
+  // MARK: Private
+
+  /// 背景涵蓋範圍之共用斷言：先驗靜態，再驗「動畫途中」（frame 大於 metrics）。
+  private func assertBackgroundTracksBounds(
+    _ name: String, metrics: CGSize, view: NSView, backgroundRect: () -> CGRect
+  ) {
+    view.frame = CGRect(origin: .zero, size: metrics)
+    #expect(
+      backgroundRect().size == metrics,
+      "\(name)：靜態時背景應與 bounds 同尺寸（實測 \(backgroundRect().size)／\(metrics)）。"
+    )
+
+    // 動畫途中：窗體仍大於佈局終值。
+    let midAnimationSize = CGSize(width: metrics.width + 120, height: metrics.height + 40)
+    view.frame = CGRect(origin: .zero, size: midAnimationSize)
+    #expect(
+      backgroundRect().size == midAnimationSize,
+      "\(name)：動畫途中背景應隨當下 bounds，不得停在 metrics 之終值（實測 \(backgroundRect().size)）。"
+    )
+
+    guard let scan = BackgroundCoverageScan(view: view) else {
+      Issue.record("\(name)：離屏繪製失敗，無法查驗背景涵蓋範圍。")
+      return
+    }
+    let allowedGap = Int((scan.scale * 1.5).rounded(.up))
+    let rightGap = scan.pixelsWide - 1 - scan.rightmostPaintedColumn
+    let bottomGap = scan.pixelsHigh - 1 - scan.bottommostPaintedRow
+    #expect(
+      rightGap <= allowedGap,
+      "\(name)：窗體右端不得留下未著色之破口（實測 \(rightGap) px，容許 \(allowedGap) px）。"
+    )
+    #expect(
+      bottomGap <= allowedGap,
+      "\(name)：窗體下端不得留下未著色之破口（實測 \(bottomGap) px，容許 \(allowedGap) px）。"
+    )
+  }
+}
+
+// MARK: - BackgroundCoverageScan
+
+/// 離屏渲染後偵測「背景填色是否涵蓋整個視圖」。
+/// 判準一律取 **alpha**（背景係半透明填色）：圓角之外與背景未涵蓋處皆為全透明，
+/// 故不以顏色判別——顏色隨明暗外觀而異。
+struct BackgroundCoverageScan {
+  // MARK: Lifecycle
+
+  init?(view: NSView) {
+    guard view.bounds.width >= 1, view.bounds.height >= 1,
+          let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return nil }
+    view.cacheDisplay(in: view.bounds, to: rep)
+    self.rep = rep
+    self.scale = CGFloat(rep.pixelsWide) / view.bounds.width
+    // 逐端取值一律走中線：圓角只影響四個角，中線不受其擾。
+    let midRow = rep.pixelsHigh / 2
+    let midColumn = rep.pixelsWide / 2
+    var rightmost = -1
+    for x in 0 ..< rep.pixelsWide where Self.isPainted(rep: rep, x: x, y: midRow) {
+      rightmost = x
+    }
+    var bottommost = -1
+    for y in 0 ..< rep.pixelsHigh where Self.isPainted(rep: rep, x: midColumn, y: y) {
+      bottommost = y
+    }
+    self.rightmostPaintedColumn = rightmost
+    self.bottommostPaintedRow = bottommost
+  }
+
+  // MARK: Internal
+
+  /// 點陣圖像素 ÷ 視圖點之比例（Retina backing scale）。
+  let scale: CGFloat
+  /// 中線列上最右之已著色像素行；-1 表示整列皆未著色。
+  let rightmostPaintedColumn: Int
+  /// 中線行上最下之已著色像素列；-1 表示整行皆未著色。
+  let bottommostPaintedRow: Int
+
+  var pixelsWide: Int { rep.pixelsWide }
+  var pixelsHigh: Int { rep.pixelsHigh }
+
+  // MARK: Private
+
+  private let rep: NSBitmapImageRep
+
+  private static func isPainted(rep: NSBitmapImageRep, x: Int, y: Int) -> Bool {
+    guard let color = rep.colorAt(x: x, y: y) else { return false }
+    return color.alphaComponent > 0.05
   }
 }
 
