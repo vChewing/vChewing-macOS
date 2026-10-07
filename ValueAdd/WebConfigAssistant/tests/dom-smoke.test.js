@@ -110,7 +110,7 @@ test('冒煙：按鈕列左下角有官網與贊助之連結', function () {
 
   const links = findByTag(hosts[0], 'a');
   assert.deepStrictEqual(links.map(function (a) { return a.textContent; }),
-    ['HomePage', 'Sponsor Me'], '兩條連結之字面應為事主指定者');
+    ['官網', '贊助'], '兩條連結之字面應為 zh-Hant 之本地化用語');
   // 位址沿用官網站根（`VCA_DOC_BASE`），與題目之「深入說明 →」同源。
   assert.deepStrictEqual(links.map(function (a) { return a.href; }),
     ['https://vchewing.github.io/', 'https://vchewing.github.io/SPONSOR_ME.html']);
@@ -123,6 +123,37 @@ test('冒煙：按鈕列左下角有官網與贊助之連結', function () {
   const footer = hosts[0].parentNode;
   assert.strictEqual(footer.firstChild, hosts[0], '連結應在按鈕之前');
   assert.strictEqual(findByTag(footer, 'button').length, 4, '按鈕列仍應為四顆鈕');
+
+  // 字重：兩連結之文字為粗體（事主 2026-10-07 指定）。
+  const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'assistant.css'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = /\.vca-footer-links\s+a\s*\{([^}]*)\}/.exec(css);
+  assert.ok(rule, '應有 .vca-footer-links a 之規則');
+  assert.ok(/font-weight:\s*bold/.test(rule[1]),
+    '站台連結之文字應為粗體：' + rule[1].replace(/\s+/g, ' '));
+});
+
+test('冒煙：按鈕列兩連結之字面逐語系本地化', function () {
+  // 值以 i18n 表為準（此處逐語系釘住，免得表改了而無人察覺）。
+  const expected = {
+    'zh-Hant': ['官網', '贊助'],
+    'zh-Hans': ['官网', '赞助'],
+    'en': ['Website', 'Sponsor'],
+    'ja': ['公式サイト', 'ご支援'],
+  };
+  const seen = [];
+  for (const lang of Object.keys(expected)) {
+    const { dom, VCA } = bootApp('?lang=' + lang);
+    const links = findByTag(dom.root.querySelectorAll('.vca-footer-links')[0], 'a');
+    const labels = links.map(function (a) { return a.textContent; });
+    assert.deepStrictEqual(labels, expected[lang], lang + ' 之兩連結字面應本地化');
+    assert.deepStrictEqual(labels,
+      [VCA.UI_STRINGS[lang]['link.homepage'], VCA.UI_STRINGS[lang]['link.sponsor']],
+      lang + ' 之字面應與 i18n 表一致');
+    seen.push(labels.join('|'));
+  }
+  assert.strictEqual(new Set(seen).size, Object.keys(expected).length,
+    '四語系之字面應兩兩不同（否則即未本地化）');
 });
 
 test('冒煙：左側水印區之第三行說明當前頁面之職能', function () {
@@ -788,9 +819,11 @@ test('冒煙：語言切換不重置答案', function () {
   assert.ok(findButtonByText(dom.root, '< Back'), '「上一步」鈕應已切為英文');
   assert.strictEqual(findButtonByText(dom.root, '＜ 上一步'), null, '不得殘留中文之字樣');
   assert.ok(findButtonByText(dom.root, 'Next >'), '「下一步」鈕應已切為英文');
-  // 左下角之站台連結四語系同形，但須確認切換後仍在場。
+  // 左下角之站台連結亦隨語系重下（標籤為本地化之文案）。
   const links = dom.root.querySelectorAll('.vca-footer-links');
   assert.strictEqual(links.length, 1, '切換語系後站台連結仍應在場');
+  assert.deepStrictEqual(findByTag(links[0], 'a').map(function (a) { return a.textContent; }),
+    ['Website', 'Sponsor'], '站台連結之字面應已切為英文');
 });
 
 test('冒煙：取消對話框會清空作答', function () {

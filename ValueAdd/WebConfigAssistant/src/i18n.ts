@@ -32,10 +32,11 @@ namespace VCA {
       // 共用
       "app.title": "唯音輸入法配置助手",
       "app.stepCounter": "第 %1 步，共 %2 步",
-      // 視窗左下角之對外連結。**四語系同形**——`HomePage` 與 `Sponsor Me` 是站台自稱之名，
-      // 不隨介面語言改寫（事主 2026-10-07 指定之字面）。仍走 i18n 表，以免文案散落各處。
-      "link.homepage": "HomePage",
-      "link.sponsor": "Sponsor Me",
+      // 視窗左下角之對外連結。用語取自 app 既有之 l10n：官網一詞見
+      // `i18n:Settings.OpenConfigAssistant.Choose.ButtonOnline`（「使用官網最新版」），
+      // 贊助一詞見官網該頁之標題與 `i18n:Menu.SponsorTheDevelopment`。
+      "link.homepage": "官網",
+      "link.sponsor": "贊助",
       "nav.back": "＜ 上一步",
       "nav.next": "下一步 ＞",
       "nav.finish": "完成",
@@ -198,8 +199,8 @@ namespace VCA {
       // 共用
       "app.title": "唯音输入法配置助手",
       "app.stepCounter": "第 %1 步，共 %2 步",
-      "link.homepage": "HomePage",
-      "link.sponsor": "Sponsor Me",
+      "link.homepage": "官网",
+      "link.sponsor": "赞助",
       "nav.back": "＜ 上一步",
       "nav.next": "下一步 ＞",
       "nav.finish": "完成",
@@ -364,8 +365,8 @@ namespace VCA {
       // Shared
       "app.title": "vChewing Configuration Assistant",
       "app.stepCounter": "Step %1 of %2",
-      "link.homepage": "HomePage",
-      "link.sponsor": "Sponsor Me",
+      "link.homepage": "Website",
+      "link.sponsor": "Sponsor",
       "nav.back": "< Back",
       "nav.next": "Next >",
       "nav.finish": "Finish",
@@ -530,8 +531,8 @@ namespace VCA {
       // 共通
       "app.title": "唯音入力アプリ配置助手",
       "app.stepCounter": "%2 ステップ中 %1 番目",
-      "link.homepage": "HomePage",
-      "link.sponsor": "Sponsor Me",
+      "link.homepage": "公式サイト",
+      "link.sponsor": "ご支援",
       "nav.back": "＜ 戻る",
       "nav.next": "次へ ＞",
       "nav.finish": "完了",
