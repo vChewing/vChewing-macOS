@@ -103,6 +103,28 @@ test('冒煙：掛載後之 DOM 結構（Win2000 外框）', function () {
   assert.strictEqual(segsHosts[0].parentNode, rightHosts[0], '分段方塊應為右側容器之直接子節點');
 });
 
+test('冒煙：按鈕列左下角有官網與贊助之連結', function () {
+  const { dom } = bootApp('?lang=zh-Hant');
+  const hosts = dom.root.querySelectorAll('.vca-footer-links');
+  assert.strictEqual(hosts.length, 1, '按鈕列應恰有一組站台連結');
+
+  const links = findByTag(hosts[0], 'a');
+  assert.deepStrictEqual(links.map(function (a) { return a.textContent; }),
+    ['HomePage', 'Sponsor Me'], '兩條連結之字面應為事主指定者');
+  // 位址沿用官網站根（`VCA_DOC_BASE`），與題目之「深入說明 →」同源。
+  assert.deepStrictEqual(links.map(function (a) { return a.href; }),
+    ['https://vchewing.github.io/', 'https://vchewing.github.io/SPONSOR_ME.html']);
+  for (const link of links) {
+    assert.strictEqual(link.target, '_blank', '對外連結應另開視窗');
+    assert.strictEqual(link.className, 'vca-link', '應沿用站內連結之外觀');
+  }
+
+  // 位次：連結容器為按鈕列之首個子節點（連結在左、按鈕在右，靠 CSS 之浮動分邊）。
+  const footer = hosts[0].parentNode;
+  assert.strictEqual(footer.firstChild, hosts[0], '連結應在按鈕之前');
+  assert.strictEqual(findByTag(footer, 'button').length, 4, '按鈕列仍應為四顆鈕');
+});
+
 test('冒煙：左側水印區之第三行說明當前頁面之職能', function () {
   const { dom, VCA } = bootApp('?lang=zh-Hant');
   const leftNote = function () {
@@ -762,6 +784,13 @@ test('冒煙：語言切換不重置答案', function () {
     if (radio.type === 'radio' && radio.checked) checkedCount += 1;
   }
   assert.strictEqual(checkedCount, 1, '先前的作答應仍為選中狀態');
+  // 按鈕列之文案亦隨語系重下（外框只建一次，靠 render 重下；`backBtn` 曾漏於此）。
+  assert.ok(findButtonByText(dom.root, '< Back'), '「上一步」鈕應已切為英文');
+  assert.strictEqual(findButtonByText(dom.root, '＜ 上一步'), null, '不得殘留中文之字樣');
+  assert.ok(findButtonByText(dom.root, 'Next >'), '「下一步」鈕應已切為英文');
+  // 左下角之站台連結四語系同形，但須確認切換後仍在場。
+  const links = dom.root.querySelectorAll('.vca-footer-links');
+  assert.strictEqual(links.length, 1, '切換語系後站台連結仍應在場');
 });
 
 test('冒煙：取消對話框會清空作答', function () {
