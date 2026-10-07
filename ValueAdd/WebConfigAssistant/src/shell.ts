@@ -24,6 +24,9 @@ namespace VCA {
     skipBtn: HTMLButtonElement;
     nextBtn: HTMLButtonElement;
     cancelBtn: HTMLButtonElement;
+    /// 按鈕列左下角之站台連結（官網首頁、贊助頁）；標籤隨語系更新，見 main.ts 之 render。
+    homeLink: HTMLAnchorElement;
+    sponsorLink: HTMLAnchorElement;
   }
 
   /// 建立整個外框。
@@ -66,6 +69,13 @@ namespace VCA {
 
     // 按鈕列
     var footer = el("div", "vca-footer", null);
+    // 左下角之站台連結（事主 2026-10-07）。位址沿用官網站根 `VCA_DOC_BASE`——與題目之
+    // 「深入說明 →」同源，故 `--doc-base=../` 一改俱改。按鈕仍在右，此組以 CSS 浮向左。
+    var footerLinks = el("span", "vca-footer-links", null);
+    var homeLink = externalLink(t("link.homepage"), docHref(""));
+    var sponsorLink = externalLink(t("link.sponsor"), docHref("SPONSOR_ME.html"));
+    footerLinks.appendChild(homeLink);
+    footerLinks.appendChild(sponsorLink);
     var cancelBtn = el("button", "vca-btn", t("nav.cancel")) as HTMLButtonElement;
     var backBtn = el("button", "vca-btn", t("nav.back")) as HTMLButtonElement;
     // 「跳到摘要」：起始配置之後，使用者隨時可就此收束（事主 2026-09-25：不必硬控走完全程）。
@@ -79,6 +89,7 @@ namespace VCA {
     backBtn.onclick = function () { handlers.onNav("back"); return false; };
     skipBtn.onclick = function () { handlers.onNav("summary"); return false; };
     nextBtn.onclick = function () { handlers.onNav("next"); return false; };
+    footer.appendChild(footerLinks);
     footer.appendChild(cancelBtn);
     footer.appendChild(backBtn);
     footer.appendChild(skipBtn);
@@ -94,6 +105,7 @@ namespace VCA {
       content: content, titleText: titleText, titleProgress: titleProgress,
       titleSegments: titleSegments,
       backBtn: backBtn, skipBtn: skipBtn, nextBtn: nextBtn, cancelBtn: cancelBtn,
+      homeLink: homeLink, sponsorLink: sponsorLink,
     };
   }
 

@@ -32,6 +32,14 @@ namespace VCA {
     return VCA_DOC_BASE + docPath;
   }
 
+  /// 對外連結之節點（另開視窗）。官網文章、以及視窗左下角之站台連結皆用之。
+  export function externalLink(text: string, href: string): HTMLAnchorElement {
+    var node = el("a", "vca-link", text) as HTMLAnchorElement;
+    node.href = href;
+    node.target = "_blank";
+    return node;
+  }
+
   /// 取選項於該語系之標籤（依序：助手 i18n ＞ app 既有 i18n ＞ 後設資料選項標籤）。
   export function choiceLabel(question: Question, choice: QuestionChoice, lang: string): string {
     if (choice.labelKey) return t(choice.labelKey);
@@ -165,9 +173,7 @@ namespace VCA {
     var help = helpShownInline ? null : questionHelp(question, state.lang);
     var host = el("div", "vca-why", null);
     if (!help) {
-      var linkOnly = el("a", "vca-link", t("q.moreInfo"));
-      (linkOnly as HTMLAnchorElement).href = docHref(docPath);
-      (linkOnly as HTMLAnchorElement).target = "_blank";
+      var linkOnly = externalLink(t("q.moreInfo"), docHref(docPath));
       host.appendChild(linkOnly);
       return host;
     }
@@ -184,9 +190,7 @@ namespace VCA {
     host.appendChild(toggle);
     host.appendChild(bodyText);
 
-    var link = el("a", "vca-link", t("q.moreInfo"));
-    (link as HTMLAnchorElement).href = docHref(docPath);
-    (link as HTMLAnchorElement).target = "_blank";
+    var link = externalLink(t("q.moreInfo"), docHref(docPath));
     link.style.marginLeft = "8px";
     host.appendChild(link);
     return host;

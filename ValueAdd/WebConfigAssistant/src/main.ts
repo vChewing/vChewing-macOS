@@ -105,6 +105,11 @@ namespace VCA {
     shell.nextBtn.textContent = state.stepIndex === steps.length - 1 ? t("nav.finish") : t("nav.next");
     shell.cancelBtn.textContent = t("nav.cancel");
     shell.skipBtn.textContent = t("nav.toSummary");
+    // 其餘按鈕列之文案一律在此重下——外框只在 boot 時建一次，切換語系走的是 render。
+    // （`backBtn` 原漏於此，切換語系後仍留開機時之字樣；隨本次加入左下角連結一併補上。）
+    shell.backBtn.textContent = t("nav.back");
+    shell.homeLink.textContent = t("link.homepage");
+    shell.sponsorLink.textContent = t("link.sponsor");
     // 「跳到摘要」只在起始配置之後露面，且僅當後面還有**兩頁以上**時才有意義
     // （只差一頁者，按「下一步」即是）。
     var starterIndex = stepIndexOf(steps, "starter");

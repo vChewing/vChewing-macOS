@@ -171,6 +171,19 @@ body {
   background: #C0C0C0;
   padding: 9px 12px;
   text-align: right;
+  /* 收攏左下角那組浮動之連結，免其溢出按鈕列。 */
+  overflow: hidden;
+}
+
+/* 按鈕列左下角之站台連結（官網首頁、贊助頁）。按鈕仍在右，兩組各安其位。
+   `line-height` 取按鈕之實高（`min-height` 23 ＋ 上下各 2 之 3D 邊框），使兩者齊頭。 */
+.vca-footer-links {
+  float: left;
+  line-height: 27px;
+}
+
+.vca-footer-links a {
+  margin-right: 10px;
 }
 
 /* --------------------------------- 標題層級 -------------------------------- */
