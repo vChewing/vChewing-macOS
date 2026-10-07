@@ -44,10 +44,12 @@ const LINK_TEXT = {
 // 故助手頁與入口頁各須自備一份——兩者共用 `ogTags()`，文案只有一處。
 // 圖與網址一律取官網站根之絕對位址：爬蟲在站外取用，相對路徑對它毫無意義。
 const SITE_ROOT = 'https://vchewing.github.io/';
-const SHARE_IMAGE = SITE_ROOT + 'site_logo@2x.png';
+// 專供分享預覽之站徽（官網倉之 `site_logo_opengraph.png`）：長寬比近 1.91:1，
+// 且高於社群平台慣例之 200 下限——`site_logo@2x.png`（576×196）兩者皆不及。
+const SHARE_IMAGE = SITE_ROOT + 'site_logo_opengraph.png';
 // 站徽之實際像素（載入時不必再猜，社群平台可先排版、免於重排）。
-const SHARE_IMAGE_WIDTH = '576';
-const SHARE_IMAGE_HEIGHT = '196';
+const SHARE_IMAGE_WIDTH = '472';
+const SHARE_IMAGE_HEIGHT = '248';
 const OG_URL_ASSISTANT = SITE_ROOT + 'assistant/assistant.html';
 const OG_URL_ENTRY = SITE_ROOT + 'assistant/';
 const SITE_NAME = {
