@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fire:(id)sender;
 
 /// The stored block, or nil if already consumed.
-@property (readonly, nullable) void (^actionBlock)(void);
+@property(readonly, nullable) void (^actionBlock)(void);
 
 @end
 
