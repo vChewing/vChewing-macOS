@@ -1,4 +1,4 @@
-语言：*简体中文* | [繁體中文](./README.md)
+语言：*简体中文* | [繁体中文](./README.md)
 
 仅以此 README 纪念祁建华 (CHIEN-HUA CHI, 1921-2001)。
 
@@ -21,7 +21,7 @@
 - 相比中州韵（鼠须管）而言，唯音能够做到真正的大千声韵并击。
 - 拥有拼音并击模式，不懂注音的人群也可以受益于该输入法所带来的稳定的平均输入速度。
     - 相比小鹤双拼等双拼方案而言，唯音双手声韵分工明确、且重码率只有双拼的五分之一。
-- 也擁有狂拼模式，只要你啓用拼音打字模式、就會承襲智能狂拼/搜狗拼音的打字體驗。
+- 也拥有狂拼模式，只要你启用拼音打字模式、就会承袭智能狂拼/搜狗拼音的打字体验。
 - 唯音对陆规审音完全相容：不熟悉台澎金马审音的大陆用户不会遇到与汉字读音有关的不便。
     - 反之亦然。
 - 唯音输入法是最安全的 macOS 副厂中文输入法：
@@ -54,10 +54,10 @@
     - 如果是某个大版本的 Xcode 的 Release Candidate 版本的话，我们可能会对此做相容性测试。
 - **（选用）建置 legacy 产物**：若需自行产生 macOS 10.9～10.10 的安装包，另需 **Xcode 15**（或任何预设 macOS SDK ≤ 14.x 的 Xcode，理由见末条）＋ **`MacOSX13.3.sdk`** ＋ **Swift 5.10.1 open-source toolchain**，并以 `make debugLegacy`／`make releaseLegacy` 驱动。此路径仅供本机使用、**不纳入 CI**。
     - 该 SDK **不是 Xcode 15 内建的**（Xcode 15 自带的是 macOS 14 系），故本仓库的 `LEGACY_SDK` 直接绑 **Command Line Tools 那份**：`/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk`（Xcode 15 内的同名目录只是指过去的 symlink）。
-    - **这份 SDK 的来历**：内容是原厂 macOS 13.3 SDK（内部文件时间戳 2023-03-29，即 Xcode 14.3 发布那批）。它**不是现行 CLT 提供的**——现行 CLT（本机为 27.0，2026-09-10 装入）已把 macOS 11／12／13／14 的 legacy SDK 一律改成「移除包」（`CLTools_macOS_DevSDK_Remove_macOS13.pkg` 等），本机这份之顶层时间戳为 2026-05-27（当日并无任何 CLT 安装记录可查）。故在干净机器上请自行备妥：自 macOS 13.3 的 Command Line Tools（或自带 13.x SDK 的 Xcode 14.3）解出后放进 CLT 的 `SDKs/`。
+    - **这份 SDK 的来历**：内容是原厂 macOS 13.3 SDK（内部档案时间戳 2023-03-29，即 Xcode 14.3 发行那批）。它**不是现行 CLT 提供的**——现行 CLT（本机为 27.0，2026-09-10 装入）已把 macOS 11／12／13／14 的 legacy SDK 一律改成「移除包」（`CLTools_macOS_DevSDK_Remove_macOS13.pkg` 等），本机这份之顶层时间戳为 2026-05-27（当日并无任何 CLT 安装记录可查）。故在干净机器上请自行备妥：自 macOS 13.3 的 Command Line Tools（或自带 13.x SDK 的 Xcode 14.3）解出后放进 CLT 的 `SDKs/`。
     - **但 Xcode 15 仍不可省**：本路径的 build plugin 之编译取的是「active developer dir 的预设 macOS SDK」，`--sdk` 到不了那里，故仍须以一个「预设 SDK ≤ 14.x」的 Xcode 为 `DEVELOPER_DIR`（任何 ≤ 15.4 者皆等价）。
 - **（选用）建置配置助手**：`ValueAdd/WebConfigAssistant/` 是唯音的配置助手（互动式设定向导）；其外部相依**只有一样：`tsc`（TypeScript 7 之原生执行档）**——**不需 node、亦不需 npm**（npm 版之 `tsc` 是 `#!/usr/bin/env node` 之启动器，`make check-tsc` 会挡下它）。取得管道有三条，逐字步骤见[助手之说明 §三.1](ValueAdd/WebConfigAssistant/README.md)。**未装 `tsc` 亦不影响输入法本体之建置**——只是不会把助手收录进 `vChewing.app`。
-- **想在 macOS 27 之前的系统上以 Swift 6.4+ 编译**（例如末代 Intel MacBook Pro 13-inch）：请注意，**「让当前 shell 自动用上 Swift 6.4+ open-source toolchain」是您自己的责任**。官方推出的 **Swiftly** 是一条可行路径，但它的 shell 环境配置相当繁琐，且会把原本装在系统根目录的 FOSS toolchain 全部改成装进您的 user-space——至少在 macOS 26 上这是能用的选择。若您的电脑最高只能跑到 macOS 15，Swiftly 可能无法把 toolchain 装进 user-space，此时只能以系统管理员权限、手动将官方发行的 toolchain `.dmg`／`.pkg` 安装到系统根目录；这样一来，您可能得按自身需求改动本仓库的 `makefile`。这些繁琐事务在当今是可以交给 LLM 打点的，但便利与风险并存，请自行斟酌。
+- **想在 macOS 27 之前的系统上以 Swift 6.4+ 编译**（例如末代 Intel MacBook Pro 13-inch）：请注意，**「让当前 shell 自动用上 Swift 6.4+ open-source toolchain」是您自己的责任**。官方推出的 **Swiftly** 是一条可行路径，但它的 shell 环境配置相当繁琐，且会把原本装在系统根目录的 FOSS toolchain 全部改成装进您的 user-space——至少在 macOS 26 上这是能用的选择。若您的电脑最高只能跑到 macOS 15，Swiftly 可能无法把 toolchain 装进 user-space，此时只能以系统管理员权限、手动将官方发行的 toolchain `.dmg`／`.pkg` 安装到系统根目录；如此一来，您可能得按自身需求改动本仓库的 `makefile`。这些繁琐事务在当今是可以交给 LLM 打点的，但便利与风险并存，请自行斟酌。
 - **本仓库不提供 `build640` 这类「锁定 Swift 版本号」的建置入口**：Swift 每发一版就得回头把所有 `makefile` 修一遍，得不偿失。建置入口一律以「当前 shell 的 `swift`」为准。
 
 编译出的成品对应系统需求：
@@ -103,7 +103,7 @@
 
 `ValueAdd/WebConfigAssistant/` 是唯音的配置助手：以 TypeScript 写成，编译后成为**单档自足**的 `assistant.html`——一份在浏览器内运作的互动式设定向导，用来产生可汇入唯音的「配置包」。该目录自有[一份说明](ValueAdd/WebConfigAssistant/README.md)，此处只讲它与本仓库建置流程之关系。
 
-**它不是唯音本体之建置相依**：不编它，`make debug`／`make release`／`make archive` 一概照常。两者之关系是：
+**它不是唯音本体的建置相依**：不编它，`make debug`／`make release`／`make archive` 一概照常。两者之关系是：
 
 - **侦测到 `tsc` 时**：上述各目标（以及 legacy 路径之 `make debugLegacy`／`releaseLegacy`／`archiveLegacy`、乃至 Xcode 专案）会顺带编译助手，并把它收录进 `vChewing.app/Contents/Resources/assistant/assistant.html`。
 - **未侦测到 `tsc` 时**：只印一则警告，**不中断输入法之建置**，该资源亦不收录。故若您发现 app 内没有配置助手，请先确认 `tsc` 是否在 `PATH` 内。
