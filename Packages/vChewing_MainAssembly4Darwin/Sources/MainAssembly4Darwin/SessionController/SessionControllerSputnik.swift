@@ -96,7 +96,7 @@ public struct SessionControllerSputnik {
 // MARK: - 一次性類別層級 Block 配置（於輸入法啟動時執行）
 
 extension SessionControllerSputnik {
-  /// 對 IMKInputSessionController 註冊 13 個類別層級 static block。
+  /// 對 IMKInputSessionController 註冊 14 個類別層級 static block。
   /// 每個 block 均從 raw controller/client 記憶體位址解析對應的 InputSession，
   /// 再將呼叫轉發至 Session 的對應方法。
   @MainActor
@@ -110,13 +110,20 @@ extension SessionControllerSputnik {
     ///   callCoreAtLeastOnce reassign，導致 client() 解讀透過舊 controller 回傳 nil，
     ///   使 doCommit / doSetMarkedText 靜默失效。
     IMKInputSessionController.configureActivatingServer { ctlAddr in
-      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else { return }
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
+        SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "activateServer")
+        return
+      }
       session.inputControllerAssignedAddr = ctlAddr
       session.performServerActivation()
     }
     /// 停用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController deactivateServer:]`。
     IMKInputSessionController.configureDeactivatingServer { ctlAddr in
-      SessionControllerSputnik.session(forAddr: ctlAddr)?.performServerDeactivation()
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
+        SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "deactivateServer")
+        return
+      }
+      session.performServerDeactivation()
     }
     /// Controller 被釋放時的最終清理。對應 `-[IMKInputController dealloc]`。
     IMKInputSessionController.configureDealloc { ctlAddr in
@@ -148,12 +155,23 @@ extension SessionControllerSputnik {
     /// 登記此輸入法能處理的 NSEventType 遮罩。
     /// 對應 `-[IMKInputController recognizedEvents:]`。
     IMKInputSessionController.configureProvidingRecognizedEvents { ctlAddr in
-      SessionControllerSputnik.session(forAddr: ctlAddr)?.recognizedEvents() ?? 0
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
+        SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "recognizedEvents")
+        return 0
+      }
+      let mask = session.recognizedEvents()
+      if PrefMgr.shared.isDebugModeEnabled {
+        vCLog("RecognizedEvents: addr=\(ctlAddr) mask=\(mask)")
+      }
+      return mask
     }
     /// 處理來自 IMK 的鍵盤／滑鼠事件。此為輸入法最核心的 dispatch 路徑。
     /// 對應 `-[IMKInputController handleEvent:client:]`。
     IMKInputSessionController.configureHandlingGivenNullableEvent { evPtr, ctlAddr in
-      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else { return false }
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
+        SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "handleEvent")
+        return false
+      }
       let event: NSEvent? = evPtr != 0
         ? Unmanaged<NSEvent>.fromOpaque(UnsafeRawPointer(bitPattern: evPtr)!).takeUnretainedValue()
         : nil
@@ -201,7 +219,34 @@ extension SessionControllerSputnik {
       guard let menuSputnik = IMEMenuSputnik(controllerAddr: ctlAddr) else { return NSMenu() }
       return menuSputnik.build()
     }
+
+    // ---- 診斷日誌 ----
+
+    /// 接收 ObjC 側（controller 初始化、啟用／停用、孤兒掃除、延遲釋放）的診斷訊息。
+    /// 除錯模式之閘門由 `vCLog` 統一承擔，故 ObjC 側可無條件呼叫此通道。
+    IMKInputSessionController.configureLoggingHandler { cMsg in
+      guard let cMsg else { return }
+      vCLog(String(cString: cMsg))
+    }
   }()
+
+  /// 診斷用：回報一處原本完全靜默的分支——以 controller 位址查無對應 session。
+  ///
+  /// 這條路徑不留任何痕跡，正是 2026-10 客訴 #618 期間無法區分「事件根本未投遞」
+  /// 與「事件投遞到的 controller 已自 tracker 除名」的主因。
+  ///
+  /// - Parameters:
+  ///   - ctlAddr: 觸發該回呼的 controller 記憶體位址。
+  ///   - callSite: 回呼名稱，用以辨識是哪一條 IMK 派發路徑。
+  private static func logUnresolvableController(_ ctlAddr: UInt, at callSite: String) {
+    guard PrefMgr.shared.isDebugModeEnabled else { return }
+    let tracker = IMKControllerLifetimeTracker.shared()
+    vCLog(
+      "UnresolvableController: callSite=\(callSite) addr=\(ctlAddr) "
+        + "alive=\(tracker.isAddressAlive(ctlAddr)) gen=\(tracker.generation(forAddress: ctlAddr)) "
+        + "tracked=\(tracker.trackedControllerCount)"
+    )
+  }
 
   /// 由 controller 記憶體位址查詢對應的 InputSession（以 parity routing 決定）。
   /// Class-level blocks 統一走 parity 路徑，避免與 `sessionAddrByControllerAddr`
