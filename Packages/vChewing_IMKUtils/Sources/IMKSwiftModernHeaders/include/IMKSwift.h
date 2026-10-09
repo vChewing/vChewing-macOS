@@ -935,6 +935,15 @@
     (nullable void (^)(uintptr_t valuePtr, intptr_t intTag, uintptr_t ctlAddr))block
     NS_SWIFT_NAME(configureSettingObjCValue(_:));
 
+/// Installs a diagnostic sink for the controller's own lifecycle paths
+/// (initialisation, activation, deactivation, stale-controller pruning and
+/// deferred dealloc).  The message travels as a UTF-8 C string so that no
+/// object crosses the ObjC→Swift boundary; the receiver is expected to perform
+/// its own debug-mode gating, hence the ObjC side may call the sink
+/// unconditionally.
++ (void)IMKSwift_configureWithLoggingHandler:(nullable void (^)(const char *_Nullable message))block
+    NS_SWIFT_NAME(configureLoggingHandler(_:));
+
 /// Returns the current controller generation counter (monotonically increasing),
 /// used by the parity-based double-buffered session pool.
 + (uint64_t)IMKSwift_currentGeneration NS_SWIFT_NAME(currentGeneration());
