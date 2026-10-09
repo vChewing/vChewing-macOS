@@ -254,12 +254,12 @@ extension KeyKeyUserDBKit.PhonaSet {
   /// 將資料庫中的 qstring 解碼為注音符號
   ///
   /// - 格式1 (unigram): 連續的 2-char absolute order 字串，每 2 個字元代表一個注音音節
-  /// - 格式2 (bigram):  "~{前字注音2char} {當前字注音2char}"，用空格分隔
+  /// - 格式2 (bigram):  "~{前字注音2char} {當前字注音2char}"，用空白字元分隔
   ///
   /// - 注意: `~` (ASCII 126) 可能是有效的編碼字元（order % 79 = 78），
-  ///         只有當 `~` 後面有空格時才是真正的 bigram 格式
+  ///         只有當 `~` 後面有空白字元時才是真正的 bigram 格式
   public static func decodeQueryString(_ queryString: String) -> String {
-    // 只有當 ~ 後面有空格時才是 bigram 格式
+    // 只有當 ~ 後面有空白字元時才是 bigram 格式
     if queryString.hasPrefix("~"), queryString.dropFirst().contains(" ") {
       return decodeBigram(queryString)
     }
@@ -273,12 +273,12 @@ extension KeyKeyUserDBKit.PhonaSet {
   /// 將資料庫中的 qstring 解碼為注音符號陣列（用於 Gram 的 keyArray）
   ///
   /// - 格式1 (unigram): 連續的 2-char absolute order 字串，每 2 個字元代表一個注音音節
-  /// - 格式2 (bigram):  "~{前字注音2char} {當前字注音2char}"，用空格分隔
+  /// - 格式2 (bigram):  "~{前字注音2char} {當前字注音2char}"，用空白字元分隔
   ///
   /// - 注意: `~` (ASCII 126) 可能是有效的編碼字元（order % 79 = 78），
-  ///         只有當 `~` 後面有空格時才是真正的 bigram 格式
+  ///         只有當 `~` 後面有空白字元時才是真正的 bigram 格式
   public static func decodeQueryStringAsKeyArray(_ queryString: String) -> [String] {
-    // 只有當 ~ 後面有空格時才是 bigram 格式
+    // 只有當 ~ 後面有空白字元時才是 bigram 格式
     if queryString.hasPrefix("~"), queryString.dropFirst().contains(" ") {
       return decodeBigramAsKeyArray(queryString)
     }

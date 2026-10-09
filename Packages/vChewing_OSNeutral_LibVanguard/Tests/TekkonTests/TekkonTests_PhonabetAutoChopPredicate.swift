@@ -75,7 +75,7 @@ enum AutoChopCorpus {
 
   /// 鍵面字元之地面真值（靜態注音排列之按鍵域）。
   ///
-  /// 實查自素材檔之 1485 列 × 5 動態排列：其鍵面字元僅 `0-9` 與 `a-z`。**反引號與空格不在其列**
+  /// 實查自素材檔之 1485 列 × 5 動態排列：其鍵面字元僅 `0-9` 與 `a-z`。**反引號與空白字元不在其列**
   /// 它在素材檔內只作「無此鍵」之標記（`` `NULL``），而本型別先前把兩者一併當成候選鍵，遂使
   /// `staticKeys(for:)` 之反推把反引號登記成某注音符號之按鍵 ⇒ 由合法讀音之前綴生成出**不可鍵入**
   /// 之鍵序，判準對該鍵之反應即隨平台而異。**此為測試之輸入域缺陷，非判準之缺陷。**
@@ -134,7 +134,7 @@ enum AutoChopCorpus {
       let reading: String = parts[0]
       let cells: [String] = Array(parts[1...])
       // 校驗閘：任何單元格若含鍵面字元以外之字元即整列剔除。實查素材檔之此類單元格只有兩種：
-      // ① 以反引號起始者（`` `NULL``、`` `vezf``…，標記「本排列無此鍵」）；② 尾端帶一空格者
+      // ① 以反引號起始者（`` `NULL``、`` `vezf``…，標記「本排列無此鍵」）；② 尾端帶一空白字元者
       // （`m `、`too `…，源自素材檔之 `__` ⇒ 空 cell）。**兩者皆為「不適用」之標記，非按鍵。**
       // 不設此閘時，該等字元會被當成按鍵餵給判準——而判準對「非注音按鍵」之反應無定義，
       // 各平台遂各自為政。
@@ -192,7 +192,7 @@ struct PhonabetAutoChopPredicateTests {
     for layout in AutoChopCorpus.staticLayouts {
       let keyMap = AutoChopCorpus.staticKeys(for: layout.parser)
       // 輸入域不變式：反推所得之按鍵一律須為鍵面字元。**此行即本檔之迴歸釘**——
-      // 先前之候選鍵含反引號與空格，反推遂把它們登記成某注音符號之按鍵，而由合法讀音之前綴
+      // 先前之候選鍵含反引號與空白字元，反推遂把它們登記成某注音符號之按鍵，而由合法讀音之前綴
       // 生成出**不可鍵入**之鍵序。
       #expect(
         keyMap.values.allSatisfy { AutoChopCorpus.isKeyCharacter(Character(String($0))) },
@@ -257,7 +257,7 @@ struct PhonabetAutoChopPredicateTests {
           var probe = composer
           probe.receiveKey(fromScalar: key.unicodeScalars.first)
           let postContent = probe.getComposition()
-          // 於**當前狀態**下寫入聲調槽者（聲調鍵／空格）由既有管線固化，不屬本案。
+          // 於**當前狀態**下寫入聲調槽者（聲調鍵／空白鍵）由既有管線固化，不屬本案。
           guard probe.intonation.value == composer.intonation.value else { continue }
           let greedy = index.isPrefix(postContent) && postContent.count > preContent.count
           guard !greedy else { continue }

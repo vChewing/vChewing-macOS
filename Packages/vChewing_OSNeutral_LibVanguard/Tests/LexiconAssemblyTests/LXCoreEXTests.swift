@@ -123,7 +123,7 @@ struct LXCoreEXTests {
   }
 
   /// 手術（Phase 230）：`convertToPhonabets()` 對純注音字串（含以半形減號作分隔者）早退。
-  /// 本測釘死「早退不改變結果」——拼音轉換與空格替換皆須照舊生效。
+  /// 本測釘死「早退不改變結果」——拼音轉換與空白字元替換皆須照舊生效。
   @Test
   func testConvertToPhonabetsFastPathParity() throws {
     // 純注音（含半形減號分隔）：早退，結果不變。
@@ -149,12 +149,12 @@ struct LXCoreEXTests {
     pureAlnum.convertToPhonabets()
     #expect(pureAlnum == "ba")
 
-    // 空格替換：newFirstTone 為空時刪除空格。
+    // 空白字元替換：newFirstTone 為空時刪除空白字元。
     var spacedPinyin = "ba shi"
     spacedPinyin.convertToPhonabets()
     #expect(spacedPinyin == "ㄅㄚㄕ")
 
-    // 空格替換：newFirstTone 非空時替換——即使字串為純注音亦須生效。
+    // 空白字元替換：newFirstTone 非空時替換——即使字串為純注音亦須生效。
     var spacedBopomofo = "ㄅㄚ ㄕ"
     spacedBopomofo.convertToPhonabets(newFirstTone: "-")
     #expect(spacedBopomofo == "ㄅㄚ-ㄕ")
@@ -197,7 +197,7 @@ struct LXCoreEXTests {
     lxTest.replaceData(textData: sampleData)
     // strData computed 屬性與載入原文一致（保護外部唯讀消費端）。
     #expect(lxTest.strData == sampleData)
-    // tab 會在載入時正規化為空格，strData 反映的是正規化後的內容。
+    // tab 會在載入時正規化為空白字元，strData 反映的是正規化後的內容。
     lxTest.replaceData(textData: "ㄍㄠ\t高\t-7.171551")
     #expect(lxTest.strData == "ㄍㄠ 高 -7.171551")
   }
@@ -227,7 +227,7 @@ struct LXCoreEXTests {
 
   @Test
   func testOpenSaveRoundTripPreservesInvalidUTF8() throws {
-    // consolidate: false 路徑：open 以位元組讀入（CR→LF、Tab→空格為位元組層級取代），
+    // consolidate: false 路徑：open 以位元組讀入（CR→LF、Tab→空白字元為位元組層級取代），
     // saveData 以原始位元組寫回——非法 UTF-8 位元組原樣保留。
     var lxTest = LXAssembly.LXCoreEX(
       reverse: false,
@@ -245,7 +245,7 @@ struct LXCoreEXTests {
     #expect(opened)
     lxTest.saveData()
     let saved = try Data(contentsOf: tempURL)
-    // CR→LF、Tab→空格後：foo bar\n\n ＋ 0xFF ＋ \nbaz\n
+    // CR→LF、Tab→空白字元後：foo bar\n\n ＋ 0xFF ＋ \nbaz\n
     let expected: [UInt8] = Array("foo bar\n\n".utf8) + [0xFF] + Array("\nbaz\n".utf8)
     #expect(Array(saved) == expected)
   }

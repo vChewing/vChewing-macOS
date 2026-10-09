@@ -35,7 +35,7 @@ extension InputHandlerProtocol {
   /// 鏡像），供 composition buffer 顯示與 Enter 遞交使用，確保顯示/遞交與 copilot
   /// 最佳猜測（含邊界文脈）同源。
   /// `tailReading` 為 copilot 組句當中最末節點對「前方位置」的具體選讀（含聲調），
-  /// 供前方候選清單與高亮預覽／顯式選字（Shift+選字鍵）路徑使用；空格固化不再以
+  /// 供前方候選清單與高亮預覽／顯式選字（Shift+選字鍵）路徑使用；空白鍵固化不再以
   /// 之釘選——只插聲調桶、不覆寫，保留 LM 重切分自由度。
   /// - Returns: 含讀音桶、預覽文字、橫跨節點詞音配對、主段文字陣列與前方選讀的
   ///   暫態結果；閘門不符或試算失敗時回傳 nil。
@@ -524,7 +524,7 @@ extension InputHandlerProtocol {
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
   /// - Parameters:
   ///   - sansReading: 不顯示組音區/組筆區。
-  ///   - guarded: 是否在該狀態的顯示文字為空的時候顯示替補空格，否則 InputMethodKit 無法正常攔截方向鍵事件。
+  ///   - guarded: 是否在該狀態的顯示文字為空的時候顯示替補空白字元，否則 InputMethodKit 無法正常攔截方向鍵事件。
   /// - Returns: 生成的「正在輸入」狀態。
   public func generateStateOfInputting(
     sansReading: Bool = false,
@@ -1033,7 +1033,7 @@ extension InputHandlerProtocol {
     }
 
     // 狂拼模式：注拼槽尚有未完成讀音（hasFuriousFrontPending）時，先把前方讀音固化進
-    // 組字器（與空格／Tab／Enter 同語義），再讓標點正常插入——未完成讀音不再擋下標點
+    // 組字器（與空白鍵／Tab／Enter 同語義），再讓標點正常插入——未完成讀音不再擋下標點
     // 輸入（消除 A9B69908D 蜂鳴）。固化失敗（如無法展開成讀音桶的無效前綴）時維持
     // 既有蜂鳴行為。
     if !isComposerOrCalligrapherEmpty, hasFuriousFrontPending {

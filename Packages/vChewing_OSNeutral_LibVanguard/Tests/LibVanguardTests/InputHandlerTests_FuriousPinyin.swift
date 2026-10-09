@@ -607,7 +607,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.keys.count == 2)
     #expect(testHandler.assembler.keys.last == .multipleKeys(["ㄐㄧㄝ", "ㄐㄧㄝˊ", "ㄐㄧㄝˇ", "ㄐㄧㄝˋ", "ㄐㄧㄝ˙"]))
     #expect(generateDisplayedText() == "世界")
-    // 空格固化（完整音節）累積 trail：auto-chop 的「shi」＋空格固化的「jie」。
+    // 空白鍵固化（完整音節）累積 trail：auto-chop 的「shi」＋空白鍵固化的「jie」。
     #expect(testHandler.furiousTrail == ["shi", "jie"])
     // 同一事件繼續走正常流程：開出正常選字窗，候選涵蓋跨邊界詞「世界」。
     #expect(testSession.state.type == .ofCandidates)
@@ -656,7 +656,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 尾鍵維持聲調桶（tone-fuzzy 保留）；顯示由真組字器組句決定（同源於 copilot）。
     #expect(testHandler.assembler.keys.last == .multipleKeys(["ㄐㄧㄝ", "ㄐㄧㄝˊ", "ㄐㄧㄝˇ", "ㄐㄧㄝˋ", "ㄐㄧㄝ˙"]))
     #expect(generateDisplayedText() == "世界")
-    // 空格固化（完整音節）累積 trail：auto-chop 的「shi」＋固化的「jie」。
+    // 空白鍵固化（完整音節）累積 trail：auto-chop 的「shi」＋固化的「jie」。
     #expect(testHandler.furiousTrail == ["shi", "jie"])
     #expect(testSession.state.type == .ofCandidates)
     #expect(testSession.state.candidates.contains { $0.value == "世界" })
@@ -1253,7 +1253,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.cursor == testHandler.assembler.keys.count)
     // 該方向鍵事件被交給選字窗導航（高亮移動嘗試發生）。
     #expect(mockController.highlightNavigationCount > 0)
-    // 空格固化（完整音節）累積 trail；無任何遞交。
+    // 空白鍵固化（完整音節）累積 trail；無任何遞交。
     #expect(testHandler.furiousTrail == ["shi", "jie"])
     #expect(testSession.recentCommissions.isEmpty)
   }
@@ -1642,10 +1642,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.recentCommissions.isEmpty)
   }
 
-  /// 狂拼空格消費：注拼槽有未完成讀音（copilot 窗顯示）時，空格固化插入讀音
+  /// 狂拼空白鍵消費：注拼槽有未完成讀音（copilot 窗顯示）時，空白鍵固化插入讀音
   /// （整組聲調桶＋copilot 選讀覆寫「媽」）並被本拍直接消費——不觸發候選輪替、
-  /// 不落入遞交路徑（不再生成空格字符拆斷組字區）。測資：媽(ㄇㄚ,9)／罵(ㄇㄚˋ,8)，
-  /// LM 初始選字為「媽」；若空格仍輪替（spaceKeyBehaviorAgainstICB == 2），
+  /// 不落入遞交路徑（不再生成空白字符拆斷組字區）。測資：媽(ㄇㄚ,9)／罵(ㄇㄚˋ,8)，
+  /// LM 初始選字為「媽」；若空白鍵仍輪替（spaceKeyBehaviorAgainstICB == 2），
   /// 會輪到「罵」。消費後組字區維持 copilot 選讀「媽」、無任何遞交。
   @Test("IH-FuriousPinyin-035 Furious typing Space consumed after solidify")
   func test_IH_FuriousPinyin_035_FuriousTypingSpaceConsumedAfterSolidify() throws {
@@ -1685,26 +1685,26 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.composer.romajiBuffer == "ma")
     #expect(!testSession.state.candidates.isEmpty)
 
-    // 按 Space：固化插入 copilot 選讀（整組聲調桶＋顯示覆寫「媽」），且空格被消費
-    // ——不輪替候選、不落入遞交路徑（不再生成空格字符拆斷組字區、使之直接遞交）。
+    // 按 Space：固化插入 copilot 選讀（整組聲調桶＋顯示覆寫「媽」），且空白鍵被消費
+    // ——不輪替候選、不落入遞交路徑（不再生成空白字符拆斷組字區、使之直接遞交）。
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
 
     #expect(testHandler.composer.romajiBuffer.isEmpty)
-    // 空格未輪替候選：組字區維持 copilot 選讀「媽」，而非輪替後的四聲「罵」。
+    // 空白鍵未輪替候選：組字區維持 copilot 選讀「媽」，而非輪替後的四聲「罵」。
     #expect(testHandler.assembler.keys.count == 1)
     #expect(testHandler.assembler.keys.last == .multipleKeys(["ㄇㄚ", "ㄇㄚˊ", "ㄇㄚˇ", "ㄇㄚˋ", "ㄇㄚ˙"]))
     #expect(generateDisplayedText() == "媽")
-    // 空格已被本拍消費：無任何遞交、無空格字符，組字區維持原狀（Inputting）。
+    // 空白鍵已被本拍消費：無任何遞交、無空白字符，組字區維持原狀（Inputting）。
     let committed = testSession.recentCommissions.joined()
     #expect(committed.isEmpty)
     #expect(!committed.contains("罵"))
     #expect(testSession.state.type == .ofInputting)
   }
 
-  /// 狂拼 BackSpace 清空注拼槽後再按空格：空格應就地輪替候選（behavior==2）、
+  /// 狂拼 BackSpace 清空注拼槽後再按空白鍵：空白鍵應就地輪替候選（behavior==2）、
   /// 而非把已刪除的前方讀音重新組回（Tekkon doBackSpace 未同步清理 phonabet 槽位
   /// 的缺陷）。測資：打「shimama」後注拼槽暫存 ma、組字器 [shi, ma]（顯示失媽）；
-  /// 兩次 BackSpace 清空注拼槽；空格輪替後組字器鍵數維持 2、顯示變為輪替結果
+  /// 兩次 BackSpace 清空注拼槽；空白鍵輪替後組字器鍵數維持 2、顯示變為輪替結果
   /// 「失嗎」、無任何遞交。
   @Test("IH-FuriousPinyin-036 Furious typing Backspace then Space revolves")
   func test_IH_FuriousPinyin_036_FuriousTypingBackspaceThenSpaceRevolves() throws {
@@ -1744,7 +1744,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.keys.count == 2)
     #expect(generateDisplayedText() == "失媽")
 
-    // 按 Space：空格就地輪替候選——鍵數維持 2（不得重新組回已刪除的「ma」）、
+    // 按 Space：空白鍵就地輪替候選——鍵數維持 2（不得重新組回已刪除的「ma」）、
     // 顯示為輪替後的「失嗎」、無任何遞交。
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
     #expect(testHandler.assembler.keys.count == 2)
@@ -1796,7 +1796,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.recentCommissions.joined() == "失媽媽")
   }
 
-  /// 空格固化只插聲調桶（不覆寫）：「xi 空格 an 空格」時 copilot 重切合併長詞
+  /// 空白鍵固化只插聲調桶（不覆寫）：「xi 空白鍵 an 空白鍵」時 copilot 重切合併長詞
   /// 「西安」，不被單字「西」的覆寫釘死打斷；trail 持續累積供語言模型引導的
   /// 重切分（對治「長詞自動選取被短詞 override 打斷」）。
   @Test("IH-FuriousPinyin-038 Furious typing Space solidification merges long word")
@@ -1822,10 +1822,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.prefs.furiousTypingEnabled4Pinyin = true
-    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空白鍵不作選字窗呼叫（聚焦固化語義）。
     testHandler.currentLM.syncPrefs()
 
-    // 「xi」＋空格：只插 ㄒㄧ桶、不覆寫；trail 累積「xi」。
+    // 「xi」＋空白鍵：只插 ㄒㄧ桶、不覆寫；trail 累積「xi」。
     typeSentence("xi")
     #expect(testHandler.composer.romajiBuffer == "xi")
     #expect(!testSession.state.candidates.isEmpty)
@@ -1835,7 +1835,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.furiousTrail == ["xi"])
     #expect(generateDisplayedText() == "西")
 
-    // 「an」＋空格：copilot 重切合併長詞「西安」，真組字器同源組句「西安」。
+    // 「an」＋空白鍵：copilot 重切合併長詞「西安」，真組字器同源組句「西安」。
     typeSentence("an")
     #expect(testSession.state.displayedText == "西安") // copilot 全句顯示（西＋前方安）。
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
@@ -2067,8 +2067,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.state.type == .ofInputting)
   }
 
-  /// 狂拼整詞簡拼（R2-α）空格固化：注拼槽整段無法展開成單一音節桶（如「xqr」→
-  /// 「星期日」）時，空格把整詞簡拼候選之首的實際讀音以單鍵插入組字器
+  /// 狂拼整詞簡拼（R2-α）空白鍵固化：注拼槽整段無法展開成單一音節桶（如「xqr」→
+  /// 「星期日」）時，空白鍵把整詞簡拼候選之首的實際讀音以單鍵插入組字器
   /// （不覆寫、保留 LM 重切分自由度）、清空注拼槽、trail 失效——不丟失前方上下文。
   @Test("IH-FuriousPinyin-043 Furious typing abbreviated Space solidifies top candidate")
   func test_IH_FuriousPinyin_043_FuriousTypingAbbreviatedSpaceSolidifiesTopCandidate() throws {
@@ -2089,7 +2089,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     // 使用者造詞「星期日」＋單音節 gram（供固化插入的讀音存在性驗證）。
     // 另注入近分競爭者「星期人」，使 xqr 不觸發 R3-a 自動套用、保留
-    // 「空格固化整詞候選之首的實際讀音」的既有確認路徑。
+    // 「空白鍵固化整詞候選之首的實際讀音」的既有確認路徑。
     [
       .init(keyArray: ["ㄒㄧㄥ", "ㄑㄧ", "ㄖˋ"], value: "星期日", score: 9),
       .init(keyArray: ["ㄒㄧㄥ", "ㄑㄧ", "ㄖㄣˊ"], value: "星期人", score: 8),
@@ -2104,7 +2104,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.prefs.furiousTypingEnabled4Pinyin = true
-    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空白鍵不作選字窗呼叫（聚焦固化語義）。
     testHandler.currentLM.syncPrefs()
 
     // 「xqr」：多音節簡拼、copilot 窗顯示整詞候選「星期日」。
@@ -2113,7 +2113,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!testSession.state.candidates.isEmpty)
     #expect(testSession.state.candidates.first?.value == "星期日")
 
-    // 空格：固化整詞簡拼候選之首的實際讀音（單鍵插入、不覆寫）。
+    // 空白鍵：固化整詞簡拼候選之首的實際讀音（單鍵插入、不覆寫）。
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
 
     #expect(testHandler.composer.romajiBuffer.isEmpty)
@@ -2312,11 +2312,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.prefs.furiousTypingEnabled4Pinyin = true
-    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空白鍵不作選字窗呼叫（聚焦固化語義）。
     testHandler.currentLM.syncPrefs()
 
     // 「xiansheng」：auto-chop 在 's' 提交「先」（注拼槽暫存 sheng）；
-    // 空格固化「生」後 trail 為 [xian, sheng]、組句維持「先生」不被拆開。
+    // 空白鍵固化「生」後 trail 為 [xian, sheng]、組句維持「先生」不被拆開。
     typeSentence("xiansheng")
     #expect(testHandler.composer.romajiBuffer == "sheng")
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
@@ -2670,7 +2670,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 狂拼模式下直接敲標點鍵不蜂鳴（P170 fail-first）：注拼槽尚有未完成讀音
   /// （如「tama」的「ma」）時敲問號等標點鍵，不得再以 A9B69908D 蜂鳴——
-  /// 先以空格／Tab／Enter 同語義把前方讀音固化進組字器，再讓標點正常插入
+  /// 先以空白鍵／Tab／Enter 同語義把前方讀音固化進組字器，再讓標點正常插入
   /// （注拼槽清空、標點鍵被消費、組句含標點）。
   @Test("IH-FuriousPinyin-054 Furious punctuation solidifies then inserts")
   func test_IH_FuriousPinyin_054_FuriousPunctuationSolidifiesThenInserts() throws {

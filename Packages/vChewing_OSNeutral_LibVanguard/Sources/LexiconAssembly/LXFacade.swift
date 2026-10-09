@@ -898,7 +898,7 @@ extension LXAssembly {
       let cacheKey = partiallyMatch ? "\(keyChain)\tPM1" : "\(keyChain)\tPM0"
       let noEmptyKey = !flatKeyArray.isEmpty && flatKeyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
-      /// 給空格鍵指定輸出值。
+      /// 給空白鍵指定輸出值。
       let asciiSpace = " "
       if flatKeyArray == [asciiSpace] { return [.init(keyArray: flatKeyArray, value: asciiSpace)] }
       // 檢查 LRU 快取

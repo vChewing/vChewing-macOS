@@ -25,7 +25,7 @@ import HomaSharedTestComponents
 // MARK: - IH.FuriousZhuyin
 
 extension LibVanguardTestsRoot.InputHandlerTests {
-  /// **本 phase 之功能底線**：注音狂打下連續鍵入兩個完整音節，**不必敲聲調、不必按空格**，
+  /// **本 phase 之功能底線**：注音狂打下連續鍵入兩個完整音節，**不必敲聲調、不必按空白鍵**，
   /// 即應各自成鍵入組字器。
   @Test("IH-FuriousZhuyin-001 Zhuyin furious auto-chops two consecutive syllables")
   func test_IH_FuriousZhuyin_001_ZhuyinFuriousAutoChopsConsecutiveSyllables() throws {
@@ -36,15 +36,15 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer { testSession.resetInputHandler(forceComposerCleanup: true) }
 
     // `el`＝ㄍㄠ；再敲 `e`（ㄍ）時，`ㄍㄠ` 已不可能再延伸 ⇒ 應自動固化，注拼槽重設為 `ㄍ`；
-    // 續敲 `j/`＝ㄨㄥ ⇒ 第二音節 `ㄍㄨㄥ`。全程未敲聲調、未按空格。
+    // 續敲 `j/`＝ㄨㄥ ⇒ 第二音節 `ㄍㄨㄥ`。全程未敲聲調、未按空白鍵。
     var keys = typeZhuyinAndCollectReadingKeys("elej/", zhuyinFurious: true)
     // 第三拍（`e`）時 `ㄍㄠ` 已不可能再延伸 ⇒ 已固化；第二音節 `ㄍㄨㄥ` 尚在注拼槽內
-    // （末音節之固化須待下一拍或空格——此與拼音狂拼之末端語義一致）。
+    // （末音節之固化須待下一拍或空白鍵——此與拼音狂拼之末端語義一致）。
     #expect(keys == ["ㄍㄠ"], "實得：\(keys)")
     #expect(testHandler.composer.getComposition() == "ㄍㄨㄥ", "實得：\(testHandler.composer.getComposition())")
     #expect(generateDisplayedText().contains("高"), "組字結果：\(generateDisplayedText())")
 
-    // 以空格固化末音節 ⇒ 兩音節皆入組字器。
+    // 以空白鍵固化末音節 ⇒ 兩音節皆入組字器。
     typeSentence(" ")
     keys = testHandler.assembler.actualKeys
     #expect(keys == ["ㄍㄠ", "ㄍㄨㄥ"], "實得：\(keys)")
@@ -98,7 +98,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.composer.receiveKey(fromString: "e")
     testHandler.composer.receiveKey(fromString: "l")
     #expect(testHandler.composer.getComposition() == "ㄍㄠ")
-    // 大千排列之五個聲調鍵：3＝ˇ、4＝ˋ、6＝ˊ、7＝˙、空格＝陰平。
+    // 大千排列之五個聲調鍵：3＝ˇ、4＝ˋ、6＝ˊ、7＝˙、空白鍵＝陰平。
     for tone in ["3", "4", "6", "7", " "] {
       #expect(
         !testHandler.composer.shouldAutoChopPhonabets(byTyping: Character(tone)),
@@ -171,7 +171,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄍㄠ")
     #expect(testSession.unfinishedReading == "ㄍㄠ")
 
-    // 固化（空格）之後：顯示源與旗子同步落回 nil。
+    // 固化（空白字元）之後：顯示源與旗子同步落回 nil。
     typeSentence(" ")
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.furiousFrontUnfinishedReading == nil)
@@ -225,8 +225,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 既有 6 個 `hasFuriousFrontPending` 讀取點，在注音狂打下逐一驗其語義。
   ///
   /// Tab／Enter／標點／方向鍵皆為「先固化前方讀音，再走各自既有語義」——注音側悉數沿用。
-  /// **空格不在此列**（P260）：注音之五個聲調鍵為 `3`／`4`／`6`／`7` 與**空格**（陰平），
-  /// 空格若被挪作固化之用則陰平無從指定 ⇒ 空格照常送入注拼槽當陰平（見 ①）。
+  /// **空白鍵不在此列**（P260）：注音之五個聲調鍵為 `3`／`4`／`6`／`7` 與**空白鍵**（陰平），
+  /// 空白鍵若被挪作固化之用則陰平無從指定 ⇒ 空白鍵照常送入注拼槽當陰平（見 ①）。
   @Test("IH-FuriousZhuyin-008 Front read points under zhuyin furious")
   func test_IH_FuriousZhuyin_008_FrontReadPointsUnderZhuyinFurious() throws {
     guard let testHandler, let testSession else {
@@ -247,8 +247,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       #expect(testHandler.hasFuriousFrontPending)
     }
 
-    // ① 空格（P260）：**空格即陰平鍵**，且陰平須確實被選用——測資刻意令去聲候選之分數遠高於
-    //    陰平（−0.1 對 −9）：若空格仍走「無調讀音桶」之路徑（P256 之過寬語義），語言模型會
+    // ① 空白鍵（P260）：**空白鍵即陰平鍵**，且陰平須確實被選用——測資刻意令去聲候選之分數遠高於
+    //    陰平（−0.1 對 −9）：若空白鍵仍走「無調讀音桶」之路徑（P256 之過寬語義），語言模型會
     //    挑走去聲者；本 phase 之後應得陰平者。
     [
       Homa.Gram(keyArray: ["ㄍㄠ"], value: "陰平測", score: -9),
@@ -259,7 +259,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     prepareTwoPendingKeys()
     typeSentence(" ")
     // 鍵須為陰平者（單鍵 ㄍㄠ）；顯示值則取決於辭庫內陰平鍵之分數，故不釘字面值——
-    // 但**不得**為去聲者：若空格仍走無調桶之路徑，去聲候選（−0.1）必被選中（實測如此）。
+    // 但**不得**為去聲者：若空白鍵仍走無調桶之路徑，去聲候選（−0.1）必被選中（實測如此）。
     #expect(testHandler.assembler.actualKeys == ["ㄍㄠ"], "實得：\(testHandler.assembler.actualKeys)")
     #expect(generateDisplayedText() != "去聲測", "實得：\(generateDisplayedText())")
     #expect(testHandler.composer.isEmpty)
@@ -370,7 +370,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.hasFuriousFrontPending)
     #expect(testSession.unfinishedReading == "gao")
 
-    // 固化後（空格）旗子落回。
+    // 固化後（空白字元）旗子落回。
     typeSentence(" ")
     #expect(testHandler.composer.romajiBuffer.isEmpty)
     #expect(!testHandler.hasFuriousFrontPending)
@@ -486,7 +486,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 本靶釘五件事：
   /// ① 模式判定不再互斥（`typingMode` 之注音臂不再讀回退）；
   /// ② 讀音素材之住處分流（`mixedAlnumZhuyinFuriousInEffect` 與 `isZhuyinFuriousTypingModeEffective` 互斥）；
-  /// ③ **行為層**：回退須真的活著——ASCII 序列依序累積於緩衝、空格遞交原文（行為即
+  /// ③ **行為層**：回退須真的活著——ASCII 序列依序累積於緩衝、空白鍵遞交原文（行為即
   ///   「按鍵確實改走 `MixedAlphanumericalTypewriter`」之鐵證，勝於斷言型別）；
   /// ④ 撤除可逆：關掉回退後狂打即刻恢復「讀音素材住注拼槽」之形態；
   /// ⑤ **拼音側不受牽連**：回退本即注音鍵盤專屬，故 `4Pinyin` 與之無涉。
@@ -542,7 +542,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence("lm")
     #expect(testHandler.mixedAlphanumericalBuffer == "film")
 
-    // 空格：`film` 非讀音 ⇒ 無物可固化，照舊遞交整段 ASCII ＋ 半形空格。
+    // 空白鍵：`film` 非讀音 ⇒ 無物可固化，照舊遞交整段 ASCII ＋ 半形空白字元。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testSession.recentCommissions.joined() == "film ",
@@ -786,11 +786,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(demotedPinyin == ["科際", "科紀", "科技"], "實得：\(demotedPinyin)")
   }
 
-  /// 「名次」一律**按分數取**，不看清單位置——α 固化（空格／Tab）與 R3-a 自動套用皆然。
+  /// 「名次」一律**按分數取**，不看清單位置——α 固化（空白鍵／Tab）與 R3-a 自動套用皆然。
   ///
   /// 名次即分數；本靶以「使用者專有詞（原廠無此詞）之分數高於所有原廠命中、且其讀音與
   /// 原廠命中互異」之構造，令兩者之判別成為可觀測之別（窗內首位即該詞，固化亦取之）：
-  /// ① **固化**（空格）：取分數最高者之讀音 ⇒ 顯示該使用者詞；取清單首筆則會插入原廠命中
+  /// ① **固化**（空白字元）：取分數最高者之讀音 ⇒ 顯示該使用者詞；取清單首筆則會插入原廠命中
   ///    之讀音、顯示成原廠詞（修前實錄）；
   /// ② **自動套用**（明確勝出）：頂級候選按分數取——即使該使用者詞在清單末位。
   @Test("IH-FuriousZhuyin-018 Abbreviation rank is score-based")
@@ -807,7 +807,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     enterPinyinFuriousTestEnvironment()
 
     // ① 固化：使用者專有詞「科吉」（ㄎㄜ-ㄐㄧˊ，−0.5）之分數高於兩筆原廠命中，惟其位置
-    //    在清單末（分區制）；且與次高者（科技 −3.311）之差 < 3.0 ⇒ 不觸發自動套用、留待空格固化。
+    //    在清單末（分區制）；且與次高者（科技 −3.311）之差 < 3.0 ⇒ 不觸發自動套用、留待空白鍵固化。
     testHandler.currentLM.insertTemporaryData(
       unigram: .init(keyArray: ["ㄎㄜ", "ㄐㄧˊ"], value: "科吉", score: -0.5),
       isFiltering: false
@@ -1072,7 +1072,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///
   /// 桶展開之後，單聲母之固化不再是「插入一批無效鍵」而是「插入該聲母家族之真讀音鍵」⇒
   /// `Tekkon.SyllableIndex.isComplete(_:)` 之紅線（**不得**以之為「可否提交」之依據）由此靶
-  /// 守住：注音 ㄎ＋方向鍵（交棒固化）與拼音 `k`＋空格（無調確認組字）必須得到同一結果。
+  /// 守住：注音 ㄎ＋方向鍵（交棒固化）與拼音 `k`＋空白鍵（無調確認組字）必須得到同一結果。
   @Test("IH-FuriousZhuyin-023 Incomplete prefix solidify matches pinyin side")
   func test_IH_FuriousZhuyin_023_IncompletePrefixSolidifyMatchesPinyinSide() throws {
     guard let testHandler, let testSession else {
@@ -1082,7 +1082,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer { leaveFuriousTestEnvironment() }
     clearTestPOM()
 
-    // ① 拼音側之基準：`k` ＋ 空格（無調確認組字）。
+    // ① 拼音側之基準：`k` ＋ 空白鍵（無調確認組字）。
     enterPinyinFuriousTestEnvironment()
     typeSentence("k")
     typeSentence(" ")
@@ -1179,11 +1179,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!testSession.isFuriousCopilotCandidateWindowVisible)
   }
 
-  /// 並存時空格＝固化該讀音；固化後本拍結束，其後每一鍵照常。
+  /// 並存時空白鍵＝固化該讀音；固化後本拍結束，其後每一鍵照常。
   ///
   /// - Important: 純注音狂打之空白鍵為陰平鍵（P260），本情境**不適用**——素材住混打緩衝、
-  ///   聲調一律經數字鍵（`su3`）進入，故空格無「挪用即陰平無從指定」之虞；反之若不固化，
-  ///   本鍵會落入混打之「整段緩衝 ＋ 半形空格」而把讀音當英文遞交（正是 P258 之病灶）。
+  ///   聲調一律經數字鍵（`su3`）進入，故空白鍵無「挪用即陰平無從指定」之虞；反之若不固化，
+  ///   本鍵會落入混打之「整段緩衝 ＋ 半形空白字元」而把讀音當英文遞交（正是 P258 之病灶）。
   @Test("IH-FuriousZhuyin-025 Space solidifies mixed alnum reading")
   func test_IH_FuriousZhuyin_025_SpaceSolidifiesMixedAlnumReading() throws {
     guard let testHandler, let testSession else {
@@ -1198,7 +1198,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let cleanup = insertRealLexiconGrams(testHandler)
     defer { cleanup() }
 
-    // 空格：以陰平確認該讀音（不遞交任何 ASCII）。
+    // 空白鍵：以陰平確認該讀音（不遞交任何 ASCII）。
     typeSentence("su")
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
@@ -1220,7 +1220,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "固化後停留於輸入狀態，實得：\(testSession.state.type.rawValue)"
     )
 
-    // 再按空格：緩衝已空 ⇒ 遞交「已組字之中文 ＋ 半形空格」。
+    // 再按空白鍵：緩衝已空 ⇒ 遞交「已組字之中文 ＋ 半形空白字元」。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     let committedCodes = testSession.recentCommissions
       .map { $0.unicodeScalars.map { String($0.value, radix: 16) }.joined(separator: ",") }
@@ -1228,7 +1228,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     print("DBG codes=" + committedCodes)
     #expect(
       testSession.recentCommissions.count == 1 && testSession.recentCommissions[0].hasSuffix(" "),
-      "第二次空格應遞交「已組字之中文 ＋ 半形空格」，實得：\(testSession.recentCommissions)"
+      "第二次空白鍵應遞交「已組字之中文 ＋ 半形空白字元」，實得：\(testSession.recentCommissions)"
     )
     #expect(
       testSession.recentCommissions[0].hasPrefix("妮"),
@@ -1426,7 +1426,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 混打＋注音狂打之空白鍵＝**陰平聲調確認鍵**（與純注音狂打看齊，`P258`／`P260`）。
   ///
-  /// 此前混打路徑會把該待調音節固化為**無調**聲調桶而後遞交 ASCII（實測：`su` 按空格
+  /// 此前混打路徑會把該待調音節固化為**無調**聲調桶而後遞交 ASCII（實測：`su` 按空白鍵
   /// 得 `["ㄋㄧ"]` ＋ 遞交 `su `），遂令陰平無從指定。修正後之語義與純狂打同源：把該
   /// 讀音之**整組聲調變體桶**插入組字器、不覆寫，故語言模型得於窗內自行挑調。
   @Test("IH-FuriousZhuyin-031 Mixed alnum Space confirms pending reading with first tone")
@@ -1447,7 +1447,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.mixedAlphanumericalBuffer == "su")
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄋㄧ")
 
-    // 空格：以陰平確認該讀音——整組聲調桶入組字器、緩衝與注拼槽俱清、**零遞交 ASCII**。
+    // 空白鍵：以陰平確認該讀音——整組聲調桶入組字器、緩衝與注拼槽俱清、**零遞交 ASCII**。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testHandler.assembler.actualKeys == ["ㄋㄧ"],
@@ -1481,7 +1481,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// 已帶聲調者之空白鍵語義不變：聲調一旦進入，讀音即為唯一解，空格照舊為「送字 ＋ 空格」。
+  /// 已帶聲調者之空白鍵語義不變：聲調一旦進入，讀音即為唯一解，空白鍵照舊為「送字 ＋ 空白字元」。
   ///
   /// 此即「本修正只及待調讀音那一態」之護欄。
   @Test("IH-FuriousZhuyin-032 A toned reading keeps Space as the commit key")
@@ -1499,7 +1499,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
     #expect(testHandler.assembler.actualKeys == ["ㄋㄧˇ"], "實得：\(testHandler.assembler.actualKeys)")
 
-    // 空格：無待調讀音 ⇒ 照舊「送字 ＋ 半形空格」。
+    // 空白鍵：無待調讀音 ⇒ 照舊「送字 ＋ 半形空白字元」。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testSession.recentCommissions == ["你 "],
@@ -1509,7 +1509,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 殘段（非「恰為一個讀音」之緩衝）不得充作讀音素材：空白鍵照舊遞交整段 ASCII。
   ///
-  /// 事主實機回報：混打＋狂打下敲 `us` 再按空格，期望遞交 `us `，實得未遞交而顯示漢字。
+  /// 事主實機回報：混打＋狂打下敲 `us` 再按空白鍵，期望遞交 `us `，實得未遞交而顯示漢字。
   /// 根因有二，皆屬同一件事（「殘段被誤認」）：① 供讀音之投影（`syncComposerWithMixedAlphanumericalBuffer`）
   /// 未強制槽序，遂把「以另一鍵補滿槽位」之殘段就地吸納（`us` 之槽值成 ㄋㄧ，與 `su` 無從
   /// 分辨）；② 讀音素材之判準只問「可發音 ∧ 是某讀音之起頭」，未問「該緩衝是否**恰為**
@@ -1534,7 +1534,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!testHandler.hasFuriousFrontPending)
     #expect(!testSession.isFuriousCopilotCandidateWindowVisible)
 
-    // 空格：無物可固化 ⇒ 遞交整段 ASCII ＋ 半形空格。
+    // 空白鍵：無物可固化 ⇒ 遞交整段 ASCII ＋ 半形空白字元。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testSession.recentCommissions == ["us "],
@@ -1551,10 +1551,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.isFuriousCopilotCandidateWindowVisible)
   }
 
-  /// 注音狂打之空格**不得**兼任「確認 copilot 當前候選」——它是陰平聲調鍵。
+  /// 注音狂打之空白鍵**不得**兼任「確認 copilot 當前候選」——它是陰平聲調鍵。
   ///
-  /// 事主原文：「注音狂打模式的空格不要觸發 copilot 的 confirm current candidate 的動作。
-  /// 這是注音狂打與拼音狂打的行為差異之一，因為空格鍵是陰平。」故空格之語義為「把該讀音
+  /// 事主原文：「注音狂打模式的空白鍵不要觸發 copilot 的 confirm current candidate 的動作。
+  /// 這是注音狂打與拼音狂打的行為差異之一，因為空白鍵是陰平。」故空白鍵之語義為「把該讀音
   /// **定為陰平**、寫入組字器」；候選之選定仍歸 `Shift+選字鍵` 等明示路徑。
   /// 本靶只驗「該音節被陰平地消費」與「窗內當前候選未被寫死」；字詞層之取捨見 `IH-FuriousZhuyin-035`
   /// （該靶以真語料庫之權重為據，測試辭典之 ㄋㄧ 族與真者不同）。
@@ -1586,7 +1586,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.composer.isEmpty, "注拼槽須已清空。")
     #expect(
       testSession.recentCommissions.isEmpty,
-      "空格不得遞交任何內容，實得：\(testSession.recentCommissions)"
+      "空白鍵不得遞交任何內容，實得：\(testSession.recentCommissions)"
     )
     #expect(!testHandler.hasFuriousFrontPending, "窗即收。")
   }
@@ -2027,10 +2027,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: - Shift+Space 之逃生口（P280）
 
   /// 混打＋注音狂打並存時，**Shift+Space** 之意義為「放棄注音處理」：整段混打緩衝以原文
-  /// 遞交、其後附一個半形空格；待確認之讀音**不得**被固化、亦不得被當成陰平確認鍵。
+  /// 遞交、其後附一個半形空白字元；待確認之讀音**不得**被固化、亦不得被當成陰平確認鍵。
   ///
-  /// - Important: 空格之陰平語義（`IH-FuriousZhuyin-031`／`IH-FuriousZhuyin-034`）只屬**不帶修飾鍵**之空格。Shift 是使用者
-  ///   明示之「英文意圖」——混打模式下它本即「整段 ASCII ＋ 半形空格」之逃生口
+  /// - Important: 空白鍵之陰平語義（`IH-FuriousZhuyin-031`／`IH-FuriousZhuyin-034`）只屬**不帶修飾鍵**之空白字元。Shift 是使用者
+  ///   明示之「英文意圖」——混打模式下它本即「整段 ASCII ＋ 半形空白字元」之逃生口
   ///   （見 `MixedAlphanumericalTypewriter` 之既有語義）；若令陰平確認搶先消費本鍵，該逃生口
   ///   即無從觸發（事主實機回報：`su` 之後按 Shift+Space 得陰平確認，而非遞交 `su `）。
   @Test("IH-FuriousZhuyin-041 Mixed alnum Shift+Space commits ASCII")
@@ -2058,11 +2058,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.furiousFrontUnfinishedReading == "ㄋㄧ")
     #expect(testSession.isFuriousCopilotCandidateWindowVisible)
 
-    // Shift+Space：放棄注音處理 ⇒ 遞交整段原文 ＋ 半形空格，且零固化。
+    // Shift+Space：放棄注音處理 ⇒ 遞交整段原文 ＋ 半形空白字元，且零固化。
     #expect(testHandler.triageInput(event: shiftSpaceEvent))
     #expect(
       testSession.recentCommissions == ["su "],
-      "Shift+Space 應遞交整段 ASCII ＋ 半形空格，實得：\(testSession.recentCommissions)"
+      "Shift+Space 應遞交整段 ASCII ＋ 半形空白字元，實得：\(testSession.recentCommissions)"
     )
     #expect(
       testHandler.mixedAlphanumericalBuffer.isEmpty,
@@ -2072,14 +2072,14 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.isEmpty, "Shift+Space 不得把待調讀音固化進組字器。")
     #expect(!testHandler.hasFuriousFrontPending, "本拍過後素材即散、窗即收。")
 
-    // 對照組：不帶 Shift 之空格仍為陰平確認鍵（`IH-FuriousZhuyin-031`／`IH-FuriousZhuyin-034` 之語義一字不動）。
+    // 對照組：不帶 Shift 之空白鍵仍為陰平確認鍵（`IH-FuriousZhuyin-031`／`IH-FuriousZhuyin-034` 之語義一字不動）。
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.clear()
     typeSentence("su")
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testSession.recentCommissions == ["su "],
-      "不帶 Shift 之空格不得遞交任何內容（遞交紀錄應與前一組相同），實得：\(testSession.recentCommissions)"
+      "不帶 Shift 之空白鍵不得遞交任何內容（遞交紀錄應與前一組相同），實得：\(testSession.recentCommissions)"
     )
     #expect(
       testHandler.assembler.actualKeys == ["ㄋㄧ"],
@@ -2091,7 +2091,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 混打＋注音狂打並存時，**任何遞交路徑之內容皆為「已組字之中文 ＋ 混打緩衝之原文」**：
   /// copilot 對該待確認讀音之**投機預覽**（語言模型之猜測）一概不得進入遞交——該讀音未經
-  /// 使用者確認（確認只走空格之陰平、固化與顯式選字三途），且組字區讀音欄所示者本即緩衝
+  /// 使用者確認（確認只走空白鍵之陰平、固化與顯式選字三途），且組字區讀音欄所示者本即緩衝
   /// 原文，故遞交內容與顯示同源。
   ///
   /// - Important: 三條路徑皆曾把投機預覽連同原文一併遞交（實測 `你你泥su`）：① 符號選單
@@ -2216,7 +2216,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 以真語料庫之實錄（`vChewing-VanguardLexicon` 之 `data-v4.8.5.txt`）注入臨時元圖。
   ///
-  /// - Parameter kanjiData: 逐行 `<帶調讀音鍵>\t或空格<詞值><分數>`；供靶以**真辭典之權重**
+  /// - Parameter kanjiData: 逐行 `<帶調讀音鍵>\t或空白字元<詞值><分數>`；供靶以**真辭典之權重**
   ///   驗字詞之取捨（測試辭典之 ㄋㄧ 族與真者不同，見 `IH-FuriousZhuyin-035`）。
   /// 逐字取自真語料庫之 ㄋㄧ 族（`data-v4.8.5.txt`）：`ㄋㄧ`（妮 −5.314）／`ㄋㄧˊ`（泥 −5.23）／
   /// `ㄋㄧˇ`（你 −5.074）／`ㄋㄧˋ`（膩 −5.26）。**測試辭典無 `ㄋㄧ` 之陰平條目**（實查：該族

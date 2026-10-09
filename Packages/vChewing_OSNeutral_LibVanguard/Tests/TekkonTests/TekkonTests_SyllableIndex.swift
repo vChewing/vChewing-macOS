@@ -149,7 +149,7 @@ struct TekkonTestsSyllableIndex {
     let index = Tekkon.SyllableIndex.shared(parser: .ofDachen)
     // 完整讀音：僅回傳自身。
     #expect(index.completions(of: "ㄍㄚ") == ["ㄍㄚ"])
-    // 空字串：全部 427 條（`hasPrefix("")` 恆真）。此與 `isPrefix("") == false` 並不矛盾
+    // 空字串：全部 426 條（`hasPrefix("")` 恆真）。此與 `isPrefix("") == false` 並不矛盾
     // ——後者是「非空」之定義，前者是列舉之定義。
     #expect(index.completions(of: "").count == 426)
     #expect(!index.isPrefix(""))

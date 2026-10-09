@@ -110,7 +110,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     vCTestLog("成功完成羅馬數字輸入測試。")
   }
 
-  /// 測試羅馬數字模式下的空格鍵功能
+  /// 測試羅馬數字模式下的空白鍵功能
   @Test("IH-InputMode-003 Roman numeral Space key handling")
   func test_IH_InputMode_003_RomanNumeralSpaceKeyHandling() throws {
     guard let testHandler, let testSession else {
@@ -119,7 +119,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     clearTestPOM()
 
-    // 建立空格鍵事件
+    // 建立空白鍵事件
     let spaceKeyEvent = KBEvent(
       with: .keyDown,
       modifierFlags: [],
@@ -153,8 +153,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.triageInput(event: symbolMenuKeyEvent))
     #expect(testHandler.currentTypingMethod == .romanNumerals)
 
-    // 測試一：空格鍵在緩衝區為空時應觸發 ofAbortion
-    vCTestLog("測試一：空格鍵在緩衝區為空時")
+    // 測試一：空白鍵在緩衝區為空時應觸發 ofAbortion
+    vCTestLog("測試一：空白鍵在緩衝區為空時")
     var errorCallbackTriggered = false
     testHandler.errorCallback = { errorID in
       vCTestLog("錯誤回呼被觸發，ID 為：\(errorID)")
@@ -165,8 +165,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // ofAbortion() 狀態在狀態機中自動轉換為 ofEmpty()
     #expect(testSession.state.type == .ofEmpty, "狀態應在 ofAbortion 轉換後變為 ofEmpty")
 
-    // 測試二：空格鍵在緩衝區有內容時應遞交羅馬數字
-    vCTestLog("測試二：空格鍵鍵入 '42' 應遞交 'XLII'")
+    // 測試二：空白鍵在緩衝區有內容時應遞交羅馬數字
+    vCTestLog("測試二：空白鍵鍵入 '42' 應遞交 'XLII'")
     testSession.switchState(.ofAbortion())
     #expect(testHandler.triageInput(event: symbolMenuKeyEvent))
     #expect(testHandler.triageInput(event: symbolMenuKeyEvent))
@@ -183,8 +183,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 
-    // 測試三：空格鍵用於三位數
-    vCTestLog("測試三：空格鍵鍵入 '999' 應遞交 'CMXCIX'")
+    // 測試三：空白鍵用於三位數
+    vCTestLog("測試三：空白鍵鍵入 '999' 應遞交 'CMXCIX'")
     testSession.switchState(.ofAbortion())
     #expect(testHandler.triageInput(event: symbolMenuKeyEvent))
     #expect(testHandler.triageInput(event: symbolMenuKeyEvent))
@@ -221,7 +221,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 
-    vCTestLog("成功完成羅馬數字空格鍵測試。")
+    vCTestLog("成功完成羅馬數字空白鍵測試。")
   }
 
   @Test("IH-InputMode-004 Symbol menu key table preview in composition buffer")
@@ -321,7 +321,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     do {
       testHandler.clear()
       testHandler.prefs.specifyIntonationKeyBehavior = 0
-      typeSentence("vu06") // 打「嫌」字的讀音：「ㄒㄧㄢˊ」，最後空格是陰平聲調。
+      typeSentence("vu06") // 打「嫌」字的讀音：「ㄒㄧㄢˊ」，最後空白字元是陰平聲調。
       #expect(testSession.state.displayedText == "嫌")
       #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataTab.asEvent))
       #expect(testSession.state.displayedText == "鹹")
@@ -334,7 +334,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     do {
       testHandler.clear()
       testHandler.prefs.specifyIntonationKeyBehavior = 1
-      typeSentence("vu06") // 打「嫌」字的讀音：「ㄒㄧㄢˊ」，最後空格是陰平聲調。
+      typeSentence("vu06") // 打「嫌」字的讀音：「ㄒㄧㄢˊ」，最後空白字元是陰平聲調。
       #expect(testSession.state.displayedText == "嫌")
       #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataTab.asEvent))
       #expect(testSession.state.displayedText == "鹹")

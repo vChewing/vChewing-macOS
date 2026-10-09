@@ -33,15 +33,15 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     }
     // 中英混合輸入回退 ＋ 注音狂打：混打緩衝區即狂打之讀音素材（copilot 候選窗之資料源）
     // ⇒ 空白鍵之語意為「固化該讀音」而非「遞交整段 ASCII」。固化後緩衝區已被消費、為空，
-    // 故本鍵續走既有流程即得「組字區送字 ＋ 半形空格」，與注音狂打側之空白鍵語義一致。
+    // 故本鍵續走既有流程即得「組字區送字 ＋ 半形空白字元」，與注音狂打側之空白鍵語義一致。
     // 未啟用注音狂打時本旗子恆假，故本分支不影響回退之既有空白鍵行為。
     // ★ 中英混合輸入回退 ＋ 注音狂打：**待調讀音之空白鍵＝陰平聲調確認鍵**（與純注音
     // 狂打看齊，`P258`／`P260`）。凡緩衝恰為一個尚未鍵入聲調之讀音者，本鍵一律**不**由
     // 混打路徑處置——逕交既有之注音全匹配路徑（`composeReadingIfReady` 之
-    // `confirmCombination` 臂，以空格作陰平鍵完成組字）。此前混打路徑會把該音節固化為
-    // **無調**聲調桶，遂令陰平無從指定（實測：`su` 按空格得 `["ㄋㄧ"]` 之無調桶）。
+    // `confirmCombination` 臂，以空白鍵作陰平鍵完成組字）。此前混打路徑會把該音節固化為
+    // **無調**聲調桶，遂令陰平無從指定（實測：`su` 按空白鍵得 `["ㄋㄧ"]` 之無調桶）。
     // - Important: 本讓位**只及待調讀音**這一態，且**只及不帶 Shift 之空白鍵**——帶 Shift 者
-    //   為「放棄注音處理、逕遞交整段 ASCII ＋ 半形空格」之逃生口（見下方
+    //   為「放棄注音處理、逕遞交整段 ASCII ＋ 半形空白字元」之逃生口（見下方
     //   `commitsWholeMixedBufferOnSpace`）。故本審判準一律取 `MixedAlnumSpaceDuty`（單一正本，
     //   分診早段之固化塊消費同一份），以免「修飾鍵」這一維日後再度漂移。
     // - Important: 本讓位之其餘各態（ASCII 詞、非讀音之緩衝、已帶聲調者）之空白鍵語義
@@ -51,12 +51,12 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
        let pendingReading = handler.mixedAlnumPendingReading {
       return confirmMixedAlnumReadingWithFirstTone(pendingReading, session: session)
     }
-    // 中英混合輸入回退 ＋ 注音狂打：**本拍空格已由分診早段用於固化前方讀音**（見
+    // 中英混合輸入回退 ＋ 注音狂打：**本拍空白鍵已由分診早段用於固化前方讀音**（見
     // `InputHandler_TriageInput`），此刻緩衝已空、無物可遞交。
     // 該情境下不得再讓本鍵落入 `callCandidateState`——那會以方才讀音桶殘留之候選開出
     // **標準選字窗**，而該窗之選取語義是逐字確認、與狂打之「前方讀音就地確認」不同；
     // 且狀態自此滯留於 `.ofCandidates`、其後每一鍵都被吸走（P273 實測實錄）。
-    // 故由本型別自行完成本拍：遞交「已組字之中文 ＋ 半形空格」，與本型別在
+    // 故由本型別自行完成本拍：遞交「已組字之中文 ＋ 半形空白字元」，與本型別在
     // `commitsWholeMixedBufferOnSpace` 分支及 `.ofEmpty` 分診上之語義一致。
     if input.isSpace, handler.mixedAlnumZhuyinFuriousInEffect,
        handler.mixedAlphanumericalBuffer.isEmpty, !handler.isConsideredEmptyForNow {
@@ -80,10 +80,10 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // Space 必須先於 isReservedKey guard 處理：Space 的 keyCode 屬於 reserved key，
     // 若不提前攔截，Space 將返回 nil，無法走到注音確認路徑。
     // Shift+Space 在 non-empty 狀態下放棄注音處理，
-    // 直接遞交 mixed buffer 內容 + ASCII 空格。此即並存態下該逃生口之唯一落點：
+    // 直接遞交 mixed buffer 內容 + ASCII 空白字元。此即並存態下該逃生口之唯一落點：
     // `handle` 開頭之陰平確認分支與分診早段之固化塊皆對之讓位（見 `MixedAlnumSpaceDuty`）。
-    // 偏好「空格鍵對內文組字區的行為」設為「插入空格」（值 0）時，**混打緩衝非空且非待調讀音**
-    // 者亦比照辦理：該偏好即使用者對「空白鍵＝插入空格」之明示，混打路徑不得逕自改判為
+    // 偏好「空白鍵對內文組字區的行為」設為「插入空白字元」（值 0）時，**混打緩衝非空且非待調讀音**
+    // 者亦比照辦理：該偏好即使用者對「空白鍵＝插入空白字元」之明示，混打路徑不得逕自改判為
     // 「遞交尾段 ASCII ＋ 將尾鍵送進注拼槽」。**緩衝區為空者不在此攔截**——仍交還既有流程
     // 處置，故純中文組字之空白鍵語意不因本偏好而變。**緩衝恰為一個尚未鍵入聲調之讀音者亦
     // 不在此攔截**——該狀態下混打緩衝承載的正是中文組字本身（`su`＝ㄋㄧ、`1u,`＝ㄅㄧㄝ、
@@ -99,7 +99,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       )
     if input.isSpace, commitsWholeMixedBufferOnSpace {
       guard !handler.isConsideredEmptyForNow else { return nil }
-      // ★ 遞交內容取「已組字之中文 ＋ 整段原文 ＋ 半形空格」，其中之原文須**先取出再清空緩衝**
+      // ★ 遞交內容取「已組字之中文 ＋ 整段原文 ＋ 半形空白字元」，其中之原文須**先取出再清空緩衝**
       // （次序不可顛倒）：`committableDisplayText` 於狂打之前方投機讀音在場時，改回 copilot 之
       // 整句猜測（主段＋前方預覽）——那是「把緩衝當注音」之投機結果，而本鍵（Shift）之語義
       // 恰恰是**放棄該投機**。緩衝既清，該投機即無所依附，所取者乃組字器自身之內容。
@@ -558,7 +558,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
 
   /// 以陰平聲調確認混打之待確認讀音（注音狂打之空白鍵語義）。
   ///
-  /// 空格即陰平 ⇒ 本函式把該讀音**定為陰平**、寫入組字器，再清空混打緩衝與注拼槽。
+  /// 空白鍵即陰平 ⇒ 本函式把該讀音**定為陰平**、寫入組字器，再清空混打緩衝與注拼槽。
   /// **並非**插入「整組聲調變體桶」：該桶只是「尚未鍵入聲調」時之陳列容器；一旦陰平被
   /// 確認，該讀音即為單一音節，其餘聲調不應再參與組句——否則預覽所示與遞交所得會脫鉤
   /// （實測真語料庫：`su ` 之窗內首選為 ㄋㄧˊ 之泥，而插入全桶後由 ㄋㄧˇ 之你勝出）。

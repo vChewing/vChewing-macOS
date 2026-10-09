@@ -235,7 +235,7 @@ extension InputHandlerProtocol {
   ///
   /// 由「可能叫出選字窗」的觸發鍵（Space／翻頁／候選導航方向鍵）在 triage 早段觸發：
   /// 只把前方聲調桶插入組字器、**不覆寫**——保留 LM 重切分自由度，
-  /// 使後續音節可自動合併成長詞（如「xi 空格 an 空格」→「西安」），
+  /// 使後續音節可自動合併成長詞（如「xi 空白鍵 an 空白鍵」→「西安」），
   /// 最後清空注拼槽。
   /// 聲調桶鍵保留 ⇒ 隨後開出的選字窗仍陳列其他 tone-fuzzy（全調）候選；顯示則由
   /// 真組字器組句決定（與 copilot 預覽同源：copilot 與真組字器使用同一 LM 與同一組
@@ -292,7 +292,7 @@ extension InputHandlerProtocol {
       if isCompleteSyllable {
         furiousTrail.append(romaji)
         // 注意：此處不做重切分——單音節 trail（如「xian」）在打字中途即被拆開會
-        // 誤傷「先生」類的後續多音節組句（「xian 空格 sheng」應為「先生」而非
+        // 誤傷「先生」類的後續多音節組句（「xian 空白鍵 sheng」應為「先生」而非
         // 「西 安 生」）。重切分僅由 auto-chop 提交路徑觸發、且 trail 至少兩段時
         // 才執行（見 `resegmentFuriousTrailIfNeeded`）。
       } else {
@@ -356,7 +356,7 @@ extension InputHandlerProtocol {
   /// 由呼叫端依 `hasFuriousFrontPending` 決定是否直接消費觸發鍵）。
   /// - Important: 名次一律**按分數取**，非清單之第一筆——本查詢之呈現順序係分區制
   ///   （原廠命中先、其後使用者片語命中），清單序≠分數序；取清單首筆即會令分數更高之
-  ///   使用者片語候選（如其讀音互異）永遠無法經空格／Tab 浮現。
+  ///   使用者片語候選（如其讀音互異）永遠無法經空白鍵／Tab 浮現。
   @discardableResult
   private func solidifyAbbreviatedFrontReading() -> Bool {
     guard let cells = furiousAbbreviatedCells else { return false }
@@ -449,10 +449,10 @@ extension InputHandlerProtocol {
   /// 被呼叫，供「使用者顯式選字」的確認路徑（Shift+選字鍵／滑鼠點選）收集 POM 觀察。
   /// Enter 直遞／高亮預覽不傳入——copilot 未經使用者逐字確認的最佳猜測
   /// 不應寫入漸退記憶模組（否則記憶的短詞會綁架長詞的組句，如「是嗎」綁架
-  /// 「是媽媽」→「是嗎嗎」）。空格固化自同日起不再走本函式
+  /// 「是媽媽」→「是嗎嗎」）。空白鍵固化自同日起不再走本函式
   /// （只插聲調桶、不覆寫，保留重切分自由度）。
   /// - Parameter preservingFuzzyKeys: 為 true 時一律插入整組聲調桶（保留 tone-fuzzy
-  ///   候選窗），僅以覆寫釘住顯示——用於空格固化的「模擬選字窗選字」路徑。
+  ///   候選窗），僅以覆寫釘住顯示——用於空白鍵固化的「模擬選字窗選字」路徑。
   @discardableResult
   func applyFuriousFrontCandidate(
     _ candidate: CandidateInState,
@@ -812,7 +812,7 @@ extension InputHandlerProtocol {
     return true
   }
 
-  /// 將 trail 展開為音節桶序列（與 auto-chop／空格固化插入語義一致；失敗防禦用）。
+  /// 將 trail 展開為音節桶序列（與 auto-chop／空白鍵固化插入語義一致；失敗防禦用）。
   private func furiousTrailKeyBuckets() -> [[String]] {
     guard let readingMap = composer.parser.mapZhuyinPinyin else { return [] }
     return furiousTrail.compactMap { blob in
@@ -831,7 +831,7 @@ extension InputHandlerProtocol {
   ///
   /// **範圍收斂（P163 補修）**：本函式刻意只做「同音節數」重切、且 trail 至少兩段——
   /// 跨音節數重切（`xian`→`[xi, an]`）在打字中途即把單音節 trail 拆開，會誤傷
-  /// 「先生」類的後續多音節組句（「xian 空格 sheng」被拆成「西 安 生」）；「每音節
+  /// 「先生」類的後續多音節組句（「xian 空白鍵 sheng」被拆成「西 安 生」）；「每音節
   /// 平均」正規化亦偏好多音節切分（普通單字平均分高於合併詞）。跨音節數的枚舉能力
   /// 仍保留於 `FuriousTypingSegmentor.candidateSegmentations(of:syllableCount: nil)`，
   /// 供今後經設計的觸發條件使用。

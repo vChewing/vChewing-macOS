@@ -148,13 +148,13 @@ extension LXAssembly {
       return next == 0x0A || next == 0x0D
     }
 
-    /// 判斷位元組緩衝於指定位置是否為一個完整空白序列（ASCII 空格／Tab／NBSP／全形空格）。
+    /// 判斷位元組緩衝於指定位置是否為一個完整空白序列（ASCII 空白字元／Tab／NBSP／全形空白字元）。
     /// 是則回傳其長度（1–3），否則為 0。
     static func whitespaceSequenceLength(_ bytes: [UInt8], at index: Int) -> Int {
       let b = bytes[index]
       if b == 0x20 || b == 0x09 { return 1 }
       if b == 0xC2, index + 1 < bytes.count, bytes[index + 1] == 0xA0 { return 2 } // NBSP
-      if b == 0xE3, index + 2 < bytes.count, bytes[index + 1] == 0x80, bytes[index + 2] == 0x80 { return 3 } // 全形空格
+      if b == 0xE3, index + 2 < bytes.count, bytes[index + 1] == 0x80, bytes[index + 2] == 0x80 { return 3 } // 全形空白字元
       return 0
     }
 
@@ -178,7 +178,7 @@ extension LXAssembly {
       }
     }
 
-    /// Step 1: 將連續空白序列（ASCII 空格／Tab／NBSP／全形空格）收斂為單一 ASCII 空格。
+    /// Step 1: 將連續空白序列（ASCII 空白字元／Tab／NBSP／全形空白字元）收斂為單一 ASCII 空白字元。
     static func collapseWhitespaceRuns(_ source: [UInt8]) -> [UInt8] {
       var out = [UInt8]()
       out.reserveCapacity(source.count)
@@ -198,7 +198,7 @@ extension LXAssembly {
       return out
     }
 
-    /// Step 2: 剝除各行之行首行尾空格（行錨依據 ICU 斷行集合，含檔案首尾）。
+    /// Step 2: 剝除各行之行首行尾空白字元（行錨依據 ICU 斷行集合，含檔案首尾）。
     static func stripLineEdgeSpaces(_ source: [UInt8]) -> [UInt8] {
       var out = [UInt8]()
       out.reserveCapacity(source.count)
@@ -251,7 +251,7 @@ extension LXAssembly {
       return out
     }
 
-    /// 以位元組層級統整內容格式：空白收斂 → 行邊空格剝除 → 斷行收斂 → 移除標頭列 →
+    /// 以位元組層級統整內容格式：空白收斂 → 行邊空白字元剝除 → 斷行收斂 → 移除標頭列 →
     /// 依「保留最後一次出現」去重複 → 補回 pragma 標頭。
     /// - Remark: 全程僅觸及完整 UTF-8 序列，不會切斷多位元組字元。
     static func consolidateNormalize(bytes source: [UInt8]) -> [UInt8] {

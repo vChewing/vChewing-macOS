@@ -20,29 +20,29 @@ extension InputHandlerProtocol {
     // Enter／數字鍵／字母鍵／編輯鍵不屬觸發集合。
     // 前後方向鍵不在此列——注拼槽有未完成讀音時由 handleForward/handleBackward
     // 的專屬規則接管（狂拼開窗或 error 退回）。
-    // 空格觸發固化時記錄本拍「空格已用於插入讀音」：後續的 kSpace 分診依此直接
-    // 消費本拍空格（不再輪替、不再遞交、不生成空格字符）——未完成讀音存在時，
-    // 空格語義為「把讀音插入組字器」而非「輪替候選」。
-    // 固化後注拼槽仍有未完成讀音（α 查無候選、或固化失敗）時，直接消費本拍空格、
-    // 以新狀態刷新——避免空格流入注拼槽（拼音模式下空格＝中性聲調，其後的獨立聲調
+    // 空白鍵觸發固化時記錄本拍「空白鍵已用於插入讀音」：後續的 kSpace 分診依此直接
+    // 消費本拍空白鍵（不再輪替、不再遞交、不生成空白字符）——未完成讀音存在時，
+    // 空白鍵語義為「把讀音插入組字器」而非「輪替候選」。
+    // 固化後注拼槽仍有未完成讀音（α 查無候選、或固化失敗）時，直接消費本拍空白字元、
+    // 以新狀態刷新——避免空白鍵流入注拼槽（拼音模式下空白鍵＝中性聲調，其後的獨立聲調
     // 處理會清空注拼槽、丟失前方的簡拼整詞上下文）。
     //
-    // ★ P260：**注音側之空格不屬固化觸發集合**。注音之五個聲調鍵為 `3`／`4`／`6`／`7`
-    // 與**空格**（陰平）——若把空格挪作「固化前方讀音」之用，陰平即無從指定（實測：
-    // 狂打下按空格所得者為**無調讀音桶**、由語言模型自行挑調，故陰平候選恆被高分之上聲／
-    // 去聲候選擠下）。拼音側之空格本即「無調確認組字」之鍵（`shouldUseToneInsensitivePinyinLookup`），
+    // ★ P260：**注音側之空白鍵不屬固化觸發集合**。注音之五個聲調鍵為 `3`／`4`／`6`／`7`
+    // 與**空白鍵**（陰平）——若把空白鍵挪作「固化前方讀音」之用，陰平即無從指定（實測：
+    // 狂打下按空白鍵所得者為**無調讀音桶**、由語言模型自行挑調，故陰平候選恆被高分之上聲／
+    // 去聲候選擠下）。拼音側之空白鍵本即「無調確認組字」之鍵（`shouldUseToneInsensitivePinyinLookup`），
     // 語義不變。固化另有 Tab／Enter／標點三條路（見 `handlePunctuation` 與同檔之 kTab 分支、
     // 以及 `Typewriter_BPMFFullMatch` 之 Enter 分支）。
     // ★ P273：**回退與注音狂打並存時，空白鍵重歸注音語義**——惟其理據與純注音狂打不同。
-    // 注音之空格在此情境下並非「陰平鍵」：讀音素材住混打緩衝區，聲調一律經數字鍵進入
-    // （`su3`＝ㄋㄧˇ），故無「空格被挪作固化即陰平無從指定」之虞；反之若不特別處置，本鍵
-    // 將落入混打之「整段緩衝 ＋ 半形空格」而令該讀音被當英文遞交（正是 P258 之病灶）。
+    // 注音之空白鍵在此情境下並非「陰平鍵」：讀音素材住混打緩衝區，聲調一律經數字鍵進入
+    // （`su3`＝ㄋㄧˇ），故無「空白鍵被挪作固化即陰平無從指定」之虞；反之若不特別處置，本鍵
+    // 將落入混打之「整段緩衝 ＋ 半形空白字元」而令該讀音被當英文遞交（正是 P258 之病灶）。
     // 其歸屬（陰平確認抑或 Shift 之 ASCII 逃生口）一律由 `MixedAlnumSpaceDuty` 判定；
     // 凡該層已接管本鍵者，本固化塊即整塊讓位（見下）。
     let spaceSolidifiesFuriousFront = isPinyinFuriousTypingModeEffective
       || mixedAlnumZhuyinFuriousInEffect
     // ★ P280：並存態下之空白鍵**兩種歸屬皆屬混打層**——不帶修飾鍵者為陰平確認鍵、帶 Shift 者
-    // 為「整段 ASCII ＋ 半形空格」之逃生口（見 `MixedAlnumSpaceDuty`）。故凡混打層已接管本鍵者
+    // 為「整段 ASCII ＋ 半形空白字元」之逃生口（見 `MixedAlnumSpaceDuty`）。故凡混打層已接管本鍵者
     // （`isOwnedByMixedAlnumLayer`），本塊**整塊讓位**：既不固化其讀音、亦不早退，逕交下方之
     // 鍵碼分診，由打字機完成確認或遞交。若只令 Shift+Space「非陰平鍵」，本塊旋即改以其為固化
     // 觸發鍵而整拍消費，逃生口仍無從觸發。
@@ -56,9 +56,9 @@ extension InputHandlerProtocol {
        (input.isSpace && spaceSolidifiesFuriousFront) || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
       // ★ P273 之修正（事主實機回報）：**混打側之待調讀音不在此固化**。
-      // 注音狂打之空格語義為「以陰平聲調確認前方讀音」（`P258`／`P260`）——惟此前本塊
-      // 對混打側一律先固化（只插**無調**聲調桶），遂令空格之聲調確認失效（實測：`su`
-      // 按空格得 `["ㄋㄧ"]` 之無調桶，而非 `ㄋㄧ`）。故凡緩衝恰為一個待確認之讀音者，
+      // 注音狂打之空白鍵語義為「以陰平聲調確認前方讀音」（`P258`／`P260`）——惟此前本塊
+      // 對混打側一律先固化（只插**無調**聲調桶），遂令空白鍵之聲調確認失效（實測：`su`
+      // 按空白鍵得 `["ㄋㄧ"]` 之無調桶，而非 `ㄋㄧ`）。故凡緩衝恰為一個待確認之讀音者，
       // 本塊**讓位**：不固化、不早退，逕交下方之鍵碼分診，由打字機以該讀音之**整組聲調
       // 變體桶**完成確認（見 `MixedAlphanumericalTypewriter` 之
       // `confirmMixedAlnumReadingWithFirstTone`）——與純注音狂打之固化同源。
@@ -85,7 +85,7 @@ extension InputHandlerProtocol {
       // 本塊既以 `!spaceDuty.isOwnedByMixedAlnumLayer` 為前提，混打側之待調讀音（與 Shift 之
       // 逃生口）一概不至此處 ⇒ 本條件無須再問「是否陰平鍵」。
       if input.isSpace, hasFuriousFrontPending {
-        // 固化不成（如 α 查無候選）⇒ 保留本鍵、逕以新狀態刷新，避免空格流入注拼槽。
+        // 固化不成（如 α 查無候選）⇒ 保留本鍵、逕以新狀態刷新，避免空白鍵流入注拼槽。
         session.switchState(generateStateOfInputting())
         return true
       }
@@ -153,12 +153,12 @@ extension InputHandlerProtocol {
         default: break
         }
       case .kSpace:
-        // 倘若沒有在偏好設定內將 Space 空格鍵設為選字窗呼叫用鍵的話………
-        // 空格字符輸入行為處理。
+        // 倘若沒有在偏好設定內將 Space 空白鍵設為選字窗呼叫用鍵的話………
+        // 空白字符輸入行為處理。
         switch state.type {
         case .ofEmpty:
           if !input.isHoldingAny([.option, .control, .command]) {
-            // 一般打字且組字區為空時：不帶 Shift 的空格鍵恆插入半形空格；
+            // 一般打字且組字區為空時：不帶 Shift 的空白鍵恆插入半形空白字元；
             // 帶 Shift 者之寬度由偏好決定（預設全形，與舊行為一致）。
             let wantsHalfWidth = !input.isShiftHeld
               || prefs.specifyShiftSpaceKeyBehavior4EmptyState
@@ -166,19 +166,19 @@ extension InputHandlerProtocol {
             return true
           }
         case .ofInputting:
-          // 空格已用於狂拼讀音固化：本拍空格被「插入讀音」消費——不再輪替候選、
-          // 亦不落入後續的空格遞交路徑（否則會生成空格字符拆斷組字區、使之直接
-          // 遞交）。behavior==1 的「空格呼叫選字窗」由更早的 callCandidateState
+          // 空白鍵已用於狂拼讀音固化：本拍空白鍵被「插入讀音」消費——不再輪替候選、
+          // 亦不落入後續的空白鍵遞交路徑（否則會生成空白字符拆斷組字區、使之直接
+          // 遞交）。behavior==1 的「空白鍵呼叫選字窗」由更早的 callCandidateState
           // 提供、不受本守衛影響；此處以新狀態刷新顯示（清掉已失效的狂拼前方預覽窗）。
           if spaceSolidifiedFuriousReading {
             session.switchState(generateStateOfInputting())
             return true
           }
-          // ★ P273：回退與注音狂打並存時之空格已於本函式早段整拍消費（固化前方讀音），
+          // ★ P273：回退與注音狂打並存時之空白鍵已於本函式早段整拍消費（固化前方讀音），
           // 故本處所見之緩衝恆空 ⇒ 直落下方之送字邏輯，不繞經
-          // `MixedAlphanumericalTypewriter`（其空白鍵分支會再判一次「整段緩衝 ＋ 半形空格」）。
-          // 空格輪替守衛：注拼槽尚有未完成讀音時，停用空格輪替——未完成讀音存在時，
-          // 空格語義為「把讀音插入組字器」、不兼任候選輪替。
+          // `MixedAlphanumericalTypewriter`（其空白鍵分支會再判一次「整段緩衝 ＋ 半形空白字元」）。
+          // 空白鍵輪替守衛：注拼槽尚有未完成讀音時，停用空白鍵輪替——未完成讀音存在時，
+          // 空白鍵語義為「把讀音插入組字器」、不兼任候選輪替。
           // （拼音模式下 composer.isEmpty 涵蓋 romajiBuffer；注音模式涵蓋聲介韻調。）
           let spaceRotationBanned = !composer.isEmpty
           // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
@@ -215,7 +215,7 @@ extension InputHandlerProtocol {
           // 中英混打模式：Space 按鍵交由 MixedAlphanumericalTypewriter 處理，
           // 避免直接進入組字區送字邏輯而將讀音字串以原文 commit。
           // 閂滯於英打時緩衝區恆空，故須另以閂滯旗標為前提——否則該鍵會繞道至
-          // 一般組字區送字邏輯（而非即刻遞交半形空格）。
+          // 一般組字區送字邏輯（而非即刻遞交半形空白字元）。
           // 緩衝區為「待確認之讀音」（回退與注音狂打並存）者已於上方早退，不至此處。
           if currentTypingMethod == .vChewingFactory, prefs.mixedAlphanumericalEnabled,
              !mixedAlphanumericalBuffer.isEmpty || mixedAlnumConfig.isLatchedToAlnum {

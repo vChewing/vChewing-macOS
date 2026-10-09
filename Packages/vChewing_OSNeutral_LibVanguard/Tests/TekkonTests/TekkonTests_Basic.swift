@@ -99,7 +99,7 @@ struct TekkonTestsBasic {
     #expect(composer.value == "ㄉㄧㄠˇ")
     composer.doBackSpace()
     composer.receiveKey(fromString: " ") // 陰平
-    #expect(composer.value == "ㄉㄧㄠ ") // 這裡回傳的結果的陰平是空格
+    #expect(composer.value == "ㄉㄧㄠ ") // 這裡回傳的結果的陰平是空白字元
 
     // Test Getting Displayed Composition
     #expect(composer.getComposition() == "ㄉㄧㄠ")
