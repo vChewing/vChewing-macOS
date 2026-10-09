@@ -149,7 +149,7 @@
 "i18n:LXMgr.notification.FactoryLexiconLoadingStarted" = "原厂辞典载入中…";
 "i18n:LXMgr.pathInvalidityFound.cassette.description" = "请开启唯音偏好设定以重新确认磁带档案路径的设定。";
 "i18n:LXMgr.pathInvalidityFound.cassette.title" = "侦测到磁带档案存取问题";
-"i18n:LXMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "若这个路径位于 iCloud 代管的“Documents”或“Desktop”内，请先将档案或资料夹移到本机位置，再重新指定。若您不确定这两个目录目前是否由 iCloud Drive 代管，建议直接联系 Apple Support 协助确认设定。";
+"i18n:LXMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "若这个路径位于 iCloud 代管的「Documents」或「Desktop」内，请先将档案或资料夹移到本机位置，再重新指定。若您不确定这两个目录目前是否由 iCloud Drive 代管，建议直接洽询 Apple Support 协助确认设定。";
 "i18n:LXMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings" = "您或许想检查位于「系统设定 -> 隐私权与安全性 -> 档案和档案夹 -> 唯音 (vChewing)」下的权限设定。";
 "i18n:LXMgr.pathInvalidityFound.userDataFolder.description" = "请开启唯音偏好设定以重新确认使用者片语辞典目录路径的设定。";
 "i18n:LXMgr.pathInvalidityFound.userDataFolder.title" = "侦测到使用者片语辞典目录存取问题";
@@ -176,7 +176,7 @@
 "i18n:Menu.RebootVChewing" = "重新启动输入法…";
 "i18n:Menu.ReloadUserPhrases" = "重载自订语汇";
 "i18n:Menu.SearchPreferences" = "搜寻偏好设定…";
-"i18n:Menu.ServiceMenu" = "服务菜单";
+"i18n:Menu.ServiceMenu" = "服务选单";
 "i18n:Menu.ServiceMenuEditor" = "服务选单编辑器";
 "i18n:Menu.SponsorTheDevelopment" = "赞助开发者…";
 "i18n:Menu.SymbolEmojiInput" = "符号＆绘文字输入";
@@ -244,7 +244,7 @@
 "i18n:settings.dictionary.mergeUserDataToNewTarget.button.skip" = "跳过";
 "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d" = "已合并 %d 个档案。";
 "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated" = "没有档案被移转。新位置可能无法写入。";
-"i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.body" = "是否要将旧位置的数据并入到新位置的同名档案内？";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.body" = "是否要将旧位置的资料并入到新位置的同名档案内？";
 "i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.title" = "移转使用者片语？";
 "i18n:Settings.DisableShiftToggleAlphanumerical" = "彻底禁止使用 Shift 键切换英数模式";
 "i18n:Settings.EnableExperimentalSwiftUITypesetting" = "使用 Swift UI 介面排版方法";
@@ -402,7 +402,7 @@
 "i18n:UserDef.kCandidateWindowShowOnlyOneLine.shortTitle" = "仅以单行/单列来陈列候选字";
 "i18n:UserDef.kCassetteEnabled.description" = "磁带模式类似于雅虎奇摩输入法的 CIN 支援模式，允许使用者借由 CIN 表格档案扩充自己想要的笔画输入法（比如五笔、仓颉、呒虾米，等）。然而，因为唯音不打算为了这个功能而牺牲注音输入的体验，所以这个磁带模式的体验对于已经习惯 RIME 或者 OpenVanilla 的人群而言可能会稍微麻烦一些。";
 "i18n:UserDef.kCassetteEnabled.shortTitle" = "启用磁带模式，会停用注音输入";
-"i18n:UserDef.kCassettePath.description" = "请指定您要使用的 CIN 磁带档案。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。必要时请先把档案移到本机资料夹。";
+"i18n:UserDef.kCassettePath.description" = "请指定您要使用的 CIN 磁带档案。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的「Documents」与「Desktop」目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。必要时请先把档案移到本机资料夹。";
 "i18n:UserDef.kCassettePath.shortTitle" = "磁带档案路径";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感资料的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去回应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动侦测正在滥用 SecureEventInput API 的后台执行绪";
@@ -422,7 +422,7 @@
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "针对被管理的客体，在标记模式下禁用分段式粗型下划线";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "纠正不合理的端点选字游标位置";
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "选字窗移动/变更大小时启用动画效果";
-"i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.description" = "本选项仅在「启用中英混合输入回退」已开启时才有作用，且默认为关闭。\n- 启用后：中英混打模式对英数内容的判定结果会被「闩滞」住：一旦判定落定为英文，该段即立刻递交并固定判定结果，其后敲出的每一颗可打印 ASCII 字符都会立刻递交给当前的输入客体，不再累积在输入法内等待确认，直到您按下解除键为止；这让「一次打一整串英文」的体验接近英数输入模式，而不需逐段确认。\n- 解除键：Enter（解除后放行，不作拦截）、BackSpace、Delete、Esc、Option+BackSpace；进入与解除闩滞时各会显示一则约一秒半的浮动提示（不占用内文组字区，故连续打字时仍看得见）。请特别留意：BackSpace、Delete 与 Esc 只会解除闩滞，并不会送出或删除任何字符——先前的英数内容早已递交出去，输入法无从回收，故这些键并不能「撤销」您刚打的英文。\n- 不会解除闩滞的按键：键盘空白键（闩滞于英打时会即刻递交一个半角空白字元）、Tab 键与方向键（组字缓冲区为空时会直接放行给输入客体）。\n- 以下情形会自动解除闩滞、不另发提示：切换中英数模式（Shift 键、CapsLock 键、或 JIS 英数键）、切换到另一个输入客体、或输入法被重新启用。\n- 请注意：本选项并不是把唯音切换成英数模式——唯音仍处于中文打字模式，只是中英混打的判定结果被固定住了而已。另外，「闩滞」只作用于英文，不存在「闩滞于中文」的状态；而在判定落定之前的最初几颗按键，仍会走原有的逐键判定。若您感受不到「判定结果被固定」所带来的差别，建议维持关闭本选项。";
+"i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.description" = "本选项仅在「启用中英混合输入回退」已开启时才有作用，且预设为关闭。\n- 启用后：中英混打模式对英数内容的判定结果会被「闩滞」住：一旦判定落定为英文，该段即立刻递交并固定判定结果，其后敲出的每一颗可列印 ASCII 字元都会立刻递交给当前的输入客体，不再累积在输入法内等待确认，直到您按下解除键为止；这让「一次打一整串英文」的体验接近英数输入模式，而不需逐段确认。\n- 解除键：Enter（解除后放行，不作拦截）、BackSpace、Delete、Esc、Option+BackSpace；进入与解除闩滞时各会显示一则约一秒半的浮动提示（不占用内文组字区，故连续打字时仍看得见）。请特别留意：BackSpace、Delete 与 Esc 只会解除闩滞，并不会送出或删除任何字元——先前的英数内容早已递交出去，输入法无从回收，故这些键并不能「撤销」您刚打的英文。\n- 不会解除闩滞的按键：键盘空白键（闩滞于英打时会即刻递交一个半形空白字元）、Tab 键与方向键（组字缓冲区为空时会直接放行给输入客体）。\n- 以下情形会自动解除闩滞、不另发提示：切换中英数模式（Shift 键、CapsLock 键、或 JIS 英数键）、切换到另一个输入客体、或输入法被重新启用。\n- 请注意：本选项并不是把唯音切换成英数模式——唯音仍处于中文打字模式，只是中英混打的判定结果被固定住了而已。另外，「闩滞」只作用于英文，不存在「闩滞于中文」的状态；而在判定落定之前的最初几颗按键，仍会走原有的逐键判定。若您感受不到「判定结果被固定」所带来的差别，建议维持关闭本选项。";
 "i18n:UserDef.kEnableLatchedAlnumStateInMixedAlnumMode.shortTitle" = "启用中英混打模式的英数闩滞状态";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "对敝输入法的候选字的顺序有着强烈的手动调整之需求的使用者们往往都是从倚天中文 DOS 开始积累了对候选字的直觉记忆、希望能使用这种候选字排序，故提供该选项。逐字选字模式会始终遵循该排序特性，不受该开关所影响。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "对所有单汉字候选字强制施加倚天中文DOS系统排序";
@@ -430,9 +430,9 @@
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "对逐字选字模式强制单行选字窗布局";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "若取消勾选，则 ESC 键会先尝试清除未组成的读音/字根；\n如果没有未组成的读音/字根的话，则会递交当前组字区的内容。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "敲 ESC 键以清空整个组字缓冲区";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "启用后，渐退记忆（POM）模块会观察您的选字行为以累积临时记忆，并在敲字时自动以这些记忆提供建议（套用至组句结果、或置顶于候选窗）；既有的记忆亦会以统计方式参与组句。记忆记录会随时间逐渐衰减失效，您亦可随时借由输入法选单清除全部记忆。关闭本选项可停止此类自动建议、新的记忆学习、以及既有的记忆以统计方式参与组句的行为。";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "启用后，渐退记忆（POM）模组会观察您的选字行为以累积临时记忆，并在敲字时自动以这些记忆提供建议（套用至组句结果、或置顶于候选窗）；既有的记忆亦会以统计方式参与组句。记忆记录会随时间逐渐衰减失效，您亦可随时借由输入法选单清除全部记忆。关闭本选项可停止此类自动建议、新的记忆学习、以及既有的记忆以统计方式参与组句的行为。";
 "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "启用渐退记忆的学习与自动建议";
-"i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "启用时，仅存在于相反输入模式（如在简体模式下出现的繁体特有字）的单一汉字候选将从选字窗中移除。倚天中文系统支持的汉字与 CNS 全字库汉字不受影响。注意：过滤范围仅限于万国码 1.0.1 所支持的汉字（即倚天中文系统收字范围）；较新版本万国码才引入的字元不在覆盖范围内。";
+"i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "启用时，仅存在于相反输入模式（如在简体模式下出现的繁体特有字）的单一汉字候选将从选字窗中移除。倚天中文系统支援的汉字与 CNS 全字库汉字不受影响。注意：过滤范围仅限万国码 1.0.1 所支援的汉字（即倚天中文系统收字范围）；较新版本万国码才引入的字元不在覆盖范围内。";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "滤除掉与输入模式不相符的汉字候选";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "对于单汉字候选字，不符合全字库读音的结果将被降权至候选字列表尾端，而非完全移除。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "仅繁体中文: 原厂辞典仅传回符合全字库读音的结果";
@@ -442,9 +442,9 @@
 "i18n:UserDef.kForceCassetteChineseConversion.option.2" = "仅在简体模式转换至简体";
 "i18n:UserDef.kForceCassetteChineseConversion.option.3" = "仅在繁体模式转换至繁体";
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁简转换:";
-"i18n:UserDef.kFuriousTypingEnabled4Pinyin.description" = "本开关是为了方便需要以不完整的读音连续进行拼音打字的使用者。仅对拼音输入（任一拼音排列）生效，对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续敲击拼音字母即可组句，无需逐音节敲声调或空白键确认。注拼槽内尚未完成的拼音会以语言模型试算整句、即时预览于组字区，尾段候选窗亦同步显示，可循「Shift+选字键」就地选字；预览期间原始拼音改以提示框显示（候选窗显示时自动让位、避免重叠）。拼音狂打预览中按空白键会将当前读音插入组字器（不再兼任候选轮替）；注拼槽尚有未完成拼音时按 Enter 亦仅固化当前读音（或就地确认高亮候选）并停留于组字状态，待注拼槽清空后再按 Enter 才递交整句。本模式会过滤掉原厂辞典内的注音文（注音符号字串）数据。";
+"i18n:UserDef.kFuriousTypingEnabled4Pinyin.description" = "本开关是为了方便需要以不完整的读音连续进行拼音打字的使用者。仅对拼音输入（任一拼音排列）生效，对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续敲击拼音字母即可组句，无需逐音节敲声调或空白键确认。注拼槽内尚未完成的拼音会以语言模型试算整句、即时预览于组字区，尾段候选窗亦同步显示，可循「Shift+选字键」就地选字；预览期间原始拼音改以提示框显示（候选窗显示时自动让位、避免重叠）。拼音狂打预览中按空白键会将当前读音插入组字器（不再兼任候选轮替）；注拼槽尚有未完成拼音时按 Enter 亦仅固化当前读音（或就地确认高亮候选）并停留于组字状态，待注拼槽清空后再按 Enter 才递交整句。本模式会过滤掉原厂辞典内的注音文（注音符号字串）资料。";
 "i18n:UserDef.kFuriousTypingEnabled4Pinyin.shortTitle" = "启用拼音狂打（连续拼音打字）";
-"i18n:UserDef.kFuriousTypingEnabled4Zhuyin.description" = "本开关是为了方便需要以不完整的读音连续进行注音打字的使用者。仅对注音输入（任一注音排列）生效，且与拼音侧之「拼音狂打」各自独立开关；对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续键入注音符号即可组句：每当当前音节已经打完、而下一键属于新音节时，该音节会自动写入组字器，无需逐音节敲声调或空白键确认（空白键在此模式下仍是阴平键；固化前方读音另有 Tab、Enter 与标点三途）。只敲声母亦可：连续的单一注音符号会被视为简拼，候选窗即时列出整词候选、长词优先（例如 ㄍㄋㄋ 得「狗男女」），可循「Shift+选字键」就地选字；未完成之音节仍显示于候选窗顶部。若同时启用「中英混合输入回退」，则该回退之 ASCII 缓冲即本模式之未完成读音：候选窗与前方预览照常运作，惟自动切音节与简拼交由该回退处置。本模式会过滤掉原厂辞典内的注音文（注音符号字串）数据。";
+"i18n:UserDef.kFuriousTypingEnabled4Zhuyin.description" = "本开关是为了方便需要以不完整的读音连续进行注音打字的使用者。仅对注音输入（任一注音排列）生效，且与拼音侧之「拼音狂打」各自独立开关；对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续键入注音符号即可组句：每当当前音节已经打完、而下一键属于新音节时，该音节会自动写入组字器，无需逐音节敲声调或空白键确认（空白键在此模式下仍是阴平键；固化前方读音另有 Tab、Enter 与标点三途）。只敲声母亦可：连续的单一注音符号会被视为简拼，候选窗即时列出整词候选、长词优先（例如 ㄍㄋㄋ 得「狗男女」），可循「Shift+选字键」就地选字；未完成之音节仍显示于候选窗顶部。若同时启用「中英混合输入回退」，则该回退之 ASCII 缓冲区即本模式之未完成读音：候选窗与前方预览照常运作，惟自动切音节与简拼交由该回退处置。本模式会过滤掉原厂辞典内的注音文（注音符号字串）资料。";
 "i18n:UserDef.kFuriousTypingEnabled4Zhuyin.shortTitle" = "启用注音狂打（连续注音打字）";
 "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "启用半形标点";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字元。";
@@ -455,16 +455,16 @@
 "i18n:UserDef.kKanjiConversionPreferences.description" = "在当代繁体／康熙／JIS 之间轮替汉字转换模式。此设定仅对繁体中文输出模式有效，简体中文输出模式下不适用。「当代繁体中文」即为不转换——输出维持标准繁体中文，不套用康熙或 JIS 字形。";
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "汉字转换模式:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "允许对无效的读音使用 BackSpace 编辑";
-"i18n:UserDef.kKeyboardParser4Pinyin.description" = "指定拼音模式下的拼音输入种类。在拼音输入模式下，若当前前后半径 ±10 的扫描范围内各读音单位的可能读音数乘积（笛卡尔积规模）超过预算（625），组字引擎会套用「最长 4 个读音」的候选组字上限，以免组字过程被笛卡尔积卡死。全拼（带声调）输入、以及笛卡尔积规模在预算之内的输入（含免声调的 4 音节以下组合），不会套用此上限。";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "指定拼音模式下的拼音输入种类。在拼音输入模式下，若目前前后半径 ±10 的扫描范围内各读音单位的可能读音数乘积（笛卡尔积规模）超过预算（625），组字引擎会套用「最长 4 个读音」的候选组字上限，以免组字过程被笛卡尔积卡死。全拼（带声调）输入、以及笛卡尔积规模在预算之内的输入（含免声调的 4 音节以下组合），不会套用此上限。";
 "i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "拼音输入种类:";
 "i18n:UserDef.kKeyboardParser4Zhuyin.description" = "指定注音模式下的注音排列。";
 "i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "注音排列:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "两个绘文字（更宽）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "横向多列选字窗最低单元宽度:";
-"i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.description" = "该选项决定中英混打模式如何判定「整段输入是否为一个读音」，需先启用上方的「启用中英混合输入回退」才有作用；本选项默认启用。\n- 启用时：判准为「依槽序键入之原始按键序」。动态注音排列（大千26、倚天26、许氏、星光、刘氏等）的合法编码本即跨键改写槽值（如大千26 之 `qquu`＝ㄅㄚ），故委由注拼引擎判定该段是否为一个打得出来的读音；静态注音排列则维持「键数 == 占用槽数」之计数式，其中冗余键即「ASCII 前缀 ＋ 注音后缀」之分界。\n- 停用后（回到旧制之判定），后果有二：①纯英文字母之短令牌（如 `ls`／`ln`／`lc`／`mv`）不再被视为英文意图，而会重新被当作注音吸收（于空白键确认时组出该读音之候选字，而非递交 `ls `）。②动态注音排列不再委由引擎层判定——大千26 因码长不定而不适用该检定，故其合法多写编码不再被吸收为单一读音（`qquu` 这类内容会留在 ASCII 缓冲、于按下空白键时以 `qquu ` 递交）；其余动态排列改以「键数 == 占用槽数」判定（倚天26 之 `ge`＝ㄐㄧ 仍如常）。\n- 若您希望在中英混打时维持声韵并击等「不需要严格按照顺序敲注音」的特性的话，请停用本选项；否则请维持启用。";
+"i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.description" = "该选项决定中英混打模式如何判定「整段输入是否为一个读音」，需先启用上方的「启用中英混合输入回退」才有作用；本选项预设启用。\n- 启用时：判准为「依槽序键入之原始按键序」。动态注音排列（大千26、倚天26、许氏、星光、刘氏等）之合法编码本即跨键改写槽值（如大千26 之 `qquu`＝ㄅㄚ），故委由注拼引擎判定该段是否为一个打得出来的读音；静态注音排列则维持「键数 == 占用槽数」之计数式，其中冗余键即「ASCII 前缀 ＋ 注音后缀」之分界。\n- 停用后（回到旧制之判定），后果有二：①纯英文字母之短令牌（如 `ls`／`ln`／`lc`／`mv`）不再被视为英文意图，而会重新被当作注音吸收（于空白键确认时组出该读音之候选字，而非递交 `ls `）。②动态注音排列不再委由引擎层判定——大千26 因码长不定而不适用该检定，故其合法多写编码不再被吸收为单一读音（`qquu` 这类内容会留在 ASCII 缓冲、于按下空白键时以 `qquu ` 递交）；其余动态排列改以「键数 == 占用槽数」判定（倚天26 之 `ge`＝ㄐㄧ 仍如常）。\n- 若您希望在中英混打时维持声韵并击等「不需要严格按照顺序敲注音」的特性的话，请停用本选项；否则请维持启用。";
 "i18n:UserDef.kMixedAlnumJudgeReadingsBySequentialRawKeyOrder.shortTitle" = "依槽序键入判定读音";
-"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将当前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。另请注意：本功能可与「注音狂打」同时启用——此时该缓冲即注音狂打之未完成读音，候选窗会即时列出该读音之候选；空白键则用于确认该读音。";
+"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将目前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。另请注意：本功能可与「注音狂打」同时启用——此时该缓冲区即注音狂打之未完成读音，候选窗会即时列出该读音之候选；空白键则用于确认该读音。";
 "i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle" = "启用中英混合输入回退";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定数字小键盘的输入行为。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始终以半形文字直接递交";
@@ -517,7 +517,7 @@
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在选字窗内显示当前候选字的万国码码位";
 "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle" = "拼音并击（组字区内显示汉语拼音）";
-"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "勾选后，每次唯音开始服务某个输入客体（例如切换到唯音输入法、或以 Caps Lock 切回中文模式）时，会以浮动提示显示当前使用的打字模式。该提示会在 0.7 秒后自动消失。不过，有些客体软体在没有接收文字输入时也会谎报文字输入区的位置，使提示可能出现在非预期的位置。";
+"i18n:UserDef.kShowModeDescriptionOnActivatingServer.description" = "勾选后，每次唯音开始服务某个输入客体（例如切换到唯音输入法、或以 Caps Lock 切回中文模式）时，会以浮动提示显示目前使用的打字模式。该提示会在 0.7 秒后自动消失。不过，有些客体软体在没有接收文字输入时也会谎报文字输入区的位置，使提示可能出现在非预期的位置。";
 "i18n:UserDef.kShowModeDescriptionOnActivatingServer.shortTitle" = "在刚刚对接输入客体时，以浮动提示提醒当前的打字模式";
 "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle" = "以 Caps Lock 切换输入法/中英模式时显示通知";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ 这可能会让您难以快速识别目前的 ASCII 模式开/关状态。";
@@ -537,7 +537,7 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.0" = "不指定";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.1" = "深色模式";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.shortTitle" = "通知飘窗配色外观:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁带模式下，该热键组合将不再递交点字阵列（届时会改为递交括弧注解标记）。如另有对点字/盲文功能的更专业的需求的话，请考虑使用专门的点字/盲文工具软体。如需使用「ButKo BPMFVS」或「点字 / 盲文 ASCII」功能，目前电脑另须安装符合相关标准的专用字型，方可确保相关资讯得以正常显示。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁带模式下，该热键组合将不再递交点字阵列（届时会改为递交括弧注解标记）。如另有对点字/盲文功能的更专业的需求的话，请考虑使用专门的点字/盲文工具软体。若要使用「ButKo BPMFVS」或「点字 / 盲文 ASCII」功能，目前电脑另须安装符合相关标准的专用字型，方可确保相关资讯得以正常显示。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "递交括弧注解标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "递交 HTML Ruby 注解标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "递交国语点字 (1947)";
@@ -592,7 +592,7 @@
 "i18n:UserDef.kUseHorizontalCandidateList.option.0" = "纵向布局";
 "i18n:UserDef.kUseHorizontalCandidateList.option.1" = "横向布局";
 "i18n:UserDef.kUseHorizontalCandidateList.shortTitle" = "选字窗布局:";
-"i18n:UserDef.kUserDataFolderSpecified.description" = "请指定您要使用的使用者片语辞典目录。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。如有疑惑者，请洽 Apple Support。";
+"i18n:UserDef.kUserDataFolderSpecified.description" = "请指定您要使用的使用者片语辞典目录。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的「Documents」与「Desktop」目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。如有疑惑者，请洽 Apple Support。";
 "i18n:UserDef.kUserDataFolderSpecified.shortTitle" = "使用者资料夹路径";
 "i18n:UserDef.kUseRearCursorMode.description" = "请选择用以触发选字的游标相对位置。";
 "i18n:UserDef.kUseRearCursorMode.option.0" = "将游标置于词语前方 // macOS 内建注音风格";

@@ -18,7 +18,7 @@
 "i18n:installer.DO_APP_UPGRADE" = "接受并升级";
 "i18n:installer.DONATION_MESSAGE" = "请考虑对敝专案捐赠。详情：https://vchewing.github.io";
 "i18n:Installer.DownloadMainstreamReleases" = "下载主流版本";
-"i18n:installer.EULA_PROMPT_NOTICE" = "若要安装该软件，请接受上述条款。";
+"i18n:installer.EULA_PROMPT_NOTICE" = "若要安装该软体，请接受上述条款。";
 "i18n:Installer.FatalError" = "安装错误";
 "i18n:installer.HP_AND_DONATION" = "🏠 主页・捐款";
 "i18n:Installer.InputMethodMayNotBeFullyEnabled" = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
@@ -28,10 +28,10 @@
 "i18n:Installer.InstallFailed" = "安装失败";
 "i18n:Installer.LegacyInstallerNotice" = "当前的安装包所安装的版本是针对 macOS 10.9 特供的版本，或许也可以在 macOS 10.10 至 macOS 12 Montery 这几个版本的系统内使用。而主流版本则针对最新的几版 macOS 开发。";
 "i18n:installer.LICENSE_TITLE" = "木兰宽松授权条款第 2 版 (MulanPSL-2.0 License):";
-"i18n:Installer.OldVersionStillInUse" = "旧版本未能及时从系统中释放，安装未完成。请注销或重新开机后再运行一次安装程式。";
+"i18n:Installer.OldVersionStillInUse" = "旧版本未能及时从系统中释放，安装未完成。请登出或重新开机后再执行一次安装程式。";
 "i18n:Installer.PleaseUseMainstreamReleases" = "请就您目前的系统版本使用本产品的主流发行版。";
 "i18n:Installer.QuitInstallation" = "退出安装程式";
-"i18n:Installer.ReadyToUse" = "唯音输入法安装成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";
+"i18n:Installer.ReadyToUse" = "唯音输入法安装成功。\n\n若是在当前使用者帐户内首次安装的话，请重新登入。";
 "i18n:installer.STOPPING_THE_OLD_VERSION" = "等待旧版完全停用，大约需要一分钟…";
 "i18n:Installer.StoppingOldVersion" = "正在试图结束正在运行的旧版输入法，大概需要一分钟…";
 "i18n:installer.SUPPORTING_OS:%@" = "该发行版支援 macOS %@ 及之后的系统版本。";
