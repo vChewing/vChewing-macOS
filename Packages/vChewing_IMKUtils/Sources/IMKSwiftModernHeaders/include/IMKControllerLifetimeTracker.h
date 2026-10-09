@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (uint64_t)currentGeneration;
 
 /// The number of currently-tracked controllers.
-@property (nonatomic, readonly) NSUInteger trackedControllerCount;
+@property(nonatomic, readonly) NSUInteger trackedControllerCount;
 
 @end
 
