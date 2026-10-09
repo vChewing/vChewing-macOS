@@ -51,6 +51,28 @@ static void (^_IMKSwift_onAutoCommittingComposition)(uintptr_t);
 static NSUInteger (^_IMKSwift_onProvidingRecognizedEvents)(uintptr_t);
 static BOOL (^_IMKSwift_onHandlingGivenNullableEvent)(uintptr_t, uintptr_t);
 static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
+static void (^_IMKSwift_onLogging)(const char *_Nullable);
+
+/// Associated-object key marking that `-IMKSwift_delayedDealloc` has already
+/// terminated this controller's client wrapper.  Purely diagnostic: it lets the
+/// activation log tell a fresh controller apart from a resurrected shell whose
+/// client connection was torn down 3 seconds after deactivation.
+static char kIMKSwiftClientTerminatedKey;
+
+/// Forwards a formatted diagnostic message to the sink installed from Swift.
+/// Safe to call unconditionally: the sink performs its own debug-mode gating.
+static void IMKSwiftLog(NSString *format, ...) {
+  if (!_IMKSwift_onLogging) return;
+  @autoreleasepool {
+    va_list args;
+    va_start(args, format);
+    NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+    const char *utf8 = [message UTF8String];
+    if (utf8) _IMKSwift_onLogging(utf8);
+    [message release];
+  }
+}
 
 @implementation IMKInputSessionController
 
@@ -136,6 +158,12 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
     _IMKSwift_onSettingObjCValue = [blk copy];
   }
 }
++ (void)IMKSwift_configureWithLoggingHandler:(nullable void (^)(const char *_Nullable))blk {
+  if (_IMKSwift_onLogging != blk) {
+    [_IMKSwift_onLogging release];
+    _IMKSwift_onLogging = [blk copy];
+  }
+}
 
 // MARK: - Lifecycle
 
@@ -151,14 +179,17 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 
 // MARK: - Stale Controller Pruning & Generation Tracking
 
-/// Removes the oldest stale controller from `IMKServer._private._controllers`
-/// when the dictionary has grown beyond a healthy threshold.
+/// Removes the oldest stale non-current controller from
+/// `IMKServer._private._controllers`, keeping that dictionary bounded.
 ///
 /// CpLk toggling causes IMKServer to create a new DO/XPC proxy on every
 /// activation.  Because `_controllers` is keyed by proxy memory address,
 /// each toggle creates a new orphan entry — the old proxy is gone and its
 /// `-sessionFinished:` will never fire.  This method evicts the oldest
 /// non-current controller, keeping the dictionary bounded.
+///
+/// - Note: The historical `count` threshold was removed in Phase 113 follow-ups
+///   (`8a734b4d`); the eviction is now unconditional on every initialisation.
 ///
 /// @param server         The `IMKServer` whose `_controllers` dictionary to prune.
 /// @param selfController The controller currently being initialised (excluded from eviction).
@@ -171,6 +202,8 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 
     id currentCtl = [serverPvt valueForKey:@"_currentController"];
     IMKControllerLifetimeTracker *tracker = [IMKControllerLifetimeTracker shared];
+    IMKSwiftLog(@"Prune: controllers=%lu current=%p self=%p", (unsigned long)[ctls count],
+                (void *)currentCtl, (void *)selfController);
 
     // Find the oldest controller (lowest generation) that is safe to evict.
     id oldest = nil;
@@ -183,15 +216,22 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
         oldest = ctl;
       }
     }
-    if (!oldest) return;
+    if (!oldest) {
+      IMKSwiftLog(@"Prune: nothing evictable (controllers=%lu)", (unsigned long)[ctls count]);
+      return;
+    }
 
     // Find the dictionary key for the oldest controller and remove it.
     for (id key in [ctls allKeys]) {
       if ([ctls objectForKey:key] == oldest) {
+        uintptr_t evictedAddr = (uintptr_t)oldest;
+        uint64_t evictedGen = oldestGen;
         [ctls removeObjectForKey:key];
         if ([key respondsToSelector:@selector(invalidate)]) {
           [(id)key invalidate];
         }
+        IMKSwiftLog(@"Prune: evicted addr=%p gen=%llu remaining=%lu", (void *)evictedAddr,
+                    (unsigned long long)evictedGen, (unsigned long)[ctls count]);
         break;
       }
     }
@@ -212,6 +252,9 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
     [[IMKControllerLifetimeTracker shared] trackController:self];
+    IMKSwiftLog(@"ControllerInit: addr=%p gen=%llu", (void *)self,
+                (unsigned long long)[[IMKControllerLifetimeTracker shared]
+                    generationForAddress:(uintptr_t)self]);
     [IMKInputSessionController IMKSwift_pruneStaleControllersOnServer:server excludingSelf:self];
 
     SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
@@ -234,6 +277,12 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 // MARK: - IMKInputController Overrides (dispatch via class-level static blocks)
 
 - (void)activateServer:(id)sender {
+  BOOL clientTerminatedBefore =
+      [objc_getAssociatedObject(self, &kIMKSwiftClientTerminatedKey) boolValue];
+  IMKSwiftLog(@"ActivateServer: addr=%p gen=%llu clientTerminatedBefore=%@", (void *)self,
+              (unsigned long long)[[IMKControllerLifetimeTracker shared]
+                  generationForAddress:(uintptr_t)self],
+              clientTerminatedBefore ? @"YES" : @"NO");
   [self IMKSwift_cancelDelayedDealloc];
   if (_IMKSwift_onActivatingServer) {
     @autoreleasepool {
@@ -243,6 +292,9 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (void)deactivateServer:(id)sender {
+  IMKSwiftLog(@"DeactivateServer: addr=%p gen=%llu", (void *)self,
+              (unsigned long long)[[IMKControllerLifetimeTracker shared]
+                  generationForAddress:(uintptr_t)self]);
   if (_IMKSwift_onDeactivatingServer) {
     @autoreleasepool {
       _IMKSwift_onDeactivatingServer((uintptr_t)self);
@@ -356,6 +408,11 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 /// per-instance release needed.
 - (void)IMKSwift_delayedDealloc {
   @autoreleasepool {
+    objc_setAssociatedObject(self, &kIMKSwiftClientTerminatedKey, @YES,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    IMKSwiftLog(@"DelayedDealloc: addr=%p gen=%llu", (void *)self,
+                (unsigned long long)[[IMKControllerLifetimeTracker shared]
+                    generationForAddress:(uintptr_t)self]);
     if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
     // Terminate the client wrapper so that IMK's global wrapper cache
     // and the underlying XPC connection are released promptly.  The controller
