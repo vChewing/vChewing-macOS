@@ -446,7 +446,7 @@ DSTROOT = /Library/Input Methods
 VC_APP_ROOT = $(DSTROOT)/vChewing.app
 
 # Pin LC_ALL so CJK collation stays identical regardless of the machine's locale settings.
-.PHONY: lint format lintFormat lintFormatUncommitted
+.PHONY: lint format lintFormat lintFormatUncommitted formatObjC
 
 format:
 	@export LC_ALL=C; swiftformat --swiftversion 5.5 --indent 2 ./
@@ -473,6 +473,28 @@ lintFormatUncommitted:
 	else \
 		printf '%s\n' "$$files" | tr '\n' '\0' | xargs -0 swiftlint lint --fix --autocorrect --config .swiftlint.yml --; \
 		printf '%s\n' "$$files" | tr '\n' '\0' | xargs -0 swiftformat --swiftversion 5.5 --indent 2; \
+	fi
+
+# C／ObjC 源碼之格式化。倉根 `.clang-format` 只宣告 `BasedOnStyle: Google`，故
+# `--style=file` 即 Google preset（2 空格、`ColumnLimit: 80`、會重排 import）。
+# `clang-format` 通常不在 PATH（MacPorts 在 /opt/local/bin；Xcode／CLT 之 toolchain
+# 內亦有），故於執行期依序探尋。可用 `make formatObjC CLANG_FORMAT=<路徑>` 覆寫。
+formatObjC:
+	@export LC_ALL=C; \
+	cf="$(CLANG_FORMAT)"; \
+	if [ -z "$$cf" ]; then \
+		cf="$$(command -v clang-format 2>/dev/null || xcrun --find clang-format 2>/dev/null || echo /opt/local/bin/clang-format)"; \
+	fi; \
+	if [ ! -x "$$cf" ] && ! command -v "$$cf" >/dev/null 2>&1; then \
+		echo "找不到 clang-format（$$cf）。請安裝（MacPorts: sudo port install clang-format）、或指定 CLANG_FORMAT=<路徑>。"; \
+		exit 1; \
+	fi; \
+	files="$$(git ls-files -- '*.h' '*.c' '*.m' '*.mm' '*.cc' '*.hh' ':!Build/**' ':!Packages/Build/**' ':!Packages/**/.build/')"; \
+	if [ -z "$$files" ]; then \
+		echo "No C/ObjC files tracked by git."; \
+	else \
+		echo "Running clang-format ($$cf) on tracked C/ObjC files..."; \
+		printf '%s\n' "$$files" | tr '\n' '\0' | xargs -0 "$$cf" --style=file -i; \
 	fi
 
 .PHONY: install-release
