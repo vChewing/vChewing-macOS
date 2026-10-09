@@ -2205,13 +2205,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - 空白鍵行為偏好於混打路徑之貫徹（`spaceKeyBehaviorAgainstICB`）
 
-  /// 偏好「空格鍵對內文組字區的行為」為「插入空格」（`spaceKeyBehaviorAgainstICB == 0`）時，
-  /// 中英混打之空白鍵語意必須與 Shift+Space 一致：整段緩衝加一個半形空格、**一次遞交**，
+  /// 偏好「空白鍵對內文組字區的行為」為「插入空白字元」（`spaceKeyBehaviorAgainstICB == 0`）時，
+  /// 中英混打之空白鍵語意必須與 Shift+Space 一致：整段緩衝加一個半形空白字元、**一次遞交**，
   /// 不得把尾鍵送進注拼槽。
   ///
   /// 病灶原委：混打路徑自始未讀該偏好——`apple` / `school` 之緩衝長度達 5 字元以上時，
   /// 空白鍵會繞過 `shouldPreferASCIIWordPath` 之英文判定而強行走 auto-split，
-  /// 遂遞交 `appl` 並把 `e`（＝ㄍ）留在注拼槽，與使用者「空白鍵＝插入空格」之明示相衝。
+  /// 遂遞交 `appl` 並把 `e`（＝ㄍ）留在注拼槽，與使用者「空白鍵＝插入空白字元」之明示相衝。
   @Test(
     "IH-MixedAlnum-057 Mixed Space pref insert Space commits whole buffer",
     arguments: ["apple", "school", "schema", "personal", "hello"]
@@ -2232,7 +2232,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testSession.recentCommissions == [word + " "],
-      "`\(word)` ＋ 空白應一次遞交整段緩衝加半形空格，實際得到 \(testSession.recentCommissions)"
+      "`\(word)` ＋ 空白應一次遞交整段緩衝加半形空白字元，實際得到 \(testSession.recentCommissions)"
     )
     #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
     #expect(testHandler.assembler.isEmpty, "`\(word)` 之尾鍵不得被送進注拼槽")
@@ -2267,7 +2267,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// Shift+Space 於預設偏好下仍為「整段緩衝加半形空格」，不受本 phase 影響。
+  /// Shift+Space 於預設偏好下仍為「整段緩衝加半形空白字元」，不受本 phase 影響。
   @Test("IH-MixedAlnum-059 Mixed Shift+Space still commits whole buffer under default preference")
   func test_IH_MixedAlnum_059_MixedShiftSpaceStillCommitsWholeBufferUnderDefaultPreference() throws {
     let (testHandler, testSession) = try prepareMixedModeHandler()
@@ -2286,7 +2286,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.assembler.isEmpty)
   }
 
-  /// 偏好「插入空格」**不**及於合法注音：`su3` 於按下聲調鍵時即已令混打緩衝區清空、讀音
+  /// 偏好「插入空白字元」**不**及於合法注音：`su3` 於按下聲調鍵時即已令混打緩衝區清空、讀音
   /// 成字，空白鍵所見之混打緩衝區為空 ⇒ 混打路徑不得攔截，仍歸既有之組字區送字邏輯處置。
   @Test("IH-MixedAlnum-060 Mixed Space pref insert Space does not affect phonetic flow")
   func test_IH_MixedAlnum_060_MixedSpacePrefInsertSpaceDoesNotAffectPhoneticFlow() throws {
@@ -2317,7 +2317,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   // MARK: - 待調讀音之空白鍵語意（`spaceKeyBehaviorAgainstICB == 0` 之界線）
 
   /// 混打模式下，**尚未鍵入聲調之讀音**棲身於混打緩衝（`su`＝ㄋㄧ）；此時空白鍵之語意為
-  /// 一聲鍵（聲調選字），不得被「插入空格」偏好接走——接走即令該音節之按鍵被當成 ASCII
+  /// 一聲鍵（聲調選字），不得被「插入空白字元」偏好接走——接走即令該音節之按鍵被當成 ASCII
   /// 遞交、音節無從完成。
   @Test("IH-MixedAlnum-061 A pending toneless reading keeps Space as the tone key (two-key syllable)")
   func test_IH_MixedAlnum_061_PendingTonelessReadingKeepsSpaceAsToneKeyTwoKeySyllable() throws {
@@ -2397,7 +2397,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
-  /// 對照組：緩衝並非讀音者（`ls`／`tod`／`film`），「插入空格」偏好照舊生效——
+  /// 對照組：緩衝並非讀音者（`ls`／`tod`／`film`），「插入空白字元」偏好照舊生效——
   /// 本 phase 之判準不得把英文詞誤判為待調讀音而令該偏好失效。
   @Test("IH-MixedAlnum-064 Non-reading buffer still commits whole buffer on Space", arguments: ["ls", "tod", "film"])
   func test_IH_MixedAlnum_064_NonReadingBufferStillCommitsWholeBufferOnSpace(_ word: String) throws {
@@ -2414,16 +2414,16 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
     #expect(
       testSession.recentCommissions == [word + " "],
-      "`\(word)` 並非讀音，應照舊一次遞交整段緩衝加半形空格，實際得到 \(testSession.recentCommissions)"
+      "`\(word)` 並非讀音，應照舊一次遞交整段緩衝加半形空白字元，實際得到 \(testSession.recentCommissions)"
     )
     #expect(testHandler.assembler.isEmpty, "`\(word)` 之尾鍵不得被送進注拼槽")
   }
 
-  /// 停用「依槽序鍵入判定讀音」後，「插入空格」偏好（`spaceKeyBehaviorAgainstICB == 0`）
+  /// 停用「依槽序鍵入判定讀音」後，「插入空白字元」偏好（`spaceKeyBehaviorAgainstICB == 0`）
   /// 不得再把兩字母亂序 token 當英文遞交：該開關之語義即「是否以槽序檢定判定讀音」，
   /// 停用者回到舊制、亂序之鍵照舊被吸納為讀音（聲韻並擊）。此為 P274 之回歸：
   /// P273 起 `mixedAlnumBufferIsTonelessReading` 無條件啟用 `enforceCSVTOrdering`，
-  /// 遂令該開關於「插入空格」路徑實質 always on——`ls`／`us` 於兩態皆遞交原文。
+  /// 遂令該開關於「插入空白字元」路徑實質 always on——`ls`／`us` 於兩態皆遞交原文。
   @Test("IH-MixedAlnum-065 Mixed insert Space pref absorbs out-of-slot-order token when judge disabled", arguments: [
     (token: "ls", reading: "ㄋㄠ", kanji: "腦"),
     (token: "us", reading: "ㄋㄧ", kanji: "妮"),
@@ -2673,7 +2673,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 供本節測項使用：注入足以令 auto-split 命中單鍵尾綴之讀音。
   ///
   /// 測試辭典僅收少量讀音，若不注入，`tryAutoSplitASCIIAndPhoneticSuffix` 會因詞庫
-  /// 查無結果而自然落回「整段 ASCII ＋ 空格」，測項遂失去判別力。
+  /// 查無結果而自然落回「整段 ASCII ＋ 空白字元」，測項遂失去判別力。
   private func injectSingleKeySuffixReadings(_ handler: MockInputHandler) {
     ["ㄍ", "ㄠ", "ㄇ", "ㄌ", "ㄟ"].forEach {
       handler.currentLM.insertTemporaryData(

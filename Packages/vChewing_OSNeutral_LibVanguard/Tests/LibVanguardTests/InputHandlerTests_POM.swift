@@ -932,7 +932,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!pomData.isEmpty)
   }
 
-  /// 狂拼固化後 POM 建議套用（容錯模式）：空格固化前方聲調桶後，
+  /// 狂拼固化後 POM 建議套用（容錯模式）：空白鍵固化前方聲調桶後，
   /// `retrievePOMSuggestions(apply: true)` 以容錯查詢召回記憶並就地覆寫——組句結果
   /// 由「是嗎」改為記憶的「是媽」。
   @Test("IH-POM-014 Furious typing solidify applies POM suggestion tolerantly")
@@ -972,7 +972,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       timestamp: Date().timeIntervalSince1970
     )
 
-    // 「shima」→ 空格：前方固化（插聲調桶）＋ POM 容錯套用（是嗎 → 是媽）。
+    // 「shima」→ 空白鍵：前方固化（插聲調桶）＋ POM 容錯套用（是嗎 → 是媽）。
     typeSentence("shima")
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
 
@@ -1020,7 +1020,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       timestamp: Date().timeIntervalSince1970
     )
 
-    // 「shima」→ 空格固化前方：主開關關閉 ⇒ 無建議、無 n-gram 餵入，組句維持 LM 最佳猜測「是嗎」。
+    // 「shima」→ 空白鍵固化前方：主開關關閉 ⇒ 無建議、無 n-gram 餵入，組句維持 LM 最佳猜測「是嗎」。
     typeSentence("shima")
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
 
@@ -1469,7 +1469,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - Test harness
 
-  /// 測試句「這個檔案是怎樣出現的？」之按鍵流（大千排列；「出」為陰平、故以空格收聲調）。
+  /// 測試句「這個檔案是怎樣出現的？」之按鍵流（大千排列；「出」為陰平、故以空白鍵收聲調）。
   static let pomContextSentenceKeys = "5k4ek42;304g4yp3u;4tj vu042k7"
 
   /// 測試語料：**逐筆取自出貨語料庫之權重**（`vChewing-VanguardLexicon/Build/Release/tsv/data-v4.8.5.txt`

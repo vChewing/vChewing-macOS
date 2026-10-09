@@ -92,8 +92,8 @@ extension Tekkon {
     public var allowsExtendedRomajiBuffer = false
 
     /// 內容值，會直接按照正確的順序拼裝自己的聲介韻調內容、再回傳。
-    /// 注意：直接取這個參數的內容的話，陰平聲調會成為一個空格。
-    /// 如果是要取不帶空格的注音的話，請使用「.getComposition()」而非「.value」。
+    /// 注意：直接取這個參數的內容的話，陰平聲調會成為一個空白字元。
+    /// 如果是要取不帶空白字元的注音的話，請使用「.getComposition()」而非「.value」。
     public var value: String {
       consonant.value + semivowel.value + vowel.value + intonation.value
     }
@@ -441,7 +441,7 @@ extension Tekkon {
           intonation.clear()
         } else {
           // 刪除拼音字元後，必須以縮短後的緩衝重新推導聲介韻槽位；否則 phonabet
-          // 欄位殘留已刪除的讀音（isPronounceable 誤判為真），後續的聲調鍵／空格鍵
+          // 欄位殘留已刪除的讀音（isPronounceable 誤判為真），後續的聲調鍵／空白鍵
           // 會把已刪除的讀音重新組回（receiveSequence 會清空 romajiBuffer，故
           // 事後須復原）。
           let shortened = String(romajiBuffer.dropLast())

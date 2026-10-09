@@ -109,7 +109,7 @@ struct LXConsolidatorConsolidateTests {
 
   @Test("[LXAssembly] ConsolidateText_WhitespaceCollapse")
   func testConsolidateTextWhitespaceCollapse() {
-    // 連續 ASCII 空格／Tab／NBSP／全形空格收斂為單一 ASCII 空格。
+    // 連續 ASCII 空白字元／Tab／NBSP／全形空白字元收斂為單一 ASCII 空白字元。
     var text = "foo  bar\t baz\u{00A0}\u{00A0}qux\u{3000}\u{3000}zap"
     LXAssembly.LXConsolidator.consolidate(text: &text, pragma: false)
     #expect(text == "\(header)\nfoo bar baz qux zap\n")
@@ -117,7 +117,7 @@ struct LXConsolidatorConsolidateTests {
 
   @Test("[LXAssembly] ConsolidateText_LineEdgeSpaces")
   func testConsolidateTextLineEdgeSpaces() {
-    // 行首行尾空格（含檔案首尾）剝除；CRLF／CR／FF 收斂為 LF。
+    // 行首行尾空白字元（含檔案首尾）剝除；CRLF／CR／FF 收斂為 LF。
     var text = "  foo  \n  bar  "
     LXAssembly.LXConsolidator.consolidate(text: &text, pragma: false)
     #expect(text == "\(header)\nfoo\nbar\n")
@@ -125,7 +125,7 @@ struct LXConsolidatorConsolidateTests {
 
   @Test("[LXAssembly] ConsolidateText_NewlineClass")
   func testConsolidateTextNewlineClass() {
-    // CRLF／CR／FF 收斂為 LF；VT 是行錨（剝除鄰近空格）但不會被收斂。
+    // CRLF／CR／FF 收斂為 LF；VT 是行錨（剝除鄰近空白字元）但不會被收斂。
     var a = "a\r\nb\rc\u{000C}d\u{000B}e\n"
     LXAssembly.LXConsolidator.consolidate(text: &a, pragma: false)
     #expect(a == "\(header)\na\nb\nc\nd\u{000B}e\n")
@@ -140,12 +140,12 @@ struct LXConsolidatorConsolidateTests {
     LXAssembly.LXConsolidator.consolidate(text: &c, pragma: false)
     #expect(c == "\(header)\na\u{000B}b\n")
 
-    // LS 是行錨（剝除鄰近空格）但留在行內。
+    // LS 是行錨（剝除鄰近空白字元）但留在行內。
     var d = "a\u{2028} b\n"
     LXAssembly.LXConsolidator.consolidate(text: &d, pragma: false)
     #expect(d == "\(header)\na\u{2028}b\n")
 
-    // 斷行前的空格剝除。
+    // 斷行前的空白字元剝除。
     var e = "x \r\ny\n"
     LXAssembly.LXConsolidator.consolidate(text: &e, pragma: false)
     #expect(e == "\(header)\nx\ny\n")

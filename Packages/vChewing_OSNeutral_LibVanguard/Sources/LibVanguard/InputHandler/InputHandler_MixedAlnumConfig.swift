@@ -67,7 +67,7 @@ enum MixedAlnumSpaceDuty: Sendable {
   case none
   /// 混打層以陰平聲調確認該待調讀音（見 `confirmMixedAlnumReadingWithFirstTone`）。
   case firstToneConfirmation
-  /// 混打層放棄注音處理：整段緩衝以原文遞交、其後附一個半形空格（即 Shift+Space 之逃生口）。
+  /// 混打層放棄注音處理：整段緩衝以原文遞交、其後附一個半形空白字元（即 Shift+Space 之逃生口）。
   case asciiCommitEscape
 
   // MARK: Internal
@@ -147,7 +147,7 @@ extension InputHandlerProtocol {
   /// 本拍之空白鍵於「中英混打＋注音狂打並存態」下之歸屬（判準之單一正本，見 `MixedAlnumSpaceDuty`）。
   ///
   /// - Important: **Shift 不在陰平確認之列**——Shift 是使用者明示之英文意圖，並存態下
-  ///   Shift+Space 之既有語義為「放棄注音處理、逕遞交整段 ASCII ＋ 半形空格」（見
+  ///   Shift+Space 之既有語義為「放棄注音處理、逕遞交整段 ASCII ＋ 半形空白字元」（見
   ///   `MixedAlphanumericalTypewriter`）。若不設此修飾鍵之閘，陰平確認即搶先消費本鍵、
   ///   該逃生口無從觸發（事主實機回報：`su` 之後按 Shift+Space 得陰平確認，而非遞交 `su `）。
   /// - Note: 兩態皆以「緩衝非空 ∧ `mixedAlnumZhuyinFuriousInEffect`」為前提；`.none` 者不屬

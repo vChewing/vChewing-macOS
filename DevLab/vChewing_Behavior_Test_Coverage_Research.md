@@ -50,7 +50,7 @@ E. 逐字選字與關聯詞語
 - Shift+Enter（非 SCPC）或自動提交後，`handleEnter` / `generateStateOfAssociates` 會根據候選讀音生成 `.ofAssociates` 狀態；SCPC 模式於候選僅剩一筆時直接提交同步觸發關聯詞。[適合測試]
 
 F. Enter / BackSpace / Delete / Esc
-- Enter：支援純提交、Option+Shift 加入空格、Ctrl+Command(+Option) 進行讀音/點字/HTML Ruby 輸出，以及在 Cassette 或 CodePoint 模式中退回主模式。[適合測試]
+- Enter：支援純提交、Option+Shift 加入空白字元、Ctrl+Command(+Option) 進行讀音/點字/HTML Ruby 輸出，以及在 Cassette 或 CodePoint 模式中退回主模式。[適合測試]
 - BackSpace / Delete：`handleBackSpace`、`handleDelete` 支援逐字刪除、Option 節點刪除、Shift 特殊偏好、CodePoint 緩衝區回退與 Cassette wildcard 清空。[適合測試]
 - Esc：依 `prefs.escToCleanInputBuffer` 決定清空或提交組字內容，否則僅清除 composer/calligrapher；在其他 TypingMethod 下會先回到 `.vChewingFactory`。[適合測試]
 

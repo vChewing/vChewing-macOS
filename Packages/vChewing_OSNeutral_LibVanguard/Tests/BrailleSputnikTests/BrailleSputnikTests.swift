@@ -43,13 +43,13 @@ final class BrailleSputnikTests {
 
   @Test
   func testBrailleASCIIConversionSpecialCells() throws {
-    // 逐個驗證 Braille ASCII 對映中容易出錯的特殊字元：ASCII 引號、反斜槓、空格。
+    // 逐個驗證 Braille ASCII 對映中容易出錯的特殊字元：ASCII 引號、反斜槓、空白字元。
     let processor = BrailleSputnik(standard: .of1947)
     // 1947 四聲（⠐ = U+2810）→ ASCII 引號。
     #expect(processor.convertToASCIIBraille(smashedPairs: [(key: "ㄉㄚˋ", value: "大")]) == "D>\"")
     // 1947 介音 ㄩ（⠳ = U+2833）→ ASCII 反斜槓（後隨陰平 ⠄ → ASCII 撇號）。
     #expect(processor.convertToASCIIBraille(smashedPairs: [(key: "ㄩ", value: "淤")]) == "\\'")
-    // 1947 句號「。」（⠤⠀）→ ASCII "-" 加空格。
+    // 1947 句號「。」（⠤⠀）→ ASCII "-" 加空白字元。
     #expect(processor.convertToASCIIBraille(smashedPairs: [(key: "_。", value: "。")]) == "- ")
     // Unicode 輸出不受影響：同一輸入仍應產出原 Unicode 點字字元。
     #expect(processor.convertToBraille(smashedPairs: [(key: "ㄩ", value: "淤")]) == "⠳⠄")

@@ -45,7 +45,7 @@ extension Tekkon {
     return buckets
   }()
 
-  /// 注音轉拼音，要求陰平必須是空格。
+  /// 注音轉拼音，要求陰平必須是空白字元。
   /// - Parameters:
   ///   - targetJoined: 傳入的 String 對象物件。
   public static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {

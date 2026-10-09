@@ -114,7 +114,7 @@ extension LXAssembly {
     /// - parameters:
     ///   - bytes: 給定資料位元組。
     mutating func replaceData(bytes newBytes: [UInt8]) {
-      // 以位元組層級將 Tab 換成空格（對應舊 `replacingOccurrences(of: "\t", with: " ")`）。
+      // 以位元組層級將 Tab 換成空白字元（對應舊 `replacingOccurrences(of: "\t", with: " ")`）。
       let processed = newBytes.map { $0 == 0x09 ? 0x20 : $0 }
       if rawData == processed { return }
 

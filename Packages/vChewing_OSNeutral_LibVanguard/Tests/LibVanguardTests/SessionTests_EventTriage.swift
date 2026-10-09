@@ -369,7 +369,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     }
   }
 
-  /// 驗證一般打字且輸入狀態為 empty 時，Shift+空格鍵之輸出寬度由偏好決定、且預設為全形。
+  /// 驗證一般打字且輸入狀態為 empty 時，Shift+空白鍵之輸出寬度由偏好決定、且預設為全形。
   @Test("SS-EventTriage-009 Shift+Space empty state width")
   func test_SS_EventTriage_009_ShiftSpaceEmptyStateWidth() throws {
     let spaceEvent = KBEvent.KeyEventData(chars: " ", keyCode: KeyCode.kSpace.rawValue)
@@ -380,7 +380,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       keyCode: KeyCode.kSpace.rawValue
     )
 
-    // 不帶 Shift 的空格鍵：恆為半形，不受偏好影響。
+    // 不帶 Shift 的空白鍵：恆為半形，不受偏好影響。
     testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = true
     testSession.switchState(.ofEmpty())
     testClientProxy.clear()
@@ -388,7 +388,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(testClientProxy.toString() == " ")
     #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
 
-    // 帶 Shift 的空格鍵：預設（偏好為 false）為全形。
+    // 帶 Shift 的空白鍵：預設（偏好為 false）為全形。
     testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = false
     testSession.switchState(.ofEmpty())
     testClientProxy.clear()
@@ -396,7 +396,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(testClientProxy.toString() == "　")
     #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
 
-    // 帶 Shift 的空格鍵：偏好為 true 時改為半形。
+    // 帶 Shift 的空白鍵：偏好為 true 時改為半形。
     testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = true
     testSession.switchState(.ofEmpty())
     testClientProxy.clear()

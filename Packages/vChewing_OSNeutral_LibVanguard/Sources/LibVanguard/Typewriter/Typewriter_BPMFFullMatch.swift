@@ -61,7 +61,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     // 狂拼模式：注拼槽尚有暫存拼音時，Enter 只固化前方讀音、停留在 Inputting 狀態
     // 留待接下來的輸入，不直接遞交全部內容。copilot 窗可見
     // 且使用者已高亮某候選時，固化該候選（等同就地選字、但不寫 POM——與 Enter 直遞
-    // 的 POM 政策一致）；否則以空格固化的語義只插聲調桶（保留重切分自由度）。
+    // 的 POM 政策一致）；否則以空白鍵固化的語義只插聲調桶（保留重切分自由度）。
     // 注拼槽清空後再次 Enter（hasFuriousFrontPending 不成立）才走正常遞交路徑。
     if confirmCombination, input.isEnter, !input.isHoldingAny([.control, .option, .shift, .command]),
        handler.hasFuriousFrontPending {
@@ -234,7 +234,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     // 因歷史緣故無閘門，故顯式補上 SCPC 這一條）。磁帶模式不經本型別
     // （`handleComposition` 之打字模式分派：`.cassette` → `CassetteTypewriter`），
     // 故無須在此另設磁帶閘。
-    // SCPC 下之逐音節選字不受影響：讀音完成（聲調鍵／空格）時仍走
+    // SCPC 下之逐音節選字不受影響：讀音完成（聲調鍵／空白鍵）時仍走
     // `composeReadingIfReady` → `handleTypewriterSCPCTasks()`。
     guard !prefs.useSCPCTypingMode else { return nil }
     guard let autoChop = handler.composer.pinyinAutoChopResult(appending: inputText) else {
