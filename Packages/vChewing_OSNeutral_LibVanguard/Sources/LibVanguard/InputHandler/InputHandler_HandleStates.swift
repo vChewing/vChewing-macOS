@@ -1698,7 +1698,7 @@ extension InputHandlerProtocol {
     var debugIntel: String?
 
     do {
-      let revolvement = try assembler.revolveCandidate(
+      let revolution = try assembler.revolveCandidate(
         cursorType: homaCandidateCursorType,
         counterClockwise: reverseOrder,
         softRevolve: softRevolve,
@@ -1707,7 +1707,7 @@ extension InputHandlerProtocol {
         debugIntel = debugIntelRetrieved
       }
       if previousSentence.map(\.value) != assembler.assembledSentence.map(\.value) {
-        tooltipPayload = (revolvement.0.pair.value, revolvement.current, revolvement.total)
+        tooltipPayload = (revolution.0.pair.value, revolution.current, revolution.total)
       } else {
         errorCode = "040CDB2A"
       }

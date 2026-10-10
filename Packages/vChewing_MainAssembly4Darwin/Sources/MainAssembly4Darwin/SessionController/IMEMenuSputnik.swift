@@ -43,9 +43,9 @@ struct IMEMenuSputnik {
       }
     }()
     if doConv {
-      return "i18n:KanjiConversionRevolvement.Notification.Prefix".i18n + " → \(result)"
+      return "i18n:KanjiConversionRevolution.Notification.Prefix".i18n + " → \(result)"
     }
-    return "\(result) (\("i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv".i18n))"
+    return "\(result) (\("i18n:KanjiConversionRevolution.Notification.Suffix.NoConv".i18n))"
   }
 }
 

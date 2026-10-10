@@ -180,12 +180,12 @@ extension InputHandlerProtocol {
           // 空白鍵輪替守衛：注拼槽尚有未完成讀音時，停用空白鍵輪替——未完成讀音存在時，
           // 空白鍵語義為「把讀音插入組字器」、不兼任候選輪替。
           // （拼音模式下 composer.isEmpty 涵蓋 romajiBuffer；注音模式涵蓋聲介韻調。）
-          let spaceRotationBanned = !composer.isEmpty
+          let spaceRevolutionBanned = !composer.isEmpty
           // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
           // Space 鍵就地輪替候選字（對應 spaceKeyBehaviorAgainstICB == 2）。
           if prefs.spaceKeyBehaviorAgainstICB == 2,
              input.keyModifierFlags.intersection([.control, .command, .option]).isEmpty,
-             !spaceRotationBanned {
+             !spaceRevolutionBanned {
             // 此時 Shift+Space 反向輪替，仿 Shift+Tab 行為。
             // SPACE 啟動的輪替一律套用 soft revolve，避免毀掉鄰近已覆寫節點。
             return revolveCandidate(
@@ -193,7 +193,7 @@ extension InputHandlerProtocol {
               softRevolve: prefs.preferredRevolverForceLevel != 0
             )
           }
-          if input.isShiftHeld, !input.isHoldingAny([.control, .option]), !spaceRotationBanned {
+          if input.isShiftHeld, !input.isHoldingAny([.control, .option]), !spaceRevolutionBanned {
             return revolveCandidate(
               reverseOrder: input.isCommandHeld,
               softRevolve: prefs.preferredRevolverForceLevel != 0

@@ -119,8 +119,8 @@
 "i18n:KanjiConversionMode.JIS" = "JIS";
 "i18n:KanjiConversionMode.KangXi" = "康熙正体";
 "i18n:KanjiConversionMode.ModernTrad" = "当代繁体中文";
-"i18n:KanjiConversionRevolvement.Notification.Prefix" = "汉字转换";
-"i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv" = "不转换";
+"i18n:KanjiConversionRevolution.Notification.Prefix" = "汉字转换";
+"i18n:KanjiConversionRevolution.Notification.Suffix.NoConv" = "不转换";
 "i18n:KeyboardLayout.AlvinLiuImitative" = "刘又铭拟音注音排列";
 "i18n:KeyboardLayout.AppleABC" = "Apple ABC (与 Apple 美规键盘等价)";
 "i18n:KeyboardLayout.AppleChewingDachen" = "Apple 大千注音键盘布局";
