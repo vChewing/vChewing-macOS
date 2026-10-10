@@ -46,7 +46,7 @@
   "SuppressTooltipForIntonationKeyOverrideEvents": false,
   "SpecifyShiftBackSpaceKeyBehavior": 0,
   "SpecifyShiftTabKeyBehavior": false,
-  "SpecifyShiftSpaceKeyBehavior4CandidateWindow": false,
+  "SpecifyShiftSpaceKeyBehavior4CandidateWindow": true,
   "SpecifyShiftSpaceKeyBehavior4EmptyState": false,
   "SpecifyCmdOptCtrlEnterBehavior": 0,
   "ReflectBPMFVSInCompositionBuffer": false,

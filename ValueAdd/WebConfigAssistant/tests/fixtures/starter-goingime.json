@@ -15,6 +15,7 @@
   "FuriousTypingEnabled4Zhuyin": false,
   "SuppressFactoryUnigramsOfKanaSyllables": false,
   "SpecifyIntonationKeyBehavior": 0,
+  "SpecifyShiftSpaceKeyBehavior4CandidateWindow": true,
   "UseSCPCTypingMode": false,
   "AlsoConfirmAssociatedCandidatesByEnter": false,
   "TogglingAlphanumericalModeWithLShift": true,
