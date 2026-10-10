@@ -48,18 +48,18 @@ extension InstallerVMProtocol {
   }
 
   func removeThenInstallInputMethod() {
-    // 先終止執行中的輸入法程序，避免 bundle 被系統鎖定
-    let killTask = Process()
-    killTask.launchPath = "/usr/bin/killall"
-    killTask.arguments = [kTargetBin]
-    killTask.launch()
-    killTask.waitUntilExit()
-
-    let killTask2 = Process()
-    killTask2.launchPath = "/usr/bin/killall"
-    killTask2.arguments = [kTargetBinPhraseEditor]
-    killTask2.launch()
-    killTask2.waitUntilExit()
+    // 換檔前先請執行中的輸入法及其附屬編輯器離場，避免 bundle 被系統鎖定。此處之終止係
+    // 「盡力而為」：它不承擔「安裝後舊碼已退場」之保證（理由見
+    // `terminateRunningInputMethodInstances` 之說明），保證由 `installInputMethod()` 於
+    // 換檔之後補上。兩路並用：`killall` 沿用既有行為，捕捉式終止另提供可驗證的訊號。
+    terminateByProcessName(kTargetBin, reason: "preSwap")
+    terminateByProcessName(kTargetBinPhraseEditor, reason: "preSwap")
+    terminateRunningInputMethodInstances(
+      reason: "preSwap",
+      executableNames: [kTargetBin, kTargetBinPhraseEditor],
+      timing: .bestEffort,
+      escalates: false
+    )
 
     // 取得本次要安裝的 IME 的 InputMethodConnectionName，用於掃描既有安裝
     let connectionName = installingIMEConnectionName ?? kTISInputSourceID
@@ -173,6 +173,17 @@ extension InstallerVMProtocol {
 
     let imeBundleURL = theBundle.bundleURL
 
+    // ★ 換檔後終止：本流程之保證所在。bundle 已就位，故此後系統無論何時把輸入法拉起來，
+    // 被拉起的都必然是剛就位的新碼。務必留在 `allRegisteredInstancesOfThisInputMethod.isEmpty`
+    // 之外：升級安裝時那個分支不會執行，而升級安裝正是最需要這一刀的情境。位置亦須先於
+    // 輸入源註冊／啟用——那些動作本身就可能請系統拉起輸入法。
+    terminateRunningInputMethodInstances(
+      reason: "postSwap",
+      executableNames: [kTargetBin],
+      bundleIdentifier: imeIdentifier,
+      escalates: true
+    )
+
     if allRegisteredInstancesOfThisInputMethod.isEmpty {
       OSUtils.consoleLog(
         "Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString)."
@@ -264,14 +275,10 @@ extension InstallerVMProtocol {
   /// 強制結束文字輸入選單的 agent 程序（TextInputMenuAgent），使其重新載入輸入法清單。
   /// 只針對 TextInputMenuAgent：結束 imklaunchagent 會讓正在接收文字輸入的客體 App 失去
   /// 與所有輸入法的對接、須重啟該客體 App 才會恢復；TextInputSwitcher 只是純 UI 套件、
-  /// 結束它沒有意義。此程序在舊版 macOS 上可能不存在或尚未啟動，故不檢查 killall 的結束
-  /// 狀態（無論成敗皆返回）。呼叫端應於本方法返回後再延後半秒才執行輸入源啟用（register）。
+  /// 結束它沒有意義。此程序在舊版 macOS 上可能不存在或尚未啟動，故無論成敗皆返回（其結束碼
+  /// 僅記入系統記錄、不作為流程依據）。呼叫端應於本方法返回後再延後半秒才執行輸入源啟用。
   private func terminateTextInputSystemAgents() {
-    let killTask = Process()
-    killTask.launchPath = "/usr/bin/killall"
-    killTask.arguments = ["TextInputMenuAgent"]
-    killTask.launch()
-    killTask.waitUntilExit()
+    terminateByProcessName("TextInputMenuAgent", reason: "textInputMenuAgent")
   }
 }
 
