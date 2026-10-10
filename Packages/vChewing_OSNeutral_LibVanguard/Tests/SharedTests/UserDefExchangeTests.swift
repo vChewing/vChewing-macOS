@@ -274,4 +274,37 @@ final class UserDefExchangeTests {
       #expect(rejected.result.failures.count == 1, "「\(userDef)」之 \(outside) 竟被接受")
     }
   }
+
+  /// 不變式：**凡 `metaData.options` 宣告之選項值，皆須原樣通過 `PrefMgr.fixOddPreferencesCore()`**。
+  ///
+  /// 動機（Phase 294 施工時查得之既有缺陷）：`fixOddPreferencesCore()` 對
+  /// `kSpaceKeyBehaviorAgainstICB` 曾硬寫 `![0, 1, 2]` 之白名單，而該鍵之值域於 P294 擴為
+  /// `-1 ... 2` 時漏改該處 ⇒ 使用者選了「插入空白字元（內文組字區）」之後，只要切換回本輸入法
+  /// （`InputSession.activateServer()` ⇒ `fixOddPreferences()`）即被靜默改回 1。
+  ///
+  /// 本測試與 `testEveryDeclaredOptionIsAcceptedByValidator` 同旨（「選項 ⊆ …」），惟對象為
+  /// **`PrefMgr` 之夾值邏輯**而非 `UserDef` 之逐鍵驗證。二者合起來即「宣告之選項須能原樣
+  /// 存活於整條偏好管線」——凡日後新增選項或擴張值域者，任一處漏改皆當場轉紅。
+  @Test
+  func testEveryDeclaredOptionSurvivesFixOddPreferencesCore() {
+    let prefs = PrefMgr()
+    var checked = 0
+    for userDef in UserDef.allCases {
+      guard let options = userDef.metaData?.options, !options.isEmpty else { continue }
+      // 無值域者非整數鍵（Bool／String），不在 `fixOddPreferencesCore()` 之夾值範圍內。
+      guard userDef.validNumeralValueRange != nil else { continue }
+      for value in options.keys.sorted() {
+        // 直接佈置於 `UserDefaults.current`（即 `@AppProperty` 之讀寫域），再驅動夾值邏輯。
+        UserDefaults.current.set(value, forKey: userDef.rawValue)
+        prefs.fixOddPreferencesCore()
+        let after = UserDefaults.current.object(forKey: userDef.rawValue) as? Int
+        #expect(
+          after == value,
+          "「\(userDef)」之選項 \(value) 竟被 `fixOddPreferencesCore()` 改為 \(after.map(\.description) ?? "nil")"
+        )
+        checked += 1
+      }
+    }
+    #expect(checked >= 40, "受檢之選項數過少：\(checked)")
+  }
 }

@@ -91,6 +91,35 @@ extension InputHandlerProtocol {
     }
   }
 
+  /// 中英混打層是否已接管當前之可列印鍵輸入（判準之單一正本）。
+  ///
+  /// 與 `handleComposition(input:)` 之分派條件同源（P294 收斂：該處原本自持一份逐字相同之
+  /// 運算式）。凡「某偏好值或某按鍵之語義在中英混打下必須另作解讀」者，皆應以本屬性為閘，
+  /// 而**不得**在消費端各自拼湊同一份條件——那正是漂移之溫床。
+  public var isMixedAlphanumericalLayerInEffect: Bool {
+    currentTypingMethod == .vChewingFactory && typingMode != .cassette && !composer.isPinyinMode
+      && prefs.mixedAlphanumericalEnabled
+  }
+
+  /// 「空白鍵對內文組字區的行為」之**實際生效值**。
+  ///
+  /// - Important: 中英混打層生效（`isMixedAlphanumericalLayerInEffect`）時，
+  ///   `UserDef.kSpaceKeyBehaviorAgainstICB` 之 `-1`（「插入空白字元（內文組字區）」）
+  ///   **一律讀作 `0`**（「先遞交當前內容、再插入空白字元」）。理由：`-1` 之語義是「把空白
+  ///   插進組字器」，而混打層之空白鍵自有其語義（固化前方讀音／遞交整段 ASCII），二者併存
+  ///   即生**互斥之雙重解讀**——實測（事主於 P294 驗收時回報；須注音狂打一併開啟才會現形）
+  ///   「組字區為空時按空白鍵」會先插入 `_SPACE_HW`，第二拍遂被
+  ///   `MixedAlphanumericalTypewriter` 之「前方讀音既已固化 ⇒ 遞交組字內容 ＋ 半形空白
+  ///   字元」分支接手，得到「一次遞交兩個空白字元」之怪異結果。混打既已接管該鍵之消化，
+  ///   降級為 `0` 即「把該鍵交還混打層既有語義」，且不犧牲 `-1` 在混打關閉時之全部行為。
+  /// - Important: 本屬性即該降級之**單一正本**：凡讀取該偏好者一律取本值，**不得**逕讀
+  ///   `prefs.spaceKeyBehaviorAgainstICB`——P294 之六個消費點原本各自逕讀，遂生本病灶。
+  public var effectiveSpaceKeyBehaviorAgainstICB: Int {
+    let rawValue = prefs.spaceKeyBehaviorAgainstICB
+    guard rawValue == -1, isMixedAlphanumericalLayerInEffect else { return rawValue }
+    return 0
+  }
+
   /// 混打緩衝區所承載之注音讀音，無則 `nil`——**不拘狂打開關**之量測。
   ///
   /// **三個必要條件**：

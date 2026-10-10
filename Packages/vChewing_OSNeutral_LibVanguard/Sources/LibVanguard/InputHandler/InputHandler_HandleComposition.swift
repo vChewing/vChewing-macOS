@@ -31,8 +31,9 @@ extension InputHandlerProtocol {
       //    與 `mixedAlnumZhuyinFuriousInEffect` 之分野）。拼音側不走此軸：回退本即
       //    注音鍵盤專屬，且 `MixedAlphanumericalTypewriter` 自身對拼音模式逕轉
       //    `BPMFFullMatchTypewriter`（見其 `handle` 之首段）。
-      let isZhuyinKeyboardFamily = typingMode != .cassette && !composer.isPinyinMode
-      if isZhuyinKeyboardFamily, prefs.mixedAlphanumericalEnabled {
+      // - Note: 本處之判準自 P294 起收斂為 `isMixedAlphanumericalLayerInEffect`（單一正本）：
+      //   值 `-1` 之空白鍵語義降級、以及凡「中英混打下須另作解讀」者，皆以同一份條件為閘。
+      if isMixedAlphanumericalLayerInEffect {
         return MixedAlphanumericalTypewriter(self).handle(input)
       }
       switch typingMode {

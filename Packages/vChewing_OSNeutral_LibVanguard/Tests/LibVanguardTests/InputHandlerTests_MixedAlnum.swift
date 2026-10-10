@@ -2536,6 +2536,136 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
   }
 
+  // MARK: - 值 -1 於混打層一律讀作 0（P294）
+
+  /// 偏好值 -1（「插入空白字元（內文組字區）」）於**中英混打層生效時一律讀作值 0**
+  /// （「先遞交當前內容、再插入空白字元」）：混打啟用且緩衝非空時，空白鍵走值 0 之既有語義
+  /// ——整段原文 ＋ 半形空白字元一次遞交，而非 auto-split。
+  ///
+  /// - Important: 此即事主於 P294 驗收時明示之處置（原提議逐字為「mixedAlnum 模式下，把
+  ///   `kSpaceKeyBehaviorAgainstICB` 的 rawValue `-1` 當成 `0` 來解讀」）。理由：值 -1 之語義是
+  ///   「把空白插進組字器」，與混打層自有之空白鍵語義**互斥**——二者併存即生雙重解讀（見
+  ///   `IH-MixedAlnum-070`）。降級之單一正本為 `effectiveSpaceKeyBehaviorAgainstICB`。
+  @Test("IH-MixedAlnum-068 Mixed mode reads the -1 space preference as 0 (ASCII buffer)")
+  func test_IH_MixedAlnum_068_MixedModeReadsMinusOneSpacePreferenceAsZero() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    injectSingleKeySuffixReadings(testHandler)
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    typeSentence("apple")
+    #expect(testHandler.mixedAlphanumericalBuffer == "apple")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == ["apple "],
+      "混打啟用時值 -1 應以值 0 解讀（整段原文 ＋ 半形空白字元），實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(
+      testHandler.assembler.actualKeys.allSatisfy { !$0.hasPrefix("_SPACE") },
+      "值 -1 之虛擬空白鍵不得出現在混打路徑的組字器內"
+    )
+    #expect(testHandler.assembler.isEmpty, "整段緩衝既已遞交，組字器不應殘留內容")
+  }
+
+  /// 承上之 Shift 側：混打緩衝非空時 Shift+Space 仍是「整段緩衝 ＋ 半形空白字元」之逃生口，
+  /// 不得被值 -1 改寫成全形空白。
+  @Test("IH-MixedAlnum-069 Mixed Shift+Space escape hatch survives the -1 space preference")
+  func test_IH_MixedAlnum_069_MixedShiftSpaceEscapeHatchSurvivesMinusOneSpacePreference() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    injectSingleKeySuffixReadings(testHandler)
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    typeSentence("apple")
+    #expect(testHandler.mixedAlphanumericalBuffer == "apple")
+
+    var shiftSpace = KBEvent.KeyEventData.spaceEvent
+    shiftSpace.flags = [.shift]
+    #expect(testHandler.triageInput(event: shiftSpace.asEvent))
+    #expect(
+      testSession.recentCommissions == ["apple "],
+      "值 -1 不得奪走混打之 Shift+Space 逃生口，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  /// **回歸測試（事主於 P294 驗收時實機回報之原始病灶）**：混打 ＋ 注音狂打並存、值 -1 之下，
+  /// 組字區為空時**連按兩次**空白鍵。
+  ///
+  /// 修復前：第一拍走分診之 -1 分支、把 `_SPACE_HW` 插進組字器；第二拍遂被
+  /// `MixedAlphanumericalTypewriter` 之「前方讀音既已固化 ⇒ 遞交組字內容 ＋ 半形空白字元」
+  /// 分支接手——因 `isConsideredEmptyForNow` 已為假——而一次遞交**兩個**空白字元。
+  /// 修復後：值 -1 於混打層讀作 0，兩拍各自即刻遞交一個半形空白，組字器全程為空。
+  ///
+  /// - Important: 注音狂打必須一併開啟才會現形（見 `mixedAlnumZhuyinFuriousInEffect`），
+  ///   而 `prepareMixedModeHandler()` 明文關閉狂打，故此處自行開啟。
+  @Test("IH-MixedAlnum-070 Mixed furious mode reads the -1 space preference as 0 (empty buffer)")
+  func test_IH_MixedAlnum_070_MixedFuriousModeReadsMinusOneSpacePreferenceAsZero() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    testHandler.prefs.furiousTypingEnabled4Zhuyin = true
+    defer {
+      testHandler.prefs.furiousTypingEnabled4Zhuyin = false
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    let spaceEvent = KBEvent.KeyEventData.spaceEvent.asEvent
+    #expect(testHandler.triageInput(event: spaceEvent))
+    #expect(
+      testSession.recentCommissions == [" "],
+      "第一拍應逕遞交一個半形空白，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.isEmpty,
+      "值 -1 於混打啟用時不得把空白插進組字器，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+
+    #expect(testHandler.triageInput(event: spaceEvent))
+    #expect(
+      testSession.recentCommissions == [" ", " "],
+      "第二拍應再遞交一個半形空白（修復前為一次遞交 `\"  \"`），實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  /// 承上之反面：值 -1 之降級**只**以混打層生效為前提。混打關閉時該值原樣透出，
+  /// 故「空白鍵往組字器插入空白」之語義不受本處置影響（其行為見
+  /// `InputHandlerTests_Composition` 之 `IH-Composition-013` 起）。
+  @Test("IH-MixedAlnum-071 Effective space preference keeps -1 when mixed mode is off")
+  func test_IH_MixedAlnum_071_EffectiveSpacePreferenceKeepsMinusOneWhenMixedModeIsOff() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    #expect(
+      testHandler.effectiveSpaceKeyBehaviorAgainstICB == 0,
+      "混打層生效時值 -1 應讀作 0，實際得到 \(testHandler.effectiveSpaceKeyBehaviorAgainstICB)"
+    )
+
+    testHandler.prefs.mixedAlphanumericalEnabled = false
+    #expect(
+      testHandler.effectiveSpaceKeyBehaviorAgainstICB == -1,
+      "混打關閉時值 -1 應原樣透出，實際得到 \(testHandler.effectiveSpaceKeyBehaviorAgainstICB)"
+    )
+  }
+
   // MARK: - Test harness
 
   private struct MixedBufferExitScenario: Sendable {

@@ -528,8 +528,9 @@
 "i18n:UserDef.kShowReverseLookupInCandidateUI.shortTitle" = "Show available reverse-lookup results in candidate window";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.description" = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.shortTitle" = "Show translated strokes in composition buffer";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "Determines whether the Space key opens the candidate window, inserts a space, or revolves candidates.\nWhen \"Revolve candidates\" is selected, Shift+Space will revolve candidates in the reverse direction.";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "Insert space";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "Determines whether the Space key opens the candidate window, inserts a space, revolves candidates, or inserts a space into the inline composition buffer.\nWhen \"Revolve candidates\" is selected, Shift+Space will revolve candidates in the reverse direction.\nWhen \"Insert space (into composition buffer)\" is selected, Shift+Space will insert a full-width space.\nWhile \"Enable mixed Chinese-English typing fallback\" is on, \"Insert space (into composition buffer)\" is read as \"Commit current content, then insert space\".\nWhen the composition buffer is empty, the Space key always sends a space character directly (this option does not change that): \"Insert space (into composition buffer)\" only inserts into the buffer once it already has content.";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.-1" = "Insert space (into composition buffer)";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "Commit current content, then insert space";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.1" = "Call candidate window";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.2" = "Revolve candidates (forward direction)";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.shortTitle" = "Space key behavior against inline composition buffer:";

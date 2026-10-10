@@ -158,8 +158,14 @@ extension InputHandlerProtocol {
         switch state.type {
         case .ofEmpty:
           if !input.isHoldingAny([.option, .control, .command]) {
-            // 一般打字且組字區為空時：不帶 Shift 的空白鍵恆插入半形空白字元；
-            // 帶 Shift 者之寬度由偏好決定（預設全形，與舊行為一致）。
+            // ★ P294：組字區**徹底為空**時，空白鍵之語義一概與值 0 看齊——即「無內容可遞交，
+            //   故逕出空白字元」：Space 恆出半形、Shift+Space 之寬度由
+            //   `specifyShiftSpaceKeyBehavior4EmptyState` 決定（預設全形）。此為**不分偏好值**之
+            //   定則（事主指示）：值 `-1`（「插入空白字元（內文組字區）」）於此**不**插入
+            //   `_SPACE_HW`／`_SPACE_FW`——否則「空組字區按一下空白鍵」會留下一個待遞交之空白
+            //   節點，令同一顆鍵在第一拍與第二拍分屬兩種語義（實測會生出「一次遞交兩個空白
+            //   字元」之怪異結果）。插入語義只在**組字區已有內容**時成立（見下方 `.ofInputting`
+            //   之 -1 分支）。
             let wantsHalfWidth = !input.isShiftHeld
               || prefs.specifyShiftSpaceKeyBehavior4EmptyState
             session.switchState(State.ofCommitting(textToCommit: wantsHalfWidth ? " " : "　"))
@@ -183,7 +189,7 @@ extension InputHandlerProtocol {
           let spaceRevolutionBanned = !composer.isEmpty
           // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
           // Space 鍵就地輪替候選字（對應 spaceKeyBehaviorAgainstICB == 2）。
-          if prefs.spaceKeyBehaviorAgainstICB == 2,
+          if effectiveSpaceKeyBehaviorAgainstICB == 2,
              input.keyModifierFlags.intersection([.control, .command, .option]).isEmpty,
              !spaceRevolutionBanned {
             // 此時 Shift+Space 反向輪替，仿 Shift+Tab 行為。
@@ -193,7 +199,11 @@ extension InputHandlerProtocol {
               softRevolve: prefs.preferredRevolverForceLevel != 0
             )
           }
-          if input.isShiftHeld, !input.isHoldingAny([.control, .option]), !spaceRevolutionBanned {
+          // ★ P294：值 -1 之下 Shift+Space 之語義為「插入全形空白至內文組字區」，
+          // 故不套用本處的「反向輪替」——否則下方新增的 -1 分支永遠輪不到 Shift+Space
+          // （本塊在它之前、且 Shift 一按下即無條件命中）。
+          if input.isShiftHeld, !input.isHoldingAny([.control, .option]), !spaceRevolutionBanned,
+             effectiveSpaceKeyBehaviorAgainstICB != -1 {
             return revolveCandidate(
               reverseOrder: input.isCommandHeld,
               softRevolve: prefs.preferredRevolverForceLevel != 0
@@ -221,6 +231,27 @@ extension InputHandlerProtocol {
              !mixedAlphanumericalBuffer.isEmpty || mixedAlnumConfig.isLatchedToAlnum {
             if let result = MixedAlphanumericalTypewriter(self).handle(input) {
               return result
+            }
+          }
+          // P294：`kSpaceKeyBehaviorAgainstICB == -1` ⇒ 空白鍵往內文組字區插入空白字元
+          // （Space ⇒ `_SPACE_HW` 半形、Shift+Space ⇒ `_SPACE_FW` 全形）。
+          // ★ 本分支置於混打委派之後、且判準取 `effectiveSpaceKeyBehaviorAgainstICB`：
+          //   中英混打層生效時 `-1` 一律讀作 `0`，故本分支在混打啟用時**恆不成立**——
+          //   空白鍵一律歸混打層之既有語義（見 `effectiveSpaceKeyBehaviorAgainstICB` 之註：
+          //   二者併存會令同一顆空白鍵生出互斥之雙重解讀）。
+          // ★ 組字區**徹底為空**（`assembler.isEmpty`）時亦不成立：此時一概與值 0 看齊，
+          //   逕出空白字元（見 `.ofEmpty` 之註；此即事主所定之定則，`-1` 亦不例外）。
+          // ★ 注拼槽尚有未完成讀音（`spaceRevolutionBanned`）時亦不適用：此時無法把空白節點
+          //   插在未完成讀音之前，故落回下方既有語義（先遞交當前內容、再插入空白字元）。
+          if effectiveSpaceKeyBehaviorAgainstICB == -1, !spaceRevolutionBanned,
+             !assembler.isEmpty, let spaceKey = virtualSpaceKey(for: input) {
+            if (try? assembler.insertKey(spaceKey)) != nil {
+              // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
+              let textToCommit = commitOverflownComposition
+              var inputting = generateStateOfInputting()
+              inputting.textToCommit = textToCommit
+              session.switchState(inputting)
+              return true
             }
           }
           if assembler.cursor < assembler.length, (try? assembler.insertKey(" ")) != nil {
@@ -402,5 +433,19 @@ extension InputHandlerProtocol {
     guard let session else { return }
     guard session.state.hasComposition || !isComposerOrCalligrapherEmpty else { return }
     session.resetInputHandler()
+  }
+
+  /// 依當下修飾鍵決定「空白鍵插入內文組字區」時要採用的虛擬索引鍵。
+  ///
+  /// 僅在 `kSpaceKeyBehaviorAgainstICB == -1` 時有意義：不帶 Shift 者為半形空白
+  /// （`_SPACE_HW`）、帶 Shift 者為全形空白（`_SPACE_FW`）。這兩把鍵的單元圖由
+  /// `LXAssembly.LXFacade` 就地合成，辭典內查無此鍵。
+  /// - Parameter input: 輸入訊號。
+  /// - Returns: 虛擬索引鍵；呼叫方持有 Option／Control／Command 等修飾鍵時回傳 `nil`。
+  private func virtualSpaceKey(for input: InputSignalProtocol) -> String? {
+    guard !input.isHoldingAny([.option, .control, .command]) else { return nil }
+    return input.isShiftHeld
+      ? LXAssembly.VirtualSpaceKey.fullWidth.rawValue
+      : LXAssembly.VirtualSpaceKey.halfWidth.rawValue
   }
 }

@@ -528,8 +528,9 @@
 "i18n:UserDef.kShowReverseLookupInCandidateUI.shortTitle" = "候補陳列ウィンドウで可能な逆引参照結果を示す";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.description" = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.shortTitle" = "原始キーネームでなく、筆画を入力緩衝列で表示する";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "スペースキーで入力候補を呼び出すか、空白を挿入するか、候補を順送りするかを指定します。\n「候補を順送り」を選択している場合、Shift+Space で逆方向に順送りします。";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "空白を挿入";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "スペースキーで入力候補を呼び出すか、空白を挿入するか、候補を順送りするか、組込中の緩衝列に空白を挿入するかを指定します。\n「候補を順送り」を選択している場合、Shift+Space で逆方向に順送りします。\n「組込緩衝列に空白を挿入」を選択している場合、Shift+Space で全角空白を挿入します。\nただし「中英混在入力のフォールバック」が有効な間は、「組込緩衝列に空白を挿入」を「現在の内容を送り出してから空白を挿入」と読み替えます。\n組込緩衝列が空のときは、スペースキーは常に空白文字をそのまま送出します（本項目による違いはありません）：「組込緩衝列に空白を挿入」が実際に緩衝列へ挿入するのは、既に内容がある場合に限られます。";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.-1" = "組込緩衝列に空白を挿入";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "現在の内容を送り出してから空白を挿入";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.1" = "候補陳列ウィンドウを呼び出す";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.2" = "候補を順送り";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.shortTitle" = "Space キーが組込中の緩衝列に対する振る舞い:";

@@ -449,6 +449,46 @@ test('題庫：五個來源刻意啟用左右 Shift 切換英數（事主 2026-0
   assert.strictEqual(oldStarter.keys.indexOf('TogglingAlphanumericalModeWithRShift'), -1);
 });
 
+test('題庫：空白鍵對內文組字區之行為——逐來源規範（事主 2026-10-10 裁定）', function () {
+  const { VCA } = loadCore();
+  const question = VCA.allQuestionsFor({ origin: 'newbie', typing: 'unsure' }, null)
+    .filter(function (q) { return q.id === 'kSpaceKeyBehaviorAgainstICB'; })[0];
+  assert.ok(question, '題庫應有 kSpaceKeyBehaviorAgainstICB 一題');
+  assert.strictEqual(question.entry.type, 'integer');
+  assert.strictEqual(question.entry.default, 1, '該鍵之出廠預設值應為「呼出選字窗」（1）');
+  // 規範：注音系諸源（含新酷音所歸之 OpenVanilla 一列）之空白鍵直覺即出廠預設值，
+  // 故助手**不用故意套用**、一律不表態；惟微軟新注音 ⇒ -1、自然輸入法 ⇒ 2。
+  const named = { msnewphonetic: -1, goingime: 2 };
+  for (const origin of ALL_ORIGIN) {
+    for (const typing of ALL_TYPING) {
+      const expected = Object.prototype.hasOwnProperty.call(named, origin) ? named[origin] : null;
+      assert.strictEqual(VCA.effectiveRecommended(question, { origin: origin, typing: typing }), expected,
+        origin + '/' + typing + ' 之空白鍵行為不符裁定');
+    }
+  }
+});
+
+test('起始配置：注音系諸源之空白鍵行為不用故意套用（值即出廠預設、屬「回歸」段）', function () {
+  const { VCA } = loadCore();
+  const key = 'SpaceKeyBehaviorAgainstICB';
+  // 事主清單之六源：macOS 內建注音／奇摩／小麥注音／新酷音（歸 OpenVanilla）／漢音／OpenVanilla。
+  for (const origin of ['macoszhuyin', 'kimo', 'mcbpmf', 'ov', 'hanin']) {
+    const starter = VCA.starterFor({ origin: origin, typing: 'zhuyin' }, 2700);
+    assert.strictEqual(starter.values[key], 1, origin + ' 之起始配置應以出廠預設值 1 收束該鍵');
+    assert.strictEqual(starter.namedKeys.indexOf(key), -1, origin + ' 不應指名該鍵');
+    assert.ok(starter.resetKeys.indexOf(key) >= 0, origin + ' 之該鍵應列於「回歸出廠預設」段');
+  }
+  // 兩例外屬「指名」段（其值非出廠預設，故須寫入配置）。
+  const exceptions = { msnewphonetic: -1, goingime: 2 };
+  for (const origin of Object.keys(exceptions)) {
+    const starter = VCA.starterFor({ origin: origin, typing: 'zhuyin' }, 2700);
+    assert.strictEqual(starter.values[key], exceptions[origin],
+      origin + ' 之起始配置應指名 ' + exceptions[origin]);
+    assert.ok(starter.namedKeys.indexOf(key) >= 0, origin + ' 應指名該鍵');
+    assert.strictEqual(starter.resetKeys.indexOf(key), -1, origin + ' 不應將該鍵列入回歸段');
+  }
+});
+
 test('題庫：選字鍵之逐來源預設值（事主 2026-09-25 裁定）', function () {
   const { VCA } = loadCore();
   // 事主之清單：微軟新注音／ㄅ半／小麥注音／奇摩／OpenVanilla／自然／華碩 ⇒ 123456789；

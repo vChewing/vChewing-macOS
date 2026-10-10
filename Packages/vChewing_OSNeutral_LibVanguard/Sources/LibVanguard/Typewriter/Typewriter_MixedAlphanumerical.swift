@@ -91,10 +91,14 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 該旗子另兼「回退與注音狂打並存」之閘：並存時不帶 Shift 之空白鍵一概不走本分支之第二款
     // ——待調讀音者由 `handle` 開頭之陰平確認分支處置，其餘各態者由分診早段先固化讀音
     // （見 `InputHandler_TriageInput`）。
+    // ★ 判準取 `effectiveSpaceKeyBehaviorAgainstICB`（而非 `prefs` 之原值）：混打層既已生效，
+    //   值 `-1`（「插入空白字元（內文組字區）」）即讀作 `0`——本分支遂一體適用，該值之下
+    //   空白鍵不再走 auto-split（詳見該屬性之註：`-1` 與混打層爭奪同一顆空白鍵會生出
+    //   「一次遞交兩個空白字元」之怪異結果）。
     let commitsWholeMixedBufferOnSpace = input.isShiftHeld
       || (
         !handler.mixedAlphanumericalBuffer.isEmpty
-          && handler.prefs.spaceKeyBehaviorAgainstICB == 0
+          && handler.effectiveSpaceKeyBehaviorAgainstICB == 0
           && !handler.mixedAlnumBufferIsTonelessReading
       )
     if input.isSpace, commitsWholeMixedBufferOnSpace {

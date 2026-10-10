@@ -29,7 +29,7 @@
   "UseShiftQuestionToCallServiceMenu": true,
   "UseDynamicCandidateWindowOrigin": true,
   "UseHorizontalCandidateList": false,
-  "SpaceKeyBehaviorAgainstICB": 1,
+  "SpaceKeyBehaviorAgainstICB": -1,
   "MixedAlphanumericalEnabled": false,
   "MixedAlnumJudgeReadingsBySequentialRawKeyOrder": true,
   "EnableLatchedAlnumStateInMixedAlnumMode": false,
