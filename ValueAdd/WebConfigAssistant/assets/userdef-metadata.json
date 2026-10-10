@@ -1404,19 +1404,19 @@
       "key" : "kSpaceKeyBehaviorAgainstICB",
       "labels" : {
         "en" : {
-          "description" : "Determines whether the Space key opens the candidate window, inserts a space, or revolves candidates.\nWhen \"Revolve candidates\" is selected, Shift+Space will revolve candidates in the reverse direction.",
+          "description" : "Determines whether the Space key opens the candidate window, inserts a space, revolves candidates, or inserts a space into the inline composition buffer.\nWhen \"Revolve candidates\" is selected, Shift+Space will revolve candidates in the reverse direction.\nWhen \"Insert space (into composition buffer)\" is selected, Shift+Space will insert a full-width space.\nWhile \"Enable mixed Chinese-English typing fallback\" is on, \"Insert space (into composition buffer)\" is read as \"Commit current content, then insert space\".\nWhen the composition buffer is empty, the Space key always sends a space character directly (this option does not change that): \"Insert space (into composition buffer)\" only inserts into the buffer once it already has content.",
           "shortTitle" : "Space key behavior against inline composition buffer:"
         },
         "ja" : {
-          "description" : "スペースキーで入力候補を呼び出すか、空白を挿入するか、候補を順送りするかを指定します。\n「候補を順送り」を選択している場合、Shift+Space で逆方向に順送りします。",
+          "description" : "スペースキーで入力候補を呼び出すか、空白を挿入するか、候補を順送りするか、組込中の緩衝列に空白を挿入するかを指定します。\n「候補を順送り」を選択している場合、Shift+Space で逆方向に順送りします。\n「組込緩衝列に空白を挿入」を選択している場合、Shift+Space で全角空白を挿入します。\nただし「中英混在入力のフォールバック」が有効な間は、「組込緩衝列に空白を挿入」を「現在の内容を送り出してから空白を挿入」と読み替えます。\n組込緩衝列が空のときは、スペースキーは常に空白文字をそのまま送出します（本項目による違いはありません）：「組込緩衝列に空白を挿入」が実際に緩衝列へ挿入するのは、既に内容がある場合に限られます。",
           "shortTitle" : "Space キーが組込中の緩衝列に対する振る舞い:"
         },
         "zh-Hans" : {
-          "description" : "指定空白键是呼出选字窗、插入空白字元、还是轮替候选字。\n选择「轮替候选字」时，Shift+Space 会反向轮替。",
+          "description" : "指定空白键是呼出选字窗、插入空白字元、轮替候选字、还是将空白字元插入内文组字区。\n选择「轮替候选字」时，Shift+Space 会反向轮替。\n选择「插入空白字元（内文组字区）」时，Shift+Space 会插入全形空白。\n惟启用「中英混合输入回退」时，「插入空白字元（内文组字区）」概以「先递交当前内容、再插入空白字元」解读。\n组字区为空时，空白键一概直接送出空白字元（不因本选项而异）：「插入空白字元（内文组字区）」只在组字区已有内容时才把空白插进组字区。",
           "shortTitle" : "空白键对内文组字区的行为:"
         },
         "zh-Hant" : {
-          "description" : "指定空白鍵是呼出選字窗、插入空白字元、還是輪替候選字。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。",
+          "description" : "指定空白鍵是呼出選字窗、插入空白字元、輪替候選字、還是將空白字元插入內文組字區。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。\n選擇「插入空白字元（內文組字區）」時，Shift+Space 會插入全形空白。\n惟啟用「中英混合輸入回退」時，「插入空白字元（內文組字區）」概以「先遞交當前內容、再插入空白字元」解讀。\n組字區為空時，空白鍵一概直接送出空白字元（不因本選項而異）：「插入空白字元（內文組字區）」只在組字區已有內容時才把空白插進組字區。",
           "shortTitle" : "空白鍵對內文組字區的行為:"
         }
       },
@@ -1425,12 +1425,22 @@
       "minimumOS" : 10.9,
       "options" : [
         {
+          "i18nKey" : "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.-1",
+          "labels" : {
+            "en" : "Insert space (into composition buffer)",
+            "ja" : "組込緩衝列に空白を挿入",
+            "zh-Hans" : "插入空白字元（内文组字区）",
+            "zh-Hant" : "插入空白字元（內文組字區）"
+          },
+          "value" : -1
+        },
+        {
           "i18nKey" : "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0",
           "labels" : {
-            "en" : "Insert space",
-            "ja" : "空白を挿入",
-            "zh-Hans" : "插入空白字元",
-            "zh-Hant" : "插入空白字元"
+            "en" : "Commit current content, then insert space",
+            "ja" : "現在の内容を送り出してから空白を挿入",
+            "zh-Hans" : "先递交当前内容、再插入空白字元",
+            "zh-Hant" : "先遞交當前內容、再插入空白字元"
           },
           "value" : 0
         },
@@ -1457,7 +1467,7 @@
       ],
       "optionsKind" : "labels",
       "range" : [
-        0,
+        -1,
         2
       ],
       "rawValue" : "SpaceKeyBehaviorAgainstICB",
@@ -1598,11 +1608,11 @@
       "key" : "kFuriousTypingEnabled4Pinyin",
       "labels" : {
         "en" : {
-          "description" : "This mode accommodates users who want to type pinyin continuously from incomplete readings. Only takes effect with pinyin keyboards (any pinyin layout); cassette mode, SCPC (select-candidate-per-character) mode, and the code-point \/ Hanin keyboard symbol \/ Roman-numeral input methods are excluded. When enabled, you can type pinyin continuously without confirming each syllable with a tone key or the space bar. Pending pinyin is assembled into a whole-sentence guess by the language model and previewed inline, with the tail candidate window shown alongside -- press Shift + a selection key to choose in place; while previewing, the raw letters are shown in a tooltip (automatically suppressed while the candidate window is visible, to avoid overlap). During the Furious Pinyin preview, pressing the space bar inserts the current reading into the composing buffer (and no longer rotates candidates); while a reading is still pending, pressing Enter likewise only solidifies the current reading (or confirms the highlighted candidate) and stays in the composing state -- press Enter again once the buffer is empty to commit the whole sentence. This mode filters out the zhuyinwen (Zhuyin-symbol strings) entries in the factory dictionary.",
+          "description" : "This mode accommodates users who want to type pinyin continuously from incomplete readings. Only takes effect with pinyin keyboards (any pinyin layout); cassette mode, SCPC (select-candidate-per-character) mode, and the code-point \/ Hanin keyboard symbol \/ Roman-numeral input methods are excluded. When enabled, you can type pinyin continuously without confirming each syllable with a tone key or the space bar. Pending pinyin is assembled into a whole-sentence guess by the language model and previewed inline, with the tail candidate window shown alongside -- press Shift + a selection key to choose in place; while previewing, the raw letters are shown in a tooltip (automatically suppressed while the candidate window is visible, to avoid overlap). During the Furious Pinyin preview, pressing the space bar inserts the current reading into the composing buffer (and no longer revolves candidates); while a reading is still pending, pressing Enter likewise only solidifies the current reading (or confirms the highlighted candidate) and stays in the composing state -- press Enter again once the buffer is empty to commit the whole sentence. This mode filters out the zhuyinwen (Zhuyin-symbol strings) entries in the factory dictionary.",
           "shortTitle" : "Enable Furious Pinyin (continuous pinyin)"
         },
         "ja" : {
-          "description" : "この機能は、不完全な読みのまま連続して弁音を入力したいユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。弁音狂打ちプレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補のローテーションは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。",
+          "description" : "この機能は、不完全な読みのまま連続して弁音を入力したいユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。弁音狂打ちプレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補の順送りは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。",
           "shortTitle" : "弁音狂打ちを有効化（連続弁音入力）"
         },
         "zh-Hans" : {

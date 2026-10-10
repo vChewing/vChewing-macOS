@@ -62,6 +62,15 @@ const SCENARIOS = [
     fillAllPages: false,
     manualAnswers: {},
   },
+  {
+    name: 'starter-goingime',
+    title: '自然輸入法轉唯音（起始配置）',
+    description: '由唯音輸入法配置助手生成：自然輸入法之用戶，套用助手建議之起始配置。',
+    profile: { origin: 'goingime', typing: 'zhuyin' },
+    starter: true,
+    fillAllPages: false,
+    manualAnswers: {},
+  },
 ];
 
 function loadCore() {

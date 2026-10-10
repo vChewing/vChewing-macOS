@@ -1870,7 +1870,10 @@ extension InputHandlerProtocol {
     let bannedModifiers: KBEvent.ModifierFlags = [.option, .shift, .command, .control]
     let noBannedModifiers = !input.isHoldingAny(bannedModifiers)
     var triggered = input.isCursorClockLeft || input.isCursorClockRight
-    triggered = triggered || (input.isSpace && prefs.spaceKeyBehaviorAgainstICB == 1)
+    // 判準取 `effectiveSpaceKeyBehaviorAgainstICB`（而非 `prefs` 之原值）：中英混打層生效時
+    // 值 `-1` 一律讀作 `0`，故不落入本處之「空白鍵呼叫選字窗」——那正是 `-1` 不得與混打層
+    // 爭奪同一顆空白鍵之另一處落實（詳見該屬性之註）。
+    triggered = triggered || (input.isSpace && effectiveSpaceKeyBehaviorAgainstICB == 1)
     triggered = triggered || input.isPageDown || input.isPageUp
     triggered = triggered || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     guard notEmpty, noBannedModifiers, triggered else { return false }

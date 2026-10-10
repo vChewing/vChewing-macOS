@@ -528,8 +528,9 @@
 "i18n:UserDef.kShowReverseLookupInCandidateUI.shortTitle" = "在選字窗內顯示可用的字根反查結果";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.description" = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.shortTitle" = "在組字區內顯示字根、而非原始鍵盤碼";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "指定空白鍵是呼出選字窗、插入空白字元、還是輪替候選字。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "插入空白字元";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "指定空白鍵是呼出選字窗、插入空白字元、輪替候選字、還是將空白字元插入內文組字區。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。\n選擇「插入空白字元（內文組字區）」時，Shift+Space 會插入全形空白。\n惟啟用「中英混合輸入回退」時，「插入空白字元（內文組字區）」概以「先遞交當前內容、再插入空白字元」解讀。\n組字區為空時，空白鍵一概直接送出空白字元（不因本選項而異）：「插入空白字元（內文組字區）」只在組字區已有內容時才把空白插進組字區。";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.-1" = "插入空白字元（內文組字區）";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "先遞交當前內容、再插入空白字元";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.1" = "呼出選字窗";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.2" = "輪替候選字（正向順延）";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.shortTitle" = "空白鍵對內文組字區的行為:";

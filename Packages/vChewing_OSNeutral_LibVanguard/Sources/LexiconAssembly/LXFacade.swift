@@ -11,6 +11,34 @@ import TrieKit
 extension LXAssembly {
   typealias ScoreAssigner = (CandidateInState?) -> Double
 
+  /// 空白鍵插入內文組字區時所使用之虛擬索引鍵。
+  ///
+  /// 這兩把鍵不由辭典供給，而是由 `LXFacade` 就地合成對應的單元圖
+  /// （見 `LXFacade.unigramsFor(keyArray:partiallyMatch:)`）。之所以不讓呼叫方
+  /// 直接把空白字元塞進組字區，而另行取用虛擬鍵，是為了讓組字區內的空白字元
+  /// 享有與其它節點完全相同的組字器語義：可被游標移動、可與前後文一同遞交、
+  /// 且不會被誤認為「用於分隔讀音的實際空格」。
+  ///
+  /// - Remark: 這兩把鍵與 `_punctuation_list` 同屬「保留給輸入法內部使用的虛擬鍵」，
+  ///   但在資料來源上不同：`_punctuation_list` 由原廠辭典實際持有，
+  ///   而 `_SPACE_HW` / `_SPACE_FW` 純粹由程式就地合成、辭典內查無此鍵。
+  public enum VirtualSpaceKey: String, CaseIterable, Sendable {
+    /// 半形空白：由 `Space` 鍵插入。
+    case halfWidth = "_SPACE_HW"
+    /// 全形空白：由 `Shift` + `Space` 鍵插入。
+    case fullWidth = "_SPACE_FW"
+
+    // MARK: Public
+
+    /// 該虛擬鍵所對應的實際空白字元。
+    public var charValue: String {
+      switch self {
+      case .halfWidth: " "
+      case .fullWidth: "　"
+      }
+    }
+  }
+
   /// 語言模組副本化模組（LXFacade）自身統籌且整理來自
   /// 其它子模組的資料（包括使用者片語、繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
@@ -734,6 +762,17 @@ extension LXAssembly {
     /// 漸退記憶模組。全體已回歸 MainActor，故直接以 stored property 承載。
     var lxPerceptor: LXPerceptor
 
+    /// 針對虛擬空白鍵就地合成單元圖；給定的索引鍵陣列不是虛擬空白鍵時回傳 `nil`。
+    ///
+    /// 合成的單元圖不進入 LRU 快取、亦不走濾除表等後處理步驟：它與
+    /// `flatKeyArray == [" "]` 的既有特例同屬「由程式直接指定輸出值」的情形。
+    static func virtualSpaceGram(forKeyArray keyArray: [String]) -> Homa.Gram? {
+      guard keyArray.count == 1, let theKey = keyArray.first,
+            let virtualSpaceKey = LXAssembly.VirtualSpaceKey(rawValue: theKey)
+      else { return nil }
+      return .init(keyArray: keyArray, value: virtualSpaceKey.charValue)
+    }
+
     // MARK: - 核心函式（對外）
 
     func hasAssociatedPhrasesFor(pair: Homa.CandidatePair) -> Bool {
@@ -779,6 +818,10 @@ extension LXAssembly {
       guard keyChain != " ", !keyChain.isEmpty else { return keyChain == " " }
       let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return false }
+
+      // 虛擬空白鍵（`_SPACE_HW` / `_SPACE_FW`）的單元圖由本層就地合成，辭典內查無此鍵，
+      // 故在此直接承認其存在——否則 Homa.Assembler.insertKey() 會以 givenKeyHasNoResults 落空。
+      if LXAssembly.VirtualSpaceKey(rawValue: keyChain) != nil { return true }
 
       // MARK: 原廠辭典快速檢查
 
@@ -901,6 +944,10 @@ extension LXAssembly {
       /// 給空白鍵指定輸出值。
       let asciiSpace = " "
       if flatKeyArray == [asciiSpace] { return [.init(keyArray: flatKeyArray, value: asciiSpace)] }
+      /// 給虛擬空白鍵指定輸出值：`_SPACE_HW` ⇒ 半形空白、`_SPACE_FW` ⇒ 全形空白。
+      if let virtualSpaceGram = Self.virtualSpaceGram(forKeyArray: flatKeyArray) {
+        return [virtualSpaceGram]
+      }
       // 檢查 LRU 快取
       let fingerprint = currentGramCacheFingerprint
       if fingerprint != unigramCacheFingerprint {

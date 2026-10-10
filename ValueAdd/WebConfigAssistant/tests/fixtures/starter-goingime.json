@@ -1,0 +1,25 @@
+{
+  "__UserDefMeta": {
+    "title": "自然輸入法轉唯音（起始配置）",
+    "description": "由唯音輸入法配置助手生成：自然輸入法之用戶，套用助手建議之起始配置。"
+  },
+  "CheckUpdateAutomatically": false,
+  "KeyboardParser4Pinyin": 100,
+  "EnforceSingleLineCandidateWindowLayout4SCPC": true,
+  "UseRearCursorMode": false,
+  "UseHorizontalCandidateList": true,
+  "SpaceKeyBehaviorAgainstICB": 2,
+  "CassetteEnabled": false,
+  "MixedAlphanumericalEnabled": false,
+  "FuriousTypingEnabled4Pinyin": true,
+  "FuriousTypingEnabled4Zhuyin": false,
+  "SuppressFactoryUnigramsOfKanaSyllables": false,
+  "SpecifyIntonationKeyBehavior": 0,
+  "UseSCPCTypingMode": false,
+  "AlsoConfirmAssociatedCandidatesByEnter": false,
+  "TogglingAlphanumericalModeWithLShift": true,
+  "TogglingAlphanumericalModeWithRShift": true,
+  "ClassicHaninKeyboardSymbolModeShortcutEnabled": false,
+  "CandidateKeys": "123456789",
+  "AssociatedPhrasesEnabled": false
+}

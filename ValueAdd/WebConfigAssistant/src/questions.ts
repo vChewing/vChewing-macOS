@@ -412,6 +412,21 @@ namespace VCA {
       // 《新手上路》：「開啟更新檢查：在『一般設定』勾選『自動檢查軟體更新』」。
       // 只對「全新使用者」來源給此推薦——該文即 `newbie` 之來源文章。
       return { value: null, typing: null, origin: { newbie: true } };
+    case "kSpaceKeyBehaviorAgainstICB":
+      // **本鍵之逐來源規範（事主 2026-10-10 裁定；助手不自作增刪）**：
+      //   · 出廠預設 `1`（「呼出選字窗」）即注音系諸源之空白鍵直覺，故 `macoszhuyin`、`kimo`、
+      //     `mcbpmf`、`ov`（OpenVanilla；新酷音於本助手無專屬選項，歸此列）、`hanin` **一律
+      //     不表態**——其值即出廠預設，**不用故意套用**（起始配置之「回歸」段自會寫入 `1`）。
+      //   · `msnewphonetic` ⇒ `-1`（「插入空白字元（內文組字區）」）：微軟新注音之使用者習慣以
+      //     空白鍵在組字區內補空格（游標定位、詞間留白），與「先遞交再插空白」或「呼出選字窗」
+      //     皆不合（事主 2026-10-10 指示：「配置助手得對微軟新注音方案啟用該行為」）。
+      //   · `goingime` ⇒ `2`（「輪替候選字（正向順延）」）：自然輸入法之使用者習慣以空白鍵就地
+      //     順延候選字，而非呼出選字窗。
+      //
+      // 註：值 `-1` 於**中英混合輸入回退**啟用時**一律以值 `0` 解讀**（見 `UserDef` 與
+      // `effectiveSpaceKeyBehaviorAgainstICB` 之說明，及 Phase 294 記錄）——該處置為事主
+      // 於 P294 驗收時所明示，助手不為此另做處置（推薦值仍為 `-1`，由執行期自行降級）。
+      return { value: null, typing: null, origin: { msnewphonetic: -1, goingime: 2 } };
     default:
       return none;
     }

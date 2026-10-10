@@ -724,4 +724,223 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       #expect(testHandler.assembler.assembledSentence.map(\.value) == ["水果汁"])
     }
   }
+
+  // MARK: - 空白鍵插入內文組字區（`spaceKeyBehaviorAgainstICB == -1`，P294）
+
+  /// ★ **組字區徹底為空時，值 -1 一概與值 0 看齊**（事主定則，P294）：按空白鍵即逕出半形
+  /// 空白、**不得**以 `_SPACE_HW` 在組字器內留下一個待遞交的節點。
+  ///
+  /// 這條定則之來由：若空組字區時把空白插進組字器，同一顆空白鍵在第一拍（插節點）與第二拍
+  /// （該節點令 `isConsideredEmptyForNow` 為假、遂被混打／狂打層當成「已有內容」而一次遞交）
+  /// 便分屬兩種語義，實測會生出「一次遞交兩顆空白」之怪異結果。插入語義只在**組字區已有
+  /// 內容**時成立（見 015／016）；此亦與微軟新注音之實際行為一致（事主實測確認）。
+  @Test("IH-Composition-013 Empty buffer Space commits half-width space immediately")
+  func test_IH_Composition_013_EmptyBufferSpaceCommitsHalfWidthSpaceImmediately() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(testHandler.assembler.isEmpty)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testHandler.assembler.isEmpty,
+      "空組字區按空白鍵不得以 `_SPACE_HW` 留下節點，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(testSession.recentCommissions == [" "], "空組字區之空白鍵應逕出半形空白字元")
+
+    // 第二拍亦然：兩顆空白＝兩次遞交，不得合併成一次遞交兩顆。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testSession.recentCommissions == [" ", " "],
+      "連按空白鍵應得兩次各一顆空白之遞交，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  /// ★ 空組字區下 Shift+Space 之寬度一概由 `specifyShiftSpaceKeyBehavior4EmptyState` 決定
+  /// （與值 0 之既有語義同一條路徑），**不因值 -1 而異**——即值 -1 在此不插入 `_SPACE_FW`。
+  @Test("IH-Composition-014 Empty buffer Shift+Space follows the empty-state width preference")
+  func test_IH_Composition_014_EmptyBufferShiftSpaceFollowsTheEmptyStateWidthPreference() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    let formerWidthPreference = testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState
+    defer {
+      testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = formerWidthPreference
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var shiftSpace = KBEvent.KeyEventData.spaceEvent
+    shiftSpace.flags = [.shift]
+
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = false
+    #expect(testHandler.triageInput(event: shiftSpace.asEvent))
+    #expect(testHandler.assembler.isEmpty, "空組字區之 Shift+Space 不得插入 `_SPACE_FW`")
+    #expect(testSession.recentCommissions == ["　"], "該偏好為假時應逕出全形空白字元")
+
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4EmptyState = true
+    #expect(testHandler.triageInput(event: shiftSpace.asEvent))
+    #expect(
+      testSession.recentCommissions == ["　", " "],
+      "該偏好為真時應逕出半形空白字元，實際得到 \(testSession.recentCommissions)"
+    )
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  /// 值 -1 之下，組字區已有內容時按空白鍵／Shift+Space：空白應接在既有節點之後
+  /// （而非先遞交既有內容），且 Shift 者為全形（`_SPACE_FW`）、不帶 Shift 者為半形。
+  @Test("IH-Composition-015 Space and Shift+Space append to existing composition buffer content")
+  func test_IH_Composition_015_SpaceAndShiftSpaceAppendToExistingCompositionBufferContent() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    let cleanup = {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄋㄧˇ"], value: "你", score: -1, id: .init()),
+      isFiltering: false
+    )
+    defer { cleanup() }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    typeSentence("su3")
+
+    var shiftSpace = KBEvent.KeyEventData.spaceEvent
+    shiftSpace.flags = [.shift]
+    #expect(testHandler.triageInput(event: shiftSpace.asEvent))
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋㄧˇ", "_SPACE_FW"],
+      "Shift+Space 應以全形 `_SPACE_FW` 接在漢字節點之後，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(testSession.recentCommissions.isEmpty, "值 -1 之下不得先遞交既有內容")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋㄧˇ", "_SPACE_FW", "_SPACE_HW"],
+      "不帶 Shift 者應為半形 `_SPACE_HW`，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(testSession.recentCommissions.isEmpty)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(
+      testSession.recentCommissions == ["你　 "],
+      "漢字與兩顆空白應一次遞交，實際得到 \(testSession.recentCommissions)"
+    )
+  }
+
+  /// 值 -1 之下，組字區內的空白與既有的漢字一同遞交：兩者之間不得被拆成兩次遞交。
+  @Test("IH-Composition-016 Space stays with kanji in a single commit")
+  func test_IH_Composition_016_SpaceStaysWithKanjiInASingleCommit() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    let cleanup = {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄋㄧˇ"], value: "你", score: -1, id: .init()),
+      isFiltering: false
+    )
+    defer { cleanup() }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    typeSentence("su3")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "你")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋㄧˇ", "_SPACE_HW"],
+      "空白應接在漢字節點之後，實際得到 \(testHandler.assembler.actualKeys)"
+    )
+    #expect(testSession.recentCommissions.isEmpty, "值 -1 之下按下空白鍵不得遞交既有內容")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(
+      testSession.recentCommissions == ["你 "],
+      "漢字與空白應一次遞交，實際得到 \(testSession.recentCommissions)"
+    )
+  }
+
+  /// 對照組：值 0（「先遞交當前內容、再插入空白字元」）之下，空組字區按空白鍵仍是**即刻遞交**
+  /// 一顆半形空白字元——既有語義不因新增 -1 而變動。
+  @Test("IH-Composition-017 Value 0 still commits a space immediately")
+  func test_IH_Composition_017_ValueZeroStillCommitsASpaceImmediately() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.spaceEvent.asEvent))
+    #expect(testSession.recentCommissions == [" "])
+    #expect(testHandler.assembler.isEmpty, "值 0 之下空白不得留在組字器內")
+  }
+
+  /// 值 -1 之下，按住 Option／Control／Command 者不屬「插入空白字元」——組字區為空時該鍵
+  /// 應逕行放行給客體（交由系統處置），不得被本偏好攔下。
+  @Test("IH-Composition-018 Space with Command-family modifiers is left to the client")
+  func test_IH_Composition_018_SpaceWithCommandFamilyModifiersIsLeftToTheClient() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = -1
+    defer {
+      testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
+      testHandler.clear()
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var optionSpace = KBEvent.KeyEventData.spaceEvent
+    optionSpace.flags = [.option]
+    #expect(
+      !testHandler.triageInput(event: optionSpace.asEvent),
+      "帶 Option 的空白鍵不屬值 -1 之範疇，應放行給客體"
+    )
+    #expect(testHandler.assembler.isEmpty)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
 }

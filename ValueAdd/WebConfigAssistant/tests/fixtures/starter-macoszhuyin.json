@@ -8,6 +8,7 @@
   "EnforceSingleLineCandidateWindowLayout4SCPC": true,
   "UseRearCursorMode": false,
   "UseHorizontalCandidateList": true,
+  "SpaceKeyBehaviorAgainstICB": 1,
   "CassetteEnabled": false,
   "MixedAlphanumericalEnabled": false,
   "FuriousTypingEnabled4Pinyin": true,
