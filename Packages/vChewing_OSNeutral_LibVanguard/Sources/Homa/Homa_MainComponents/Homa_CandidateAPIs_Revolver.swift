@@ -2,7 +2,7 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// MARK: - Extending Assembler for Candidates (Revolvement).
+// MARK: - Extending Assembler for Candidates (Revolution).
 
 extension Homa.Assembler {
   /// 選字游標種類：選字時是游標在（文字書寫方向上的）前方（macOS 內建注音）、還是在後方（微軟新注音）。

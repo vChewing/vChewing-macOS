@@ -656,8 +656,8 @@ extension HomaTestsRoot {
     }
 
     /// 組字器的候選字輪替測試。
-    @Test("[Homa] Assembler_TestCandidateRevolvementWithConsolidation", arguments: [false, true])
-    func testCandidateRevolvementWithConsolidation(partialMatch: Bool) async throws {
+    @Test("[Homa] Assembler_TestCandidateRevolutionWithConsolidation", arguments: [false, true])
+    func testCandidateRevolutionWithConsolidation(partialMatch: Bool) async throws {
       let rdSimp = "k j g y c s m n j"
       let rdFull = "ke1 ji4 gong1 yuan2 chao1 shang1 mai4 nai3 ji1"
       let readings: String = partialMatch ? rdSimp : rdFull
@@ -702,7 +702,7 @@ extension HomaTestsRoot {
         }
         let partialText: String = partialMatch ? "PartialMatch" : "FullMatch"
         print(
-          "// Testing revolvement (\(partialText)) with CandidateCursorType.\(candidateCursorType)..."
+          "// Testing revolution (\(partialText)) with CandidateCursorType.\(candidateCursorType)..."
         )
         try (0 ... assembler.length).forEach { pos in
           assembler.cursor = pos
@@ -713,9 +713,9 @@ extension HomaTestsRoot {
           var previouslyRevolvedCandidate: CandidateIdentity?
           var debugIntelBuilder = [String]()
           var hasValidatedCandidateTotal = false
-          var revolvementLoopCount = 0
-          let baseRevolvementLoopLimit = 200
-          var revolvementLoopLimit = baseRevolvementLoopLimit
+          var revolutionLoopCount = 0
+          let baseRevolutionLoopLimit = 200
+          var revolutionLoopLimit = baseRevolutionLoopLimit
           var hasUnlockedFullLoop = false
 
           func resolveIdentity(for pair: Homa.CandidatePair) -> CandidateIdentity? {
@@ -739,13 +739,13 @@ extension HomaTestsRoot {
             return CandidateIdentity(pair: pair, gram: matchedGram)
           }
           do {
-            revolvementTaskAtThisPos: while doRevolve {
-              revolvementLoopCount += 1
-              if revolvementLoopCount > revolvementLoopLimit {
+            revolutionTaskAtThisPos: while doRevolve {
+              revolutionLoopCount += 1
+              if revolutionLoopCount > revolutionLoopLimit {
                 Issue.record(
-                  "Exceeded revolvement loop limit (\(revolvementLoopLimit)) at cursor position \(pos)"
+                  "Exceeded revolution loop limit (\(revolutionLoopLimit)) at cursor position \(pos)"
                 )
-                break revolvementTaskAtThisPos
+                break revolutionTaskAtThisPos
               }
               var fetchedCandidates: [Homa.CandidatePairWeighted] = []
               let currentRevolved = try assembler.revolveCandidate(
@@ -760,7 +760,7 @@ extension HomaTestsRoot {
               // 記錄這次的候選字
               let currentRevolvedPair = currentRevolved.0.pair
               guard let identity = resolveIdentity(for: currentRevolvedPair) else {
-                break revolvementTaskAtThisPos
+                break revolutionTaskAtThisPos
               }
               allCandidates.append((currentRevolved.0, identity))
               let newCount = candidateRevolveCounts[identity, default: 0] + 1
@@ -823,8 +823,8 @@ extension HomaTestsRoot {
                   hasValidatedCandidateTotal = true
                   if !hasUnlockedFullLoop {
                     let expectedLoops = currentRevolved.total * minimumRevolvesPerCandidate
-                    if expectedLoops > baseRevolvementLoopLimit {
-                      revolvementLoopLimit = expectedLoops + currentRevolved.total
+                    if expectedLoops > baseRevolutionLoopLimit {
+                      revolutionLoopLimit = expectedLoops + currentRevolved.total
                     }
                     hasUnlockedFullLoop = true
                   }
@@ -835,7 +835,7 @@ extension HomaTestsRoot {
                 Comment(stringLiteral: "\(identity.debugSummary)")
               )
               guard previouslyRevolvedCandidate != identity else {
-                break revolvementTaskAtThisPos
+                break revolutionTaskAtThisPos
               }
               previouslyRevolvedCandidate = identity
               let metMinimumRevolves =
@@ -854,8 +854,8 @@ extension HomaTestsRoot {
     }
 
     /// 組字器的候選字輪替測試——某個罕見情形。
-    @Test("[Homa] Assembler_TestCandidateRevolvementRareCase1")
-    func testCandidateRevolvementRareCase1() async throws {
+    @Test("[Homa] Assembler_TestCandidateRevolutionRareCase1")
+    func testCandidateRevolutionRareCase1() async throws {
       let mockLX = TestLX(rawData: HomaTests.strLXSampleData_JiHuQiKeng)
       let assembler = Homa.Assembler(
         gramQuerier: { mockLX.queryGrams($0) }

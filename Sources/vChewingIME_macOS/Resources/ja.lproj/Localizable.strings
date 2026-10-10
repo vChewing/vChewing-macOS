@@ -119,8 +119,8 @@
 "i18n:KanjiConversionMode.JIS" = "JIS";
 "i18n:KanjiConversionMode.KangXi" = "康熙";
 "i18n:KanjiConversionMode.ModernTrad" = "現代繁体字";
-"i18n:KanjiConversionRevolvement.Notification.Prefix" = "漢字変換";
-"i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv" = "不変換";
+"i18n:KanjiConversionRevolution.Notification.Prefix" = "漢字変換";
+"i18n:KanjiConversionRevolution.Notification.Suffix.NoConv" = "不変換";
 "i18n:KeyboardLayout.AlvinLiuImitative" = "劉又銘擬音注音配列";
 "i18n:KeyboardLayout.AppleABC" = "Apple ABC (Apple U.S. キーボードと同じ)";
 "i18n:KeyboardLayout.AppleChewingDachen" = "Apple 大千注音キーボード";
@@ -442,7 +442,7 @@
 "i18n:UserDef.kForceCassetteChineseConversion.option.2" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
 "i18n:UserDef.kForceCassetteChineseConversion.option.3" = "繁体モードだけの場合、カセットモードの漢字出力転換を";
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁体字・簡体字変換:";
-"i18n:UserDef.kFuriousTypingEnabled4Pinyin.description" = "この機能は、不完全な読みのまま連続して弁音を入力したいユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。弁音狂打ちプレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補のローテーションは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。";
+"i18n:UserDef.kFuriousTypingEnabled4Pinyin.description" = "この機能は、不完全な読みのまま連続して弁音を入力したいユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して入力緩衝列に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。弁音狂打ちプレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補の順送りは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。";
 "i18n:UserDef.kFuriousTypingEnabled4Pinyin.shortTitle" = "弁音狂打ちを有効化（連続弁音入力）";
 "i18n:UserDef.kFuriousTypingEnabled4Zhuyin.description" = "この機能は、不完全な読みのまま連続して注音を入力したいユーザーのために提供されています。注音入力（任意の注音配列）でのみ有効で、弁音側の「弁音狂打ち」とは独立して切り替えられます（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力には適用されません）。有効にすると、注音符号を連続して入力するだけで組句できます。現在の音節を入力し終えたところで次のキーが新しい音節に属する場合、その音節は自動的に組字器へ書き込まれ、音節ごとに声調キーやスペースキーで確定する必要はありません（スペースは本モードでも陰平キーです。前方の読みの確定には Tab／Enter／句読点が使えます）。声母だけの入力も可能です。連続した単一の注音符号は略打ちとして扱われ、候補ウィンドウに語の候補が即時表示されます（長い語が優先。例：ㄍㄋㄋ で「狗男女」）。Shift+選択キーでその場選択でき、未確定の音節は候補ウィンドウの上部に表示されます。中英混在入力のフォールバックも有効にしている場合、その ASCII バッファが本モードの未確定の読みとなります。候補ウィンドウと前方プレビューはそのまま機能し、自動音節分割と略打ちはそのフォールバック側が担います。本モードでは、原廠辞書内の注音文（注音符号の文字列）データを濾過します。";
 "i18n:UserDef.kFuriousTypingEnabled4Zhuyin.shortTitle" = "注音狂打ちを有効化（連続注音入力）";
