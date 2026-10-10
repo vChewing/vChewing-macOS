@@ -489,6 +489,44 @@ test('起始配置：注音系諸源之空白鍵行為不用故意套用（值�
   }
 });
 
+test('題庫：選字窗內之空白鍵——除「全新使用者」外一律指名 true（事主 2026-10-10 裁定）', function () {
+  const { VCA } = loadCore();
+  const question = VCA.allQuestionsFor({ origin: 'newbie', typing: 'unsure' }, null)
+    .filter(function (q) { return q.id === 'kSpecifyShiftSpaceKeyBehavior4CandidateWindow'; })[0];
+  assert.ok(question, '題庫應有 kSpecifyShiftSpaceKeyBehavior4CandidateWindow 一題');
+  assert.strictEqual(question.entry.type, 'bool');
+  assert.strictEqual(question.entry.default, false,
+    '該鍵之出廠預設值應為 false（「Shift+空白鍵 換下一頁，空白鍵 換選下一個候選字」）');
+  // 規範：凡非「全新使用者」之來源一律指名 true（＝「空白鍵 換下一頁，Shift+空白鍵 換選下一個
+  // 候選字」）；「全新使用者」不表態——其無他款肌肉記憶，逕用唯音之出廠值。
+  for (const origin of ALL_ORIGIN) {
+    for (const typing of ALL_TYPING) {
+      const expected = origin === 'newbie' ? null : true;
+      assert.strictEqual(
+        VCA.effectiveRecommended(question, { origin: origin, typing: typing }), expected,
+        origin + '/' + typing + ' 之選字窗空白鍵推薦值不符裁定');
+    }
+  }
+});
+
+test('起始配置：選字窗內之空白鍵除「全新使用者」外皆屬「指名」段（值 true）', function () {
+  const { VCA } = loadCore();
+  const key = 'SpecifyShiftSpaceKeyBehavior4CandidateWindow';
+  for (const origin of ALL_ORIGIN) {
+    const starter = VCA.starterFor({ origin: origin, typing: 'zhuyin' }, 2700);
+    assert.ok(starter.keys.indexOf(key) >= 0, origin + ' 之起始配置應含該鍵（封閉性）');
+    if (origin === 'newbie') {
+      assert.strictEqual(starter.values[key], false, '「全新使用者」應收束於出廠預設 false');
+      assert.strictEqual(starter.namedKeys.indexOf(key), -1, '「全新使用者」不應指名該鍵');
+      assert.ok(starter.resetKeys.indexOf(key) >= 0, '該鍵應列於「回歸出廠預設」段');
+    } else {
+      assert.strictEqual(starter.values[key], true, origin + ' 之起始配置應指名 true');
+      assert.ok(starter.namedKeys.indexOf(key) >= 0, origin + ' 應指名該鍵');
+      assert.strictEqual(starter.resetKeys.indexOf(key), -1, origin + ' 不應將該鍵列入回歸段');
+    }
+  }
+});
+
 test('題庫：選字鍵之逐來源預設值（事主 2026-09-25 裁定）', function () {
   const { VCA } = loadCore();
   // 事主之清單：微軟新注音／ㄅ半／小麥注音／奇摩／OpenVanilla／自然／華碩 ⇒ 123456789；

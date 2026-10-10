@@ -427,6 +427,25 @@ namespace VCA {
       // `effectiveSpaceKeyBehaviorAgainstICB` 之說明，及 Phase 294 記錄）——該處置為事主
       // 於 P294 驗收時所明示，助手不為此另做處置（推薦值仍為 `-1`，由執行期自行降級）。
       return { value: null, typing: null, origin: { msnewphonetic: -1, goingime: 2 } };
+    case "kSpecifyShiftSpaceKeyBehavior4CandidateWindow":
+      // **本鍵之逐來源規範（事主 2026-10-10 裁定；助手不自作增刪）**：除「全新使用者」外，
+      // 各方案一律指名 `true`（＝選項 1「空白鍵 換下一頁，Shift+空白鍵 換選下一個候選字」）。
+      //   · 依據（事主逐款實測）：於選字窗內**單敲空白鍵翻行（下一頁）**係各款輸入法之通例——
+      //     新酷音、macOS 內建注音（以及其餘注音／拼音方案）皆然；反之，**「以 Shift+空白鍵
+      //     控制選字窗內游標行為」係唯音獨有之設計**，故凡有他款肌肉記憶者，皆不應沿用唯音
+      //     之出廠值（出廠 `false`＝「Shift+空白鍵 換下一頁，空白鍵 換選下一個候選字」）。
+      //   · 「全新使用者」**不表態**：其無既有肌肉記憶，逕用唯音之出廠值（`false`）。
+      //
+      // 註：逐字選字（SCPC）模式下，不帶 Shift 之空白鍵**恆**為翻頁（`useSCPCTypingMode` 已令
+      // `effectiveSpecifyShift` 為真，見 `InputHandler_HandleCandidate.swift`），故本推薦值於
+      // `scpc` 之實效落在 Shift+空白鍵之語義。
+      return {
+        value: null, typing: null,
+        origin: {
+          macoszhuyin: true, msnewphonetic: true, kimo: true, mcbpmf: true, ov: true,
+          hanin: true, goingime: true, asus: true, rimezhuyin: true, cin: true, pinyin: true,
+        },
+      };
     default:
       return none;
     }
