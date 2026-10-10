@@ -167,14 +167,19 @@ extension SessionControllerSputnik {
     }
     /// 處理來自 IMK 的鍵盤／滑鼠事件。此為輸入法最核心的 dispatch 路徑。
     /// 對應 `-[IMKInputController handleEvent:client:]`。
+    ///
+    /// - Note: 每次進入此回呼時（解析 session 之前）均留下一行 `EventEntry:` 診斷日誌，
+    ///   以便分辨「事件根本未抵達本行程」與「已抵達、但被路由到別枚 controller」。
     IMKInputSessionController.configureHandlingGivenNullableEvent { evPtr, ctlAddr in
-      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
-        SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "handleEvent")
-        return false
-      }
       let event: NSEvent? = evPtr != 0
         ? Unmanaged<NSEvent>.fromOpaque(UnsafeRawPointer(bitPattern: evPtr)!).takeUnretainedValue()
         : nil
+      let session = SessionControllerSputnik.session(forAddr: ctlAddr)
+      SessionControllerSputnik.logEventEntry(event: event, controllerAddr: ctlAddr, session: session)
+      guard let session else {
+        SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "handleEvent")
+        return false
+      }
       let result = session.handleNSEvent(event)
       if !result, PrefMgr.shared.isDebugModeEnabled {
         let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
@@ -245,6 +250,38 @@ extension SessionControllerSputnik {
       "UnresolvableController: callSite=\(callSite) addr=\(ctlAddr) "
         + "alive=\(tracker.isAddressAlive(ctlAddr)) gen=\(tracker.generation(forAddress: ctlAddr)) "
         + "tracked=\(tracker.trackedControllerCount)"
+    )
+  }
+
+  /// 診斷用：記錄每一次 IMK 事件回呼之進入點狀態（僅除錯模式）。
+  ///
+  /// 目的在於分辨三種原本無法從日誌區分的情況：
+  /// - 事件根本未進入本行程：本行完全不出現（但同一時段的其他事件型別仍有本行）。
+  /// - 事件已進入、但 controller 位址已自 tracker 除名：`alive=false`、`session=nil`。
+  /// - 事件已進入、卻被路由到另一枚仍存活的 session：`slot(assigned: …)` 與 `addr=` 不同，
+  ///   或 `client=` 指向非前景客體——此即「修飾鍵事件被投給舊客體」之徵。
+  ///
+  /// - Parameters:
+  ///   - event: 該次回呼攜帶的 NSEvent（可能為 nil）。
+  ///   - ctlAddr: 觸發該回呼的 controller 記憶體位址。
+  ///   - session: 解析所得之 session；nil 表示該位址已不可解析。
+  private static func logEventEntry(event: NSEvent?, controllerAddr ctlAddr: UInt, session: InputSession?) {
+    guard PrefMgr.shared.isDebugModeEnabled else { return }
+    var eventDescription = "[NOEVENT]"
+    if let event {
+      eventDescription = event.copyAsKBEvent.map { "\($0)" } ?? "[RAW]\(event.debugDescription)"
+    }
+    var sessionDescription = "nil"
+    if let session {
+      let assignedAddr = session.inputControllerAssignedAddr.map { "\($0)" } ?? "nil"
+      let client = session.clientBundleIdentifier.isEmpty ? "?" : session.clientBundleIdentifier
+      sessionDescription = "slot(assigned=\(assignedAddr) client=\(client) ascii=\(session.isASCIIMode))"
+    }
+    let tracker = IMKControllerLifetimeTracker.shared()
+    vCLog(
+      "EventEntry: addr=\(ctlAddr) alive=\(tracker.isAddressAlive(ctlAddr)) "
+        + "gen=\(tracker.generation(forAddress: ctlAddr)) tracked=\(tracker.trackedControllerCount) "
+        + "session=\(sessionDescription) event=\(eventDescription)"
     )
   }
 
