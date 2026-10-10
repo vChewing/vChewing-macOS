@@ -57,6 +57,7 @@
 "i18n:Common.Warning" = "Warning";
 "i18n:Common.Weight" = "Weight";
 "i18n:Common.Yes" = "Yes";
+"i18n:DevZone.IMKSwiftPrivateSurface.SectionTitle" = "IMKSwift's interference with the IMKServer private surface (diagnostic only)";
 "i18n:DevZone.JSONPrefsExchange.Description" = "Allows exporting the current preferences to a JSON file, or importing preferences from a JSON file. Path settings involving sandbox security permissions and UI language settings are not within the exchange scope.";
 "i18n:DevZone.JSONPrefsExchange.Export" = "Export";
 "i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@" = "The preferences file was saved as:\n\n%@\n\nFinder will now reveal the file.";
@@ -418,6 +419,14 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "A Step Front";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "Restore Pre-Candidate-Window Cursor Position";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle" = "Post-Candidate Cursor Position:";
+"i18n:UserDef.kDisableIMKSwiftClientWrapperTermination.description" = "Three seconds after an input controller is deactivated, vChewing normally terminates that client's XPC connection; this switch keeps the connection alive instead. The controller itself is still unregistered from the input method's tables.\nBy default, vChewing aggressively tears down the discarded Client Object XPC Wrapper, so that the useless IMKInputController instances can be deallocated in a timely manner.";
+"i18n:UserDef.kDisableIMKSwiftClientWrapperTermination.shortTitle" = "Keep client connections alive after deactivating IMKInputController";
+"i18n:UserDef.kDisableIMKSwiftControllerDelayedDeallocation.description" = "Suppresses the whole deferred-deallocation pass that normally runs three seconds after deactivation: the controller is neither unregistered nor is its client connection torn down, so both wait for the controller's real deallocation instead.\nBy default, vChewing applies deferred deallocation to the instance three seconds after the IMKInputController is deactivated, so that the client XPC connection resources it occupies are returned.";
+"i18n:UserDef.kDisableIMKSwiftControllerDelayedDeallocation.shortTitle" = "Disable deferred deallocation of the IMKInputController instance";
+"i18n:UserDef.kDisableIMKSwiftEvictedClientInvalidation.description" = "Stops vChewing from invalidating the client XPC connection of a registration while that registration is evicted from IMKServer's private controller registry; the eviction itself still happens. Use it to tell whether event delivery breaks because of that invalidation.\nBy default, vChewing invalidates the client XPC connection along with the evicted controller registration, so that the connection does not outlive the controller and accumulate.";
+"i18n:UserDef.kDisableIMKSwiftEvictedClientInvalidation.shortTitle" = "Keep client connections alive when evicting a controller";
+"i18n:UserDef.kDisableIMKSwiftServerControllerPruning.description" = "Stops vChewing from evicting the oldest non-current entry of IMKServer's private controller registry each time an input controller is initialised. Use it to tell whether event delivery breaks because of that eviction.\nBy default, vChewing proactively tries to evict possibly-stale IMKInputController instances from IMKServer, so that they do not pile up while the user keeps switching among client apps and typing (which would otherwise let the memory heap footprint only grow, never shrink).";
+"i18n:UserDef.kDisableIMKSwiftServerControllerPruning.shortTitle" = "Disable IMKServer controller pruning";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.description" = "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "Disable segmented thick underline in marking mode for managed clients";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "Dodge Invalid Edge Candidate Cursor Position";

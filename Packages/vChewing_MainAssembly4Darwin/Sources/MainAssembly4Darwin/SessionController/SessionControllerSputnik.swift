@@ -96,7 +96,7 @@ public struct SessionControllerSputnik {
 // MARK: - 一次性類別層級 Block 配置（於輸入法啟動時執行）
 
 extension SessionControllerSputnik {
-  /// 對 IMKInputSessionController 註冊 14 個類別層級 static block。
+  /// 對 IMKInputSessionController 註冊 18 個類別層級 static block。
   /// 每個 block 均從 raw controller/client 記憶體位址解析對應的 InputSession，
   /// 再將呼叫轉發至 Session 的對應方法。
   @MainActor
@@ -104,11 +104,12 @@ extension SessionControllerSputnik {
     // ---- 伺服器生命週期 ----
 
     /// 啟用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController activateServer:]`。
-    /// - Warning: 必須在 resolve session 之前，將 session 的
-    ///   inputControllerAssignedAddr 設為實際觸發 activateServer 的 controller 位址。
-    ///   極性雙緩衝模式下，同一奇偶性的 session 可能已被其他 controller 的
-    ///   callCoreAtLeastOnce reassign，導致 client() 解讀透過舊 controller 回傳 nil，
-    ///   使 doCommit / doSetMarkedText 靜默失效。
+    /// - Note: 設計不變式：session 解析成功之後、`performServerActivation()` 之前，必須把
+    ///   `inputControllerAssignedAddr` 重設為此次觸發 activateServer 的 controller 位址。
+    ///   理由：極性雙緩衝模式下全行程只有 sessionEven / sessionOdd 兩枚 session，同一奇偶性者
+    ///   可能已被其他 controller 的 `callCoreAtLeastOnce` 重新指位；位址未重設時，
+    ///   `client()` 會經由舊 controller 解讀而回傳 nil，使 `doCommit` / `doSetMarkedText` 靜默失效。
+    ///   此順序即規格本身，而非對某一已知故障的權宜描述。
     IMKInputSessionController.configureActivatingServer { ctlAddr in
       guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
         SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "activateServer")
@@ -232,6 +233,29 @@ extension SessionControllerSputnik {
     IMKInputSessionController.configureLoggingHandler { cMsg in
       guard let cMsg else { return }
       vCLog(String(cString: cMsg))
+    }
+
+    // ---- 診斷開關（DevZone；P299）----
+    //
+    // 四者皆於「決策當下」被查詢而非快取，故在執行中的行程裡翻動偏好即可
+    // 左右下一次決策——這是把「疑似病灶」就地關掉、以判定因果的手段。
+    // 四者一律預設 false（＝維持既有行為），亦不主動通知任何一方。
+
+    /// 停用 `IMKServer._private._controllers` 之無條件剔除。
+    IMKInputSessionController.configureServerControllerPruningDisabled {
+      PrefMgr.shared.disableIMKSwiftServerControllerPruning
+    }
+    /// 停用剔除 controller 時對其客體 XPC 連線所施之作廢（剔除本身照舊）。
+    IMKInputSessionController.configureEvictedClientInvalidationDisabled {
+      PrefMgr.shared.disableIMKSwiftEvictedClientInvalidation
+    }
+    /// 停用 controller 停用 3 秒後對 client wrapper 所施之 XPC 終止。
+    IMKInputSessionController.configureClientWrapperTerminationDisabled {
+      PrefMgr.shared.disableIMKSwiftClientWrapperTermination
+    }
+    /// 停用對 controller 之延遲 dealloc（停用 3 秒後之計時器）的整個流程。
+    IMKInputSessionController.configureControllerDelayedDeallocationDisabled {
+      PrefMgr.shared.disableIMKSwiftControllerDelayedDeallocation
     }
   }()
 

@@ -1,5 +1,5 @@
 {
-  "count" : 119,
+  "count" : 123,
   "entries" : [
     {
       "default" : false,
@@ -4468,6 +4468,134 @@
       "optionsKind" : null,
       "range" : null,
       "rawValue" : "FilterFactoryKanjisOfNonCurrentInputMode",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDisableIMKSwiftServerControllerPruning",
+      "labels" : {
+        "en" : {
+          "description" : "Stops vChewing from evicting the oldest non-current entry of IMKServer's private controller registry each time an input controller is initialised. Use it to tell whether event delivery breaks because of that eviction.\nBy default, vChewing proactively tries to evict possibly-stale IMKInputController instances from IMKServer, so that they do not pile up while the user keeps switching among client apps and typing (which would otherwise let the memory heap footprint only grow, never shrink).",
+          "shortTitle" : "Disable IMKServer controller pruning"
+        },
+        "ja" : {
+          "description" : "入力コントローラを初期化するたびに、IMKServer の非公開コントローラ登録簿から最古の（現在使用中でない）一件を間引く処理を止める。イベント配送の不具合がこの間引きに由来するかどうかの切り分け用。\n既定では、唯音入力方式は IMKServer から失効した可能性のある IMKInputController の複製を積極的に間引こうとし、客体ソフトを頻繁に切り替えながら入力する際に複製が蓄積する現象（メモリ Heap の占有が増える一方になる）を防いでいる。",
+          "shortTitle" : "IMKServer のコントローラ間引きを停止"
+        },
+        "zh-Hans" : {
+          "description" : "停用「唯音在每次建立输入控制器时，从 IMKServer 私有控制器登记表剔除一枚最旧且非当前者」的动作。用于判断事件投递失灵是否源于该剔除。\n预设情况下，唯音输入法会主动从 IMKServer 尝试剔除可能失效的 IMKInputController 副本、防止在经常切换客体软体打字时出现 IMKInputController 副本蓄积之现象（会导致记忆体 Heap 占用的只增不减）。",
+          "shortTitle" : "停用 IMKServer 控制器剔除"
+        },
+        "zh-Hant" : {
+          "description" : "停用「唯音在每次建立輸入控制器時，自 IMKServer 私有控制器登記表剔除一枚最舊且非當前者」的動作。用於判斷事件投遞失靈是否源於該剔除。\n預設情況下，唯音輸入法會主動從 IMKServer 嘗試剔除可能失效的 IMKInputController 副本、防止在經常切換客體軟體打字時出現 IMKInputController 副本蓄積之現象（會導致記憶體 Heap 佔用的只增不減）。",
+          "shortTitle" : "停用 IMKServer 控制器剔除"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_IMKSwift_disableServerControllerPruning",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDisableIMKSwiftEvictedClientInvalidation",
+      "labels" : {
+        "en" : {
+          "description" : "Stops vChewing from invalidating the client XPC connection of a registration while that registration is evicted from IMKServer's private controller registry; the eviction itself still happens. Use it to tell whether event delivery breaks because of that invalidation.\nBy default, vChewing invalidates the client XPC connection along with the evicted controller registration, so that the connection does not outlive the controller and accumulate.",
+          "shortTitle" : "Keep client connections alive when evicting a controller"
+        },
+        "ja" : {
+          "description" : "IMKServer の非公開コントローラ登録簿から登録を間引く際に、その登録の客体 XPC 接続まで無効化する処理を止める（間引き自体は従来どおり行う）。イベント配送の不具合がこの無効化に由来するかどうかの切り分け用。\n既定では、唯音入力方式はコントローラの登録を間引く際にその客体 XPC 接続も併せて無効化し、接続がコントローラより長生きして蓄積するのを防いでいる。",
+          "shortTitle" : "コントローラ間引き時に客体接続を維持"
+        },
+        "zh-Hans" : {
+          "description" : "停用「唯音剔除 IMKServer 私有控制器登记表之登记时、顺带作废该笔登记之客体 XPC 连线」的动作（剔除本身照旧）。用于判断事件投递失灵是否源于该作废。\n预设情况下，唯音输入法会在剔除控制器登记时一并作废其客体 XPC 连线，以免该连线比控制器活得还久而蓄积。",
+          "shortTitle" : "剔除控制器时保留客体连线"
+        },
+        "zh-Hant" : {
+          "description" : "停用「唯音剔除 IMKServer 私有控制器登記表之登記時、順帶作廢該筆登記之客體 XPC 連線」的動作（剔除本身照舊）。用於判斷事件投遞失靈是否源於該作廢。\n預設情況下，唯音輸入法會在剔除控制器登記時一併作廢其客體 XPC 連線，以免該連線比控制器活得還久而蓄積。",
+          "shortTitle" : "剔除控制器時保留客體連線"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_IMKSwift_disableEvictedClientInvalidation",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDisableIMKSwiftClientWrapperTermination",
+      "labels" : {
+        "en" : {
+          "description" : "Three seconds after an input controller is deactivated, vChewing normally terminates that client's XPC connection; this switch keeps the connection alive instead. The controller itself is still unregistered from the input method's tables.\nBy default, vChewing aggressively tears down the discarded Client Object XPC Wrapper, so that the useless IMKInputController instances can be deallocated in a timely manner.",
+          "shortTitle" : "Keep client connections alive after deactivating IMKInputController"
+        },
+        "ja" : {
+          "description" : "入力コントローラの停止から 3 秒後に、その客体の XPC 接続を切断する処理を止めて接続を維持する（コントローラ自身の登録解除は従来どおり）。\n既定では、唯音入力方式は使われなくなった Client Object XPC Wrapper を積極的に破棄し、不要な IMKInputController の複製が速やかに解放されるようにしている。",
+          "shortTitle" : "IMKInputController の入力停止後も客体接続を維持"
+        },
+        "zh-Hans" : {
+          "description" : "输入控制器停用 3 秒后，唯音原本会终止该客体的 XPC 连线；本开关保留该连线（控制器本身的除名照旧）。\n预设情况下，唯音输入法会积极析构被弃用的 Client Object XPC Wrapper，以便让 IMKInputController 无用副本得以被及时析构。",
+          "shortTitle" : "停用 IMKInputController 后保留客体连线"
+        },
+        "zh-Hant" : {
+          "description" : "輸入控制器停用 3 秒後，唯音原會終止該客體的 XPC 連線；本開關保留該連線（控制器本身的除名照舊）。\n預設情況下，唯音輸入法會積極析構被棄用的 Client Object XPC Wrapper，以便讓 IMKInputController 無用副本得以被及時析構。",
+          "shortTitle" : "停用 IMKInputController 後保留客體連線"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_IMKSwift_disableClientWrapperTermination",
+      "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDisableIMKSwiftControllerDelayedDeallocation",
+      "labels" : {
+        "en" : {
+          "description" : "Suppresses the whole deferred-deallocation pass that normally runs three seconds after deactivation: the controller is neither unregistered nor is its client connection torn down, so both wait for the controller's real deallocation instead.\nBy default, vChewing applies deferred deallocation to the instance three seconds after the IMKInputController is deactivated, so that the client XPC connection resources it occupies are returned.",
+          "shortTitle" : "Disable deferred deallocation of the IMKInputController instance"
+        },
+        "ja" : {
+          "description" : "停止 3 秒後に走る遅延解放の処理を丸ごと止める（コントローラの登録解除も客体接続の切断も行わず、コントローラが実際に解放されるまで待つ）。\n既定では、唯音入力方式は IMKInputController の停止から 3 秒後にその複製を遅延解放し、占有していた客体 XPC 接続の資源を返却する。",
+          "shortTitle" : "IMKInputController の複製の遅延解放を停止"
+        },
+        "zh-Hans" : {
+          "description" : "停用「停用 3 秒后的延迟释放」的整个流程（既不除名、也不终止客体连线），改为等待控制器真正解构。\n预设情况下，唯音输入法会在 IMKInputController 停用 3 秒后对该副本施以延迟析构，以便归还其占用的客体 XPC 连线资源。",
+          "shortTitle" : "停用对 IMKInputController 副本的延迟释放"
+        },
+        "zh-Hant" : {
+          "description" : "停用「停用 3 秒後之延遲釋放」的整個流程（既不除名、亦不終止客體連線），改為等待控制器真正解構。\n預設情況下，唯音輸入法會在 IMKInputController 停用 3 秒後對該副本施以延遲析構，以便歸還其佔用的客體 XPC 連線資源。",
+          "shortTitle" : "停用對 IMKInputController 副本的延遲釋放"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_IMKSwift_disableControllerDelayedDeallocation",
       "type" : "bool"
     }
   ],

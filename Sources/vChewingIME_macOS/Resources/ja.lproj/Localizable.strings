@@ -57,6 +57,7 @@
 "i18n:Common.Warning" = "警告";
 "i18n:Common.Weight" = "優先度";
 "i18n:Common.Yes" = "うむ";
+"i18n:DevZone.IMKSwiftPrivateSurface.SectionTitle" = "IMKSwift による IMKServer 私有面への介入（診断専用）";
 "i18n:DevZone.JSONPrefsExchange.Description" = "現在の環境設定を JSON ファイルに書き出し、または JSON ファイルから環境設定を読み込むことができます。サンドボックスに関連するパス設定とインターフェース言語の設定は交換対象外です。";
 "i18n:DevZone.JSONPrefsExchange.Export" = "書き出す";
 "i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@" = "環境設定ファイルは次の場所に保存されました：\n\n%@\n\nFinder でファイルの場所を表示します。";
@@ -418,6 +419,14 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "前へ一歩進める";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "候補陳列ウィンドウ呼び出し前のカーソル位置に戻す";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle" = "候補確定後のカーソル位置:";
+"i18n:UserDef.kDisableIMKSwiftClientWrapperTermination.description" = "入力コントローラの停止から 3 秒後に、その客体の XPC 接続を切断する処理を止めて接続を維持する（コントローラ自身の登録解除は従来どおり）。\n既定では、唯音入力方式は使われなくなった Client Object XPC Wrapper を積極的に破棄し、不要な IMKInputController の複製が速やかに解放されるようにしている。";
+"i18n:UserDef.kDisableIMKSwiftClientWrapperTermination.shortTitle" = "IMKInputController の入力停止後も客体接続を維持";
+"i18n:UserDef.kDisableIMKSwiftControllerDelayedDeallocation.description" = "停止 3 秒後に走る遅延解放の処理を丸ごと止める（コントローラの登録解除も客体接続の切断も行わず、コントローラが実際に解放されるまで待つ）。\n既定では、唯音入力方式は IMKInputController の停止から 3 秒後にその複製を遅延解放し、占有していた客体 XPC 接続の資源を返却する。";
+"i18n:UserDef.kDisableIMKSwiftControllerDelayedDeallocation.shortTitle" = "IMKInputController の複製の遅延解放を停止";
+"i18n:UserDef.kDisableIMKSwiftEvictedClientInvalidation.description" = "IMKServer の非公開コントローラ登録簿から登録を間引く際に、その登録の客体 XPC 接続まで無効化する処理を止める（間引き自体は従来どおり行う）。イベント配送の不具合がこの無効化に由来するかどうかの切り分け用。\n既定では、唯音入力方式はコントローラの登録を間引く際にその客体 XPC 接続も併せて無効化し、接続がコントローラより長生きして蓄積するのを防いでいる。";
+"i18n:UserDef.kDisableIMKSwiftEvictedClientInvalidation.shortTitle" = "コントローラ間引き時に客体接続を維持";
+"i18n:UserDef.kDisableIMKSwiftServerControllerPruning.description" = "入力コントローラを初期化するたびに、IMKServer の非公開コントローラ登録簿から最古の（現在使用中でない）一件を間引く処理を止める。イベント配送の不具合がこの間引きに由来するかどうかの切り分け用。\n既定では、唯音入力方式は IMKServer から失効した可能性のある IMKInputController の複製を積極的に間引こうとし、客体ソフトを頻繁に切り替えながら入力する際に複製が蓄積する現象（メモリ Heap の占有が増える一方になる）を防いでいる。";
+"i18n:UserDef.kDisableIMKSwiftServerControllerPruning.shortTitle" = "IMKServer のコントローラ間引きを停止";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.description" = "一部の「Web UI を用いた」客体アプリには、多段式太下線の描きをうまく取り扱えぬ支障はございます。このチェックを入れると、IME から「client().setMarkedText()」を経由して、客体に「多段式太下線を書かずに」と命令することはできます。多段式太下線はマーキングモードだけで用いるデザインですが、間違くて別のモードでもそれを書いてしまう客体アプリはございます（多分 IMKTextInput の実作の問題かもしれません）。このチェックは「文脈内入力緩衝列」だけに関わります。";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";

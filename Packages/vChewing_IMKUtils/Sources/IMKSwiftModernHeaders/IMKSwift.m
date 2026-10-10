@@ -53,6 +53,14 @@ static BOOL (^_IMKSwift_onHandlingGivenNullableEvent)(uintptr_t, uintptr_t);
 static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 static void (^_IMKSwift_onLogging)(const char *_Nullable);
 
+/// Diagnostic kill-switches for the private-surface interventions.  Evaluated
+/// at each decision point (never cached) so that a running process can be
+/// reconfigured from the preferences; `README`-style docs live in the header.
+static BOOL (^_IMKSwift_serverControllerPruningDisabled)(void);
+static BOOL (^_IMKSwift_evictedClientInvalidationDisabled)(void);
+static BOOL (^_IMKSwift_clientWrapperTerminationDisabled)(void);
+static BOOL (^_IMKSwift_controllerDelayedDeallocationDisabled)(void);
+
 /// Associated-object key marking that `-IMKSwift_delayedDealloc` has already
 /// terminated this controller's client wrapper.  Purely diagnostic: it lets the
 /// activation log tell a fresh controller apart from a resurrected shell whose
@@ -72,6 +80,13 @@ static void IMKSwiftLog(NSString *format, ...) {
     if (utf8) _IMKSwift_onLogging(utf8);
     [message release];
   }
+}
+
+/// Evaluates one of the diagnostic kill-switches above.  A switch that was
+/// never installed reads as "not disabled", which is the shipping behaviour.
+static BOOL IMKSwiftIsDisabled(BOOL (^_Nullable toggle)(void)) {
+  if (!toggle) return NO;
+  return toggle();
 }
 
 @implementation IMKInputSessionController
@@ -164,6 +179,30 @@ static void IMKSwiftLog(NSString *format, ...) {
     _IMKSwift_onLogging = [blk copy];
   }
 }
++ (void)IMKSwift_configureWithServerControllerPruningDisabled:(nullable BOOL (^)(void))blk {
+  if (_IMKSwift_serverControllerPruningDisabled != blk) {
+    [_IMKSwift_serverControllerPruningDisabled release];
+    _IMKSwift_serverControllerPruningDisabled = [blk copy];
+  }
+}
++ (void)IMKSwift_configureWithEvictedClientInvalidationDisabled:(nullable BOOL (^)(void))blk {
+  if (_IMKSwift_evictedClientInvalidationDisabled != blk) {
+    [_IMKSwift_evictedClientInvalidationDisabled release];
+    _IMKSwift_evictedClientInvalidationDisabled = [blk copy];
+  }
+}
++ (void)IMKSwift_configureWithClientWrapperTerminationDisabled:(nullable BOOL (^)(void))blk {
+  if (_IMKSwift_clientWrapperTerminationDisabled != blk) {
+    [_IMKSwift_clientWrapperTerminationDisabled release];
+    _IMKSwift_clientWrapperTerminationDisabled = [blk copy];
+  }
+}
++ (void)IMKSwift_configureWithControllerDelayedDeallocationDisabled:(nullable BOOL (^)(void))blk {
+  if (_IMKSwift_controllerDelayedDeallocationDisabled != blk) {
+    [_IMKSwift_controllerDelayedDeallocationDisabled release];
+    _IMKSwift_controllerDelayedDeallocationDisabled = [blk copy];
+  }
+}
 
 // MARK: - Lifecycle
 
@@ -196,6 +235,10 @@ static void IMKSwiftLog(NSString *format, ...) {
 + (void)IMKSwift_pruneStaleControllersOnServer:(IMKServer *)server
                                  excludingSelf:(id)selfController {
   @autoreleasepool {
+    if (IMKSwiftIsDisabled(_IMKSwift_serverControllerPruningDisabled)) {
+      IMKSwiftLog(@"Prune: skipped (disableServerControllerPruning)");
+      return;
+    }
     id serverPvt = [server valueForKey:@"_private"];
     NSMutableDictionary *ctls = [serverPvt valueForKey:@"_controllers"];
     if (!ctls) return;
@@ -227,11 +270,21 @@ static void IMKSwiftLog(NSString *format, ...) {
         uintptr_t evictedAddr = (uintptr_t)oldest;
         uint64_t evictedGen = oldestGen;
         [ctls removeObjectForKey:key];
-        if ([key respondsToSelector:@selector(invalidate)]) {
-          [(id)key invalidate];
+        // The invalidation of the registration's client connection is the
+        // aggressive half of the eviction, so it gets its own kill-switch:
+        // the entry still leaves `_controllers`, yet the client connection
+        // survives for whoever still holds it.
+        if (IMKSwiftIsDisabled(_IMKSwift_evictedClientInvalidationDisabled)) {
+          IMKSwiftLog(@"Prune: evicted addr=%p gen=%llu remaining=%lu (client connection kept)",
+                      (void *)evictedAddr, (unsigned long long)evictedGen,
+                      (unsigned long)[ctls count]);
+        } else {
+          if ([key respondsToSelector:@selector(invalidate)]) {
+            [(id)key invalidate];
+          }
+          IMKSwiftLog(@"Prune: evicted addr=%p gen=%llu remaining=%lu", (void *)evictedAddr,
+                      (unsigned long long)evictedGen, (unsigned long)[ctls count]);
         }
-        IMKSwiftLog(@"Prune: evicted addr=%p gen=%llu remaining=%lu", (void *)evictedAddr,
-                    (unsigned long long)evictedGen, (unsigned long)[ctls count]);
         break;
       }
     }
@@ -255,6 +308,12 @@ static void IMKSwiftLog(NSString *format, ...) {
     IMKSwiftLog(@"ControllerInit: addr=%p gen=%llu", (void *)self,
                 (unsigned long long)[[IMKControllerLifetimeTracker shared]
                     generationForAddress:(uintptr_t)self]);
+    // Which pair of IMK classes this process actually received.  The system
+    // picks them through `+subclass` at runtime (see the header's caveat), so
+    // this is the only way to tell a legacy server from a modern one at the
+    // scene of a bug report.
+    IMKSwiftLog(@"ServerFlavor: server=%@ client=%@", NSStringFromClass([server class]),
+                NSStringFromClass([inputClient class]));
     [IMKInputSessionController IMKSwift_pruneStaleControllersOnServer:server excludingSelf:self];
 
     SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
@@ -393,6 +452,11 @@ static void IMKSwiftLog(NSString *format, ...) {
   [NSObject cancelPreviousPerformRequestsWithTarget:self
                                            selector:@selector(IMKSwift_delayedDealloc)
                                              object:nil];
+  if (IMKSwiftIsDisabled(_IMKSwift_controllerDelayedDeallocationDisabled)) {
+    IMKSwiftLog(@"DelayedDealloc: not scheduled (disableControllerDelayedDeallocation) addr=%p",
+                (void *)self);
+    return;
+  }
   [self performSelector:@selector(IMKSwift_delayedDealloc) withObject:nil afterDelay:delay];
 }
 
@@ -408,6 +472,13 @@ static void IMKSwiftLog(NSString *format, ...) {
 /// per-instance release needed.
 - (void)IMKSwift_delayedDealloc {
   @autoreleasepool {
+    // Re-checked here as well, so that a timer scheduled before the toggle was
+    // flipped does not slip through.
+    if (IMKSwiftIsDisabled(_IMKSwift_controllerDelayedDeallocationDisabled)) {
+      IMKSwiftLog(@"DelayedDealloc: skipped (disableControllerDelayedDeallocation) addr=%p",
+                  (void *)self);
+      return;
+    }
     objc_setAssociatedObject(self, &kIMKSwiftClientTerminatedKey, @YES,
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     IMKSwiftLog(@"DelayedDealloc: addr=%p gen=%llu", (void *)self,
@@ -420,23 +491,29 @@ static void IMKSwiftLog(NSString *format, ...) {
     // heavy XPC resources (~440 bytes per connection) are freed now.
     id<IMKTextInput> clientProxy = [self client];
     if (clientProxy) {
-      // macOS 15 Sequoia split IPMDServerClientWrapper into Modern / Legacy subclasses.
-      // Try both variants, then fall back to the undecorated name for ≤10.15.
-      Class wrapperClass = nil;
-      for (NSString *name in @[
-             @"_IPMDServerClientWrapperModern", @"_IPMDServerClientWrapperLegacy",
-             @"IPMDServerClientWrapper"
-           ]) {
-        wrapperClass = NSClassFromString(name);
-        if (wrapperClass) break;
-      }
-      if (wrapperClass) {
-        if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
-          [wrapperClass terminateForClientXPCConn:clientProxy];
-        } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
-          [wrapperClass terminateForClientDOProxy:clientProxy];
-        } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
-          [wrapperClass terminateForClient:clientProxy];
+      if (IMKSwiftIsDisabled(_IMKSwift_clientWrapperTerminationDisabled)) {
+        IMKSwiftLog(
+            @"DelayedDealloc: client wrapper kept (disableClientWrapperTermination) addr=%p",
+            (void *)self);
+      } else {
+        // macOS 15 Sequoia split IPMDServerClientWrapper into Modern / Legacy subclasses.
+        // Try both variants, then fall back to the undecorated name for ≤10.15.
+        Class wrapperClass = nil;
+        for (NSString *name in @[
+               @"_IPMDServerClientWrapperModern", @"_IPMDServerClientWrapperLegacy",
+               @"IPMDServerClientWrapper"
+             ]) {
+          wrapperClass = NSClassFromString(name);
+          if (wrapperClass) break;
+        }
+        if (wrapperClass) {
+          if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
+            [wrapperClass terminateForClientXPCConn:clientProxy];
+          } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
+            [wrapperClass terminateForClientDOProxy:clientProxy];
+          } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
+            [wrapperClass terminateForClient:clientProxy];
+          }
         }
       }
     }

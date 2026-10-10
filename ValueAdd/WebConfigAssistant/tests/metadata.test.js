@@ -25,7 +25,7 @@ const PARSER_LABEL_KEYS = [
 test('後設資料：基本不變式', function () {
   const { metadata } = loadCore();
   assert.strictEqual(metadata.schemaVersion, 1);
-  assert.strictEqual(metadata.count, 119);
+  assert.strictEqual(metadata.count, 123);
   assert.strictEqual(metadata.count, metadata.entries.length);
   assert.deepStrictEqual(metadata.locales, ['zh-Hant', 'zh-Hans', 'en', 'ja']);
   assert.deepStrictEqual(metadata.missingI18nKeys, []);

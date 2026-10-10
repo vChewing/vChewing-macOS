@@ -17,6 +17,22 @@
 ///
 /// Downstream Swift modules should `import IMKSwift` instead of
 /// `import InputMethodKit` to pick up these refinements.
+///
+/// @note **Private-surface caveat.** Some members of this overlay — see
+/// ``IMKServer(IMKSwift)`` and ``IMKInputSessionController`` — reach into
+/// undocumented internals of the system framework: `IMKServer._private`,
+/// `_IPMDServerClientWrapper*`, and the `+subclass` dispatch that decides
+/// whether the input method is handed a legacy or a modern server/client pair.
+/// Whether such an internal exists, and under which name, is a macOS
+/// implementation detail with no compatibility contract.  In particular, the
+/// flavour is chosen by the framework's own `+subclass` at runtime and is
+/// **not** a function of the SDK this project is built against: a build made
+/// against the legacy SDK still receives `_IMKServerLegacy` on a current
+/// system, and vice versa.  Every intervention here must therefore degrade to a
+/// no-op when the private member is absent, and each intervention that can be
+/// switched off has a `PrefMgr` toggle (the `_IMKSwift_*` keys, surfaced in
+/// Preferences → DevZone) so that a suspect behaviour can be turned off in a
+/// running process without a rebuild.
 
 #import <Carbon/Carbon.h>
 #import <Cocoa/Cocoa.h>
@@ -943,6 +959,36 @@
 /// unconditionally.
 + (void)IMKSwift_configureWithLoggingHandler:(nullable void (^)(const char *_Nullable message))block
     NS_SWIFT_NAME(configureLoggingHandler(_:));
+
+/// Installs the diagnostic kill-switches for the private-surface interventions
+/// listed in this class.  Each block is evaluated **at the decision point** and
+/// never cached, so flipping the corresponding `_IMKSwift_disable…` preference
+/// of a running process takes effect on the next occasion — that is what makes
+/// these usable as a live experiment rather than a rebuild-and-hope.
+///
+/// A block that was never installed (or a `nil` one) leaves its intervention
+/// **enabled**, i.e. the shipping behaviour; a block returning `YES` disables
+/// it.  The four switches are independent, but note the nesting:
+/// ``configureControllerDelayedDeallocationDisabled(_:)`` suppresses the whole
+/// deferred teardown (so neither the dealloc callback nor the client-wrapper
+/// teardown runs; the Swift-side session stays registered until the
+/// controller's real `-dealloc`), whereas
+/// ``configureClientWrapperTerminationDisabled(_:)`` runs the dealloc
+/// bookkeeping as usual and only spares the client wrapper's XPC connection.
+/// ``configureEvictedClientInvalidationDisabled(_:)`` sits one level deeper
+/// still: the eviction itself (which removes the controller's registration
+/// from `IMKServer`) proceeds, yet the evicted registration's client
+/// connection is spared, i.e. only the aggressive half of the eviction is
+/// switched off.  It therefore has no effect while
+/// ``configureServerControllerPruningDisabled(_:)`` suppresses the eviction.
++ (void)IMKSwift_configureWithServerControllerPruningDisabled:(nullable BOOL (^)(void))block
+    NS_SWIFT_NAME(configureServerControllerPruningDisabled(_:));
++ (void)IMKSwift_configureWithEvictedClientInvalidationDisabled:(nullable BOOL (^)(void))block
+    NS_SWIFT_NAME(configureEvictedClientInvalidationDisabled(_:));
++ (void)IMKSwift_configureWithClientWrapperTerminationDisabled:(nullable BOOL (^)(void))block
+    NS_SWIFT_NAME(configureClientWrapperTerminationDisabled(_:));
++ (void)IMKSwift_configureWithControllerDelayedDeallocationDisabled:(nullable BOOL (^)(void))block
+    NS_SWIFT_NAME(configureControllerDelayedDeallocationDisabled(_:));
 
 /// Returns the current controller generation counter (monotonically increasing),
 /// used by the parity-based double-buffered session pool.

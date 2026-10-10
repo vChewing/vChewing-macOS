@@ -53,6 +53,18 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kCheckAbusersOfSecureEventInputAPI)
   public var checkAbusersOfSecureEventInputAPI: Bool
 
+  @AppProperty(userDef: .kDisableIMKSwiftServerControllerPruning)
+  public var disableIMKSwiftServerControllerPruning: Bool
+
+  @AppProperty(userDef: .kDisableIMKSwiftEvictedClientInvalidation)
+  public var disableIMKSwiftEvictedClientInvalidation: Bool
+
+  @AppProperty(userDef: .kDisableIMKSwiftClientWrapperTermination)
+  public var disableIMKSwiftClientWrapperTermination: Bool
+
+  @AppProperty(userDef: .kDisableIMKSwiftControllerDelayedDeallocation)
+  public var disableIMKSwiftControllerDelayedDeallocation: Bool
+
   @AppProperty(userDef: .kDeltaOfCalendarYears)
   public var deltaOfCalendarYears: Int
 

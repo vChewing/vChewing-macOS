@@ -36,6 +36,12 @@
           Text("i18n:Settings.OptionsMovedToOtherTabs".i18n)
             .settingsDescription()
         }
+        Section("i18n:DevZone.IMKSwiftPrivateSurface.SectionTitle".i18n) {
+          UserDef.kDisableIMKSwiftServerControllerPruning.renderUI()
+          UserDef.kDisableIMKSwiftEvictedClientInvalidation.renderUI()
+          UserDef.kDisableIMKSwiftClientWrapperTermination.renderUI()
+          UserDef.kDisableIMKSwiftControllerDelayedDeallocation.renderUI()
+        }
         Section("i18n:DevZone.JSONPrefsExchange.SectionTitle".i18n) {
           HStack {
             Button("i18n:DevZone.JSONPrefsExchange.Export".i18n) {

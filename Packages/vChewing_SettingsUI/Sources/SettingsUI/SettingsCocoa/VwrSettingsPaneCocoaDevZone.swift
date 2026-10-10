@@ -68,6 +68,29 @@ extension SettingsPanesCocoa {
             .makeNSLabel(descriptive: true, fixWidth: contentWidth)
           NSView()
         }
+        NSStackView.build(.horizontal, insets: .new(all: 0, left: 16, right: 16)) {
+          "i18n:DevZone.IMKSwiftPrivateSurface.SectionTitle"
+            .makeNSLabel(fixWidth: contentWidth)
+          NSView()
+        }
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kDisableIMKSwiftServerControllerPruning.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kDisableIMKSwiftEvictedClientInvalidation.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kDisableIMKSwiftClientWrapperTermination.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kDisableIMKSwiftControllerDelayedDeallocation.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+        }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
           NSStackView.build(.vertical) {
             NSStackView.build(.horizontal) {

@@ -57,6 +57,7 @@
 "i18n:Common.Warning" = "警告";
 "i18n:Common.Weight" = "權重";
 "i18n:Common.Yes" = "是";
+"i18n:DevZone.IMKSwiftPrivateSurface.SectionTitle" = "IMKSwift 對 IMKServer 私有面的干涉（僅供診斷）";
 "i18n:DevZone.JSONPrefsExchange.Description" = "允許將目前的偏好設定匯出為 JSON 檔案、或從 JSON 檔案匯入偏好設定。涉及沙箱安全權限的路徑設定與介面語言設定不在交換範圍內。";
 "i18n:DevZone.JSONPrefsExchange.Export" = "匯出";
 "i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@" = "偏好設定檔已儲存為：\n\n%@\n\n將於 Finder 中顯示該檔案。";
@@ -418,6 +419,14 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "向前推進一格";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "復原呼出選字窗之前的游標位置";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle" = "候選字確認後的游標位置:";
+"i18n:UserDef.kDisableIMKSwiftClientWrapperTermination.description" = "輸入控制器停用 3 秒後，唯音原會終止該客體的 XPC 連線；本開關保留該連線（控制器本身的除名照舊）。\n預設情況下，唯音輸入法會積極析構被棄用的 Client Object XPC Wrapper，以便讓 IMKInputController 無用副本得以被及時析構。";
+"i18n:UserDef.kDisableIMKSwiftClientWrapperTermination.shortTitle" = "停用 IMKInputController 後保留客體連線";
+"i18n:UserDef.kDisableIMKSwiftControllerDelayedDeallocation.description" = "停用「停用 3 秒後之延遲釋放」的整個流程（既不除名、亦不終止客體連線），改為等待控制器真正解構。\n預設情況下，唯音輸入法會在 IMKInputController 停用 3 秒後對該副本施以延遲析構，以便歸還其佔用的客體 XPC 連線資源。";
+"i18n:UserDef.kDisableIMKSwiftControllerDelayedDeallocation.shortTitle" = "停用對 IMKInputController 副本的延遲釋放";
+"i18n:UserDef.kDisableIMKSwiftEvictedClientInvalidation.description" = "停用「唯音剔除 IMKServer 私有控制器登記表之登記時、順帶作廢該筆登記之客體 XPC 連線」的動作（剔除本身照舊）。用於判斷事件投遞失靈是否源於該作廢。\n預設情況下，唯音輸入法會在剔除控制器登記時一併作廢其客體 XPC 連線，以免該連線比控制器活得還久而蓄積。";
+"i18n:UserDef.kDisableIMKSwiftEvictedClientInvalidation.shortTitle" = "剔除控制器時保留客體連線";
+"i18n:UserDef.kDisableIMKSwiftServerControllerPruning.description" = "停用「唯音在每次建立輸入控制器時，自 IMKServer 私有控制器登記表剔除一枚最舊且非當前者」的動作。用於判斷事件投遞失靈是否源於該剔除。\n預設情況下，唯音輸入法會主動從 IMKServer 嘗試剔除可能失效的 IMKInputController 副本、防止在經常切換客體軟體打字時出現 IMKInputController 副本蓄積之現象（會導致記憶體 Heap 佔用的只增不減）。";
+"i18n:UserDef.kDisableIMKSwiftServerControllerPruning.shortTitle" = "停用 IMKServer 控制器剔除";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.description" = "部分採用 Web 前端介面設計的客體應用可能會無法正常繪製用於輸入法標記模式的分段式粗型下劃線。這個選項將會阻止輸入法藉由 client().setMarkedText() 函式向客體應用傳達對粗型下劃線的分段繪製請求。分段式粗型下劃線僅用於輸入法的標記模式，除非客體應用對 setMarkedText() 這個 IMKTextInput 協定方法的實作有問題。該選項僅影響內文組字區。";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "針對被管理的客體，在標記模式下禁用分段式粗型下劃線";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端點選字游標位置";
