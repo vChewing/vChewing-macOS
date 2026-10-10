@@ -24,7 +24,7 @@ extension Tekkon {
       self.allPossibleReadings = parser.allPossibleReadings.sorted {
         ($0.count, $1) > ($1.count, $0)
       }
-      // Key 是注音，Value 是拼音，所以要反過來建樹。
+      // Key 是拼音，Value 是注音，所以要反過來建樹。
       if let table = parser.mapZhuyinPinyin {
         for (pinyin, zhuyin) in table {
           insert(pinyin, entry: zhuyin)
