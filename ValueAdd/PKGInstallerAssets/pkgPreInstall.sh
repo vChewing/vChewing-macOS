@@ -7,9 +7,27 @@ login_user=$(/usr/bin/stat -f%Su /dev/console)
 user_home=$(eval echo "~${login_user}")
 user_trash="${user_home}/.Trash"
 
-# Terminate any running vChewing processes so bundles are not locked.
-killall "${TARGET}" 2>/dev/null || true
-killall "${TARGET}PhraseEditor" 2>/dev/null || true
+# Terminate any running vChewing processes so the bundles are not locked. This
+# is a best-effort first cut and carries no guarantee: killing before the
+# payload lands cannot retire the old code for good, since IMK launches input
+# methods on demand from whichever bundle is registered on disk at that moment
+# (i.e. the old one) - the system simply relaunches the old code under a new
+# PID. The guarantee lives in the post-install script, which runs after the
+# payload is in place (Phase 300). The exit code is logged so that a future
+# install can tell whether this cut even ran: it used to be swallowed by
+# `|| true` along with the error output.
+#
+# The phrase editor is covered by this cut but not by the post-swap one: it is
+# no longer shipped, so only a machine upgrading from an old release could have
+# it running, and it is not the input method whose instances the swap retires.
+terminate_by_name() {
+    output=$(/usr/bin/killall "$1" 2>&1)
+    status=$?
+    printf 'Terminate: reason=preSwap target=%s killall=%s output=%s\n' "$1" "${status}" "${output}"
+}
+
+terminate_by_name "${TARGET}"
+terminate_by_name "${TARGET}PhraseEditor"
 
 # Generate a timestamped destination name for an existing .app bundle.
 timestamped_name() {

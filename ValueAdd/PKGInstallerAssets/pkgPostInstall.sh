@@ -44,6 +44,107 @@ done
 chown "${login_user}:${login_group}" "${user_home}/Library/Input Methods" 2>/dev/null || true
 chown "${login_user}:${login_group}" "${user_kb_dir}" 2>/dev/null || true
 
+# Post-swap termination of stale instances (begin).
+#
+# This is the guarantee, and the reason it sits here rather than in the
+# pre-install script: the payload is extracted between the two scripts, so by
+# now the new bundle is on disk. IMK launches input methods on demand from
+# whichever bundle is registered at that moment, so killing before the payload
+# lands only prompts a relaunch of the old code under a new PID - an instance
+# that then slips past every later check. Retiring the old instances after the
+# swap is what makes every later launch come from the new code. The pass also
+# runs before the input source is registered, since registration itself may
+# pull the input method up. The postcondition is "the captured PIDs are gone",
+# deliberately not "no process exists": IMK relaunches on demand, so the latter
+# could never hold.
+#
+# Only the console user's processes are targeted: the instances that matter
+# belong to the GUI session whose bundle we just replaced, and a root-run
+# install (e.g. Homebrew's `pkg` stanza) must not retire the instances of other
+# logged-in users.
+#
+# `pgrep -x` matches the executable's name (what `killall` uses) and thus also
+# catches instances launched from a `.appTrashed` copy of an older bundle; the
+# path pattern covers a process whose recorded name was altered or truncated.
+#
+# This block is self-contained - it only reads ${TERMINATION_NAME} (which
+# defaults to ${IME_EXECUTABLE}) and ${login_user}, both defined above - so that
+# the local probe harness can extract and source it verbatim; see the Phase 300
+# research note.
+TERMINATION_NAME="${TERMINATION_NAME:-${IME_EXECUTABLE}}"
+TERMINATION_POLL_INTERVAL=0.1
+TERMINATION_GRACE_TICKS=30 # 3.0s of polling after SIGTERM
+TERMINATION_FORCE_TICKS=30 # 3.0s of polling after SIGKILL
+
+process_is_alive() {
+    [ -n "$1" ] || return 1
+    /bin/ps -o pid= -p "$1" 2>/dev/null | /usr/bin/grep -q '[0-9]'
+}
+
+# Echo the PIDs in $1 that are still alive after at most $2 polls.
+wait_until_vacant() {
+    pending="$1"
+    ticks="$2"
+    tick=0
+    while [ -n "${pending}" ]; do
+        remaining=""
+        for pid in ${pending}; do
+            if process_is_alive "${pid}"; then
+                remaining="${remaining}${remaining:+ }${pid}"
+            fi
+        done
+        pending="${remaining}"
+        [ -n "${pending}" ] || break
+        if [ "${tick}" -ge "${ticks}" ]; then
+            break
+        fi
+        sleep "${TERMINATION_POLL_INTERVAL}"
+        tick=$((tick + 1))
+    done
+    printf '%s' "${pending}"
+}
+
+terminate_stale_instances() {
+    pending=""
+    for pid in $(/usr/bin/pgrep -x "${TERMINATION_NAME}" 2>/dev/null) \
+        $(/usr/bin/pgrep -f "Contents/MacOS/${TERMINATION_NAME}" 2>/dev/null); do
+        case "${pid}" in '' | 1 | "$$") continue ;; esac
+        case "${pending} " in *"${pid} "*) continue ;; esac
+        owner=$(/bin/ps -o user= -p "${pid}" 2>/dev/null | /usr/bin/tr -d ' ')
+        [ "${owner}" = "${login_user}" ] || continue
+        pending="${pending}${pending:+ }${pid}"
+    done
+
+    captured=$(printf '%s' "${pending}" | /usr/bin/tr ' ' ',')
+    escalated=false
+    surviving=""
+    if [ -n "${pending}" ]; then
+        for pid in ${pending}; do
+            /bin/kill -TERM "${pid}" 2>/dev/null || true
+        done
+        surviving=$(wait_until_vacant "${pending}" "${TERMINATION_GRACE_TICKS}")
+        if [ -n "${surviving}" ]; then
+            escalated=true
+            for pid in ${surviving}; do
+                /bin/kill -KILL "${pid}" 2>/dev/null || true
+            done
+            surviving=$(wait_until_vacant "${surviving}" "${TERMINATION_FORCE_TICKS}")
+        fi
+    fi
+
+    if [ -n "${surviving}" ]; then
+        result=stuck
+    else
+        result=vacated
+    fi
+    printf 'Terminate: reason=postSwap captured=[%s] escalated=%s result=%s surviving=[%s]\n' \
+        "${captured}" "${escalated}" "${result}" \
+        "$(printf '%s' "${surviving}" | /usr/bin/tr ' ' ',')"
+}
+
+terminate_stale_instances
+# End of post-swap termination helper.
+
 # Terminate the text input menu agent (TextInputMenuAgent) before registering the
 # input method: the register step must wait for the kill to finish (regardless of
 # its outcome) plus 0.5s, so the relaunched agent can pick up the newly registered
