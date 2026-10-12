@@ -39,6 +39,7 @@ let package = Package(
       type: .dynamic,
       targets: buildStrings {
         "LibVanguard"
+        "Arimitsu"
         "Shared"
         "ResourceLocator"
         "LexiconAssembly"
@@ -147,8 +148,16 @@ let package = Package(
       }
     )
     Target.target(
+      name: "Arimitsu",
+      dependencies: buildTargetDependencies {
+        "Tekkon"
+      },
+      path: "Sources/LibVanguard/Arimitsu"
+    )
+    Target.target(
       name: "LibVanguard",
       dependencies: buildTargetDependencies {
+        "Arimitsu"
         "BPMFVS"
         "BrailleSputnik"
         "LexiconAssembly"
@@ -160,6 +169,7 @@ let package = Package(
         )
         "Tekkon"
       },
+      exclude: ["Arimitsu"],
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
       },
@@ -199,6 +209,18 @@ let package = Package(
 
     // MARK: - Test Targets
 
+    Target.testTarget(
+      name: "ArimitsuTests",
+      dependencies: buildTargetDependencies {
+        "Arimitsu"
+        "Shared"
+        "Tekkon"
+      },
+      path: "Tests/LibVanguardTests/Arimitsu",
+      swiftSettings: buildSwiftSettings {
+        .defaultIsolation(MainActor.self) // set Default Actor Isolation
+      }
+    )
     Target.testTarget(
       name: "BPMFVSTests",
       dependencies: buildTargetDependencies {
@@ -278,6 +300,7 @@ let package = Package(
       name: "LibVanguardTests",
       dependencies: buildTargetDependencies {
         "LibVanguard"
+        "Arimitsu"
         "LexiconAssembly"
         "LXAssemblyMaterials4Tests"
         "Homa"
@@ -286,6 +309,7 @@ let package = Package(
         "Shared"
         "Tekkon"
       },
+      exclude: ["Arimitsu"],
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
       },

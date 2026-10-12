@@ -12,7 +12,8 @@ import Foundation
 /// 是另一層「輸入方法」概念，兩者勿混淆。本枚舉僅在 `currentTypingMethod == .vChewingFactory`
 /// 時有意義。
 public enum TypingMode: String, Equatable {
-  /// 磁帶（Cin Cassette）模式：以使用者提供的鍵盤對照表輸入（雙拼、部首筆畫等由磁帶承載）。
+  /// 磁帶（Cin Cassette）模式：以使用者提供的鍵盤對照表輸入（部首筆畫等由磁帶承載；
+  /// 雙拼已有原生實作，不復倚賴磁帶）。
   case cassette
   /// 注音鍵盤模式（Bopomofo Keyblock）。
   case bopomofoKeyblock
@@ -20,6 +21,14 @@ public enum TypingMode: String, Equatable {
   case pinyinKeyblock
   /// 狂拼模式（Furious Typing）：拼音鍵盤＋快速自動 chop 組句。
   case pinyinFuriousTyping
+  /// 雙拼模式（Dualpin）：以「聲母鍵＋韻母鍵」兩鍵取一音節，組音區仍住漢語拼音。
+  ///
+  /// - Important: 本值與 `.pinyinFuriousTyping` **不可互相取代**：雙拼之組音區雖為拼音家族、
+  ///   且狂打諸義（copilot 候選窗、前方預覽、無調確認組字）一律沿用拼音側，惟其按鍵並非
+  ///   拼音字母流 —— 兩鍵成碼、碼非逐鍵累積，故須由 `DualpinTypewriter` 前控辨識。
+  ///   又：空白鍵於雙拼下之語義為「無調確認組字」（同拼音鍵盤），而非注音側之「固化前方
+  ///   讀音」⇒ 本值**不屬於** `isPinyinFuriousTypingModeEffective`（見該處註釋）。
+  case DualPin
   /// 狂注模式（Furious Zhuyin Typing）：注音鍵盤＋快速自動切音節組句。
   ///
   /// - Important: 本值之可達性由 `prefs.furiousTypingEnabled4Zhuyin` 決定，而該偏好之出廠
@@ -34,14 +43,18 @@ public enum TypingMode: String, Equatable {
 
   /// 該打字模式用於「內文模式提示」（於對接輸入客體時顯示）的 i18n key。
   public var i18nKey4InlineModeHint: String {
-    "i18n:TypingMode.i18nKey4InlineModeHint.\(rawValue)"
+    switch self {
+    case .DualPin: return "i18n:TypingMode.i18nKey4InlineModeHint.dualPin"
+    default: return "i18n:TypingMode.i18nKey4InlineModeHint.\(rawValue)"
+    }
   }
 }
 
 extension InputHandlerProtocol {
   /// 當前打字模式（於 `currentTypingMethod == .vChewingFactory` 時才有意義）。
   ///
-  /// 判定順序：磁帶優先於一切；狂打要求狂打開關＋非逐字選字＋注拼槽之鍵盤家族；
+  /// 判定順序：磁帶優先於一切；雙拼次之（鍵盤種類即其方案之選擇）；
+  /// 狂打要求狂打開關＋非逐字選字＋注拼槽之鍵盤家族；
   /// 其餘以注拼槽是否拼音區分拼音鍵盤／注音鍵盤。
   /// `furiousTypingEnabled4Pinyin` pref 保留為「快速切換」的底層開關，本枚舉是其語義化抽象。
   ///
@@ -57,6 +70,15 @@ extension InputHandlerProtocol {
   ///   見 `kMixedAlphanumericalEnabled.description`）。
   public var typingMode: TypingMode {
     if prefs.cassetteEnabled { return .cassette }
+    // 雙拼：拼音側打字中樞成立、且「雙拼模式」開關（`dualpinEnabledForPinyinTyping`）開啟時，
+    // `currentKeyboardParserType` 即改讀方案槽 `keyboardParser4Dualpin`（內建雙拼／自訂雙拼），
+    // 而其組音區仍為拼音家族。此閘門只問「方案是否為雙拼」，**不問**方案資料是否可用 —— 後者之驗證成本高
+    // （須遍歷音節清單），故一律交由 `DualpinTypewriter` 於實際收鍵時惰性解析；
+    // 資料不可用時該打字機自行退位給 `BPMFFullMatchTypewriter`，按鍵不因而遭吞。
+    // 逐字選字模式下雙拼不生效（同狂打：該模式為逐鍵選字，與「兩鍵成碼」相衝）。
+    if currentKeyboardParserType.isDualpin, composer.isPinyinMode, !prefs.useSCPCTypingMode {
+      return .DualPin
+    }
     // 狂打開關依注拼槽之鍵盤家族二選一；兩側各自獨立（§7.1）。
     let isFurious = composer.isPinyinMode
       ? prefs.furiousTypingEnabled4Pinyin

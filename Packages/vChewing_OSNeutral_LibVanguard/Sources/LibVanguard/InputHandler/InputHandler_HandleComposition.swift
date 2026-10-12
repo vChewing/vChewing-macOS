@@ -39,6 +39,11 @@ extension InputHandlerProtocol {
       switch typingMode {
       case .cassette:
         return CassetteTypewriter(self).handle(input)
+      case .DualPin:
+        // 雙拼之前控：兩鍵成碼者可自收，餘者一律退位給 `BPMFFullMatchTypewriter`
+        // （見 `DualpinTypewriter`）。此處**直接分派**、不經 `BPMFFullMatchTypewriter`
+        // 之內部前置判斷：雙拼之 pending 首鍵與無效序皆須有持有人。
+        return DualpinTypewriter(self).handle(input)
       case .bopomofoKeyblock, .pinyinFuriousTyping, .pinyinKeyblock, .zhuyinFuriousTyping:
         return BPMFFullMatchTypewriter(self).handle(input)
       }

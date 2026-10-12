@@ -43,35 +43,29 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     let confirmCombination = input.isSpace || input.isEnter
 
     // 狂拼模式：前方候選窗顯示時，Shift+選字鍵就地選字（仿磁帶快選的路由方式）。
-    // 僅當該鍵確為選字鍵（與 handleCandidate 的 checkSelectionKey 同語義）時才路由，
-    // 避免 Shift+方向鍵／Shift+字母誤入 handleCandidate 的取消選字分支、造成重 triage
-    // 無限遞迴（注拼槽未動、候選恆在，事件反覆回到路由器）。
-    let selectionKeyMatched = input.inputTextIgnoringModifiers.map {
-      session.selectionKeys.lowercased().contains($0.lowercased())
-    } ?? false
-    let furiousShiftCandidateSelection = input.isShiftHeld
-      && handler.hasFuriousFrontPending
-      && session.state.type == .ofInputting && !session.state.candidates.isEmpty
-      && selectionKeyMatched
-    if furiousShiftCandidateSelection,
-       handler.handleCandidate(input: input, ignoringModifiers: true) {
-      return true
-    }
+    // 判準見 `handleFuriousShiftCandidateSelectionIfNeeded`（雙拼側亦共用之）。
+    if handler.handleFuriousShiftCandidateSelectionIfNeeded(input) { return true }
 
     // 狂拼模式：注拼槽尚有暫存拼音時，Enter 只固化前方讀音、停留在 Inputting 狀態
     // 留待接下來的輸入，不直接遞交全部內容。copilot 窗可見
     // 且使用者已高亮某候選時，固化該候選（等同就地選字、但不寫 POM——與 Enter 直遞
     // 的 POM 政策一致）；否則以空白鍵固化的語義只插聲調桶（保留重切分自由度）。
     // 注拼槽清空後再次 Enter（hasFuriousFrontPending 不成立）才走正常遞交路徑。
+    // 雙拼之待配首鍵雖令 `hasFuriousFrontPending` 成立，然其半截之碼無可固化者
+    // （`solidifyFuriousFrontReading` 讓位）⇒ 亦走本路徑、不吞本鍵。
     if confirmCombination, input.isEnter, !input.isHoldingAny([.control, .option, .shift, .command]),
        handler.hasFuriousFrontPending {
       if let highlight = handler.furiousHighlightOverride {
         handler.confirmFuriousFrontCandidate(highlight)
-      } else {
-        handler.solidifyFuriousFrontReading()
+        session.switchState(handler.generateStateOfInputting())
+        return true
       }
-      session.switchState(handler.generateStateOfInputting())
-      return true
+      // 無可固化者（如雙拼之待配首鍵：半截之碼不成音節、其桶含該鍵所能開啟之全部詞幹）
+      // ⇒ 不吞本鍵，逕交下方常規路徑（雙拼之非碼鍵路徑會丟棄該首鍵並照常遞交）。
+      if handler.solidifyFuriousFrontReading() {
+        session.switchState(handler.generateStateOfInputting())
+        return true
+      }
     }
 
     // 先嘗試讓注拼槽消化當前按鍵（含可能的聲調覆寫），以保留既有行為。
@@ -127,6 +121,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   ///
   /// 若本次是拼音無調的確認組字，則會將單一讀音擴成同音節的聲調候選桶；
   /// 否則維持既有的單一 full-match 索引鍵。
+  /// 雙拼模式下，同碼重碼詞幹之讀音亦一併併入（雙拼之一碼可能對應多條詞幹）。
   /// - Parameters:
   ///   - confirmCombination: 是否為用來確認組字的按鍵。
   ///   - existedIntonation: 接收本拍按鍵之前，composer 內既有的聲調狀態。
@@ -147,9 +142,13 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       confirmCombination: confirmCombination,
       existedIntonation: existedIntonation
     ) else {
-      return [readingKey]
+      return [readingKey] + handler.dualpinSiblingReadingKeys(toneInsensitiveExpansion: false)
     }
-    return Tekkon.makeToneInsensitiveVariants(of: readingKey)
+    let toneInsensitiveKeys = Tekkon.makeToneInsensitiveVariants(of: readingKey)
+    let siblings = handler.dualpinSiblingReadingKeys(toneInsensitiveExpansion: true)
+    guard !siblings.isEmpty else { return toneInsensitiveKeys }
+    var seen = Set(toneInsensitiveKeys)
+    return toneInsensitiveKeys + siblings.filter { seen.insert($0).inserted }
   }
 
   /// 判斷本次是否應將無調拼音改以聲調候選桶查詢。
@@ -485,6 +484,11 @@ extension BPMFFullMatchTypewriter {
     // 注意：actualKeys 永遠是注音符號，與 parser 模式無關。
     for scalar in readingKey.unicodeScalars {
       playbackComposer.receiveKey(fromPhonabet: scalar)
+    }
+    // 後節點必須真的是讀音音節。否則（例如字面標點節 `_punctuation_1`）此處
+    // 不得吞掉聲調鍵，而得放行給後續處置，讓同一按鍵繼續走標點鏈。
+    guard playbackComposer.phonabetKeyForQuery(pronounceableOnly: true) != nil else {
+      return nil
     }
     let cachedIntonation = playbackComposer.intonation.isValid ? playbackComposer.intonation : nil
     if playbackComposer.hasIntonation() { playbackComposer.doBackSpace() }

@@ -33,7 +33,13 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kKanjiConversionPreferences = "KanjiConversionPreferences"
   case kKeyboardParser4Pinyin = "KeyboardParser4Pinyin"
   case kKeyboardParser4Zhuyin = "KeyboardParser4Zhuyin"
+  /// 拼音打字時所採用之雙拼方案（值域 200…202，見 `KeyboardParser`）。
+  case kKeyboardParser4Dualpin = "KeyboardParser4Dualpin"
   case kPinyinTypingEnabled = "PinyinTypingEnabled"
+  /// 拼音打字時是否啟用雙拼（將字母鍵序按雙拼方案翻譯成讀音）。
+  case kDualpinEnabledForPinyinTyping = "DualpinEnabledForPinyinTyping"
+  /// 使用者自訂雙拼方案之 JSON 原文（空字串表「尚未匯入」）。內建方案不經此槽。
+  case kDualpinSchemaJSON = "DualpinSchemaJSON"
   case kBasicKeyboardLayout = "BasicKeyboardLayout"
   case kAlphanumericalKeyboardLayout = "AlphanumericalKeyboardLayout"
   case kShowModeDescriptionOnActivatingServer = "ShowModeDescriptionOnActivatingServer"
@@ -562,8 +568,12 @@ extension UserDef {
   public var validNumeralValueRange: ClosedRange<Int>? {
     switch self {
     case .kKeyboardParser4Pinyin:
-      // 拼音 parser 的值域（含 ofWadeGilesPinyin = 105）。
+      // 拼音 parser 的值域：100…105 為原廠各拼音方案。雙拼方案族（200 起）另立一鍵，
+      // 故此處不得收 200 以上之值——否則「拼音槽混入雙拼值」會通過逐鍵驗證。
       100 ... 105
+    case .kKeyboardParser4Dualpin:
+      // 雙拼 parser 的值域：200 為自訂案、201…202 為原廠兩案（見 `KeyboardParser`）。
+      200 ... 202
     case .kKeyboardParser4Zhuyin:
       // 注音 parser 的值域。
       0 ... 10
@@ -666,8 +676,11 @@ extension UserDef {
     case .kUseExternalFactoryDict: return .bool(false)
     case .kKanjiConversionPreferences: return .integer(0)
     case .kKeyboardParser4Pinyin: return .integer(100)
+    case .kKeyboardParser4Dualpin: return .integer(201) // 微軟雙拼（`ofDualpinMSPY`）。
     case .kKeyboardParser4Zhuyin: return .integer(0)
     case .kPinyinTypingEnabled: return .bool(false)
+    case .kDualpinEnabledForPinyinTyping: return .bool(false)
+    case .kDualpinSchemaJSON: return .string("")
     case .kBasicKeyboardLayout: return .string(Self.kDefaultBasicKeyboardLayout)
     case .kAlphanumericalKeyboardLayout: return .string(Self.kDefaultAlphanumericalKeyboardLayout)
     case .kShowModeDescriptionOnActivatingServer: return .bool(false)
@@ -859,9 +872,22 @@ extension UserDef {
         userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle",
         description: "i18n:UserDef.kKeyboardParser4Zhuyin.description"
       )
+    case .kKeyboardParser4Dualpin: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser4Dualpin.shortTitle",
+        description: "i18n:UserDef.kKeyboardParser4Dualpin.description"
+      )
     case .kPinyinTypingEnabled: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kPinyinTypingEnabled.shortTitle",
         description: "i18n:UserDef.kPinyinTypingEnabled.description"
+      )
+    case .kDualpinEnabledForPinyinTyping: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kDualpinEnabledForPinyinTyping.shortTitle",
+        description: "i18n:UserDef.kDualpinEnabledForPinyinTyping.description"
+      )
+    case .kDualpinSchemaJSON: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kDualpinSchemaJSON.shortTitle",
+        description: "i18n:UserDef.kDualpinSchemaJSON.description",
+        minimumOS: 14
       )
     case .kBasicKeyboardLayout: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kBasicKeyboardLayout.shortTitle",

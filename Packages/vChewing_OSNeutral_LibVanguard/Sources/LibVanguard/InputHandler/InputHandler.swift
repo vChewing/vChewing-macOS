@@ -73,6 +73,8 @@ public final class InputHandler: InputHandlerProtocol {
   public var calligrapher = "" // 磁帶專用組筆區
   public var mixedAlnumConfig = MixedAlnumConfig() // 中英混打模式之執行期狀態
   public var furiousConfig = FuriousTypingConfig() // 狂拼模式之執行期狀態
+  /// 雙拼模式之執行期狀態（方案快取＋鍵序翻譯器）。未選雙拼時為 `nil`。
+  public var dualpinConfig: DualpinConfig?
   public var composer: Composer = .init() // 注拼槽
   public var assembler: Assembler // 組字器
 

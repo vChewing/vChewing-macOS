@@ -48,6 +48,7 @@ public protocol InputHandlerProtocol: AnyObject {
   var calligrapher: String { get set } // 磁帶專用組筆區
   var mixedAlnumConfig: MixedAlnumConfig { get set } // 中英混打模式之執行期狀態
   var furiousConfig: FuriousTypingConfig { get set } // 狂拼模式之執行期狀態
+  var dualpinConfig: DualpinConfig? { get set } // 雙拼模式之執行期狀態（方案快取＋鍵序翻譯器）
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
 }
@@ -248,6 +249,7 @@ extension InputHandlerProtocol {
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
     furiousConfig.resetAll() // 狀態重置：狂拼之整批執行期狀態（trail＋當拍狀態）一併失效。
+    dualpinConfig?.resetAll() // 狀態重置：雙拼之待配首鍵一併失效（方案快取不動）。
   }
 
   /// 解除中英混打之「閂滯於英打」狀態。
@@ -475,6 +477,10 @@ extension InputHandlerProtocol {
     case .ofHualuoPinyin: composer.ensureParser(arrange: .ofHualuoPinyin)
     case .ofUniversalPinyin: composer.ensureParser(arrange: .ofUniversalPinyin)
     case .ofWadeGilesPinyin: composer.ensureParser(arrange: .ofWadeGilesPinyin)
+    // 雙拼之組音區恆為漢語拼音：雙拼方案之選擇另由 `prefs.keyboardParser4Dualpin` 與
+    // `prefs.dualpinSchemaJSON` 承載（見 `currentKeyboardParserType`）。
+    case .ofDualpinCustom, .ofDualpinGBT17, .ofDualpinMSPY:
+      composer.ensureParser(arrange: .ofHanyuPinyin)
     }
     composer.clear()
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
@@ -568,13 +574,26 @@ extension InputHandlerProtocol {
   var isComposerOrCalligrapherEmpty: Bool {
     if !strCodePointBuffer.isEmpty { return false }
     if !mixedAlphanumericalBuffer.isEmpty { return false }
+    // 雙拼之待配首鍵雖不住注拼槽，仍是已經顯示於組字區的組字素材（同混打緩衝之理）。
+    if dualpinPendingDisplayText != nil { return false }
     return prefs.cassetteEnabled ? calligrapher.isEmpty : composer.isEmpty
   }
 
   /// 獲取與當前注音排列或拼音輸入種類有關的標點索引鍵，以英數下畫線「_」結尾。
   var currentKeyboardParser: String { currentKeyboardParserType.name + "_" }
+  /// 當前實際採用之注拼槽排列。
+  ///
+  /// 雙拼係**拼音打字之加掛模式**，不自成一種打字中樞：拼音側方案（`parser.isPinyin`）成立、
+  /// 且 `prefs.dualpinEnabledForPinyinTyping` 開啟時，實際佈局改由 `keyboardParser4Dualpin`
+  /// 承載；否則一概沿用 `prefs.keyboardParser`。如此一來，「拼音方案之選擇」與「雙拼方案之
+  /// 選擇」各自獨立、互不覆寫（詳見 `UserDef.kKeyboardParser4Dualpin`）。
   var currentKeyboardParserType: KeyboardParser {
-    .init(rawValue: prefs.keyboardParser) ?? .ofStandard
+    let parser = KeyboardParser(rawValue: prefs.keyboardParser) ?? .ofStandard
+    guard parser.isPinyin, prefs.dualpinEnabledForPinyinTyping else { return parser }
+    guard let dualpin = KeyboardParser(rawValue: prefs.keyboardParser4Dualpin),
+          dualpin.isDualpin
+    else { return .ofDualpinMSPY }
+    return dualpin
   }
 
   /// 返回前一個游標位置的可解析的漢字筆畫。

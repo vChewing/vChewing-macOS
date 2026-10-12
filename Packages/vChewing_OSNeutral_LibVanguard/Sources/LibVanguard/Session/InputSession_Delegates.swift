@@ -204,6 +204,10 @@ extension SessionProtocol {
   /// 素材之取得（拼音字母流／注音音節）與其**顯示字串之組裝**（中英混合輸入回退並存時
   /// 之「原文 → 讀音」）一律交由 `InputHandlerProtocol` 分流，本處與 `MockSession` 皆只做
   /// 轉發，以免同一份判準兩處各自演化。
+  /// - Note: **雙拼之待配首鍵**亦屬「未完成讀音」：彼時碼未成、素材住翻譯狀態機而非注拼槽，
+  ///   然雙拼之音節恆為兩鍵，故首鍵即待確認之讀音（事主 2026-10-14 裁定）——
+  ///   `isFuriousCopilotCandidateWindowVisible` 於該拍即成立，窗頂 pane 之資料源
+  ///   （「原始碼 → 全等碼義」）與其顯示字串之組裝一併由 `InputHandlerProtocol` 處置。
   public var unfinishedReading: String? {
     guard isFuriousCopilotCandidateWindowVisible else { return nil }
     return inputHandler?.furiousFrontUnfinishedReadingForDisplay

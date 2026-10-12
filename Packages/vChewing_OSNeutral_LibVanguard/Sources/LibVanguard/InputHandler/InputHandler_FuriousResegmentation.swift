@@ -61,9 +61,15 @@ extension InputHandlerProtocol {
   /// `furiousFrontContext`／`hasFuriousFrontPending` 各自把守。
   /// `typingMode` 已把「狂打開關＋非磁帶＋非逐字選字＋注拼槽之鍵盤家族」打包為
   /// `.pinyinFuriousTyping`／`.zhuyinFuriousTyping` 二者之一。
+  ///
+  /// - Important: **雙拼（`.DualPin`）不另立狂打開關**，其狂打特性之有無一律隨**拼音側**之
+  ///   狂打開關（`prefs.furiousTypingEnabled4Pinyin`）——雙拼恆屬拼音家族，`LXFacade` 之
+  ///   `furiousSideEnabled` 同此口徑。否則關掉拼音狂打後，雙拼仍會開出 copilot 候選窗、
+  ///   簡拼 cells 與重切分（事主實機回報）。
   public var isFuriousTypingModeEffective: Bool {
     guard currentTypingMethod == .vChewingFactory else { return false }
     switch typingMode {
+    case .DualPin: return prefs.furiousTypingEnabled4Pinyin
     case .pinyinFuriousTyping, .zhuyinFuriousTyping: return true
     default: return false
     }
@@ -76,6 +82,16 @@ extension InputHandlerProtocol {
   ///   有意義）；② 同檔之 trail 記錄（trail 是拼音字母 blob）；③ `isPinyinFamilyTypingMode`
   ///   之語意（見 `InputHandler_CoreProtocol.swift`）；④ `retrievePOMSuggestions` 之容錯查詢
   ///   （讀的是拼音字母流）。
+  ///
+  /// - Important: **雙拼亦不屬本旗子**（`.DualPin` 僅收於 `isFuriousTypingModeEffective`），
+  ///   而係 `isFuriousTypingModeEffective` 與拼音專屬諸義之**交集外**的一員：
+  ///   ① 雙拼之按鍵不是逐鍵累積之字母流，`allowsExtendedRomajiBuffer` 對其無義，且其組音區
+  ///   之字母流係**整段寫入**（`replacePinyinBuffer`），不需尾端續接；
+  ///   ② 雙拼無 trail（trail 之語義為「同一音節之續打字母」，雙拼之音節恆為兩鍵、不成 trail）；
+  ///   ③ `isPinyinFamilyTypingMode` 讀的是 `composer.isPinyinMode`，與本旗子無涉；
+  ///   ④ **空白鍵之語義**：拼音側之空白鍵為「無調確認組字」（`shouldUseToneInsensitivePinyinLookup`），
+  ///   而本旗子一旦成立即令 `InputHandler_TriageInput` 之空白鍵改走「固化前方讀音（只插聲調桶）」
+  ///   —— 那會令雙拼使用者按下空白鍵時得到無調桶、而非其所鍵詞幹之確認組字。故雙拼不收取本旗子。
   public var isPinyinFuriousTypingModeEffective: Bool {
     currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
@@ -125,7 +141,16 @@ extension InputHandlerProtocol {
     guard isFuriousCopilotEligible else { return nil }
     if mixedAlnumZhuyinFuriousInEffect { return mixedAlnumPendingReading }
     switch typingMode {
+    case .DualPin:
+      // 雙拼之組音區與拼音鍵盤同構（`romajiBuffer` 即其詞幹）；惟**首鍵即成讀音**——雙拼之音節
+      // 恆為兩鍵，故半截之碼（首鍵）即「未完成之讀音」，只是其素材住翻譯狀態機
+      // （`translator.pendingFirstKey`）而非注拼槽。該鍵所能開啟之諸詞幹已足以開出 copilot 窗
+      // （見 `furiousFrontContext` 之雙拼首鍵分支、與 `dualpinPendingDisplayText`）。
+      // 拼音專屬之旗子（`isPinyinFuriousTypingModeEffective`）另司空白鍵與 trail，此處不涉。
+      let romaji = composer.romajiBuffer
+      return romaji.isEmpty ? dualpinPendingDisplayText : romaji
     case .pinyinFuriousTyping:
+      // 拼音側無「首鍵即成讀音」之義：空之字母流即無讀音可示。
       let romaji = composer.romajiBuffer
       return romaji.isEmpty ? nil : romaji
     case .zhuyinFuriousTyping:
@@ -154,6 +179,13 @@ extension InputHandlerProtocol {
   ///   拼音素材（romaji 字母流）本即拼音，原樣轉發；磁帶模式亦原樣。
   public var furiousFrontUnfinishedReadingForDisplay: String? {
     guard let reading = furiousFrontUnfinishedReading else { return nil }
+    // 雙拼之首鍵：素材係半截之碼（音節未定、無單一讀音可示），故窗頂 pane 改示
+    // 「原始碼 → 該鍵於首鍵之位之意義」（聲母，或零聲母政策所定之韻母首字元）；
+    // 前綴詞幹之窮舉太寬、次鍵之韻母又非其義，皆不可用。
+    if typingMode == .DualPin, composer.romajiBuffer.isEmpty,
+       let paneText = dualpinPendingFirstKeyPaneText {
+      return paneText
+    }
     let displayed = IMEStateParsed.convertReadingForHanyuPinyinDisplay(
       reading,
       isHanyuPinyin: !composer.isPinyinMode
@@ -176,7 +208,34 @@ extension InputHandlerProtocol {
   ///   **P273 起「素材之住處」不再限於注拼槽**：中英混合輸入回退啟用時，素材住在混打之
   ///   ASCII 緩衝區（該緩衝區已被投影進注拼槽，故量測處不變）。使用者可見之義為
   ///   「前方有一個待確認之讀音」，與它住在哪裡無涉。
+  ///   **2026-10-14（事主裁定）起雙拼之首鍵亦屬之**：雙拼之音節恆為兩鍵，故首鍵（半截之碼）
+  ///   即「未完成之讀音」，copilot 窗於該拍即成立、Shift+選字鍵亦可提前選字
+  ///   （見 `furiousFrontUnfinishedReading` 之 `.DualPin` 臂）。
   public var hasFuriousFrontPending: Bool { furiousFrontUnfinishedReading != nil }
+
+  /// 狂打 copilot 窗顯示中，Shift＋選字鍵就地選字（提前確認前方讀音）。
+  ///
+  /// 注音側與雙拼側**共用同一份判準**：該鍵須確為選字鍵（與 `handleCandidate` 之
+  /// `checkSelectionKey` 同語義），否則 Shift＋方向鍵／Shift＋字母會誤入
+  /// `handleCandidate` 之取消選字分支、造成重 triage 之無限遞迴
+  /// （注拼槽未動、候選恆在，事件反覆回到路由器）。
+  ///
+  /// - Note: 雙拼側**必須**經本處受理：雙拼之按鍵一律由 `InputHandler_HandleComposition`
+  ///   直接分派給 `DualpinTypewriter`，`BPMFFullMatchTypewriter` 之同名前置判斷於該路徑
+  ///   不復見——若不在雙拼側另設本處，Shift＋選字鍵會先被雙拼之「非碼鍵」分支作廢待配首鍵、
+  ///   再落入 BPMF 之符號輸入（實測：雙拼首鍵之拍按 Shift+1 會插入「！」）。
+  /// - Returns: 是否已消費本鍵。
+  func handleFuriousShiftCandidateSelectionIfNeeded(_ input: some InputSignalProtocol) -> Bool {
+    guard let session = session else { return false }
+    guard input.isShiftHeld, hasFuriousFrontPending,
+          session.state.type == .ofInputting, !session.state.candidates.isEmpty
+    else { return false }
+    let selectionKeyMatched = input.inputTextIgnoringModifiers.map {
+      session.selectionKeys.lowercased().contains($0.lowercased())
+    } ?? false
+    guard selectionKeyMatched else { return false }
+    return handleCandidate(input: input, ignoringModifiers: true)
+  }
 
   /// 注音狂打：**標準選字窗**用之簡拼整詞候選。
   ///
@@ -264,6 +323,11 @@ extension InputHandlerProtocol {
   ///   ——後者之素材住緩衝區，而 `hasFuriousFrontPending` 讀的正是該緩衝，故固化後仍為真。
   @discardableResult
   func solidifyFuriousFrontReading() -> Bool {
+    // 雙拼之待配首鍵：半截之碼不成音節，故**無讀音可固化**。其桶係「該首鍵所能開啟之全部
+    // 詞幹之全部讀音」（數百鍵），逕插將令同一音節重複入庫——該首鍵仍待配，次鍵仍會與之成碼。
+    // 該拍之窗本就只為「Shift+選字鍵提前選字」而開（事主 2026-10-14 裁定），
+    // 故本函式於該情境一律讓位，由呼叫端決定本鍵之歸屬。
+    if typingMode == .DualPin, composer.romajiBuffer.isEmpty { return false }
     guard let furiousContext = furiousFrontContext else {
       return solidifyAbbreviatedFrontReading()
     }

@@ -80,6 +80,7 @@
 "i18n:ErrorMessage.IdentifierAlreadyExists" = "The selected item's identifier is already in the list.";
 "i18n:ErrorMessage.InvalidAppBundle" = "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier.";
 "i18n:ErrorMessage.InvalidCodePoint" = "Invalid Code Point.";
+"i18n:ErrorMessage.InvalidDualpinCode" = "The dual-pin code just typed is invalid; both keys were dropped.";
 "i18n:ErrorMessage.InvalidSelectionKeys" = "Invalid Selection Keys.";
 "i18n:ErrorMessage.MaxCandidateKeys" = "Maximum 10 candidate keys allowed.";
 "i18n:ErrorMessage.MaxResultsReturnable" = "Maximum 15 results returnable.";

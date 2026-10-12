@@ -91,11 +91,12 @@ final class MockSessionUI: SessionUIProtocol {
 
 // MARK: - MockTooltipUI
 
-/// `TooltipUIProtocol` 替身：記錄顯示內容、次數與座標。
+/// `TooltipUIProtocol` 替身：記錄顯示內容、配色、次數與座標。
 final class MockTooltipUI: TooltipUIProtocol {
   var shownTooltip: String?
   var shownDuration: Double?
   var shownPoint: CGPoint?
+  var shownColorState: TooltipColorState?
   var showCount = 0
   var hideCount = 0
   var syncCount = 0
@@ -126,7 +127,7 @@ final class MockTooltipUI: TooltipUIProtocol {
     isShown = false
   }
 
-  func setColor(state _: TooltipColorState) {}
+  func setColor(state: TooltipColorState) { shownColorState = state }
 }
 
 // MARK: - MockPCB

@@ -94,8 +94,39 @@ public enum KeyboardParser: Int, CaseIterable {
   case ofHualuoPinyin = 103
   case ofUniversalPinyin = 104
   case ofWadeGilesPinyin = 105
+  /// 使用者自訂之雙拼方案（其內容存於 `UserDef.kDualpinSchemaJSON`）。取值域之下界 200。
+  ///
+  /// 雙拼族**不**與拼音方案共用同一連續段（拼音：100…105、雙拼：200…202）：雙拼係拼音打字
+  /// 之加掛模式，其方案選擇另由 `UserDef.kKeyboardParser4Dualpin` 承載，故兩者之值域必須分離，
+  /// 否則「拼音槽裡放了雙拼值」這種混合態無從以值辨識（見 `KeyboardParser.isPinyin`）。
+  /// 宣告序即值序：使用者自備者取下界 200，其後依序為原廠方案 201…202。
+  case ofDualpinCustom = 200
+  /// 微軟雙拼（MSPY）。雙拼方案之鍵序翻譯由 `Arimitsu` 模組承擔、組音區之注音排列仍為
+  /// 漢語拼音（見 `ensureKeyboardParser()`）。
+  case ofDualpinMSPY = 201
+  /// GB/T 34947-2017 之雙拼方案。
+  case ofDualpinGBT17 = 202
 
   // MARK: Public
+
+  /// 該排列是否為雙拼方案族（其鍵序須經 `Arimitsu` 翻譯方可成為讀音）。
+  public var isDualpin: Bool {
+    switch self {
+    case .ofDualpinCustom, .ofDualpinGBT17, .ofDualpinMSPY: return true
+    default: return false
+    }
+  }
+
+  /// 該排列是否為注音方案族（臺灣注音：大千、倚天、許氏、倉頡……等十案）。
+  ///
+  /// 注音側之值域恆為 `0…10`，故以此為唯一判準即可。
+  public var isZhuyin: Bool { rawValue < 100 }
+
+  /// 該排列是否為拼音方案族（不含雙拼）。
+  ///
+  /// 不得再以 `rawValue >= 100` 判定拼音：雙拼族自 200 起亦滿足該條件，卻屬另一模式
+  /// （其組音區雖為漢語拼音，方案選擇與拼音方案互不相干）。
+  public var isPinyin: Bool { rawValue >= 100 && !isDualpin }
 
   public var localizedMenuName: String {
     let rawString: String = {
@@ -117,6 +148,9 @@ public enum KeyboardParser: Int, CaseIterable {
       case .ofHualuoPinyin: return "i18n:TypingMethod.HualuoPinyinNumeral"
       case .ofUniversalPinyin: return "i18n:TypingMethod.UniversalPinyinNumeral"
       case .ofWadeGilesPinyin: return "i18n:TypingMethod.WadeGilesPinyinNumeral"
+      case .ofDualpinCustom: return "i18n:KeyboardLayout.DualpinCustom"
+      case .ofDualpinMSPY: return "i18n:KeyboardLayout.DualpinMSPY"
+      case .ofDualpinGBT17: return "i18n:KeyboardLayout.DualpinGBT17"
       }
     }()
     return rawString.i18n
@@ -158,6 +192,12 @@ public enum KeyboardParser: Int, CaseIterable {
       return "UniversalPinyin"
     case .ofWadeGilesPinyin:
       return "WadeGilesPinyin"
+    case .ofDualpinCustom:
+      return "DualpinCustom"
+    case .ofDualpinMSPY:
+      return "DualpinMSPY"
+    case .ofDualpinGBT17:
+      return "DualpinGBT17"
     }
   }
 }

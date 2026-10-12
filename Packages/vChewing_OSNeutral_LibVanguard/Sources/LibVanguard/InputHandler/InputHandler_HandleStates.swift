@@ -54,9 +54,16 @@ extension InputHandlerProtocol {
       // （§3.2 條件 ②），故有聲調時不提供前方上下文。
       guard composer.intonation.isEmpty else { return nil }
       let romaji = composer.romajiBuffer
-      guard !romaji.isEmpty else { return nil }
-      let tonelessZhuyin = Tekkon.PinyinTrie.shared(parser: composer.parser)
-        .zhuyinReadings(forPinyinFragment: romaji)
+      // 雙拼之首鍵尚未成碼時組音區為空，但該鍵所能開啟之諸碼已足以推算桶——狂打之
+      // copilot 窗於首鍵按下時即成立，不必等次鍵（事主 2026-10-13）。
+      var tonelessZhuyin: [String]
+      if romaji.isEmpty {
+        tonelessZhuyin = dualpinPendingPrefixReadingKeys()
+        guard !tonelessZhuyin.isEmpty else { return nil }
+      } else {
+        tonelessZhuyin = Tekkon.PinyinTrie.shared(parser: composer.parser)
+          .zhuyinReadings(forPinyinFragment: romaji)
+      }
       bucket = tonelessZhuyin.flatMap { Tekkon.makeToneInsensitiveVariants(of: $0) }
     } else {
       // 注音側：未完成音節即讀音本體、無須反推；與顯示源共用同一判準（連聲調之有無
@@ -420,6 +427,9 @@ extension InputHandlerProtocol {
     // 前方候選一旦套用，該暫存即被候選之讀音覆蓋，故先清空；失敗時整槽還原
     // （比逐欄重建更忠實，且兩側共用同一段碼）。
     let composerBackup = composer
+    // 雙拼：該拍之「未完成讀音」即待配之首鍵（碼未成，故組音區尚空）。使用者既已顯式選字，
+    // 翻譯狀態機之該首鍵即告消耗——否則緊接之次鍵會與同一首鍵再次成碼（同一音節重複入庫）。
+    let consumesDualpinFirstKey = typingMode == .DualPin && composer.romajiBuffer.isEmpty
     composer.clear()
     // 中英混合輸入回退側：讀音素材住混打緩衝區。候選一旦套用，該緩衝即被候選之讀音
     // 取代（與注拼槽同理）⇒ 一併清空；套用失敗時整段還原（與 `composerBackup` 同構）。
@@ -440,10 +450,12 @@ extension InputHandlerProtocol {
       return
     case .inserted:
       // 覆寫失敗：保留已插入讀音（組句結果與 copilot 預覽一致）。
+      if consumesDualpinFirstKey { dualpinFlushPending() }
       return
     case .overridden:
       break
     }
+    if consumesDualpinFirstKey { dualpinFlushPending() }
     // 僅使用者顯式選字（memorizePOM）才進入 POM 觀察；Enter 固化高亮候選不寫入。
     guard memorizePOM else { return }
     memorizeFuriousPOMObservation(
@@ -576,9 +588,12 @@ extension InputHandlerProtocol {
       guard prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty else { return nil }
       return mixedAlphanumericalBuffer
     }()
+    // ★ 雙拼模式：待配之首鍵**原樣顯示**（雙拼使用者未必識得注音，故不作文音前綴之展開）。
+    // 此顯示只入組字區、不入注拼槽；`dualpinPendingDisplayText` 不觸發方案解析。
+    let dualpinReading = dualpinPendingDisplayText
     let reading: String = noReading
       ? ""
-      : (mixedAlnumReading ?? furiousPreview ?? readingForDisplay)
+      : (dualpinReading ?? mixedAlnumReading ?? furiousPreview ?? readingForDisplay)
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""

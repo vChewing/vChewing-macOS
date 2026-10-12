@@ -92,11 +92,20 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kKeyboardParser4Pinyin)
   public var keyboardParser4Pinyin: Int
 
+  @AppProperty(userDef: .kKeyboardParser4Dualpin)
+  public var keyboardParser4Dualpin: Int
+
   @AppProperty(userDef: .kKeyboardParser4Zhuyin)
   public var keyboardParser4Zhuyin: Int
 
   @AppProperty(userDef: .kPinyinTypingEnabled)
   public var pinyinTypingEnabled: Bool
+
+  @AppProperty(userDef: .kDualpinEnabledForPinyinTyping)
+  public var dualpinEnabledForPinyinTyping: Bool
+
+  @AppProperty(userDef: .kDualpinSchemaJSON)
+  public var dualpinSchemaJSON: String
 
   @AppProperty(userDef: .kKanjiConversionPreferences)
   public var kanjiConversionPreferences: Int
@@ -370,12 +379,22 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   /// 舊版單一注拼槽 parser 屬性的相容層：依當前打字模式（注音/拼音）讀寫各自的 parser 槽位。
   ///
   /// - getter：`pinyinTypingEnabled` 時讀 `keyboardParser4Pinyin`，否則讀 `keyboardParser4Zhuyin`。
-  /// - setter：依給定值的語系自動分流——值 ≥ 100（拼音系）寫入 `keyboardParser4Pinyin` 並開啟
-  ///   `pinyinTypingEnabled`；值 < 100（注音系）寫入 `keyboardParser4Zhuyin` 並關閉 `pinyinTypingEnabled`。
+  /// - setter：依給定值的語系自動分流——拼音方案（100…105）寫入 `keyboardParser4Pinyin` 並開啟
+  ///   `pinyinTypingEnabled`；雙拼方案（200 起）寫入 `keyboardParser4Dualpin` 並開啟
+  ///   `pinyinTypingEnabled` 與 `dualpinEnabledForPinyinTyping`（雙拼係拼音打字之加掛模式，
+  ///   故兩閘皆須開，否則該值寫入後即無處生效）；注音方案（< 100）寫入 `keyboardParser4Zhuyin`
+  ///   並關閉 `pinyinTypingEnabled`。
+  ///
+  /// - Remark: getter 恆回拼音／注音方案，不回雙拼方案——雙拼之選擇以 `keyboardParser4Dualpin`
+  ///   為單一正本（見 `InputHandlerProtocol.currentKeyboardParserType`）。
   public var keyboardParser: Int {
     get { pinyinTypingEnabled ? keyboardParser4Pinyin : keyboardParser4Zhuyin }
     set {
-      if newValue >= 100 {
+      if KeyboardParser(rawValue: newValue)?.isDualpin == true {
+        keyboardParser4Dualpin = newValue
+        pinyinTypingEnabled = true
+        dualpinEnabledForPinyinTyping = true
+      } else if newValue >= 100 {
         keyboardParser4Pinyin = newValue
         pinyinTypingEnabled = true
       } else {
@@ -477,12 +496,18 @@ extension PrefMgr {
   public func fixOddPreferencesCore() {
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
-    // 注拼槽注音排列選項糾錯：注音與拼音 parser 分兩路檢查，非法值各自歸回預設。
-    if KeyboardParser(rawValue: keyboardParser4Zhuyin) == nil {
+    // 注拼槽注音排列選項糾錯：注音／拼音／雙拼三槽各自檢查，非法值各自歸回預設。
+    // 三槽之值域互斥（注音 0…10、拼音 100…105、雙拼 200…202），故不得只驗「是否為合法 enum
+    // 值」——`KeyboardParser(rawValue:)` 對三族一律非 nil，混槽之值會就此矇混過關
+    // （例如拼音槽裡放了 201，逐鍵驗證與夾值皆須拒絕）。
+    if KeyboardParser(rawValue: keyboardParser4Zhuyin)?.isZhuyin != true {
       keyboardParser4Zhuyin = 0
     }
-    if KeyboardParser(rawValue: keyboardParser4Pinyin) == nil {
+    if KeyboardParser(rawValue: keyboardParser4Pinyin)?.isPinyin != true {
       keyboardParser4Pinyin = 100
+    }
+    if KeyboardParser(rawValue: keyboardParser4Dualpin)?.isDualpin != true {
+      keyboardParser4Dualpin = KeyboardParser.ofDualpinMSPY.rawValue
     }
     // 漢字轉換（當代繁體/康熙/JIS）的枚舉值糾錯。
     if ![0, 1, 2].contains(kanjiConversionPreferences) {

@@ -64,6 +64,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var calligrapher = ""
   public var mixedAlnumConfig = MixedAlnumConfig()
   public var furiousConfig = FuriousTypingConfig() // 狂拼模式之執行期狀態
+  public var dualpinConfig: DualpinConfig? // 雙拼模式之執行期狀態（方案快取＋鍵序翻譯器）
   public var composer: Tekkon.Composer = .init()
   public var assembler: Homa.Assembler
   public var isJISKeyboard: (() -> Bool)? = { false }
@@ -128,6 +129,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
     // 與生產端 InputSession_Delegates 逐字對應：狂打 copilot 窗的未完成讀音
     // （頂部 pane 資料源）。素材取得與其顯示字串之組裝一律委由 handler 分流，
     // 本處不自行判讀注拼槽或混打緩衝，以免 mock 與生產之判準各自演化。
+    // 雙拼之待配首鍵亦屬「未完成讀音」（見 `furiousFrontUnfinishedReading` 之 `.DualPin` 臂）。
     guard isFuriousCopilotCandidateWindowVisible else { return nil }
     return inputHandler?.furiousFrontUnfinishedReadingForDisplay
   }
@@ -362,7 +364,24 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   }
 
   public func getMitigatedState(_ givenState: State) -> State { givenState }
-  public func showTooltip(_: String?, colorState _: TooltipColorState, duration _: Double) {}
+
+  /// 真品之實作位於 `InputSession_HandleDisplay`（另有 `isCurrentSession`／`hasClient` 閘
+  /// 與錨點量測，於 mock 無從施作）；此處僅把顯示請求轉發至 `ui?.tooltipUI`，
+  /// 以便測試斷言提示之內容、配色與時長。
+  public func showTooltip(_ string: String?, colorState: TooltipColorState, duration: Double) {
+    guard let string, !string.isEmpty else {
+      ui?.tooltipUI?.hide()
+      return
+    }
+    ui?.tooltipUI?.setColor(state: colorState)
+    ui?.tooltipUI?.show(
+      tooltip: string,
+      at: CGPoint(x: 0, y: 0),
+      bottomOutOfScreenAdjustmentHeight: 0,
+      direction: .horizontal,
+      duration: duration
+    )
+  }
 
   // MARK: Internal
 

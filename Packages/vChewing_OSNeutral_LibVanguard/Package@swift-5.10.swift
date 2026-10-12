@@ -46,6 +46,7 @@ let package = Package(
       type: .static,
       targets: [
         "LibVanguard",
+        "Arimitsu",
         "Shared",
         "ResourceLocator",
         "LexiconAssembly",
@@ -121,8 +122,16 @@ let package = Package(
       ]
     ),
     .target(
+      name: "Arimitsu",
+      dependencies: [
+        "Tekkon",
+      ],
+      path: "Sources/LibVanguard/Arimitsu"
+    ),
+    .target(
       name: "LibVanguard",
       dependencies: [
+        "Arimitsu",
         "BPMFVS",
         "BrailleSputnik",
         "LexiconAssembly",
@@ -133,6 +142,9 @@ let package = Package(
           name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
         ),
         "Tekkon",
+      ],
+      exclude: [
+        "Arimitsu",
       ],
       linkerSettings: [
         LinkerSetting.linkedLibrary("iconv", .when(platforms: [.macOS])),

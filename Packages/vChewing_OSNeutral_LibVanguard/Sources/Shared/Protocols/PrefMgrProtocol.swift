@@ -25,7 +25,10 @@ public protocol PrefMgrProtocol {
   var keyboardParser: Int { get set }
   var keyboardParser4Pinyin: Int { get set }
   var keyboardParser4Zhuyin: Int { get set }
+  var keyboardParser4Dualpin: Int { get set }
   var pinyinTypingEnabled: Bool { get set }
+  var dualpinEnabledForPinyinTyping: Bool { get set }
+  var dualpinSchemaJSON: String { get set }
   var kanjiConversionPreferences: Int { get set }
   var basicKeyboardLayout: String { get set }
   var alphanumericalKeyboardLayout: String { get set }

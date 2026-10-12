@@ -2919,4 +2919,41 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
     }
   }
+
+  // MARK: - 字面節點之後的數字連打
+
+  /// 「覆寫身後聲調」之流程於後節點並非讀音音節（如字面標點節 `_punctuation_1`）時
+  /// 會誤吞數字鍵——該缺陷住拼音家族共用的打字機鏈路，雙拼之境見 `IH-Dualpin-013`；
+  /// 於此另立一測，使拼音側亦不得復發。
+  @Test("IH-FuriousPinyin-016 Consecutive digit keys insert literal nodes")
+  func test_IH_FuriousPinyin_016_ConsecutiveDigitKeysInsertLiteralNodes() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+    var reportedErrors: [String] = []
+    testHandler.errorCallback = { reportedErrors.append($0) }
+    defer {
+      testHandler.errorCallback = nil
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
+    testHandler.currentLM.syncPrefs()
+
+    ["1", "2", "3"].forEach { typeSentence($0) }
+    #expect(reportedErrors.isEmpty, "連打數字不得示警：\(reportedErrors)")
+    #expect(
+      testHandler.assembler.assembledSentence.map(\.value) == ["1", "2", "3"],
+      "數字應逐鍵落為字面節"
+    )
+  }
 }
