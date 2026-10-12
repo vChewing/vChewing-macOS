@@ -32,6 +32,14 @@ public enum Tekkon {
     allowedConsonants + allowedSemivowels + allowedVowels + allowedIntonations
   }
 
+  /// 漢語拼音之全部讀音詞幹（426 條，如 `chuang`、`nv`），為 `mapHanyuPinyin` 之鍵的公開投影。
+  ///
+  /// 此 API 供需要「漢語拼音讀音全集」卻不便直讀注音對照表者使用：值才是注音、鍵才是拼音，
+  /// 且注音之讀音全集（見 `SyllableIndex`）與此不可混用。結果按字母升冪排序，便於比對與測試。
+  public static var allHanyuPinyinStems: [String] {
+    mapHanyuPinyin.keys.sorted()
+  }
+
   // MARK: Internal
 
   /// 原始轉換對照表資料貯存專用佇列（數字標調格式）。

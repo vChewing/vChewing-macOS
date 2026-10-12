@@ -10,6 +10,16 @@ import Testing
 @MainActor
 @Suite(.serialized)
 struct TekkonTestsPinyin {
+  @Test("[Tekkon] HanyuPinyin_StemInventory")
+  func testAllHanyuPinyinStems() async throws {
+    let stems = Tekkon.allHanyuPinyinStems
+    #expect(stems.count == 426)
+    #expect(Set(stems) == Set(Tekkon.mapHanyuPinyin.keys))
+    #expect(stems == stems.sorted())
+    #expect(!stems.contains("q"))
+    #expect(stems.contains("eh"))
+  }
+
   @Test("[Tekkon] Composer_InputAndComposition_HanyuPinyin")
   func testHanyuPinyinKeyReceivingAndCompositions() async throws {
     var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
