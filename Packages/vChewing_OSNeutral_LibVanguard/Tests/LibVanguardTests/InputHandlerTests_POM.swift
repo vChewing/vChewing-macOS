@@ -18,7 +18,7 @@ import HomaSharedTestComponents
 // 語境詞界一節緣於使用者報告：打「這個檔案是怎樣出現的？」時實際輸出為「這個檔案室怎樣出現的？」；
 // 而用以糾正該句之漸退記憶（`這個 檔案 是` 之三元語境）只在先把游標退到「檔」後面、
 // 於選字窗選一次「檔案」，再把游標推到「是」、於選字窗選一次「是」之後才會生成。
-// 該節以三支互補之靶釘住該流程：**寫入側**（單次選字即應寫下詞級語境）、
+// 該節以三支互補之測試用例釘住該流程：**寫入側**（單次選字即應寫下詞級語境）、
 // **讀取側**（語境加分於每一輪組句皆須重算）、**整合**（單次糾正 → 重打即得正確句子）。
 
 // MARK: - IH.POM
@@ -1443,7 +1443,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   ///
   /// 舊行為：組句函式於命中語境加分時把節點記成 `withTopGramScore` 覆寫狀態，而該狀態之計分臂
   /// 逕以 unigram 基線計分 ⇒ 加分不再重算。實測：按「ㄕˋ」時得「這個檔案是」，再按「ㄗ」即
-  /// 還原成「這個檔案室怎」。本靶直接注入詞級記憶、不經寫入側，故兩側之缺陷可分別歸因。
+  /// 還原成「這個檔案室怎」。本測試目標直接注入詞級記憶、不經寫入側，故兩側之缺陷可分別歸因。
   @Test("IH-POM-025 Contextual bonus is recomputed on every assembly")
   func test_IH_POM_025_ContextualBonusIsRecomputedOnEveryAssembly() throws {
     guard let testHandler, let testSession else {

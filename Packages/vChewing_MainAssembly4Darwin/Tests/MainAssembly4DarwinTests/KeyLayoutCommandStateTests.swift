@@ -10,7 +10,7 @@ import Testing
 /// 病灶：`⌘`／`⌃⌘` 系和弦在這些佈局上必須落到拉丁字母表，客體（Chromium 系）才拿得到
 /// `c`／`w` 一類字元；若落到注音表或控制字元表，客體的熱鍵即失效（`⌃⌘C` 會得到 `ㄏ`／`0x03`）。
 /// Apple 自家的注音佈局（`com.apple.keylayout.ZhuyinBopomofo`／`ZhuyinEten`）在 `⌘`／`⌃⌘` 下一律回
-/// 拉丁小寫。故本靶釘住兩件事：
+/// 拉丁小寫。故本測試目標釘住兩件事：
 /// ① 每個佈局都存在一條「**必須同時**按住 Command 與 Control」的 `keyMapSelect`，且它**排在**
 /// 「只需 Control」那一條之前——IMK 取首個命中者，故此處**位置即判準**；
 /// ② 凡 modifier 規格**要求** Command 的條目，其目標 `keyMap` 的字母鍵輸出必須是 ASCII

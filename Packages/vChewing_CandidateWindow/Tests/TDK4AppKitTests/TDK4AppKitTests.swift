@@ -921,7 +921,7 @@ struct TDK4AppKitTests {
   ///
   /// 窗體縮放動畫期間，視圖之 frame 尚在途中，而 `pool.metrics`（＝`fittingSize`）已是終值。
   /// 背景若取終值，窗體右端（橫向縮小）／下端（縱向縮小）就會留下一條未著色之破口。
-  /// 本靶以「frame 大於 metrics」重現動畫途中之狀態，逐端查驗背景之涵蓋範圍。
+  /// 本測試目標以「frame 大於 metrics」重現動畫途中之狀態，逐端查驗背景之涵蓋範圍。
   @Test
   func testBackgroundTracksCurrentBoundsInsteadOfLayoutMetrics() throws {
     let candidates: [CandidateInState] = ["我", "好", "的"].map {

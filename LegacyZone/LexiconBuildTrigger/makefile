@@ -44,7 +44,7 @@ clean510:
 
 # 集中產物。檔名逐一列出（而非整目錄複製），以免把 plug-in 的中間垃圾一併帶進固定產物目錄。
 #
-# 4.8.0 的實測產物位置（`<scratch>/plugins/outputs/<套件名小寫>/<靶名>/<plug-in 名>/…`）：
+# 4.8.0 的實測產物位置（`<scratch>/plugins/outputs/<套件名小寫>/<建置目標名>/<plug-in 名>/…`）：
 #   VanguardTextMapPlugin/VanguardLexiconData/Build/Release/vanguard-textmap/VanguardFactoryDict4Typing.txtMap
 #   TextTemplateAssetInjectorPlugin/TextTemplateAssets/template-associatedPhrases-cht.txt
 #   TextTemplateAssetInjectorPlugin/TextTemplateAssets/template-associatedPhrases-chs.txt

@@ -28,7 +28,7 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 ## Testing & Tooling
 
 - 針對變更的 package 執行 `swift test`；對 Tekkon/Homa 相關改動請補齊邊界案例。
-- **單元測試不對 Swift 5.10 開放**：5.10 側 manifest 不宣告任何測試靶（含僅供測試的素材靶），逐套件 makefile 亦不提供測試目標；測試一律只在 6.4 側跑（`swift test`），5.10 側僅以 `make build510`（逐套件）與 `make debugLegacy`（倉根兩支執行檔）驗可建置性。
+- **單元測試不對 Swift 5.10 開放**：5.10 側 manifest 不宣告任何測試目標（含僅供測試的素材目標），逐套件 makefile 亦不提供測試目標；測試一律只在 6.4 側跑（`swift test`），5.10 側僅以 `make build510`（逐套件）與 `make debugLegacy`（倉根兩支執行檔）驗可建置性。
 - 偏好 (PrefMgr) 相關測試需在測試前後還原設定，避免滲漏。
 - 若新增可視化或除錯輸出，透過偏好旗標控制，避免影響 Release 組建。
 

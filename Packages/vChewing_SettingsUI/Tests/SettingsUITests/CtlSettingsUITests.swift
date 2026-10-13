@@ -13,7 +13,7 @@ import Testing
 
 /// SwiftUI 偏好設定視窗的生命週期測試：確認關閉後不留殘存 controller 與 contentView。
 ///
-/// 原位於 MainAssembly4Darwin 的單元測試靶（該處以 `AppDelegate.shared.checkMemoryUsage()`
+/// 原位於 MainAssembly4Darwin 的單元測試目標（該處以 `AppDelegate.shared.checkMemoryUsage()`
 /// 另作主體 RAM 取樣）；移入本套件後僅保留視窗生命週期斷言——RAM 取樣屬宿主 App 的
 /// 記憶體遙測，非本套件可觀測之範圍。
 @Suite(.serialized)

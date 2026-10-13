@@ -161,7 +161,7 @@ func cassetteURLForTests(_ fileNameStem: String, ext: String) -> URL? {
 
 // MARK: - LibVanguardTestsRoot.InputHandlerTests
 
-// 歸入本靶唯一根 suite（見 `LibVanguardTests_Root.swift`）：本靶測試共用全域狀態，不得並行。
+// 歸入本測試目標唯一根 suite（見 `LibVanguardTests_Root.swift`）：本測試目標測試共用全域狀態，不得並行。
 extension LibVanguardTestsRoot {
   /// 唯音輸入法的 InputHandler 單元測試（LibVanguard 模組）。
   /// 其子 suite `SessionTests` 亦隨之落入同一 serialized 子樹。

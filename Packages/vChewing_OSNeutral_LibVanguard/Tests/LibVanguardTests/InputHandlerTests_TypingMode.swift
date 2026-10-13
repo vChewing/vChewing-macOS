@@ -215,11 +215,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 熱鍵之動作即 `PrefMgr.shared.pinyinTypingEnabled.toggle()` ＋ `ensureKeyboardParser()`
   /// （`IMEMenuSputnik`）；而 `syncPrefs()` 於**每一次分診之頂端**執行
   /// （`InputHandler_TriageInput.swift`）⇒「切換後之下一拍」即「下一次 `triageInput`」。
-  /// 本靶以真實之分診釘住該語義：切換與分診之間旗標**必須仍是舊值**（證明它由分診頂端
+  /// 本測試目標以真實之分診釘住該語義：切換與分診之間旗標**必須仍是舊值**（證明它由分診頂端
   /// 刷新、而非偏好之寫入即時連動），分診之後**必須已跟上**。
   ///
   /// 測資令兩側狂打開關**相反**，故旗標必然隨熱鍵反向翻轉——若實作誤認「當前打字方式」
-  /// 或只看拼音側，本靶即轉紅。
+  /// 或只看拼音側，本測試目標即轉紅。
   @Test("IH-TypingMode-005 Typing mode hotkey reflects on next beat")
   func test_IH_TypingMode_005_TypingModeHotKeyReflectsOnNextBeat() throws {
     guard let testHandler, let testSession else {
@@ -264,11 +264,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(!testHandler.currentLM.config.shouldSuppressFactoryZhuyinwenData)
   }
 
-  /// 逐字選字（SCPC）與磁帶模式下**不啟用狂打特性**——本靶驗其中一項：
+  /// 逐字選字（SCPC）與磁帶模式下**不啟用狂打特性**——本測試目標驗其中一項：
   /// 拼音連打之自動切音節須於 SCPC 下停用（注音側之孿生函式由狂打閘門把守；
   /// 拼音側因歷史緣故無閘門，此即該閘之固化物）。磁帶不經本型別
   /// （`handleComposition` 之打字模式分派：`.cassette` → `CassetteTypewriter`），
-  /// 故無從在同一個靶內驅動，僅以註解記之。
+  /// 故無從在同一個測試目標內驅動，僅以註解記之。
   @Test("IH-TypingMode-006 SCPC disables pinyin auto chop")
   func test_IH_TypingMode_006_SCPCDisablesPinyinAutoChop() throws {
     guard let testHandler, let testSession else {

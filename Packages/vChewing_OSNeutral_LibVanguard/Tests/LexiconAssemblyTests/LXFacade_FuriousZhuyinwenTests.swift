@@ -13,7 +13,7 @@ import Testing
 /// 測試樣本（vanguardTextMap_test.txtMap）中，讀音「ㄋㄟ-ㄋㄟ」的唯一注音文
 /// 條目為「ㄋㄟㄋㄟ」（type 10）。
 ///
-/// - Important: 本檔之測試分兩類。第一類（兩支既有靶）以 `setOptions` **直接驅動 config**，
+/// - Important: 本檔之測試分兩類。第一類（兩支既有測試用例）以 `setOptions` **直接驅動 config**，
 ///   驗的是「旗標為真即抑制」這條下游語義；第二類（四態與熱鍵）**必須經 `syncPrefs()`**，
 ///   因為它們驗的正是「偏好 → 旗標」這條上游推導——直接寫 config 會使它們恆真而失去意義。
 @Suite(.serialized)
@@ -96,7 +96,7 @@ struct LXFacadeFuriousZhuyinwenTests {
                   prefs.mixedAlphanumericalEnabled = mixedAlnum
                   instance.syncPrefs()
 
-                  // 回退之維度已撤（P273）——見本靶之說明。
+                  // 回退之維度已撤（P273）——見本測試目標之說明。
                   let furiousSideEnabled = isPinyin
                     ? furious4Pinyin
                     : furious4Zhuyin
@@ -110,8 +110,8 @@ struct LXFacadeFuriousZhuyinwenTests {
                     "旗標不符：\(context)"
                   )
                   // 查詢層之斷言只在「原廠 TextMap 為現行辭典來源」時有意義：磁帶模式下
-                  // 查詢走磁帶辭典（本靶未載入任何磁帶）⇒ 該條於磁帶下恆為「查不到」，
-                  // 與本旗標無涉（此為靶之界線，非語義之界線）。
+                  // 查詢走磁帶辭典（本測試目標未載入任何磁帶）⇒ 該條於磁帶下恆為「查不到」，
+                  // 與本旗標無涉（此為測試之界線，非語義之界線）。
                   guard !cassette else { continue }
                   let hasZhuyinwen = instance.unigramsFor(keyArray: Self.boobsKey)
                     .contains { $0.current == "ㄋㄟㄋㄟ" }
@@ -130,7 +130,7 @@ struct LXFacadeFuriousZhuyinwenTests {
   /// 頂端執行 ⇒「切換後之下一拍」即「下一次 `syncPrefs()`」。
   ///
   /// 測資刻意令兩側狂打開關**相反**，使抑制旗標必然隨熱鍵反向翻轉——若實作誤把
-  /// 「當前打字方式」換成別的判準（或只看拼音側），本靶即轉紅。
+  /// 「當前打字方式」換成別的判準（或只看拼音側），本測試目標即轉紅。
   @Test
   func testZhuyinwenSuppressionFollowsTypingModeHotKeyOnNextBeat() throws {
     defer {

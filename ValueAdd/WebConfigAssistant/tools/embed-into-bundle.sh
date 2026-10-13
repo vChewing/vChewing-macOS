@@ -11,7 +11,7 @@
 #   * SwiftPM 現代側：`Plugins/BundleApps/plugin.swift`（`make debug`／`release`／`archive`）
 #   * SwiftPM 5.10 legacy 側：`Plugins/BundleAppsLegacy/plugin.swift`
 #     （`make debugLegacy`／`releaseLegacy`／`archiveLegacy`）
-#   * Xcode：`vChewing.xcodeproj` 之 `vChewing` 靶上的 Run Script phase
+#   * Xcode：`vChewing.xcodeproj` 之 `vChewing` 建置目標上的 Run Script phase
 #
 # **紀律（事主 2026-09-25 明示）**：當且僅當偵測到 `tsc` 編譯器時，才編譯教學文章並收錄；
 # 未偵測到即給出警告，但**絕不中斷輸入法之建置**。同理，本步之任何失敗（含 tsc 存在

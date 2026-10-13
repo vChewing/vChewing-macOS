@@ -19,22 +19,22 @@ import PackageDescription
 //    由宿主把所有 `.a` 連成單一二進位。
 // 2. **`platforms` 填 `nil`**。PackageDescription 能宣告的 macOS 最低值只有 10.10，一旦宣告即被
 //    明文寫入產物的 `LC_BUILD_VERSION`；本側索性不宣告任何平台限制，讓 SDK 之預設值說話。
-// 3. **不含任何測試靶**。單元測試僅由 Swift 6.2 以上 toolchain 負責（Swift Testing 等設施本身即
+// 3. **不含任何測試目標**。單元測試僅由 Swift 6.2 以上 toolchain 負責（Swift Testing 等設施本身即
 //    非 5.10 所及），故 `Tests/` 全目錄於本側不進 manifest；僅為測試供料的 `LXAssemblyMaterials4Tests`
-//    與 `HomaSharedTestComponents` 兩靶及其產品亦一併不宣告。
+//    與 `HomaSharedTestComponents` 兩建置目標及其產品亦一併不宣告。
 // 4. **不使用 6.x 才有的設定**：`.defaultIsolation(MainActor.self)` 與 `swiftLanguageModes` 皆為
 //    tools 6.2 起才存在；本側語言模式即 5.10 toolchain 之預設（Swift 5），故僅以
 //    `swiftLanguageVersions: [.v5]` 明示之。
 // 5. **不需要 `Package.swift` 那套 `@resultBuilder` DSL**。該 DSL 是為了讓 `#if` 能寫進 builder
 //    body；本側的產品型別與平台清單皆為無條件值，用不上條件編譯，直接寫陣列字面量即可。
 //
-// 6. **不收 `vChewingSharedCLI`**。該靶是早年用來輔助提取 `UserDef` localization key 的一次性枴杖，
+// 6. **不收 `vChewingSharedCLI`**。該建置目標是早年用來輔助提取 `UserDef` localization key 的一次性枴杖，
 //    非出貨路徑；且它是本側唯一的**可執行檔**——唯有可執行檔會被壓上 `LC_BUILD_VERSION`／
 //    `LC_VERSION_MIN_MACOSX` 的 minOS（本側因 5.10 工具鏈地板而必為 10.13），靜態庫則完全不帶
 //    load command。不收它，既省事也少一處與 macOS 10.9 目標相牴觸的產物。
 //
 // 註：套件名為 `LibVanguard`、出貨產品名為 `Vanguard`，故靜態產物是 `libVanguard.a`；SwiftPM 的
-// 資源 bundle 名取「套件名 ＋ 靶名」，故各靶的資源 bundle 實名仍為 `LibVanguard_<Target>.bundle`。
+// 資源 bundle 名取「套件名 ＋ 建置目標名」，故各建置目標的資源 bundle 實名仍為 `LibVanguard_<Target>.bundle`。
 
 let package = Package(
   name: "LibVanguard",

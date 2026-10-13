@@ -9,7 +9,7 @@ import PackageDescription
 //   動態庫，改出 `.a`，由宿主把所有 `.a` 連成單一二進位。（6.2 側則相反：Darwin 出 dynamic，好讓
 //   `libVanguard.dylib` 對它是**動態相倚**而非靜態內嵌，故每個行程內本模組恰有一份 image；App-based
 //   installer 亦只需帶這一顆小庫，不必連帶吃下整條打字閉包。其餘平台維持 static。）
-// - **不含測試靶**。單元測試僅由 Swift 6.2 以上 toolchain 負責，`Tests/SwiftExtensionTests/` 於本側
+// - **不含測試目標**。單元測試僅由 Swift 6.2 以上 toolchain 負責，`Tests/SwiftExtensionTests/` 於本側
 //   不進 manifest。
 //
 // 另 `platforms` 填 `nil`（PackageDescription 能宣告的 macOS 最低值只有 10.10，一旦宣告即被明文寫入

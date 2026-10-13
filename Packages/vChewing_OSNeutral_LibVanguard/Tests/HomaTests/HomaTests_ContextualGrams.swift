@@ -13,7 +13,7 @@ import Testing
 extension HomaTestsRoot {
   /// 語境加分（bigram／trigram）與上下文鞏固之互動。
   ///
-  /// 兩支靶各釘住一個機制：
+  /// 兩支測試用例各釘住一個機制：
   /// - `testContextualBonusIsRecomputedByEveryAssembly`：語境加分是**當次推導**之結果，
   ///   不得於命中時把節點記成覆寫狀態——否則同一組鍵再組一次時加分不再重算、結果與分數
   ///   皆會漂移（`assemble()` 因此不冪等）。

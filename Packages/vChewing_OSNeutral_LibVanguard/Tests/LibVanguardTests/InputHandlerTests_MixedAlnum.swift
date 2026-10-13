@@ -43,7 +43,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     // 本測試逐音跑遍整個注音表、大量觸及使用者資料路徑；載入**必須為同步**，
     // 否則斷言會在資料尚未落定時執行，失敗且**時過時不過**（既有案例：`Early commission is tearing …`、
-    // `Commissions missing prefix …`）。這與同靶九支磁帶測試的處置一致。
+    // `Commissions missing prefix …`）。這與同測試目標九支磁帶測試的處置一致。
     let originalAsyncLoading = LXAssembly.LXFacade.asyncLoadingUserData
     LXAssembly.LXFacade.asyncLoadingUserData = false
     defer {
@@ -58,9 +58,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       cfg.alwaysSupplyETenDOSUnigrams = true
     }
 
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -561,9 +561,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 案例 A：acceptLeadingIntonations = true，3su 仍應留在 ASCII buffer。
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -577,9 +577,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 案例 B：acceptLeadingIntonations = false，3su 同樣留在 ASCII buffer。
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -630,9 +630,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -654,9 +654,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -691,9 +691,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -718,9 +718,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -755,9 +755,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -780,9 +780,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -804,9 +804,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -828,9 +828,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -841,9 +841,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -957,9 +957,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -1053,9 +1053,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -1082,9 +1082,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -1288,9 +1288,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -1683,9 +1683,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       "非混輸之組字狀態亦應一律賦值；實際得到：\(String(describing: state.data.cursorPosRightBehindTheUnfinishedReading))／cursor \(state.cursor)"
     )
     #expect(state.data.u16CursorPosRightBehindTheUnfinishedReading == state.u16Cursor)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -1761,9 +1761,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -2147,9 +2147,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -2745,9 +2745,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    // 本靶群驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
-    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本靶群
-    // 之期望值係為「混打單獨生效」而設。此為測試靶之隔離義務：`furiousTypingEnabled4Zhuyin`
+    // 本組測試用例驗的是**混打本身**：注音狂打須明確關閉，否則 P273 起「兩者並存」之語義會
+    // 一併生效（`typingMode` 成 `.zhuyinFuriousTyping`、空白鍵改為固化讀音），而本組測試用例
+    // 之期望值係為「混打單獨生效」而設。此為測試目標之隔離義務：`furiousTypingEnabled4Zhuyin`
     // 係行程級偏好、會被其他 suite 留下（實測即然）。
     testHandler.prefs.furiousTypingEnabled4Zhuyin = false
     testHandler.prefs.mixedAlphanumericalEnabled = true

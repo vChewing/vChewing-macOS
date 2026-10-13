@@ -55,9 +55,9 @@ build510:
 # 只建置巢狀子套件 `Deps/VanguardSwiftExtension`（即 `SwiftExtension` 模組本身）的 5.10 側。
 #
 # 為什麼要單獨一個入口：它是**獨立的 package**、有自己的一組 `Package*.swift`，故版本擇定與聚合體
-# 各別進行；而它又位於整條依賴閉包的最底層（聚合體所有靶都倚賴它），因此出錯時把它單獨切出來驗，
+# 各別進行；而它又位於整條依賴閉包的最底層（聚合體所有建置目標都倚賴它），因此出錯時把它單獨切出來驗，
 # 遠比每次重跑整包 `build510` 快。它同時是目前唯一兩套 toolchain 皆可建置、且 5.10 側能產出
-# 可用靜態庫的靶。
+# 可用靜態庫的建置目標。
 #
 # scratch path 刻意與聚合體分開（`LEGACY_SCRATCH_SWIFTEXTENSION`）：兩份 manifest 的產物若共用同一個
 # scratch，會互相踩。其餘環境配對與 `build510` 完全相同（同一組 `LEGACY_*`）。
@@ -83,7 +83,7 @@ clean510:
 # SDK 一律以 `xcrun` 現算，不寫死路徑。
 #
 # **只出 `Vanguard` 這一個產品**：另兩個 library 產品（`LXAssemblyMaterials4Tests`、
-# `HomaSharedTestComponents`）是測試素材靶，而後者對 `Homa` 之 `@testable import` 只在
+# `HomaSharedTestComponents`）是測試素材目標，而後者對 `Homa` 之 `@testable import` 只在
 # `-enable-testing` 之下成立——該旗標於 debug 由 SwiftPM 自動施加、於 release 則否，故
 # `swift build -c release` 於**任何平台**都建不出它（與 iOS 無涉）；而 iOS 之單元測試本即無法以
 # `swift test` 於裝置上跑（須宿主 app）。故 iOS 入口一律只出貨動態庫。

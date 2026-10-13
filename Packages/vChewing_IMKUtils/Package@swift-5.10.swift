@@ -14,12 +14,12 @@ import PackageDescription
 //    故本側不出動態庫，只出 `.a`、由宿主把所有 `.a` 連成單一二進位。
 // 2. **`platforms` 填 `nil`**。PackageDescription 能宣告的 macOS 最低值只有 10.10，一旦宣告即被明文寫入
 //    產物的 `LC_BUILD_VERSION`；本側索性不宣告平台限制，讓 SDK 之預設值說話。
-// 3. **不含任何測試靶**（Unit Tests 不對 Swift 5.10 開放）。本套件的 6.2 側本即無測試靶。
+// 3. **不含任何測試目標**（Unit Tests 不對 Swift 5.10 開放）。本套件的 6.2 側本即無測試目標。
 // 4. **不使用 6.x 才有的設定**：`.defaultIsolation(MainActor.self)` 與 `swiftLanguageModes` 皆為 tools 6.2
 //    起才存在；本側語言模式即 5.10 toolchain 之預設（Swift 5），另以 `swiftLanguageVersions: [.v5]` 明示。
 //
-// C／ObjC 靶 `IMKSwiftModernHeaders`（`cSettings: [.unsafeFlags(["-fno-objc-arc"])]`）原樣保留——它是
-// **生產靶**、不是測試靶。環境配對與各項差異的機理見 vChewing-DevLogs/Research/Phase217_SOP.md §三／§四。
+// C／ObjC 建置目標 `IMKSwiftModernHeaders`（`cSettings: [.unsafeFlags(["-fno-objc-arc"])]`）原樣保留——它是
+// **生產建置目標**、不是測試目標。環境配對與各項差異的機理見 vChewing-DevLogs/Research/Phase217_SOP.md §三／§四。
 
 let package = Package(
   name: "IMKUtils",

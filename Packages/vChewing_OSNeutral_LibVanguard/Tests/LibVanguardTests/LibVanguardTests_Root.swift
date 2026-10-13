@@ -6,10 +6,10 @@ import Testing
 
 // MARK: - LibVanguardTestsRoot
 
-/// 本測試靶（`LibVanguardTests`）的**唯一根 suite**。
+/// 本測試目標（`LibVanguardTests`）的**唯一根 suite**。
 ///
-/// - Important: **本靶內所有測試一律關在此根之下，且根標 `.serialized`。**
-///   理由（2026-09-15 實測）：本靶各 suite 共用大量**行程內全域狀態**——`LXFacade` 的
+/// - Important: **本測試目標內所有測試一律關在此根之下，且根標 `.serialized`。**
+///   理由（2026-09-15 實測）：本測試目標各 suite 共用大量**行程內全域狀態**——`LXFacade` 的
 ///   `factoryTrie`／`lxCassette`、`PrefMgr.shared`、`SessionHost.shared`（`InputHandlerTests`
 ///   與 `SessionTests` 各自的 `init` 都會重新指派它）。**只要有任何兩個 suite 並行，就會互相踩踏**，
 ///   症狀是偶發的「handler 狀態殘留」型失敗（例：`mixedAlphanumericalBuffer` 該有值卻是空字串、
@@ -19,7 +19,7 @@ import Testing
 ///   1. **`swift test --no-parallel`**：CLI 層，擋「同時間多個測試函式」。**必要，但不充分**
 ///      ——它不保證非同步測試在 `await` 暫停點不交錯，也不改變 suite 之間的關係。
 ///   2. **單一根 suite ＋ `.serialized`**：型別層，`Swift Testing` 保證**該子樹內絕不並行**。
-///      這才是本靶真正需要的保證，故所有 suite 一律嵌於本根之下。
+///      這才是本測試目標真正需要的保證，故所有 suite 一律嵌於本根之下。
 ///
 ///   新增測試時：**把新 suite 寫成 `extension LibVanguardTestsRoot { … }` 並在其內宣告 `@Suite`**，
 ///   不要新增游離於本根之外的頂層 suite。

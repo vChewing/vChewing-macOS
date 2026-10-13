@@ -14,7 +14,7 @@ private final class ResourceProvisionAnchor {}
 
 // MARK: - LibVanguardTestsRoot.ResourceProvisionTests
 
-// 歸入本靶唯一根 suite（見 `LibVanguardTests_Root.swift`）：本靶測試共用全域狀態，不得並行。
+// 歸入本測試目標唯一根 suite（見 `LibVanguardTests_Root.swift`）：本測試目標測試共用全域狀態，不得並行。
 extension LibVanguardTestsRoot {
   @Suite("ResourceProvisionTests", .serialized)
   struct ResourceProvisionTests {

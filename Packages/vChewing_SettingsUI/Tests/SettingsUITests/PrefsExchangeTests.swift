@@ -15,7 +15,7 @@ import Testing
 /// 隔離作法比照 `CtlSettingsUITests`：以本套件專屬 suite 覆蓋 `UserDefaults.current`
 /// （`UserDefaults.unitTests` ＋ `UserDefaults.pendingUnitTests`），並於 `deinit` 復原。
 ///
-/// 須留意：測試靶不帶 lproj 資源，故 `.i18n` 一律回傳鍵名本身——本檔之斷言因此以鍵名為預期值。
+/// 須留意：測試目標不帶 lproj 資源，故 `.i18n` 一律回傳鍵名本身——本檔之斷言因此以鍵名為預期值。
 @Suite(.serialized)
 final class PrefsExchangeTests {
   // MARK: Lifecycle
@@ -196,7 +196,7 @@ final class PrefsExchangeTests {
     )
   }
 
-  /// 各態之標題與訊息皆有對應之 i18n 鍵（測試靶下即鍵名本身）。
+  /// 各態之標題與訊息皆有對應之 i18n 鍵（測試目標下即鍵名本身）。
   @Test
   func testAlertTextsPerState() throws {
     #expect(
@@ -262,7 +262,7 @@ final class PrefsExchangeTests {
   func testChangedItemTitleFallsBackToRawValue() throws {
     // 無 `.strings` 條目、亦無 `metaData` 之鍵 ⇒ 退回 `rawValue`。
     #expect(PrefsExchange.changedItemTitle(for: .kMaxCandidateLength) == "MaxCandidateLength")
-    // 有條目之鍵 ⇒ 非 `rawValue`（測試靶無 lproj 資源時即 i18n 鍵名本身）。
+    // 有條目之鍵 ⇒ 非 `rawValue`（測試目標無 lproj 資源時即 i18n 鍵名本身）。
     let candidateKeysTitle = PrefsExchange.changedItemTitle(for: .kCandidateKeys)
     #expect(candidateKeysTitle != UserDef.kCandidateKeys.rawValue)
     #expect(candidateKeysTitle == "i18n:UserDef.kCandidateKeys.shortTitle")

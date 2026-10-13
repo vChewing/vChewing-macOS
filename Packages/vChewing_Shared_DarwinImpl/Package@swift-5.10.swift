@@ -14,7 +14,7 @@ import PackageDescription
 //    只出 `.a`、由宿主把所有 `.a` 連成單一二進位。
 // 2. **`platforms` 填 `nil`**。PackageDescription 能宣告的 macOS 最低值只有 10.10，一旦宣告即被明文寫入
 //    產物的 `LC_BUILD_VERSION`；本側索性不宣告平台限制，讓 SDK 之預設值說話。
-// 3. **不含任何測試靶**（Unit Tests 不對 Swift 5.10 開放）：`Package.swift` 的 `Shared_DarwinImplTests`
+// 3. **不含任何測試目標**（Unit Tests 不對 Swift 5.10 開放）：`Package.swift` 的 `Shared_DarwinImplTests`
 //    整段略去。
 // 4. **不使用 6.x 才有的設定**：`.defaultIsolation(MainActor.self)` 與 `swiftLanguageModes` 皆為 tools 6.2
 //    起才存在；本側語言模式即 5.10 toolchain 之預設（Swift 5），另以 `swiftLanguageVersions: [.v5]` 明示。

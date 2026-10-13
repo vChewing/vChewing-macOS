@@ -119,7 +119,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 拉平至 `cursor`，故此測試同時釘死「marker 已拉平、錨點資訊仍在」之狀態形制。
   ///
   /// - Note: 混打之 Tooltip 只承載讀音、不承載 ASCII 原文（原文由組字區讀音欄承載），
-  ///   故本靶以「進注拼槽之小寫鍵」造出 Tooltip：大寫鍵（如 `T`）不進注拼槽 ⇒ 無讀音可示
+  ///   故本測試目標以「進注拼槽之小寫鍵」造出 Tooltip：大寫鍵（如 `T`）不進注拼槽 ⇒ 無讀音可示
   ///   ⇒ 根本無 Tooltip 可錨（該態另由 `IH-MixedAlnum-039` 釘住）。
   @Test("SS-TooltipAndMarking-003 Mixed alnum tooltip anchors at cursor pos behind reading")
   func test_SS_TooltipAndMarking_003_MixedAlnumTooltipAnchorsAtCursorPosBehindReading() throws {

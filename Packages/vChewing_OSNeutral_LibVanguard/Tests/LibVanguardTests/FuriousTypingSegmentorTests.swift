@@ -8,7 +8,7 @@ import Testing
 
 // MARK: - FuriousTypingSegmentorTests
 
-// 歸入本靶唯一根 suite（見 `LibVanguardTests_Root.swift`）：本靶測試共用全域狀態，不得並行。
+// 歸入本測試目標唯一根 suite（見 `LibVanguardTests_Root.swift`）：本測試目標測試共用全域狀態，不得並行。
 extension LibVanguardTestsRoot {
   /// 狂拼切分器的純函式單元測試：以小型音節表閉包注入，不依賴任何 LM／Tekkon 實體。
   @Suite("FuriousTypingSegmentorTests", .serialized)

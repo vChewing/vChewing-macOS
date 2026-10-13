@@ -14,7 +14,7 @@ import PackageDescription
 // toolchain 版本者之最高者」（故 6.0／6.1 toolchain 會取本檔而非 `Package.swift` 的 6.2），而
 // `#error` 於 manifest 編譯期即中止載入。
 //
-// 可用的兩條路：Swift 5.10（見 `Package@swift-5.10.swift`：靜態產物、無測試靶、無平台限制）
+// 可用的兩條路：Swift 5.10（見 `Package@swift-5.10.swift`：靜態產物、無測試目標、無平台限制）
 // 或 Swift 6.2 以上（見 `Package.swift`：動態聚合庫、macOS 12+）。
 #error(
   """

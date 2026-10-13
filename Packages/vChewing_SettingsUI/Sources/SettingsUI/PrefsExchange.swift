@@ -76,7 +76,7 @@ public enum PrefsExchange {
   ///
   /// 本倉有少數鍵（如 `MaxCandidateLength`）無 `.strings` 條目，其 `.i18n` 會原封不動回傳鍵名
   /// （仍以 `i18n:` 起頭），屆時逕退回 `rawValue`，以免在 alert 內露出 i18n 鍵名。
-  /// 惟測試靶等不帶 lproj 資源之行程對**所有**鍵皆回傳鍵名，故退化條件以「本行程確實帶有語系資源」
+  /// 惟測試目標等不帶 lproj 資源之行程對**所有**鍵皆回傳鍵名，故退化條件以「本行程確實帶有語系資源」
   /// 為前提（此類無 `.strings` 條目之鍵在本倉亦無 `metaData`，故兩側之退化結果一致）。
   /// - Parameter userDef: 目標偏好鍵。
   /// - Returns: 本地化標題；無從取得時為該鍵之 `rawValue`。

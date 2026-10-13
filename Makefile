@@ -103,7 +103,7 @@ clean510:
 # Xcode active, the 5.10 compiler is handed its macOS 27 SDK and dies on
 # `could not build Objective-C module 'Foundation'`.
 #
-# C／ObjC 靶（`IMKSwiftModernHeaders`／`OSFrameworkImplViaObjC`／`SwiftyCapsLockToggler`）另須 `-Xcc -target`：
+# C／ObjC 建置目標（`IMKSwiftModernHeaders`／`OSFrameworkImplViaObjC`／`SwiftyCapsLockToggler`）另須 `-Xcc -target`：
 # `-Xswiftc -target` 只管 Swift，clang 端仍照 SwiftPM 的地板產出（`ld: warning: object file … was built for
 # newer 'macOS' version (10.13) than being linked (10.9)`）；而 `-Xcc -mmacosx-version-min=…` 會被 SwiftPM
 # 自己那條 `-target …10.13` 壓住（clang 讓 `-target` 勝、與先後無關），故必須再下一條 `-target` 覆蓋
