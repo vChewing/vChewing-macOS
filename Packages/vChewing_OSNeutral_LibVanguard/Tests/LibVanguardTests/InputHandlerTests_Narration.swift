@@ -152,6 +152,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       Issue.record("Test handler or session is nil.")
       return
     }
+    let tooltipPrefix = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
 
     // 插入臨時語料：原始讀音與覆寫目標讀音皆需存在。
     testHandler.currentLM.insertTemporaryData(
@@ -174,12 +175,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       #expect(testHandler.assembler.actualKeys.last?.contains("ㄋㄧ") == true)
     }
 
-    // 預設（偏好關閉）：覆寫成功時，既有的內文提示照常顯示。
+    // 預設（偏好關閉）：覆寫成功時，既有的內文提示照常顯示，且末尾附上所覆寫之聲調記號。
     prepareOverrideScenario()
     typeSentence("4")
-    #expect(
-      testSession.state.tooltip == "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
-    )
+    #expect(testSession.state.tooltip == "\(tooltipPrefix) (ˋ)")
     #expect(testSession.state.tooltipDuration == 2)
 
     // 偏好開啟：覆寫照常生效，但不再附加該內文提示。
@@ -191,5 +190,63 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     typeSentence("4")
     #expect(testHandler.assembler.actualKeys.last != readingBeforeOverride)
     #expect(testSession.state.tooltip.isEmpty)
+  }
+
+  // MARK: E) 後置聲調覆寫的內文提示所附聲調記號
+
+  @Test("IH-Narration-005 Rear intonation override tooltip tone mark")
+  func test_IH_Narration_005_RearIntonationOverrideTooltipToneMark() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    let tooltipPrefix = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
+
+    // 五聲（含陰平）之覆寫目標讀音皆須在語彙庫內，否則覆寫會被婉拒而不發提示。
+    let unigrams: [(reading: String, value: String)] = [
+      ("ㄋㄧ", "尼測"),
+      ("ㄋㄧˊ", "泥測"),
+      ("ㄋㄧˇ", "你測"),
+      ("ㄋㄧˋ", "逆測"),
+      ("ㄋㄧ˙", "膩測"),
+    ]
+    unigrams.forEach {
+      testHandler.currentLM.insertTemporaryData(
+        unigram: Homa.Gram(keyArray: [$0.reading], value: $0.value, score: -1.0),
+        isFiltering: false
+      )
+    }
+    let originalToneBehavior = testHandler.prefs.specifyIntonationKeyBehavior
+    // 0 ＝ 恆覆寫且重設選字狀態（`BPMFFullMatchTypewriter.IntonationKeyBehavior` 之首案），
+    // 用以確保「同調亦覆寫」，免得鍵入與現行讀音同調之聲調鍵時不發提示。
+    testHandler.prefs.specifyIntonationKeyBehavior = 0
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.specifyIntonationKeyBehavior = originalToneBehavior
+    }
+
+    /// 先鍵入 `ni3`（ㄋㄧˇ）建出「已組好一個字、注拼槽已空」之局，再鍵入聲調鍵觸發覆寫。
+    /// - Parameter overrideKey: 漢語拼音之聲調鍵。
+    /// - Returns: 覆寫後之提示字串。
+    func tooltipAfterTyping(overrideKey: String) -> String {
+      testHandler.clear()
+      testHandler.composer.ensureParser(arrange: .ofHanyuPinyin)
+      typeSentence("ni3")
+      #expect(testHandler.assembler.actualKeys.last?.contains("ㄋㄧ") == true)
+      typeSentence(overrideKey)
+      return testSession.state.tooltip
+    }
+
+    // 陰平於引擎內係以空白字元儲存，提示字串內改以 `ˉ`（U+02C9）呈現；
+    // 其餘四聲之注音本身即為其所對應之聲調記號。
+    let expectations: [(overrideKey: String, toneMark: String)] = [
+      ("1", "ˉ"), ("2", "ˊ"), ("3", "ˇ"), ("4", "ˋ"), ("5", "˙"),
+    ]
+    expectations.forEach { overrideKey, toneMark in
+      #expect(
+        tooltipAfterTyping(overrideKey: overrideKey) == "\(tooltipPrefix) (\(toneMark))",
+        "聲調鍵「\(overrideKey)」之提示應附聲調記號「\(toneMark)」"
+      )
+    }
   }
 }

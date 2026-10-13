@@ -602,7 +602,12 @@ extension BPMFFullMatchTypewriter {
       refreshedState.textToCommit = textToCommit
       // 是否顯示「已覆寫游標身後的漢字的音調」提示由偏好決定；抑制時不留殘餘的提示與其色彩狀態。
       if !handler.prefs.suppressTooltipForIntonationKeyOverrideEvents {
-        refreshedState.tooltip = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
+        // 陰平在引擎內以 U+0020 空白字元儲存，於提示字串內改以 `ˉ`（U+02C9）呈現；
+        // 其餘四聲之注音本身即為其所對應之聲調記號。
+        let toneMark = incomingIntonation.value == " " ? "ˉ" : incomingIntonation.value
+        let tooltipText = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
+        // 於提示字串末尾另附本次覆寫所採之聲調記號，以免使用者無從得知覆寫成了哪個聲調。
+        refreshedState.tooltip = "\(tooltipText) (\(toneMark))"
         refreshedState.tooltipDuration = 2
         refreshedState.data.tooltipColorState = .normal
       }
