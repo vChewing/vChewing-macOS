@@ -991,14 +991,20 @@ extension LXAssembly.LXPerceptor {
   func loadData(fromURL fileURL: URL? = nil) {
     persistor.loadData(
       loadCallback: { [self] in loadData(from: $0) },
-      replayApplicator: { [self] tempMap, mutated in
+      replayApplicator: { [self] changes in
+        guard !changes.isEmpty else { return }
         lock.withLock {
-          guard !tempMap.isEmpty else { return }
-          for (key, pair) in tempMap {
-            mutLRUMap[key] = pair
+          for change in changes {
+            switch change {
+            case .clear:
+              mutLRUMap.removeAll()
+            case let .upsert(pair):
+              mutLRUMap[pair.key] = pair
+            case let .remove(key):
+              mutLRUMap.removeValue(forKey: key)
+            }
           }
-          mutated = true
-          // 日誌重播只帶入鍵值；重播後必須重建 LRU 序並收斂容量，
+          // 日誌重播會增刪鍵值；重播後必須重建 LRU 序並收斂容量，
           // 否則重播鍵不會進入 LRU 清單、因而永遠不會被淘汰（記憶無界膨脹）。
           resetLRUList()
           enforceCapacity()

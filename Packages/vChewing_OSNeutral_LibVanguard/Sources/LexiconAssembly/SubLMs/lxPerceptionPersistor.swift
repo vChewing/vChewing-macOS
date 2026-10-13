@@ -98,6 +98,17 @@ extension LXAssembly.PerceptionPersistor {
     var key: String?
     var pair: LXAssembly.LXPerceptor.KeyPerceptionPair?
   }
+
+  /// 日誌重播時交予呼叫端的一套有序變化（陣列序即日誌序）。
+  ///
+  /// 移除之所以必須是獨立一筆、而非「映射中的空值」：`[String: KeyPerceptionPair]`
+  /// 無從區分「未提及此鍵」與「此鍵已移除」，故移除記錄過去一律於重播時被丟棄，
+  /// 被 bleach 或逐出的鍵於是自快照復活。
+  enum JournalChange {
+    case clear
+    case upsert(LXAssembly.LXPerceptor.KeyPerceptionPair)
+    case remove(key: String)
+  }
 }
 
 // MARK: - Pending Key Tracking (called by LXPerceptor under its lock)
@@ -117,15 +128,18 @@ extension LXAssembly.PerceptionPersistor {
   }
 
   /// 標記某鍵值已刪除，讓變更能寫入磁碟。
+  ///
+  /// 移除**不**受 `perKeyThrottleInterval` 所抑。節流意在抑制同一鍵的反覆 upsert
+  /// （其值於落盤時自現行映射讀取，故略過不失資料），但一條被略過的移除會使該鍵
+  /// 滯留於快照或日誌中，重新啟動時即復活。同一鍵若其 upsert 尚未落盤，則兩者相消，
+  /// 此時才無須記錄移除。
   func markKeyForRemoval(_ key: String) {
     lock.withLock {
-      pendingUpsertKeys.remove(key)
-      let now = Date().timeIntervalSince1970
-      if let last = lastLogTimestampByKey[key], now - last < Self.perKeyThrottleInterval {
-        return
+      let upsertStillPending = pendingUpsertKeys.remove(key) != nil
+      if !upsertStillPending {
+        pendingRemovedKeys.insert(key)
       }
-      pendingRemovedKeys.insert(key)
-      lastLogTimestampByKey[key] = now
+      lastLogTimestampByKey[key] = Date().timeIntervalSince1970
     }
   }
 
@@ -217,11 +231,11 @@ extension LXAssembly.PerceptionPersistor {
   /// - Parameters:
   ///   - loadCallback: 回呼，將解碼後的資料載入 POM 記憶體。
   ///   - keyValidator: 回呼判斷某 key 是否應被忽略。
+  ///   - replayApplicator: 回呼，依序套用日誌重播所得之變化（含移除與清空）。
   ///   - fileURL: 可選的載入路徑。
   func loadData(
     loadCallback: ([LXAssembly.LXPerceptor.KeyPerceptionPair]) -> (),
-    replayApplicator: (inout [String: LXAssembly.LXPerceptor.KeyPerceptionPair], inout Bool) -> () = { _, _ in
-    },
+    replayApplicator: ([JournalChange]) -> () = { _ in },
     keyValidator: @escaping (String) -> Bool,
     fromURL fileURL: URL? = nil
   ) {
@@ -443,7 +457,7 @@ extension LXAssembly.PerceptionPersistor {
   private func replayJournal(
     from baseURL: URL,
     keyValidator: @escaping (String) -> Bool,
-    replayApplicator: (inout [String: LXAssembly.LXPerceptor.KeyPerceptionPair], inout Bool) -> ()
+    replayApplicator: ([JournalChange]) -> ()
   ) {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
@@ -482,28 +496,27 @@ extension LXAssembly.PerceptionPersistor {
         }
       }
 
-      // Apply validated records through the callback.
-      var tempMap = [String: LXAssembly.LXPerceptor.KeyPerceptionPair]()
-      var mutated = false
+      // Apply validated records through the callback, in journal order.
+      var changes: [JournalChange] = []
       for record in recordsToApply {
         switch record.operation {
         case .clear:
-          tempMap.removeAll()
-          mutated = true
+          // 清空會使其前的變化全數失效，故不必帶給呼叫端；
+          // 但清空本身必須帶出去，否則清不掉快照既有的內容。
+          changes.removeAll()
+          changes.append(.clear)
         case .removeKey:
           if let key = record.key {
-            tempMap[key] = nil // Mark for removal
-            mutated = true
+            changes.append(.remove(key: key))
           }
         case .upsert:
           if let pair = record.pair, keyValidator(pair.key) {
-            tempMap[pair.key] = pair
-            mutated = true
+            changes.append(.upsert(pair))
           }
         }
       }
 
-      replayApplicator(&tempMap, &mutated)
+      replayApplicator(changes)
 
       lock.withLock {
         pendingUpsertKeys.removeAll()

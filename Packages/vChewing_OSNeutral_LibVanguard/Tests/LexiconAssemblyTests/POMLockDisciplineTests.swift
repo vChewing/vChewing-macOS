@@ -100,7 +100,7 @@ extension POMTestSuite {
       var lockHeldDuringReplayApplicator = false
       persistor.loadData(
         loadCallback: { _ in lockHeldDuringLoadCallback = persistor.isLockHeld },
-        replayApplicator: { _, _ in lockHeldDuringReplayApplicator = persistor.isLockHeld },
+        replayApplicator: { _ in lockHeldDuringReplayApplicator = persistor.isLockHeld },
         keyValidator: { _ in
           lockHeldDuringKeyValidator = persistor.isLockHeld
           return true
