@@ -25,6 +25,12 @@ LEGACY_SCRATCH ?= .build/.legacy
 # target-specific 變數隨 sub-make 外洩到環境），兩者同名會讓 `debugLegacy` 把這份詞典建置一起拖回
 # debug——它與 app 的 config 無關，不該被牽著走。
 LEXICON_CONFIG ?= release
+# 額外傳給 SwiftPM 的旗標（預設空）。典型用途是 `--disable-sandbox`：`swift build` 於部分環境（自身已受
+# 外層沙箱拘束者）會在 manifest 編譯那關失敗——`sandbox-exec: sandbox_apply: Operation not permitted`、
+# 繼而 `error: 'lexiconbuildtrigger': Invalid manifest`——該處即由呼叫端傳入本旗標。倉根 `Makefile` 之
+# `lexiconLegacy` 會把同名變數轉遞進來；直接跑本檔的 `make build510` 時亦可自行指定。預設不動：正常環境
+# 不該削弱 SwiftPM 之 manifest 沙箱。
+LEGACY_SWIFT_EXTRA_FLAGS ?=
 # plug-in 產物集中處：組裝 legacy `.app` 時由此固定路徑取用。`Build/` 一類目錄已被 `.gitignore`
 # 既有的通用規則 `[Bb]uild` 蓋掉，故無需另加忽略條目。
 COLLECT_DIR ?= Build
@@ -37,7 +43,8 @@ build510:
 	"$(LEGACY_TOOLCHAIN)/usr/bin/swift" build \
 		--package-path . \
 		--scratch-path "$(LEGACY_SCRATCH)" \
-		--configuration "$(LEXICON_CONFIG)"
+		--configuration "$(LEXICON_CONFIG)" \
+		$(LEGACY_SWIFT_EXTRA_FLAGS)
 
 clean510:
 	@rm -rf "$(LEGACY_SCRATCH)" "$(COLLECT_DIR)"

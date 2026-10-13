@@ -139,6 +139,12 @@ LEGACY_SCRATCH_ROOT ?= .build/.legacy-root
 LEGACY_CONFIG ?= debug
 LEGACY_ARCLITE ?= ./LegacyZone/ARCLite/libarclite_macosx.a
 LEGACY_BUILD_FLAGS = --package-path . --scratch-path "$(LEGACY_SCRATCH_ROOT)" --sdk "$(LEGACY_SDK)"
+# 額外傳給 SwiftPM 的旗標（預設空）。典型用途是 `--disable-sandbox`：本側之 `swift build` 於部分環境
+# （自身已受外層沙箱拘束者）會在 manifest 編譯那關失敗——`sandbox-exec: sandbox_apply: Operation not
+# permitted`、繼而 `error: Invalid manifest`——該處即由呼叫端傳入本旗標。`lexiconLegacy` 會把它轉遞給
+# `LegacyZone/LexiconBuildTrigger` 的 `swift build`（見下）。預設不動：正常環境不該削弱 SwiftPM 之
+# manifest 沙箱。`LEGACY_BUILD_FLAGS` 同理，只是後者已由既有各 target 直接用於 `swift build`。
+LEGACY_SWIFT_EXTRA_FLAGS ?=
 # 鏈結期的 `-platform_version <platform> <min> <sdk>`。SwiftPM 5.10 不認得 `--sdk`，會把 triple 的版本段
 # **同時**填進 min 與 sdk 兩格，於是產物之 `LC_VERSION_MIN_MACOSX` 記成 `version 10.9 sdk 10.9`——而實情
 # 是以 13.3 的 SDK 鏈結的（`--sdk` 有生效，只是沒寫進這個欄位）。
@@ -244,8 +250,12 @@ bundleLegacy: lexiconLegacy
 # 該套件以 `LEXICON_CONFIG`（預設 release）建置——辭典產製 CPU 密集，debug 產物慢上許多。該變數名與
 # 本檔的 `LEGACY_CONFIG` 刻意不同：後者指 *app* 的 config，且會以 target-specific 變數外洩到 sub-make，
 # 同名會讓 `make debugLegacy` 把詞典建置一起拖回 debug。
+#
+# `LEGACY_SWIFT_EXTRA_FLAGS` 顯式轉遞：命令列變數雖會經 `MAKEFLAGS` 傳進 sub-make，但本檔是同名的定義
+# 所在，顯式傳遞才看得出這條線是刻意接上的（見檔首該變數之註解）。
 lexiconLegacy:
-	@$(MAKE) --no-print-directory -C LegacyZone/LexiconBuildTrigger build510 collect
+	@$(MAKE) --no-print-directory -C LegacyZone/LexiconBuildTrigger build510 collect \
+		LEGACY_SWIFT_EXTRA_FLAGS="$(LEGACY_SWIFT_EXTRA_FLAGS)"
 
 # ── archiveLegacy ───────────────────────────────────────────────────
 #
