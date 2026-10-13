@@ -193,6 +193,21 @@ namespace VCA {
       if (noteKey) container.appendChild(el("div", "vca-note-box", t(noteKey)));
     }
 
+    // 「打」步：打字方式若有加註（如「漢語拼音（雙拼）」⇒ 雙拼方案編輯器之所在與方案檔之
+    // 出處），即顯示於題目之下——該步正是雙拼方案被選定之處（見 `NOTE_KEY_BY_TYPING`）。
+    if (step.id === "method") {
+      var typingNoteKey = NOTE_KEY_BY_TYPING[state.profile.typing];
+      if (typingNoteKey) {
+        var note = el("div", "vca-note-box", t(typingNoteKey));
+        var noteLink = LINK_BY_TYPING[state.profile.typing];
+        if (noteLink) {
+          note.appendChild(document.createTextNode(" "));
+          note.appendChild(externalLink(t(noteLink.labelKey), noteLink.href));
+        }
+        container.appendChild(note);
+      }
+    }
+
     if (step.id === "starter") appendStarterFooter(container);
 
     if (hasEntryQuestion) {

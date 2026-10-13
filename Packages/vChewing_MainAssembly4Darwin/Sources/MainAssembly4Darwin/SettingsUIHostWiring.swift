@@ -39,6 +39,7 @@ extension SettingsUIHost {
     host.openPhraseFile = { mode, type, app in
       LXMgr.shared.openPhraseFile(mode: mode, type: type, using: app)
     }
+    host.importDualpinSchema = { DualpinSchemaStore.importSchema(from: $0) }
     // 以 provider 延遲注入：LXMgr.shared 僅在詞彙編輯頁真正開啟時才實體化，
     // 避免程序啟動階段就武裝其 KVO 路徑失效觀察器。
     host.phraseEditorDelegateProvider = { LXMgr.shared }

@@ -5,6 +5,8 @@
   },
   "CheckUpdateAutomatically": false,
   "KeyboardParser4Pinyin": 100,
+  "KeyboardParser4Dualpin": 201,
+  "DualpinEnabledForPinyinTyping": false,
   "EnforceSingleLineCandidateWindowLayout4SCPC": true,
   "UseRearCursorMode": false,
   "UseHorizontalCandidateList": true,

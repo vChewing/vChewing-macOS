@@ -13,8 +13,10 @@ const ROOT = path.resolve(path.dirname(__filename), '..');
 const ASSET_PATH = path.join(ROOT, 'assets', 'settings-surface.json');
 // 助手目錄位於 vChewing-macOS/ValueAdd/WebConfigAssistant ⇒ 往上三層即倉根。
 const SETTINGS_ROOT = path.join(ROOT, '..', '..', 'Packages', 'vChewing_SettingsUI', 'Sources', 'SettingsUI');
-// 注音／拼音排列之清單：順序與標籤皆取自 app 自身（`KeyboardParser` 之宣告序 ＋ 其選單名稱），
-// 分隔線則取自設定介面之繪製碼——故助手不必手抄這 17 條，亦不會與介面分歧。
+// 注音／拼音／雙拼排列之清單：順序與標籤皆取自 app 自身（`KeyboardParser` 之宣告序 ＋ 其選單名稱），
+// 分隔線則取自設定介面之繪製碼——故助手不必手抄這 20 條，亦不會與介面分歧。
+// 三槽之分界即 `KeyboardParser` 之值域設計：注音 0…10、拼音 100…105、雙拼 200…202
+// （雙拼係拼音輸入之加掛模式，於偏好設定中另有 `kDualpinEnabledForPinyinTyping` 一閘）。
 const SHARED_SWIFT = path.join(
   ROOT, '..', '..', 'Packages', 'vChewing_OSNeutral_LibVanguard', 'Sources', 'Shared', 'Shared.swift'
 );
@@ -85,7 +87,9 @@ function extractKeyboardParsers() {
   return {
     dividerBefore: dividerBefore,
     zhuyin: enriched.filter(function (item) { return item.value < 100; }).map(function (item) { return item; }),
-    pinyin: enriched.filter(function (item) { return item.value >= 100; }).map(function (item) { return item; }),
+    pinyin: enriched.filter(function (item) { return item.value >= 100 && item.value < 200; })
+      .map(function (item) { return item; }),
+    dualpin: enriched.filter(function (item) { return item.value >= 200; }).map(function (item) { return item; }),
   };
 }
 
@@ -130,7 +134,8 @@ function main() {
   fs.writeFileSync(ASSET_PATH, text, 'utf8');
   process.stdout.write(
     '設定介面曝露面已更新：' + sorted.length + ' 鍵（掃描 ' + files.length + ' 檔）；' +
-    '注音排列 ' + keyboardParsers.zhuyin.length + ' 項、拼音排列 ' + keyboardParsers.pinyin.length + ' 項，' +
+    '注音排列 ' + keyboardParsers.zhuyin.length + ' 項、拼音排列 ' + keyboardParsers.pinyin.length + ' 項、' +
+    '雙拼排列 ' + keyboardParsers.dualpin.length + ' 項，' +
     '分隔線 ' + JSON.stringify(keyboardParsers.dividerBefore) + '\n'
   );
 }

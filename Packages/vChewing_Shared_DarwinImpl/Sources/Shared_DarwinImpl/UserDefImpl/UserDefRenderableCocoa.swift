@@ -41,15 +41,16 @@ public final class UserDefRenderableCocoa: NSObject, Identifiable {
         objOptions.append((currentTIS.id, currentTIS.titleLocalized))
       }
       self.optionsLocalizedAsIdentifiables = objOptions
-    case .kKeyboardParser4Pinyin, .kKeyboardParser4Zhuyin:
+    case .kKeyboardParser4Dualpin, .kKeyboardParser4Pinyin, .kKeyboardParser4Zhuyin:
       KeyboardParser.allCases.forEach { currentParser in
-        // 注音/拼音分裂後，各自的選項只列示其值域內的 parser。
+        // 注音／拼音／雙拼分裂後，各自的選項只列示其值域內的 parser。
         switch def {
-        case .kKeyboardParser4Zhuyin where currentParser.rawValue >= 100: return
-        case .kKeyboardParser4Pinyin where currentParser.rawValue < 100: return
+        case .kKeyboardParser4Zhuyin where !currentParser.isZhuyin: return
+        case .kKeyboardParser4Pinyin where !currentParser.isPinyin: return
+        case .kKeyboardParser4Dualpin where !currentParser.isDualpin: return
         default: break
         }
-        if [7, 100].contains(currentParser.rawValue) { intOptions.append(nil) }
+        if [7, 100, 200].contains(currentParser.rawValue) { intOptions.append(nil) }
         intOptions.append((currentParser.rawValue, currentParser.localizedMenuName))
       }
       self.optionsLocalized = intOptions

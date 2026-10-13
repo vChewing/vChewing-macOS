@@ -621,6 +621,57 @@ test('冒煙：「注音組句＋中英混打」帶出混打回退；狂拼流�
   assert.strictEqual(parsed['TogglingAlphanumericalModeWithRShift'], true);
 });
 
+test('冒煙：雙拼之加註只為「漢語拼音（雙拼）」而落於「打」步（事主 2026-10-13 裁定）', function () {
+  const { dom } = bootApp('?lang=zh-Hant');
+  clickNext(dom); // background
+  assert.ok(pickRadioIn(dom, 'origin', '狂拼流'));
+  assert.ok(pickRadioIn(dom, 'typing', '漢語拼音（雙拼）'),
+    '打字方式一題應有「漢語拼音（雙拼）」');
+  clickNext(dom); // starter
+  starterRadios(dom)[1].click(); // 套用
+  assert.ok(gotoDetailStep(dom, '打字方式'), '應可抵達「打」步');
+
+  // 加註：提及編輯器之所在與方案檔之獲取處，並附一條連結。
+  const notes = contentOf(dom).querySelectorAll('.vca-note-box');
+  assert.strictEqual(notes.length, 1, '「打」步應恰有一則加註');
+  const note = notes[0];
+  assert.ok(note.textContent.indexOf('雙拼方案編輯器') >= 0,
+    '加註應提及雙拼方案編輯器：' + note.textContent);
+  assert.ok(note.textContent.indexOf('方案檔') >= 0,
+    '加註應說明方案檔之獲取處：' + note.textContent);
+  const links = findByTag(note, 'a');
+  assert.strictEqual(links.length, 1, '加註應恰附一條連結');
+  assert.strictEqual(links[0].href,
+    'https://github.com/vChewing/vChewing.github.io/tree/main/valueadd/dualpin-schema-files',
+    '連結應指向官網倉庫之方案檔');
+
+  // 同頁之兩題應已依推薦值預選：微軟雙拼、且啟用雙拼。
+  const radiosOf = function (questionId) {
+    return findByTag(contentOf(dom), 'input').filter(function (input) {
+      return input.type === 'radio' && String(input.name) === 'vca-group-' + questionId;
+    });
+  };
+  const dualpinChecked = radiosOf('kKeyboardParser4Dualpin').filter(function (r) { return r.checked; })[0];
+  assert.ok(dualpinChecked, '「雙拼方案」應已預選');
+  assert.ok(dualpinChecked.parentNode.textContent.indexOf('微軟雙拼') >= 0,
+    '「雙拼方案」應預選微軟雙拼：' + dualpinChecked.parentNode.textContent);
+  const enabledChecked = radiosOf('kDualpinEnabledForPinyinTyping').filter(function (r) { return r.checked; })[0];
+  assert.ok(enabledChecked, '「啟用雙拼」應已預選');
+  assert.strictEqual(enabledChecked.parentNode.textContent.indexOf('啟用'), 0,
+    '「啟用雙拼」應預選「啟用」：' + enabledChecked.parentNode.textContent);
+
+  // 對照組：「漢語拼音（不是雙拼）」之「打」步不應出現該加註。
+  const { dom: dom2 } = bootApp('?lang=zh-Hant');
+  clickNext(dom2); // background
+  assert.ok(pickRadioIn(dom2, 'origin', '狂拼流'));
+  assert.ok(pickRadioIn(dom2, 'typing', '漢語拼音（不是雙拼）'));
+  clickNext(dom2); // starter
+  starterRadios(dom2)[1].click(); // 套用
+  assert.ok(gotoDetailStep(dom2, '打字方式'), '應可抵達「打」步');
+  assert.strictEqual(contentOf(dom2).querySelectorAll('.vca-note-box').length, 0,
+    '「漢語拼音（不是雙拼）」不應有雙拼之加註');
+});
+
 test('冒煙：起始配置——套用、預覽、撤回與預設配置名', function () {
   const { dom, VCA } = bootApp('?lang=zh-Hant');
   const profile = { origin: 'msnewphonetic', typing: 'scpc' };

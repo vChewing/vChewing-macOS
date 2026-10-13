@@ -5,7 +5,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { loadCore } = require('./core-loader');
 
-const ALL_TYPING = ['zhuyin', 'zhuyinmix', 'scpc', 'pinyin', 'cin', 'unsure'];
+const ALL_TYPING = ['zhuyin', 'zhuyinmix', 'scpc', 'pinyin', 'pinyindualpin', 'cin', 'unsure'];
 // 來源清單一律取自執行期（不手抄——新增來源時本清單自動跟上）。
 const ALL_ORIGIN = loadCore().VCA.ORIGIN_VALUES.slice();
 
@@ -194,7 +194,7 @@ test('題庫：推薦值一律合法，且與 profile 之對位正確', function
     VCA.effectiveRecommended(byId['kUseRearCursorMode'], { origin: 'newbie', typing: 'zhuyin' }), null);
 });
 
-test('題庫：注音／拼音排列之順序與標籤皆與設定介面同源', function () {
+test('題庫：注音／拼音／雙拼排列之順序與標籤皆與設定介面同源', function () {
   const { VCA } = loadCore();
   const surface = JSON.parse(
     require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'assets', 'settings-surface.json'), 'utf8')
@@ -227,10 +227,26 @@ test('題庫：注音／拼音排列之順序與標籤皆與設定介面同源',
   );
   assert.deepStrictEqual(VCA.entryByKey('kKeyboardParser4Pinyin').range, [100, 105]);
 
+  // 雙拼另立一槽（200…202）：拼音清單只列 100…105，雙拼於設定介面另有其下拉。
+  const dualpin = byId['kKeyboardParser4Dualpin'];
+  assert.ok(dualpin, '缺雙拼方案一題');
+  assert.deepStrictEqual(
+    dualpin.choices.map(function (c) { return c.value; }),
+    surface.keyboardParsers.dualpin.map(function (p) { return p.value; })
+  );
+  assert.deepStrictEqual(
+    dualpin.choices.map(function (c) { return c.value; }), [200, 201, 202]
+  );
+  assert.deepStrictEqual(VCA.entryByKey('kKeyboardParser4Dualpin').range, [200, 202]);
+
   // 標籤鍵亦須與設定介面同源，且逐選項皆查得四語系之譯文。
-  for (const question of [zhuyin, pinyin]) {
-    const expectedKeys = question.id === 'kKeyboardParser4Zhuyin'
-      ? surface.keyboardParsers.zhuyin : surface.keyboardParsers.pinyin;
+  const expectedKeysByQuestion = {
+    kKeyboardParser4Zhuyin: surface.keyboardParsers.zhuyin,
+    kKeyboardParser4Pinyin: surface.keyboardParsers.pinyin,
+    kKeyboardParser4Dualpin: surface.keyboardParsers.dualpin,
+  };
+  for (const question of [zhuyin, pinyin, dualpin]) {
+    const expectedKeys = expectedKeysByQuestion[question.id];
     for (let i = 0; i < question.choices.length; i += 1) {
       assert.strictEqual(question.choices[i].i18nKey, expectedKeys[i].i18nKey);
       for (const lang of VCA.LANG_ORDER) {
@@ -242,6 +258,8 @@ test('題庫：注音／拼音排列之順序與標籤皆與設定介面同源',
   }
 
   // 分隔線：與設定介面所標者一致，且首項不插（清單之首無從標示分界）。
+  // 拼音族之首（100）與雙拼族之首（200，自訂雙拼）皆因此不插分隔，
+  // 惟設定介面之 dividerBefore 仍逐值保留 100 與 200（供 App 端過濾後判讀）。
   const separatorValues = function (question) {
     const out = [];
     for (let i = 0; i < question.choices.length; i += 1) {
@@ -251,7 +269,8 @@ test('題庫：注音／拼音排列之順序與標籤皆與設定介面同源',
   };
   assert.deepStrictEqual(separatorValues(zhuyin), [7]);
   assert.deepStrictEqual(separatorValues(pinyin), []);
-  assert.deepStrictEqual(surface.keyboardParsers.dividerBefore, [7, 100]);
+  assert.deepStrictEqual(separatorValues(dualpin), []);
+  assert.deepStrictEqual(surface.keyboardParsers.dividerBefore, [7, 100, 200]);
 });
 
 test('題庫：分支依打字方式過濾', function () {
@@ -364,6 +383,109 @@ test('題庫：「ㄅ半」之稱呼', function () {
   for (const lang of VCA.LANG_ORDER) {
     assert.strictEqual(VCA.UI_STRINGS[lang]['typing.opt.scpc'], expected[lang],
       lang + ' 之「ㄅ半」稱呼未依裁定');
+  }
+});
+
+test('題庫：拼音之二分——「不是雙拼」與「雙拼」（事主 2026-10-13 裁定）', function () {
+  const { VCA } = loadCore();
+  assert.deepStrictEqual(VCA.TYPING_VALUES, ALL_TYPING,
+    '打字方式之諸值應與本測試之清單一致（次序即畫面之次序）');
+  assert.deepStrictEqual(VCA.TYPING_VALUES.slice(3, 5), ['pinyin', 'pinyindualpin'],
+    '「漢語拼音（雙拼）」應緊隨「漢語拼音（不是雙拼）」之後');
+  const expected = {
+    'zh-Hant': ['漢語拼音（不是雙拼）', '漢語拼音（雙拼）'],
+    'zh-Hans': ['汉语拼音（不是双拼）', '汉语拼音（双拼）'],
+    en: ['Hanyu Pinyin (not Dualpin)', 'Hanyu Pinyin (Dualpin)'],
+    ja: ['漢語弁音（双拼ではない）', '漢語弁音（双拼）'],
+  };
+  for (const lang of VCA.LANG_ORDER) {
+    assert.strictEqual(VCA.UI_STRINGS[lang]['typing.opt.pinyin'], expected[lang][0],
+      lang + ' 之「不是雙拼」一支未依裁定改稱');
+    assert.strictEqual(VCA.UI_STRINGS[lang]['typing.opt.pinyindualpin'], expected[lang][1],
+      lang + ' 之「雙拼」一支未依裁定新增');
+  }
+});
+
+test('題庫：「漢語拼音（雙拼）」之起始配置與分支（事主 2026-10-13 裁定）', function () {
+  const { VCA } = loadCore();
+  // 來源取「狂拼流拼音」——`newbie` 會由 `ORIGIN_VETOED_KEYS` 否決拼音狂打，測不出打字方式級之推薦。
+  function recommended(typing, id) {
+    const profile = { origin: 'pinyin', typing: typing };
+    const question = VCA.allQuestionsFor(profile, null)
+      .filter(function (q) { return q.id === id; })[0];
+    return question ? VCA.effectiveRecommended(question, profile) : undefined;
+  }
+  // 雙拼一支：指名微軟雙拼（`ofDualpinMSPY` ＝ 201）、啟用雙拼、並沿用拼音之狂打。
+  assert.strictEqual(recommended('pinyindualpin', 'kKeyboardParser4Dualpin'), 201,
+    '「漢語拼音（雙拼）」應預設微軟雙拼');
+  assert.strictEqual(recommended('pinyindualpin', 'kDualpinEnabledForPinyinTyping'), true,
+    '「漢語拼音（雙拼）」應預設啟用雙拼');
+  assert.strictEqual(recommended('pinyindualpin', 'kFuriousTypingEnabled4Pinyin'), true,
+    '「漢語拼音（雙拼）」仍屬連續拼音打字，應預設狂打');
+  // 「不是雙拼」一支：刻意停用雙拼（非「不表態」），而狂打照舊刻意開啟。
+  assert.strictEqual(recommended('pinyin', 'kDualpinEnabledForPinyinTyping'), false,
+    '「漢語拼音（不是雙拼）」應刻意停用雙拼');
+  assert.strictEqual(recommended('pinyin', 'kFuriousTypingEnabled4Pinyin'), true);
+  assert.strictEqual(recommended('pinyin', 'kKeyboardParser4Dualpin'), null,
+    '「不是雙拼」一支對雙拼方案不表態');
+  // `newbie` 之否決仍優先於打字方式級（既有裁定不因本次新增而動搖）。
+  const newbieProfile = { origin: 'newbie', typing: 'pinyindualpin' };
+  const furious = VCA.allQuestionsFor(newbieProfile, null)
+    .filter(function (q) { return q.id === 'kFuriousTypingEnabled4Pinyin'; })[0];
+  assert.strictEqual(VCA.effectiveRecommended(furious, newbieProfile), false,
+    '`newbie` 仍應否決拼音狂打');
+  // 分支：雙拼之二題只在拼音兩支露面。
+  for (const typing of ['pinyin', 'pinyindualpin']) {
+    const ids = allQuestions(stepsFor(VCA, 'newbie', typing)).map(function (q) { return q.id; });
+    assert.ok(ids.indexOf('kKeyboardParser4Dualpin') >= 0, typing + ' 應出「雙拼方案」');
+    assert.ok(ids.indexOf('kDualpinEnabledForPinyinTyping') >= 0, typing + ' 應出「啟用雙拼」');
+  }
+  for (const typing of ['zhuyin', 'zhuyinmix', 'scpc', 'cin']) {
+    const ids = allQuestions(stepsFor(VCA, 'newbie', typing)).map(function (q) { return q.id; });
+    assert.strictEqual(ids.indexOf('kKeyboardParser4Dualpin'), -1,
+      typing + ' 不應見到「雙拼方案」');
+    assert.strictEqual(ids.indexOf('kDualpinEnabledForPinyinTyping'), -1,
+      typing + ' 不應見到「啟用雙拼」');
+  }
+  // `unsure` 一律看得到全部題目（`isVisibleFor` 對 unsure／空字串繞過 `showForTyping` 之篩選）。
+  const unsure = allQuestions(stepsFor(VCA, 'newbie', 'unsure')).map(function (q) { return q.id; });
+  assert.ok(unsure.indexOf('kKeyboardParser4Dualpin') >= 0,
+    '「不確定」之使用者仍應看得到「雙拼方案」');
+  // 拼音排列一題仍只屬「不是雙拼」一支——雙拼開啟時該排列本即無用。
+  const plain = allQuestions(stepsFor(VCA, 'newbie', 'pinyin')).map(function (q) { return q.id; });
+  const dual = allQuestions(stepsFor(VCA, 'newbie', 'pinyindualpin')).map(function (q) { return q.id; });
+  assert.ok(plain.indexOf('kKeyboardParser4Pinyin') >= 0,
+    '「漢語拼音（不是雙拼）」仍應問拼音排列');
+  assert.strictEqual(dual.indexOf('kKeyboardParser4Pinyin'), -1,
+    '「漢語拼音（雙拼）」不應再問拼音排列');
+});
+
+test('題庫：雙拼之加註落在「打」步（事主 2026-10-13 裁定）', function () {
+  const { VCA } = loadCore();
+  assert.deepStrictEqual(VCA.NOTE_KEY_BY_TYPING, { pinyindualpin: 'typing.note.pinyindualpin' },
+    '打字方式之加註應只有雙拼一支');
+  assert.strictEqual(VCA.LINK_BY_TYPING.pinyindualpin.href,
+    'https://github.com/vChewing/vChewing.github.io/tree/main/valueadd/dualpin-schema-files',
+    '加註之連結應指向官網倉庫之方案檔');
+  for (const lang of VCA.LANG_ORDER) {
+    const note = VCA.UI_STRINGS[lang]['typing.note.pinyindualpin'];
+    const label = VCA.UI_STRINGS[lang]['typing.note.pinyindualpin.link'];
+    assert.ok(typeof note === 'string' && note.length > 0, lang + ' 缺雙拼之加註');
+    assert.ok(typeof label === 'string' && label.length > 0, lang + ' 缺加註之連結文案');
+    // 加註之兩項實質：編輯器之所在、以及方案檔之獲取處。
+    const mentionsScheme = note.indexOf('方案') >= 0 ||
+      note.indexOf('scheme') >= 0 || note.indexOf('Scheme') >= 0;
+    const mentionsEditor = note.indexOf('編輯') >= 0 || note.indexOf('编辑') >= 0 ||
+      note.indexOf('編輯器') >= 0 || note.indexOf('Editor') >= 0 || note.indexOf('editor') >= 0 ||
+      note.indexOf('編集') >= 0;
+    assert.ok(mentionsScheme, lang + ' 之加註未提及方案');
+    assert.ok(mentionsEditor, lang + ' 之加註未提及編輯器');
+  }
+  for (const typing of ['zhuyin', 'zhuyinmix', 'scpc', 'pinyin', 'cin', 'unsure']) {
+    assert.strictEqual(typeof VCA.NOTE_KEY_BY_TYPING[typing], 'undefined',
+      typing + ' 不應有加註');
+    assert.strictEqual(typeof VCA.LINK_BY_TYPING[typing], 'undefined',
+      typing + ' 不應有連結');
   }
 });
 

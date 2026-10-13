@@ -51,7 +51,7 @@ namespace VCA {
     extraLabels: { [locale: string]: { [key: string]: string } };
   }
 
-  /// 單一鍵盤排列（注音／拼音）。
+  /// 單一鍵盤排列（注音／拼音／雙拼）。
   export interface KeyboardParserEntry {
     name: string;
     value: number;
@@ -61,10 +61,11 @@ namespace VCA {
   /// 設定介面曝露面之執行期段落（其餘段落屬建置期與測試之用）。
   export interface SettingsSurface {
     keyboardParsers: {
-      /// 設定介面在此些值之前插入分隔（如注音之 7 與拼音之 100）。
+      /// 設定介面在此些值之前插入分隔（如注音之 7、拼音之 100、雙拼之 200）。
       dividerBefore: number[];
       zhuyin: KeyboardParserEntry[];
       pinyin: KeyboardParserEntry[];
+      dualpin: KeyboardParserEntry[];
     };
   }
 

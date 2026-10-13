@@ -57,6 +57,12 @@ public final class SettingsUIHost {
   )
     -> () = { _, _, _ in }
 
+  // MARK: - 雙拼方案動作依賴
+
+  /// 匯入雙拼（Dualpin）自訂方案：讀檔、交由引擎校驗、寫入偏好設定。
+  /// 未注入時一律回報無法讀取。
+  public var importDualpinSchema: (_ url: URL) -> DualpinImportOutcome = { _ in .failure(.unreadable) }
+
   /// 語彙編輯器委派之延遲供應器（宿主注入 `{ LXMgr.shared }`）。
   /// 刻意不以值直接注入：`phraseEditorDelegate` 只在詞彙編輯頁（GUI）被使用，
   /// 沒有必要在程序啟動階段就實體化 `LXMgr.shared`（連帶提早武裝其 KVO 路徑失效觀察器）。

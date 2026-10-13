@@ -103,6 +103,31 @@ namespace VCA {
     macoszhuyin: "origin.note.macoszhuyin",
   };
 
+  /// 各「打字方式」於「打」步顯示之加註（`null` ＝ 不顯示）。
+  ///
+  /// 與 `NOTE_KEY_BY_ORIGIN` 同制，僅掛在**打字方式**而非來源之上，且不掛於背景頁而掛於
+  /// 「打」步——**事主 2026-10-13 裁定**：選「漢語拼音（雙拼）」者於第三步要額外看到
+  /// 「雙拼方案編輯器」之存在（唯音輸入法偏好設定 → 鍵盤設定）與方案檔之獲取處。
+  /// 該說明落在此頁，正因雙拼方案即在此步選擇（`kKeyboardParser4Dualpin`）。
+  export var NOTE_KEY_BY_TYPING: { [typing: string]: string } = {
+    pinyindualpin: "typing.note.pinyindualpin",
+  };
+
+  /// 打字方式加註之附帶連結（無者即不附）。
+  ///
+  /// 方案檔之獲取處即唯音官網倉庫之 `valueadd/dualpin-schema-files`——值得可點，故與加註
+  /// 同制另立一表，而非把網址逕寫進文案（文案本身不含任何標記）。
+  export interface TypingNoteLink {
+    labelKey: string;
+    href: string;
+  };
+  export var LINK_BY_TYPING: { [typing: string]: TypingNoteLink } = {
+    pinyindualpin: {
+      labelKey: "typing.note.pinyindualpin.link",
+      href: "https://github.com/vChewing/vChewing.github.io/tree/main/valueadd/dualpin-schema-files",
+    },
+  };
+
   /// 該頁於當前狀態下之「深入說明 →」目標。
   ///
   /// 「起始配置」一頁與「背景」頁同源：該組配置之依據即該來源之官網策展文章
@@ -129,7 +154,16 @@ namespace VCA {
   ///
   /// `zhuyinmix` 為 `zhuyin` 之手足（事主 2026-09-25）：同樣是注音組句，但明示要中英混打
   /// ——故分支與 `zhuyin` 同進退，並帶出 `kMixedAlphanumericalEnabled` 之推薦值（見下）。
-  export var TYPING_VALUES: string[] = ["zhuyin", "zhuyinmix", "scpc", "pinyin", "cin", "unsure"];
+  ///
+  /// `pinyindualpin`（**事主 2026-10-13 裁定**）為 `pinyin` 之手足：原「漢語拼音」一支改稱
+  /// 「漢語拼音（不是雙拼）」（＝明示**不用**雙拼），另立「漢語拼音（雙拼）」一項緊隨其後。
+  /// 後者之起始配置指名「微軟雙拼」與「拼音狂打」，並於「打」步加註「雙拼方案編輯器」之
+  /// 所在與方案檔之出處（見 `NOTE_KEY_BY_TYPING`）；其分支之題目與 `pinyin` 同源而**不盡同**
+  /// ——雙拼係拼音之加掛模式，故兩支皆出「雙拼方案」與「啟用雙拼」（見下之 `showForTyping`
+  /// 與 `limitTyping`），而拼音排列一題仍只屬後者（既有之拼音排列於雙拼開啟時本即無用）。
+  export var TYPING_VALUES: string[] = [
+    "zhuyin", "zhuyinmix", "scpc", "pinyin", "pinyindualpin", "cin", "unsure",
+  ];
 
   /// **題庫之外、但起始配置得指名之鍵**（事主 2026-09-25 裁定）。
   ///
@@ -353,7 +387,23 @@ namespace VCA {
       // 刻意開啟**之（其值恰等於出廠預設 `true`，仍指名寫入——同上之經核定例外）。
       // 與注音側不同：本模式本就是為桌面而設，故並非「代為關閉」而是「代為確認開啟」。
       // 例外：`newbie`（全新使用者）由 `ORIGIN_VETOED_KEYS` **否決**之——事主 2026-09-26「Newbie 來源現階段刻意停用該特性」（現階段＝日後可能再議）。
-      return { value: null, typing: { pinyin: true }, origin: { pinyin: true } };
+      // 2026-10-13：拼音之二支皆然——「漢語拼音（不是雙拼）」與「漢語拼音（雙拼）」同屬
+      // 連續拼音打字，故 `pinyindualpin` 併入（事主該日之裁定）。
+      return {
+        value: null, typing: { pinyin: true, pinyindualpin: true }, origin: { pinyin: true },
+      };
+    case "kKeyboardParser4Dualpin":
+      // **事主 2026-10-13 裁定**：選「漢語拼音（雙拼）」者預設指名**微軟雙拼**
+      //（`ofDualpinMSPY` ＝ 201，亦即引擎之出廠預設——仍指名寫入，同上述之經核定例外：
+      // 使用者若曾匯入他案或手動改過，藉此回歸微軟雙拼）。另一支（「不是雙拼」）**不表態**：
+      // 其方案與該使用者無涉，留予現狀。
+      return { value: null, typing: { pinyindualpin: 201 }, origin: null };
+    case "kDualpinEnabledForPinyinTyping":
+      // **事主 2026-10-13 裁定**：「漢語拼音（雙拼）」⇒ 預設**啟用雙拼**；
+      // 「漢語拼音（不是雙拼）」⇒ **刻意停用**（其值恰等於出廠預設 `false`，仍指名寫入，
+      // 同 `kMixedAlphanumericalEnabled` 之「刻意停用」之例）：該支之語意即「我不用雙拼」，
+      // 故不該因前次之試用而殘留為開啟。
+      return { value: null, typing: { pinyin: false, pinyindualpin: true }, origin: null };
     case "kUseHorizontalCandidateList":
       return { value: null, typing: { scpc: false }, origin: null };
     // 註：`kCandidateWindowShowOnlyOneLine`（僅以單行/單列來陳列候選字）**刻意不收**
@@ -488,19 +538,23 @@ namespace VCA {
     return null;
   }
 
-  /// 注音／拼音排列之題目。
+  /// 注音／拼音／雙拼排列之題目。
   ///
-  /// 該兩條鍵之標籤**不在** `UserDef.metaData.options` 內——其選單名稱由
+  /// 該三條鍵之標籤**不在** `UserDef.metaData.options` 內——其選單名稱由
   /// `KeyboardParser.localizedMenuName` 供出，且設定介面是以 `KeyboardParser.allCases`
   /// 之**宣告序**列示（並在特定值之前插分隔線）。故本函式一律取用
-  /// `tools/settings-surface.mjs` 自 app 源碼抽出、經建置注入之 `VCA_SURFACE.keyboardParsers`：
+  /// `tools/settings-surface.js` 自 app 源碼抽出、經建置注入之 `VCA_SURFACE.keyboardParsers`：
   /// **順序、標籤、分隔線三者皆與設定介面同源**，助手不再手抄（事主 2026-09-24 指示：
   /// 「注音排列的 option 順序請調整得跟輸入法 settingsUI 一致」）。
   function parserQuestion(caseName: string, side: string): Question | null {
     var entry = entryByKey(caseName);
     if (!entry || !isTouchable(entry)) return null;
     var spec = VCA_SURFACE.keyboardParsers;
-    var list: KeyboardParserEntry[] = side === "pinyin" ? spec.pinyin : spec.zhuyin;
+    var lists: { [side: string]: KeyboardParserEntry[] } = {
+      zhuyin: spec.zhuyin, pinyin: spec.pinyin, dualpin: spec.dualpin,
+    };
+    var list: KeyboardParserEntry[] = lists[side] || [];
+    if (list.length === 0) return null;
     var choices: QuestionChoice[] = [];
     for (var i = 0; i < list.length; i += 1) {
       // 首項之前的分隔線省略——清單之首無從標示分界（設定介面之拼音清單即如此）。
@@ -526,11 +580,21 @@ namespace VCA {
       table["kKeyboardParser4Pinyin"] = pinyin;
     }
 
+    // 雙拼係拼音輸入之加掛模式：方案之題目與其總開關皆只在**拼音兩支**露面
+    //（「漢語拼音（不是雙拼）」與「漢語拼音（雙拼）」，見 `TYPING_VALUES`），
+    // 且與設定介面之鍵盤頁同構（方案下拉 ＋ 啟用雙拼之開關）。
+    var dualpin = parserQuestion("kKeyboardParser4Dualpin", "dualpin");
+    if (dualpin) {
+      dualpin.showForTyping = ["pinyin", "pinyindualpin"];
+      table["kKeyboardParser4Dualpin"] = dualpin;
+    }
+
     // 逐題之分支限定。
     limitTyping(table, ["kCassetteEnabled", "kShowTranslatedStrokesInCompositionBuffer",
       "kAutoCompositeWithLongestPossibleCassetteKey", "kForceCassetteChineseConversion"], ["cin"]);
     limitTyping(table, ["kUseSCPCTypingMode", "kUseSpaceToCommitHighlightedCandidate4SCPC",
       "kEnforceSingleLineCandidateWindowLayout4SCPC"], ["scpc"]);
+    limitTyping(table, ["kDualpinEnabledForPinyinTyping"], ["pinyin", "pinyindualpin"]);
 
     return table;
   }
@@ -585,6 +649,8 @@ namespace VCA {
     seeds.push(seedOf("method", "打", "manual/preferences.html", false, [
       questionForCase(table, "kKeyboardParser4Zhuyin"),
       questionForCase(table, "kKeyboardParser4Pinyin"),
+      questionForCase(table, "kKeyboardParser4Dualpin"),
+      questionForCase(table, "kDualpinEnabledForPinyinTyping"),
       questionForCase(table, "kUseSCPCTypingMode"),
       questionForCase(table, "kUseSpaceToCommitHighlightedCandidate4SCPC"),
       questionForCase(table, "kCassetteEnabled"),

@@ -4,8 +4,8 @@
     "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsUI",
     "../../Packages/vChewing_SettingsUI/Sources/SettingsUI/SettingsCocoa"
   ],
-  "scannedFileCount": 31,
-  "count": 112,
+  "scannedFileCount": 33,
+  "count": 115,
   "keys": [
     "kAcceptLeadingIntonations",
     "kAllowRescoringSingleKanjiCandidates",
@@ -39,6 +39,8 @@
     "kDisableIMKSwiftServerControllerPruning",
     "kDisableSegmentedThickUnderlineInMarkingModeForManagedClients",
     "kDodgeInvalidEdgeCandidateCursorPosition",
+    "kDualpinEnabledForPinyinTyping",
+    "kDualpinSchemaJSON",
     "kEnableCandidateWindowAnimation",
     "kEnableLatchedAlnumStateInMixedAlnumMode",
     "kEnforceETenDOSCandidateSequence",
@@ -55,6 +57,7 @@
     "kIsDebugModeEnabled",
     "kKanjiConversionPreferences",
     "kKeepReadingUponCompositionError",
+    "kKeyboardParser4Dualpin",
     "kKeyboardParser4Pinyin",
     "kKeyboardParser4Zhuyin",
     "kMinCellWidthForHorizontalMatrix",
@@ -123,7 +126,8 @@
   "keyboardParsers": {
     "dividerBefore": [
       7,
-      100
+      100,
+      200
     ],
     "zhuyin": [
       {
@@ -212,6 +216,23 @@
         "name": "ofWadeGilesPinyin",
         "value": 105,
         "i18nKey": "i18n:TypingMethod.WadeGilesPinyinNumeral"
+      }
+    ],
+    "dualpin": [
+      {
+        "name": "ofDualpinCustom",
+        "value": 200,
+        "i18nKey": "i18n:KeyboardLayout.DualpinCustom"
+      },
+      {
+        "name": "ofDualpinMSPY",
+        "value": 201,
+        "i18nKey": "i18n:KeyboardLayout.DualpinMSPY"
+      },
+      {
+        "name": "ofDualpinGBT17",
+        "value": 202,
+        "i18nKey": "i18n:KeyboardLayout.DualpinGBT17"
       }
     ]
   }

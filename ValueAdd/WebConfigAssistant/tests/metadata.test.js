@@ -20,12 +20,15 @@ const PARSER_LABEL_KEYS = [
   'i18n:TypingMethod.HanyuPinyinNumeral', 'i18n:TypingMethod.SecondaryPinyinNumeral',
   'i18n:TypingMethod.YalePinyinNumeral', 'i18n:TypingMethod.HualuoPinyinNumeral',
   'i18n:TypingMethod.UniversalPinyinNumeral', 'i18n:TypingMethod.WadeGilesPinyinNumeral',
+  // 雙拼方案族（200…202）：與拼音同為「排列」標籤，同樣不在 UserDef 之 options 內。
+  'i18n:KeyboardLayout.DualpinMSPY', 'i18n:KeyboardLayout.DualpinGBT17',
+  'i18n:KeyboardLayout.DualpinCustom',
 ];
 
 test('後設資料：基本不變式', function () {
   const { metadata } = loadCore();
   assert.strictEqual(metadata.schemaVersion, 1);
-  assert.strictEqual(metadata.count, 123);
+  assert.strictEqual(metadata.count, 126);
   assert.strictEqual(metadata.count, metadata.entries.length);
   assert.deepStrictEqual(metadata.locales, ['zh-Hant', 'zh-Hans', 'en', 'ja']);
   assert.deepStrictEqual(metadata.missingI18nKeys, []);

@@ -14,6 +14,8 @@
   "UseExternalFactoryDict": true,
   "KanjiConversionPreferences": 0,
   "KeyboardParser4Pinyin": 100,
+  "KeyboardParser4Dualpin": 201,
+  "DualpinEnabledForPinyinTyping": false,
   "ShowModeDescriptionOnActivatingServer": false,
   "ShowNotificationsWhenTogglingCapsLock": true,
   "ShowNotificationsWhenTogglingEisu": true,

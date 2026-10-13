@@ -1,5 +1,5 @@
 {
-  "count" : 123,
+  "count" : 126,
   "entries" : [
     {
       "default" : false,
@@ -615,6 +615,41 @@
       "type" : "integer"
     },
     {
+      "default" : 201,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : false,
+      "key" : "kKeyboardParser4Dualpin",
+      "labels" : {
+        "en" : {
+          "description" : "Specifies the dualpin scheme used while typing in pinyin (the two built-in schemes and the user-supplied custom one). This setting takes effect only while the Enable Dualpin switch is on.",
+          "shortTitle" : "Dualpin Scheme:"
+        },
+        "ja" : {
+          "description" : "弁音入力時に使用する双拼方案（内蔵の二種と、ユーザーが用意したカスタム方案）を指定します。本設定は「双拼を有効にする」がオンの場合にのみ作用します。",
+          "shortTitle" : "双拼方案:"
+        },
+        "zh-Hans" : {
+          "description" : "指定拼音打字时所采用之双拼方案（原厂两案与使用者自备之自订案）。此设定唯于「启用双拼」开启时才有作用。",
+          "shortTitle" : "双拼方案:"
+        },
+        "zh-Hant" : {
+          "description" : "指定拼音打字時所採用之雙拼方案（原廠兩案與使用者自備之自訂案）。此設定唯於「啟用雙拼」開啟時才有作用。",
+          "shortTitle" : "雙拼方案:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : [
+        200,
+        202
+      ],
+      "rawValue" : "KeyboardParser4Dualpin",
+      "type" : "integer"
+    },
+    {
       "default" : false,
       "defaultsType" : "bool",
       "exchangeBlacklisted" : false,
@@ -645,6 +680,70 @@
       "range" : null,
       "rawValue" : "PinyinTypingEnabled",
       "type" : "bool"
+    },
+    {
+      "default" : false,
+      "defaultsType" : "bool",
+      "exchangeBlacklisted" : false,
+      "key" : "kDualpinEnabledForPinyinTyping",
+      "labels" : {
+        "en" : {
+          "description" : "When enabled, pinyin typing translates the key sequence into readings according to the dualpin scheme selected above (two keys per syllable). When disabled, pinyin typing stays fully spelled out. This option affects pinyin input only; zhuyin input is unaffected.",
+          "shortTitle" : "Enable Dualpin"
+        },
+        "ja" : {
+          "description" : "有効にすると、弁音入力のキー順を上で選択した双拼方案に従って読みに変換します（二鍵で一音節）。無効の場合は通常の完全表記のままとなります。本項目は弁音入力にのみ作用し、注音入力には影響しません。",
+          "shortTitle" : "双拼を有効にする"
+        },
+        "zh-Hans" : {
+          "description" : "启用时，拼音打字会将字母键序按上方所选之双拼方案翻译成读音（两键取一音节）；停用时，拼音打字维持一般拼音（全拼）。此选项仅作用于拼音输入，注音输入不受影响。",
+          "shortTitle" : "启用双拼"
+        },
+        "zh-Hant" : {
+          "description" : "啟用時，拼音打字會將字母鍵序按上方所選之雙拼方案翻譯成讀音（兩鍵取一音節）；停用時，拼音打字維持一般拼音（全拼）。此選項僅作用於拼音輸入，注音輸入不受影響。",
+          "shortTitle" : "啟用雙拼"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "DualpinEnabledForPinyinTyping",
+      "type" : "bool"
+    },
+    {
+      "default" : "",
+      "defaultsType" : "string",
+      "exchangeBlacklisted" : false,
+      "key" : "kDualpinSchemaJSON",
+      "labels" : {
+        "en" : {
+          "description" : "JSON source of the imported custom dualpin scheme. It is managed by the Dualpin import section of the Keyboard pane; edit it with care.",
+          "shortTitle" : "Custom Dualpin Schema:"
+        },
+        "ja" : {
+          "description" : "導入済みカスタム双拼方案の JSON 原文。キーボード設定の双拼導入欄で管理されます。編集は慎重に。",
+          "shortTitle" : "カスタム双拼方案:"
+        },
+        "zh-Hans" : {
+          "description" : "已导入之自订双拼方案 JSON 原文。由键盘设定页的双拼导入区管理，请谨慎编辑。",
+          "shortTitle" : "自订双拼方案:"
+        },
+        "zh-Hant" : {
+          "description" : "已匯入之自訂雙拼方案 JSON 原文。由鍵盤設定頁的雙拼匯入區管理，請謹慎編輯。",
+          "shortTitle" : "自訂雙拼方案:"
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 14,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "DualpinSchemaJSON",
+      "type" : "string"
     },
     {
       "default" : "com.apple.keylayout.ZhuyinBopomofo",
@@ -4614,6 +4713,9 @@
       "i18n:KeyboardLayout.Dachen26" : "Dachen 26 (libChewing)",
       "i18n:KeyboardLayout.DachenMicrosoftStandard" : "Dachen (Microsoft Standard \/ Wang \/ 01, etc.)",
       "i18n:KeyboardLayout.DachenTraditional" : "Dachen Trad.",
+      "i18n:KeyboardLayout.DualpinCustom" : "Custom Dualpin Scheme",
+      "i18n:KeyboardLayout.DualpinGBT17" : "GB\/T 34947-2017",
+      "i18n:KeyboardLayout.DualpinMSPY" : "Microsoft",
       "i18n:KeyboardLayout.Eten26" : "Eten 26",
       "i18n:KeyboardLayout.EtenTraditional" : "Eten Traditional",
       "i18n:KeyboardLayout.EtenTraditionalShort" : "Eten Trad.",
@@ -4644,6 +4746,9 @@
       "i18n:KeyboardLayout.Dachen26" : "酷音大千 26 キー配列",
       "i18n:KeyboardLayout.DachenMicrosoftStandard" : "大千配列 (Microsoft 標準・王安・零壹など)",
       "i18n:KeyboardLayout.DachenTraditional" : "大千伝統",
+      "i18n:KeyboardLayout.DualpinCustom" : "カスタム双拼方案",
+      "i18n:KeyboardLayout.DualpinGBT17" : "GB\/T 34947-2017",
+      "i18n:KeyboardLayout.DualpinMSPY" : "Microsoft",
       "i18n:KeyboardLayout.Eten26" : "倚天形忘れ配列 (26 キー)",
       "i18n:KeyboardLayout.EtenTraditional" : "倚天伝統配列",
       "i18n:KeyboardLayout.EtenTraditionalShort" : "倚天伝統",
@@ -4674,6 +4779,9 @@
       "i18n:KeyboardLayout.Dachen26" : "酷音大千二十六键排列",
       "i18n:KeyboardLayout.DachenMicrosoftStandard" : "大千排列 (微软标准\/王安\/零壹\/仲鼎\/国乔)",
       "i18n:KeyboardLayout.DachenTraditional" : "大千传统",
+      "i18n:KeyboardLayout.DualpinCustom" : "自订双拼方案",
+      "i18n:KeyboardLayout.DualpinGBT17" : "GB\/T 34947-2017",
+      "i18n:KeyboardLayout.DualpinMSPY" : "微软双拼",
       "i18n:KeyboardLayout.Eten26" : "倚天忘形排列 (26 键)",
       "i18n:KeyboardLayout.EtenTraditional" : "倚天传统排列",
       "i18n:KeyboardLayout.EtenTraditionalShort" : "倚天传统",
@@ -4704,6 +4812,9 @@
       "i18n:KeyboardLayout.Dachen26" : "酷音大千二十六鍵排列",
       "i18n:KeyboardLayout.DachenMicrosoftStandard" : "大千排列 (微軟標準\/王安\/零壹\/仲鼎\/國喬)",
       "i18n:KeyboardLayout.DachenTraditional" : "大千傳統",
+      "i18n:KeyboardLayout.DualpinCustom" : "自訂雙拼方案",
+      "i18n:KeyboardLayout.DualpinGBT17" : "GB\/T 34947-2017",
+      "i18n:KeyboardLayout.DualpinMSPY" : "微軟雙拼",
       "i18n:KeyboardLayout.Eten26" : "倚天忘形排列 (26 鍵)",
       "i18n:KeyboardLayout.EtenTraditional" : "倚天傳統排列",
       "i18n:KeyboardLayout.EtenTraditionalShort" : "倚天傳統",
