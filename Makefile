@@ -6,9 +6,9 @@ update:
 	@echo "Running lexicon update script for vChewing-macOS..."
 	@chmod +x ./Scripts/vchewing-update-lexicon.swift || true
 	@if [ "$(DRY_RUN)" = "true" ]; then \
-		./Scripts/vchewing-update-lexicon.swift --path . --dry-run; \
+		SWIFT_EXTRA_FLAGS="$(LEGACY_SWIFT_EXTRA_FLAGS)" ./Scripts/vchewing-update-lexicon.swift --path . --dry-run; \
 	else \
-		./Scripts/vchewing-update-lexicon.swift --path .; \
+		SWIFT_EXTRA_FLAGS="$(LEGACY_SWIFT_EXTRA_FLAGS)" ./Scripts/vchewing-update-lexicon.swift --path .; \
 	fi
 
 # ── 鍵盤熱鍵使用手冊（`shortcuts.html`）之產製 ──────────────────────
@@ -142,8 +142,10 @@ LEGACY_BUILD_FLAGS = --package-path . --scratch-path "$(LEGACY_SCRATCH_ROOT)" --
 # 額外傳給 SwiftPM 的旗標（預設空）。典型用途是 `--disable-sandbox`：本側之 `swift build` 於部分環境
 # （自身已受外層沙箱拘束者）會在 manifest 編譯那關失敗——`sandbox-exec: sandbox_apply: Operation not
 # permitted`、繼而 `error: Invalid manifest`——該處即由呼叫端傳入本旗標。`lexiconLegacy` 會把它轉遞給
-# `LegacyZone/LexiconBuildTrigger` 的 `swift build`（見下）。預設不動：正常環境不該削弱 SwiftPM 之
-# manifest 沙箱。`LEGACY_BUILD_FLAGS` 同理，只是後者已由既有各 target 直接用於 `swift build`。
+# `LegacyZone/LexiconBuildTrigger` 的 `swift build`（見下）；兩條版本提升鏈路（`update` 與 `gitrelease`）
+# 則以 `SWIFT_EXTRA_FLAGS` 之名把它轉遞給其 `swift package resolve`（同樣會在 manifest 編譯那關失敗）。
+# 預設不動：正常環境不該削弱 SwiftPM 之 manifest 沙箱。`LEGACY_BUILD_FLAGS` 同理，只是後者已由既有各
+# target 直接用於 `swift build`。
 LEGACY_SWIFT_EXTRA_FLAGS ?=
 # 鏈結期的 `-platform_version <platform> <min> <sdk>`。SwiftPM 5.10 不認得 `--sdk`，會把 triple 的版本段
 # **同時**填進 min 與 sdk 兩格，於是產物之 `LC_VERSION_MIN_MACOSX` 記成 `version 10.9 sdk 10.9`——而實情
@@ -557,7 +559,7 @@ gitrelease:
 	@echo "Running git release script for vChewing-macOS..."
 	@chmod +x ./Scripts/vchewing-update.swift || true
 	@if [ "$(DRY_RUN)" = "true" ]; then \
-		./Scripts/vchewing-update.swift --path . --dry-run; \
+		SWIFT_EXTRA_FLAGS="$(LEGACY_SWIFT_EXTRA_FLAGS)" ./Scripts/vchewing-update.swift --path . --dry-run; \
 	else \
-		./Scripts/vchewing-update.swift --path .; \
+		SWIFT_EXTRA_FLAGS="$(LEGACY_SWIFT_EXTRA_FLAGS)" ./Scripts/vchewing-update.swift --path .; \
 	fi

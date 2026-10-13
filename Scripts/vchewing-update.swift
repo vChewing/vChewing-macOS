@@ -133,46 +133,54 @@ func nowStamp() -> String {
 let commitTime = nowStamp()
 let updateCommitMsg = "DictionaryData - \(commitTime)"
 
-// 1) 檢查並更新 DictionaryData (VanguardLexicon)
-// 由於不再使用 submodule，我們直接檢查 MainAssembly 的 Package.swift 是否需要更新 Dependency。
+// MARK: - LexiconPinSite
 
-let packageSwiftRelPath = "Packages/vChewing_MainAssembly4Darwin/Package.swift"
-let packageResolvedRelPath = "Packages/vChewing_MainAssembly4Darwin/Package.resolved"
-let packageDirRelPath = "Packages/vChewing_MainAssembly4Darwin"
+struct LexiconPinSite {
+  let packageSwiftRelPath: String
+  let packageResolvedRelPath: String
+  let packageDirRelPath: String
+}
+
+/// 語料庫版本在本倉的全部落地點。新增依賴宣告時必須一併加進來，否則該鏈路會靜默落後。
+let lexiconPinSites = [
+  LexiconPinSite(
+    packageSwiftRelPath: "Packages/vChewing_MainAssembly4Darwin/Package.swift",
+    packageResolvedRelPath: "Packages/vChewing_MainAssembly4Darwin/Package.resolved",
+    packageDirRelPath: "Packages/vChewing_MainAssembly4Darwin"
+  ),
+  LexiconPinSite(
+    packageSwiftRelPath: "LegacyZone/LexiconBuildTrigger/Package.swift",
+    packageResolvedRelPath: "LegacyZone/LexiconBuildTrigger/Package.resolved",
+    packageDirRelPath: "LegacyZone/LexiconBuildTrigger"
+  ),
+]
+
 let vanguardURL = "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git"
 
-print("Checking VanguardLexicon version in \(packageSwiftRelPath)...")
+/// 轉遞給 `swift package resolve` 的額外旗標，來源為環境變數 `SWIFT_EXTRA_FLAGS`（`Makefile` 自
+/// `LEGACY_SWIFT_EXTRA_FLAGS` 映射而來）。預設空：正常環境不該削弱 SwiftPM 之 manifest 沙箱。
+let swiftExtraFlags =
+  ProcessInfo.processInfo.environment["SWIFT_EXTRA_FLAGS"]?
+    .split(separator: " ").map(String.init) ?? []
+
+// 1) 檢查並更新 DictionaryData (VanguardLexicon)
+// 由於不再使用 submodule，我們直接檢查各 manifest 的 Package.swift 是否需要更新 Dependency。
+// 語料庫版本的落地點有兩處，且兩者必須同步：現代鏈路（`MainAssembly4Darwin`）與 legacy 鏈路
+// （`LegacyZone/LexiconBuildTrigger`）。後者是另一份獨立的依賴宣告，若不在此一併更新，legacy 側
+// 的 TextMap 會永遠停在被忽略的舊版語料庫上。
 
 func performDictionaryUpdate() {
-  let packageSwiftPath = repoPath + "/" + packageSwiftRelPath
-  let packageDir = repoPath + "/" + packageDirRelPath
-
-  guard let content = try? String(contentsOfFile: packageSwiftPath, encoding: .utf8) else {
-    print("Error: Could not read \(packageSwiftPath)")
-    return
-  }
-
   // 尋找目前的 version
   let escapedURL = NSRegularExpression.escapedPattern(for: vanguardURL)
   let pattern = #"\.package\(url:\s*"\#(escapedURL)",\s*exact:\s*"([^"]+)"\),"#
 
   guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
     print("Error: Invalid regex pattern")
-    return
-  }
-
-  var currentVer: String?
-  var existingRange: Range<String.Index>?
-
-  if let match = regex.firstMatch(in: content, options: [], range: NSRange(content.startIndex..., in: content)) {
-    if let verRange = Range(match.range(at: 1), in: content) {
-      currentVer = String(content[verRange])
-      existingRange = verRange
-    }
+    exit(2)
   }
 
   // 取得 Remote tags，設定 15 秒 timeout 避免 atomgit.com 無回應時無限掛住。
-  var remoteVer = currentVer
+  var remoteVer: String?
   let lsRemote = Shell.runExec(
     "/usr/bin/git",
     args: [
@@ -195,77 +203,92 @@ func performDictionaryUpdate() {
     print("Warning: Failed to query remote tags (status \(lsRemote.status)): \(lsRemote.output)")
   }
 
-  var newContent = content
-  var pendingUpdate = false
+  for site in lexiconPinSites {
+    print("Checking VanguardLexicon version in \(site.packageSwiftRelPath)...")
+    let packageSwiftPath = repoPath + "/" + site.packageSwiftRelPath
+    let packageDir = repoPath + "/" + site.packageDirRelPath
 
-  if let current = currentVer, let remote = remoteVer, current != remote, let range = existingRange {
-    print("Update available: \(current) -> \(remote)")
-    if !dryRun {
-      newContent.replaceSubrange(range, with: remote)
-      pendingUpdate = true
-    } else {
+    // 讀不到 manifest 即中止：靜默略過任何一個落地點，正是本 Phase 要根除的失效模式。
+    guard let content = try? String(contentsOfFile: packageSwiftPath, encoding: .utf8) else {
+      print("Error: Could not read \(packageSwiftPath)")
+      exit(2)
+    }
+
+    guard let match = regex.firstMatch(
+      in: content,
+      options: [],
+      range: NSRange(content.startIndex..., in: content)
+    ),
+      let existingRange = Range(match.range(at: 1), in: content)
+    else {
+      print("Error: No VanguardLexicon version pin found in \(site.packageSwiftRelPath)")
+      exit(2)
+    }
+
+    let currentVer = String(content[existingRange])
+    guard let remote = remoteVer else {
+      print("VanguardLexicon version cannot be determined (Current: \(currentVer)). Skipping.")
+      continue
+    }
+    guard currentVer != remote else {
+      print("VanguardLexicon is up to date (Current: \(currentVer)).")
+      continue
+    }
+
+    print("Update available: \(currentVer) -> \(remote)")
+    guard !dryRun else {
       print("dry-run: skipping update")
+      continue
     }
-  } else {
-    var msg = "VanguardLexicon is up to date or cannot be determined (Current: \(currentVer ?? "?")"
-    if let r = remoteVer, r != currentVer {
-      msg += ", Remote: \(r)"
-    }
-    msg += ")"
-    print(msg)
-  }
 
-  if pendingUpdate {
+    var newContent = content
+    newContent.replaceSubrange(existingRange, with: remote)
     do {
       try newContent.write(toFile: packageSwiftPath, atomically: true, encoding: .utf8)
-      print("Updated Package.swift to version \(remoteVer!)")
+      print("Updated \(site.packageSwiftRelPath) to version \(remote)")
 
       print("Running 'swift package resolve' in \(packageDir)...")
-      let resolve = Shell.runExec("/usr/bin/swift", args: ["package", "resolve"], cwd: packageDir)
+      // 外層已受沙箱拘束者（AI harness 等）會在 manifest 編譯那關失敗（`sandbox-exec: sandbox_apply:
+      // Operation not permitted` ⇒ `error: Invalid manifest`）。與 `LEGACY_SWIFT_EXTRA_FLAGS` 同一慣例：
+      // 旗標由呼叫端傳入（`make gitrelease LEGACY_SWIFT_EXTRA_FLAGS=--disable-sandbox`），預設不削弱沙箱。
+      let resolve = Shell.runExec("/usr/bin/swift", args: ["package", "resolve"] + swiftExtraFlags, cwd: packageDir)
       if resolve.status != 0 {
         print("Warning: swift package resolve failed: \(resolve.output)")
+        print("Hint: 失敗訊息若含 sandbox_apply／Invalid manifest，請以 LEGACY_SWIFT_EXTRA_FLAGS=--disable-sandbox 重跑。")
       }
     } catch {
-      print("Error writing Package.swift: \(error)")
+      print("Error writing \(site.packageSwiftRelPath): \(error)")
+      exit(2)
     }
   }
 
   // 2) 檢查檔案變更並 Commit
-  let status = Shell.runExec("/usr/bin/git", args: ["status", "--porcelain", packageDirRelPath], cwd: repoPath)
-  // Check if Package.swift or Package.resolved inside that folder are changed
-  if !status.output.isEmpty {
-    // Determine if relevant files changed
-    let lines = status.output.split(separator: "\n")
-    let relevantChanges = lines.contains { line in
-      line.contains("Package.swift") || line.contains("Package.resolved")
-    }
-
-    if relevantChanges {
-      print("Detected changes in DictionaryData related files.")
-      if dryRun {
-        print("dry-run: skipping commit")
-      } else {
-        var filesToAdd = [packageSwiftRelPath]
-        if FileManager.default.fileExists(atPath: repoPath + "/" + packageResolvedRelPath) {
-          filesToAdd.append(packageResolvedRelPath)
-        }
-        _ = Shell.runExec("/usr/bin/git", args: ["add"] + filesToAdd, cwd: repoPath)
-        let commit = Shell.runExec("/usr/bin/git", args: ["commit", "-m", updateCommitMsg], cwd: repoPath)
-        if commit.status != 0 {
-          print("Failed to commit DictionaryData changes: \(commit.output)")
-          // 失敗則退出
-          exit(4)
-        }
-        print("Committed: \(updateCommitMsg)")
-      }
-    } else {
-      print(
-        "Changes detected in MainAssembly4Darwin but not Package.swift/resolved. Ignoring for DictionaryData update."
-      )
-    }
-  } else {
+  let pinnedRelPaths = lexiconPinSites.flatMap { [$0.packageSwiftRelPath, $0.packageResolvedRelPath] }
+  let status = Shell.runExec(
+    "/usr/bin/git",
+    args: ["status", "--porcelain", "--"] + pinnedRelPaths,
+    cwd: repoPath
+  )
+  guard !status.output.isEmpty else {
     print("No DictionaryData changes detected.")
+    return
   }
+
+  print("Detected changes in DictionaryData related files.")
+  guard !dryRun else {
+    print("dry-run: skipping commit")
+    return
+  }
+
+  let filesToAdd = pinnedRelPaths.filter { FileManager.default.fileExists(atPath: repoPath + "/" + $0) }
+  _ = Shell.runExec("/usr/bin/git", args: ["add"] + filesToAdd, cwd: repoPath)
+  let commit = Shell.runExec("/usr/bin/git", args: ["commit", "-m", updateCommitMsg], cwd: repoPath)
+  if commit.status != 0 {
+    print("Failed to commit DictionaryData changes: \(commit.output)")
+    // 失敗則退出
+    exit(4)
+  }
+  print("Committed: \(updateCommitMsg)")
 }
 
 performDictionaryUpdate()

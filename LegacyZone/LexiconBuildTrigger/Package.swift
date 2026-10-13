@@ -15,7 +15,7 @@ let package = Package(
     .macOS(.v10_15),
   ],
   dependencies: [
-    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.8.0"),
+    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.8.8"),
   ],
   targets: [
     .target(
