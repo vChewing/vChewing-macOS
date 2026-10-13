@@ -105,6 +105,25 @@ extension LXAssembly {
 
     // MARK: Private
 
+    /// head 讀音（以組字分隔符正規化）→ 該 head 之下所有記憶鍵（最近使用者在前）。
+    ///
+    /// 供 `perceptionsFor` 的 `.exact` 查詢以 O(命中數) 取回記憶，免除逐鍵解析的全表掃描。
+    private var headReadingIndex: [String: [String]] = [:]
+    /// head 讀音逐段去除聲調後（正規化）→ 該 head 之下所有記憶鍵（最近使用者在前）。
+    ///
+    /// 供 `perceptionsFor(.toneInsensitivePrefix)` 與 `getToneInsensitiveSuggestion` 使用。
+    private var toneStrippedHeadReadingIndex: [String: [String]] = [:]
+    /// head 讀音的每一個讀音段 → 該段所屬的記憶鍵（最近使用者在前）。
+    ///
+    /// 供 `alternateKeys(for:)` 找出「單段候選插斷多段 head」類的替代鍵。
+    private var headReadingSegmentIndex: [String: [String]] = [:]
+
+    /// 記憶鍵 → 已解析的鍵部件快取。
+    ///
+    /// `parsePerceptionKey` 逐字元走訪且會產生大量字串配置；而檢索時同一批鍵會被反覆走訪，
+    /// 故在此快取解析結果。快取內容恆為 `mutLRUMap` 現有鍵的子集：鍵一律隨索引一同登錄／除名。
+    private var parsedKeyCache: [String: PerceptionKeyParts] = [:]
+
     /// 用於保護所有可變狀態的鎖，確保執行緒安全。
     private let lock = NSLock()
   }
@@ -402,13 +421,15 @@ extension LXAssembly.LXPerceptor {
     // 避免在每輪疊代中重複建立候選鍵陣列。
     let effectiveKeyArray = keyArrayForCandidate.isEmpty ? [frontEdgeReading] : keyArrayForCandidate
     let previousStr: String? = parts.previous?.value
+    // 候選總數於迴圈中不變，先算一次以免逐輪重算造成 O(k²)。
+    let totalCount: Int = perception.count
 
     for (candidate, override) in perception.overrides {
       // P192 資料守衛：注音讀音下候選字數 ≠ head 段數之錯位記憶不套用。
       guard !(isZhuyinReading(keyArrayForCandidate) && candidate.count != keyArrayForCandidate.count) else { continue }
       let overrideScore = calculateWeight(
         eventCount: override.count,
-        totalCount: perception.count,
+        totalCount: totalCount,
         eventTimestamp: override.timestamp,
         timestamp: timestamp,
         isUnigram: isUnigramKey,
@@ -482,8 +503,12 @@ extension LXAssembly.LXPerceptor {
       )] = .init()
     var currentHighScore: Double = threshold
 
-    for kvPair in mutLRUMap.values {
-      guard let candidateParts = parsePerceptionKey(kvPair.key) else { continue }
+    let indexedKeys = toneStrippedHeadReadingIndex[
+      toneStrippedIndexKey(forHeadReading: parts.headReading)
+    ] ?? []
+    for indexedKey in indexedKeys {
+      guard let kvPair = mutLRUMap[indexedKey] else { continue }
+      guard let candidateParts = cachedKeyParts(forKey: indexedKey) else { continue }
       guard !shouldIgnorePerception(candidateParts) else { continue }
       guard matchesToneInsensitively(candidateParts, query: parts, separatorString: separatorString) else {
         continue
@@ -491,12 +516,14 @@ extension LXAssembly.LXPerceptor {
       let perception = kvPair.perception
       let isUnigramKey = candidateParts.previous == nil && candidateParts.anterior == nil
       let isSingleCharUnigram = isUnigramKey && queryHeadSegments.count == 1
+      // 候選總數於迴圈中不變，先算一次以免逐輪重算造成 O(k²)。
+      let totalCount: Int = perception.count
       for (candidate, override) in perception.overrides {
         // P192 資料守衛：注音讀音下候選字數 ≠ head 段數之錯位記憶不套用。
         guard !(isZhuyinReading(queryHeadSegments) && candidate.count != queryHeadSegments.count) else { continue }
         let overrideScore = calculateWeight(
           eventCount: override.count,
-          totalCount: perception.count,
+          totalCount: totalCount,
           eventTimestamp: override.timestamp,
           timestamp: timestamp,
           isUnigram: isUnigramKey,
@@ -614,8 +641,18 @@ extension LXAssembly.LXPerceptor {
     var results: [(headReading: String, previous: String?, anterior: String?, candidate: String, probability: Double)] =
       []
     lock.withLock {
-      for kvPair in mutLRUMap.values {
-        guard let parts = parsePerceptionKey(kvPair.key) else { continue }
+      // 以 head 讀音索引直接取回候選桶：`.exact` 走原文索引、`.toneInsensitivePrefix` 走去聲調索引，
+      // 免除逐鍵 `parsePerceptionKey` 的全表掃描（原本的成本與記憶總量成正比）。
+      let indexedKeys: [String]
+      switch matchMode {
+      case .toneInsensitivePrefix:
+        indexedKeys = toneStrippedHeadReadingIndex[toneStrippedIndexKey(forHeadReading: headReading)] ?? []
+      case .exact:
+        indexedKeys = headReadingIndex[normalizedHeadReading(headReading)] ?? []
+      }
+      for indexedKey in indexedKeys {
+        guard let kvPair = mutLRUMap[indexedKey] else { continue }
+        guard let parts = cachedKeyParts(forKey: indexedKey) else { continue }
         guard !shouldIgnorePerception(parts) else { continue }
         let storedSegments = segments(of: parts.headReading)
         guard storedSegments.count == querySegments.count else { continue }
@@ -634,13 +671,15 @@ extension LXAssembly.LXPerceptor {
         let perception = kvPair.perception
         let isUnigramKey = parts.previous == nil && parts.anterior == nil
         let isSingleCharUnigram = isUnigramKey && querySegments.count == 1
+        // 候選總數於迴圈中不變，先算一次以免逐輪重算造成 O(k²)。
+        let totalCount: Int = perception.count
         for (candidate, override) in perception.overrides {
           // P192 資料守衛：注音 head 讀音段數與候選字數不符（如「體式」被記在單 ㄕˊ 下）
           // 的錯位記憶不得餵入/套用——否則單鍵輸入會被錯位記憶綁架（客訴「打時出體式」）。
           guard !(isZhuyinReading(storedSegments) && candidate.count != storedSegments.count) else { continue }
           let overrideScore = calculateWeight(
             eventCount: override.count,
-            totalCount: perception.count,
+            totalCount: totalCount,
             eventTimestamp: override.timestamp,
             timestamp: timestamp,
             isUnigram: isUnigramKey,
@@ -698,14 +737,11 @@ extension LXAssembly.LXPerceptor {
         // 先將 key 添加到 map 和 list 的開頭
         mutLRUMap[key] = koPair
         mutLRUKeySeqList.insert(key, at: 0)
+        registerPerceptionIndex(forKey: key)
 
-        // 如果超過容量，則移除最後一個。
-        // Capacity 始終大於 0，所以不用擔心 .removeLast() 會吃到空值而出錯。
-        if mutLRUKeySeqList.count > mutCapacity {
-          let removedKey = mutLRUKeySeqList.removeLast()
-          mutLRUMap.removeValue(forKey: removedKey)
-          persistor.markKeyForRemoval(removedKey)
-        }
+        // 超過容量時收斂（含「映射因歷史資料而脫鉤膨脹」的情形）。
+        // Capacity 始終大於 0，所以不用擔心逐出會吃到空值而出錯。
+        enforceCapacity()
         persistor.markKeyForUpsert(key)
       }
     }
@@ -744,7 +780,10 @@ extension LXAssembly.LXPerceptor {
 
       // 移除已經沒有任何 overrides 的 keys
       if !keysToRemoveCompletely.isEmpty {
-        keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+        keysToRemoveCompletely.forEach {
+          mutLRUMap.removeValue(forKey: $0)
+          unregisterPerceptionIndex(forKey: $0)
+        }
       }
 
       if hasChanges {
@@ -795,7 +834,10 @@ extension LXAssembly.LXPerceptor {
 
       // 移除已經沒有任何 overrides 的 keys
       if !keysToRemoveCompletely.isEmpty {
-        keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+        keysToRemoveCompletely.forEach {
+          mutLRUMap.removeValue(forKey: $0)
+          unregisterPerceptionIndex(forKey: $0)
+        }
       }
 
       if hasChanges {
@@ -831,7 +873,10 @@ extension LXAssembly.LXPerceptor {
       }
 
       if !keysToRemove.isEmpty {
-        keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
+        keysToRemove.forEach {
+          mutLRUMap.removeValue(forKey: $0)
+          unregisterPerceptionIndex(forKey: $0)
+        }
       }
 
       if hasChanges {
@@ -858,7 +903,10 @@ extension LXAssembly.LXPerceptor {
         }
       }
       if !keysToRemove.isEmpty {
-        keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
+        keysToRemove.forEach {
+          mutLRUMap.removeValue(forKey: $0)
+          unregisterPerceptionIndex(forKey: $0)
+        }
         resetLRUList()
         keysToRemove.forEach { persistor.markKeyForRemoval($0) }
         return true
@@ -880,6 +928,7 @@ extension LXAssembly.LXPerceptor {
     for neta in mapLRUSorted {
       mutLRUKeySeqList.append(neta.key)
     }
+    rebuildPerceptionIndex()
   }
 
   /// 將記憶中的覆寫資料清空，並重置日誌追蹤狀態。
@@ -887,6 +936,10 @@ extension LXAssembly.LXPerceptor {
     lock.withLock {
       mutLRUMap = [:]
       mutLRUKeySeqList = []
+      headReadingIndex = [:]
+      toneStrippedHeadReadingIndex = [:]
+      headReadingSegmentIndex = [:]
+      parsedKeyCache = [:]
     }
     persistor.resetPendingState()
   }
@@ -915,6 +968,8 @@ extension LXAssembly.LXPerceptor {
       }
       mutLRUMap = newMap
       resetLRUList()
+      // 快照可能來自舊版（或容量上限調降前的）資料，載入後一律收斂回容量上限。
+      enforceCapacity()
     }
   }
 
@@ -938,10 +993,15 @@ extension LXAssembly.LXPerceptor {
       loadCallback: { [self] in loadData(from: $0) },
       replayApplicator: { [self] tempMap, mutated in
         lock.withLock {
+          guard !tempMap.isEmpty else { return }
           for (key, pair) in tempMap {
             mutLRUMap[key] = pair
-            mutated = true
           }
+          mutated = true
+          // 日誌重播只帶入鍵值；重播後必須重建 LRU 序並收斂容量，
+          // 否則重播鍵不會進入 LRU 清單、因而永遠不會被淘汰（記憶無界膨脹）。
+          resetLRUList()
+          enforceCapacity()
         }
       },
       keyValidator: { [self] in !shouldIgnoreKey($0) },
@@ -1020,6 +1080,164 @@ extension LXAssembly.LXPerceptor {
     )
   }
 
+  // MARK: - 檢索索引與容量收斂
+
+  /// 將 head 讀音正規化為「去除空段後、以組字分隔符串接」的形式（索引鍵）。
+  func normalizedHeadReading(_ headReading: String) -> String {
+    let separatorString = Homa.Assembler.theSeparator
+    guard !separatorString.isEmpty else { return headReading }
+    let segments = headReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
+    return segments.joined(separator: separatorString)
+  }
+
+  /// 逐段去除聲調後的索引鍵；段數資訊由分隔符保留，故索引鍵等值等價於「逐段去聲調等值」。
+  func toneStrippedIndexKey(forHeadReading headReading: String) -> String {
+    let separatorString = Homa.Assembler.theSeparator
+    return readingSegments(of: headReading)
+      .map { toneStrippedReading($0) }
+      .joined(separator: separatorString)
+  }
+
+  private func readingSegments(of reading: String) -> [String] {
+    let separatorString = Homa.Assembler.theSeparator
+    guard !separatorString.isEmpty else { return reading.isEmpty ? [] : [reading] }
+    return reading.components(separatedBy: separatorString).filter { !$0.isEmpty }
+  }
+
+  private func indexEntryInsert(_ index: inout [String: [String]], head: String, key: String) {
+    guard !head.isEmpty else { return }
+    var bucket = index[head] ?? []
+    if let position = bucket.firstIndex(of: key) {
+      guard position != 0 else { return }
+      bucket.remove(at: position)
+    }
+    bucket.insert(key, at: 0)
+    index[head] = bucket
+  }
+
+  private func indexEntryRemove(_ index: inout [String: [String]], head: String, key: String) {
+    guard !head.isEmpty, var bucket = index[head] else { return }
+    bucket.removeAll { $0 == key }
+    if bucket.isEmpty {
+      index[head] = nil
+    } else {
+      index[head] = bucket
+    }
+  }
+
+  /// 取得（並快取）某記憶鍵的解析結果。
+  func cachedKeyParts(forKey key: String) -> PerceptionKeyParts? {
+    if let cached = parsedKeyCache[key] { return cached }
+    guard let parts = parsePerceptionKey(key) else { return nil }
+    parsedKeyCache[key] = parts
+    return parts
+  }
+
+  /// 將一筆記憶鍵登錄進三組索引。同一鍵重複登錄僅會把該鍵移到所屬桶的前端。
+  func registerPerceptionIndex(forKey key: String) {
+    guard let parts = cachedKeyParts(forKey: key) else { return }
+    indexEntryInsert(
+      &headReadingIndex,
+      head: normalizedHeadReading(parts.headReading),
+      key: key
+    )
+    indexEntryInsert(
+      &toneStrippedHeadReadingIndex,
+      head: toneStrippedIndexKey(forHeadReading: parts.headReading),
+      key: key
+    )
+    for segment in readingSegments(of: parts.headReading) {
+      indexEntryInsert(&headReadingSegmentIndex, head: segment, key: key)
+    }
+  }
+
+  /// 自三組索引內除名一筆記憶鍵。
+  func unregisterPerceptionIndex(forKey key: String) {
+    guard let parts = cachedKeyParts(forKey: key) else { return }
+    parsedKeyCache[key] = nil
+    indexEntryRemove(
+      &headReadingIndex,
+      head: normalizedHeadReading(parts.headReading),
+      key: key
+    )
+    indexEntryRemove(
+      &toneStrippedHeadReadingIndex,
+      head: toneStrippedIndexKey(forHeadReading: parts.headReading),
+      key: key
+    )
+    for segment in readingSegments(of: parts.headReading) {
+      indexEntryRemove(&headReadingSegmentIndex, head: segment, key: key)
+    }
+  }
+
+  /// 依現行 `mutLRUKeySeqList`（時間戳降冪）整個重建索引。
+  func rebuildPerceptionIndex() {
+    headReadingIndex.removeAll(keepingCapacity: true)
+    toneStrippedHeadReadingIndex.removeAll(keepingCapacity: true)
+    headReadingSegmentIndex.removeAll(keepingCapacity: true)
+    parsedKeyCache.removeAll(keepingCapacity: true)
+    // 由舊到新登錄，使各桶前端恆為最近使用者。
+    for key in mutLRUKeySeqList.reversed() {
+      registerPerceptionIndex(forKey: key)
+    }
+  }
+
+  /// 將記憶收斂回容量上限，並使 `mutLRUMap` 與 `mutLRUKeySeqList` 恆保持同構。
+  ///
+  /// 逐出鍵一律標記給持久化層；完整快照係由現行映射寫出，故經此標記後，
+  /// 下一次快照即不再含有該鍵。
+  func enforceCapacity() {
+    guard mutLRUMap.count > mutCapacity else { return }
+    while mutLRUMap.count > mutCapacity, !mutLRUKeySeqList.isEmpty {
+      let evictedKey = mutLRUKeySeqList.removeLast()
+      guard mutLRUMap.removeValue(forKey: evictedKey) != nil else { continue }
+      unregisterPerceptionIndex(forKey: evictedKey)
+      persistor.markKeyForRemoval(evictedKey)
+    }
+    // 兜底：清單已空但映射仍超量（歷史資料造成兩者脫鉤）時，改以時間戳最舊者逐出。
+    guard mutLRUMap.count > mutCapacity else { return }
+    let surplus = mutLRUMap.count - mutCapacity
+    let oldestKeys = mutLRUMap
+      .sorted { $0.value.latestTimeStamp < $1.value.latestTimeStamp }
+      .prefix(surplus)
+      .map(\.key)
+    for evictedKey in oldestKeys {
+      guard mutLRUMap.removeValue(forKey: evictedKey) != nil else { continue }
+      unregisterPerceptionIndex(forKey: evictedKey)
+      persistor.markKeyForRemoval(evictedKey)
+    }
+  }
+
+  /// 供 `alternateKeys(for:)` 使用的候選鍵超集：只掃描「head 可能與查詢 head 相關」的鍵。
+  ///
+  /// 收錄範圍（超集，事後仍由 `alternateKeys` 的完整判準覆核）：
+  /// - 查詢 head 的所有**後綴**：涵蓋 `matchesFullHead`（後綴為全串）與
+  ///   `matchesCombinedHead`（候選 head 加上其 previous 讀音後等於查詢 head，故候選 head
+  ///   必為查詢 head 的後綴）；
+  /// - 查詢 head 本身、及其**首段／尾段**：涵蓋 `matchesOriginalHead`
+  ///   （候選 head 的某一段等於查詢 head）與 `matchesPrimaryHead`
+  ///   （候選 head 的某一段等於查詢 head 的首段或尾段）。
+  private func alternateCandidateKeys(forHeadReading headReading: String) -> Set<String> {
+    var result = Set<String>()
+    let segments = readingSegments(of: headReading)
+    // (1) 後綴掃描：逐字元列舉所有後綴，故無須假設候選 head 的段數。
+    let characters = Array(headReading)
+    for startIndex in characters.indices {
+      let suffix = String(characters[startIndex...])
+      guard let bucket = headReadingIndex[normalizedHeadReading(suffix)] else { continue }
+      result.formUnion(bucket)
+    }
+    // (2) 段命中：查詢 head 全串、首段、尾段。
+    var segmentProbes: Set<String> = [headReading]
+    if let firstSegment = segments.first { segmentProbes.insert(firstSegment) }
+    if let lastSegment = segments.last { segmentProbes.insert(lastSegment) }
+    for probe in segmentProbes {
+      guard let bucket = headReadingSegmentIndex[probe] else { continue }
+      result.formUnion(bucket)
+    }
+    return result
+  }
+
   private func compareContextPart(
     _ lhs: (reading: String, value: String)?,
     _ rhs: (reading: String, value: String)?,
@@ -1080,9 +1298,43 @@ extension LXAssembly.LXPerceptor {
     guard !primaryHeadCandidates.isEmpty else { return [] }
 
     var results: [String] = []
+    // 由索引取出「head 可能相關」的候選鍵超集（原本是逐鍵 parse 全表掃描），
+    // 再以 `mutLRUKeySeqList` 的既有次序走訪，故不必另行排序。
+    let candidateKeySet = alternateCandidateKeys(forHeadReading: originalParts.headReading)
+    guard !candidateKeySet.isEmpty else { return [] }
     for keyCandidate in mutLRUKeySeqList {
-      guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
+      guard candidateKeySet.contains(keyCandidate) else { continue }
+      guard keyCandidate != originalKey else { continue }
+      guard let candidateParts = cachedKeyParts(forKey: keyCandidate) else { continue }
       guard !shouldIgnorePerception(candidateParts) else { continue }
+      let matchesFullHead = candidateParts.headReading == originalParts.headReading
+      // 若候選的 previous 與 head 串接後等於原始 head（例如切分候選
+      // (B,B)&(C,C) 與原始 (BC,BC)），則視為匹配。
+      var matchesCombinedHead = false
+      if !matchesFullHead {
+        let candidateCombinedHead: String = {
+          if let prev = candidateParts.previous { return prev.reading + candidateParts.headReading }
+          return candidateParts.headReading
+        }()
+        matchesCombinedHead = candidateCombinedHead == originalParts.headReading
+      }
+      var candidateHeadSegments: [String] = []
+      var matchesOriginalHead = false
+      var matchesPrimaryHead = false
+      if !matchesFullHead, !matchesCombinedHead {
+        candidateHeadSegments =
+          separatorString.isEmpty
+            ? (candidateParts.headReading.isEmpty ? [] : [candidateParts.headReading])
+            : candidateParts.headReading.components(
+              separatedBy: separatorString
+            ).filter { !$0.isEmpty }
+        matchesOriginalHead = candidateHeadSegments.contains(originalParts.headReading)
+        matchesPrimaryHead = candidateHeadSegments.contains(
+          where: primaryHeadCandidates.contains
+        )
+        // 四種 head 條件若全不成立，該候選必被拒絕；在此先行否決可省下後續的上下文比對。
+        guard matchesOriginalHead || matchesPrimaryHead else { continue }
+      }
       guard compareContextPart(
         candidateParts.previous,
         originalParts.previous,
@@ -1093,24 +1345,6 @@ extension LXAssembly.LXPerceptor {
         originalParts.anterior,
         separatorString: separatorString
       ) else { continue }
-      let candidateHeadSegments =
-        separatorString.isEmpty
-          ? (candidateParts.headReading.isEmpty ? [] : [candidateParts.headReading])
-          : candidateParts.headReading.components(
-            separatedBy: separatorString
-          ).filter { !$0.isEmpty }
-      let matchesPrimaryHead = candidateHeadSegments.contains(
-        where: primaryHeadCandidates.contains
-      )
-      let matchesFullHead = candidateParts.headReading == originalParts.headReading
-      let matchesOriginalHead = candidateHeadSegments.contains(originalParts.headReading)
-      // 若候選的 previous 與 head 串接後等於原始 head（例如切分候選
-      // (B,B)&(C,C) 與原始 (BC,BC)），則視為匹配。
-      let candidateCombinedHead: String = {
-        if let prev = candidateParts.previous { return prev.reading + candidateParts.headReading }
-        return candidateParts.headReading
-      }()
-      let matchesCombinedHead = candidateCombinedHead == originalParts.headReading
 
       // 處理 primary segment 配對的特例：
       // 當原始 head 有多個 segment，且候選為單段時，僅靠 primary segment 配對會導致
@@ -1264,9 +1498,10 @@ extension LXAssembly.LXPerceptor {
   }
 
   private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
-    let readings = [parts.headReading, parts.previous?.reading, parts.anterior?.reading]
-      .compactMap { $0 }
-    return readings.contains { containsUnderscorePrefixedReading($0) }
+    if containsUnderscorePrefixedReading(parts.headReading) { return true }
+    if let previous = parts.previous, containsUnderscorePrefixedReading(previous.reading) { return true }
+    if let anterior = parts.anterior, containsUnderscorePrefixedReading(anterior.reading) { return true }
+    return false
   }
 
   private func shouldIgnoreKey(_ key: String) -> Bool {
@@ -1275,7 +1510,10 @@ extension LXAssembly.LXPerceptor {
   }
 
   private func containsUnderscorePrefixedReading(_ reading: String) -> Bool {
-    readingSegments(from: reading).contains { $0.hasPrefix("_") }
+    // 絕大多數讀音不含底線字元。先以無配置的字元掃描快速否決，避免為每一筆
+    // 記憶鍵做逐段切分與字串修剪（該路徑位於檢索熱路徑上）。
+    guard reading.contains("_") else { return false }
+    return readingSegments(from: reading).contains { $0.hasPrefix("_") }
   }
 
   private func readingSegments(from reading: String) -> [String] {
@@ -1291,7 +1529,10 @@ extension LXAssembly.LXPerceptor {
   private func purgeUnderscorePrefixedKeys() {
     let invalidKeys = mutLRUMap.keys.filter { shouldIgnoreKey($0) }
     guard !invalidKeys.isEmpty else { return }
-    invalidKeys.forEach { mutLRUMap.removeValue(forKey: $0) }
+    invalidKeys.forEach {
+      mutLRUMap.removeValue(forKey: $0)
+      unregisterPerceptionIndex(forKey: $0)
+    }
   }
 }
 
