@@ -776,4 +776,66 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       )
     }
   }
+
+  // MARK: - 待配首鍵期間之數字鍵（既有語義之釘樁）
+
+  /// 待配首鍵（首鍵已顯示、尚未得碼）期間摁下數字鍵時，首鍵逕捨、該數字落為一般字面節。
+  ///
+  /// 此係 P302 以來之既有語義（`.passthrough` ⇒ 拼音打字機不成讀音 ⇒ 標點鏈落字面節），
+  /// 本 phase 一字未改，此處僅為釘樁。數字鍵**非**本故障之病灶：事主所報者，係客體
+  /// （Spotlight）於組字途中自行重新啟用輸入法時，Session 逕將狀態歸零而不收拾客體之
+  /// 未提交標記文字——故聲調鍵 `2` 與非聲調鍵 `9` 所見皆同（見 `SS-Lifecycle-012`）。
+  /// 別客體之所以無此故障，正因彼不於組字途中重新啟用：該字面節於彼處係可為 BkSp 所刪
+  /// 之正常組字內容（狀態為 `.ofInputting`，`handleBackSpace` 方予受理）。
+  @Test("IH-Dualpin-017 Digit during a pending first key lands as a literal node")
+  func test_IH_Dualpin_017_DigitDuringPendingFirstKeyLandsAsLiteralNode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+    var reportedErrors: [String] = []
+    testHandler.errorCallback = { reportedErrors.append($0) }
+    let originalFurious = testHandler.prefs.furiousTypingEnabled4Pinyin
+    defer {
+      testHandler.prefs.furiousTypingEnabled4Pinyin = originalFurious
+      testHandler.errorCallback = nil
+      deactivateDualpin()
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    activateDualpin(keyboardParserRawValue: KeyboardParser.ofDualpinMSPY.rawValue)
+
+    for furious in [true, false] {
+      for digit in ["2", "9"] {
+        testSession.resetInputHandler(forceComposerCleanup: true)
+        testHandler.prefs.furiousTypingEnabled4Pinyin = furious
+        reportedErrors.removeAll()
+
+        // 首鍵縱入待配之列，亦不得落任何讀音，且不得示警。
+        typeSentence("s")
+        #expect(testHandler.composer.isEmpty)
+        #expect(testHandler.assembler.isEmpty)
+        #expect(testHandler.dualpinPendingDisplayText == "s")
+
+        // 次鍵為數字：首鍵逕捨，數字落為字面節；既有語義不示警。
+        typeSentence(digit)
+        #expect(
+          testHandler.dualpinPendingDisplayText == nil,
+          "數字鍵落定後首鍵不得仍待配（furious＝\(furious)、鍵＝\(digit)）"
+        )
+        #expect(
+          reportedErrors.isEmpty,
+          "數字鍵不示警（furious＝\(furious)、鍵＝\(digit)）：\(reportedErrors)"
+        )
+        #expect(
+          testHandler.assembler.assembledSentence.map(\.value) == [digit],
+          "數字應落為字面節（furious＝\(furious)、鍵＝\(digit)）"
+        )
+        #expect(
+          testSession.state.type == .ofInputting,
+          "落定後應為組字中，方得為 BkSp 所刪（furious＝\(furious)、鍵＝\(digit)）"
+        )
+      }
+    }
+  }
 }

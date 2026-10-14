@@ -120,7 +120,10 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     self.observation = Broadcaster.shared
       .observe(\.eventForClosingAllPanels, options: [.new]) { [weak self] _, _ in
         asyncOnMain {
-          self?.hide()
+          // 「收合所有面板」是請求、非狀態：遲到之請求不得收掉當下仍欲顯示之組字內容
+          // （Phase 307：啟用路徑所發之請求會遲於組字內容之顯示才落地）。
+          guard let this = self, !this.isRetainedOnCloseRequest else { return }
+          this.hide()
         }
       }
   }
@@ -137,6 +140,14 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
   }
 
   // MARK: Public
+
+  /// 是否應無視「收合所有面板」之請求而維持顯示。
+  ///
+  /// 「收合所有面板」為請求、非狀態：該請求經 `SessionProtocol.hidePalettes()` 之
+  /// `asyncOnMain`、以及本類觀察者之 `asyncOnMain` 才落地，故可能遲於組字內容之顯示；
+  /// 為真時觀察者即不予收合（Phase 307）。唯一設定處為
+  /// `updatePopupDisplayWithCursor()`（`InputSession_HandleStates.swift`）。
+  public var isRetainedOnCloseRequest: Bool = false
 
   public var isTypingDirectionVertical: Bool {
     get { compositionView.isTypingDirectionVertical }

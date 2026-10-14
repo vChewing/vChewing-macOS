@@ -30,10 +30,25 @@ extension SessionProtocol {
     updatePopupDisplayWithCursor()
   }
 
+  /// 浮動組字窗當下是否應顯示。此亦為「該視窗是否應對『收合所有面板』之請求免疫」之
+  /// 唯一判準：該請求為一過性、且其落地得經數拍延遲，不得收掉當下仍要求顯示之視窗。
+  /// 非現行 Session 者不主張顯示——切換客體時殘骸須能被收掉。
+  public var isPopupCompositionBufferDesired: Bool {
+    isCurrentSession && state.hasComposition && clientMitigationLevel >= 2
+  }
+
+  /// 將上述判準同步給浮動組字窗。狀態若逕行歸零（不經 `switchState`，如啟用路徑），
+  /// 便不會有 `updateCompositionBufferDisplay()` 之呼叫，須由歸零之處手動同步。
+  public func syncPopupCompositionBufferRetention() {
+    ui?.pcb?.isRetainedOnCloseRequest = isPopupCompositionBufferDesired
+  }
+
   /// 浮動組字窗的顯示判定
   public func updatePopupDisplayWithCursor() {
     guard isCurrentSession else { return }
-    if state.hasComposition, clientMitigationLevel >= 2 {
+    let isPCBDesired = isPopupCompositionBufferDesired
+    syncPopupCompositionBufferRetention()
+    if isPCBDesired {
       updateVerticalTypingStatus()
       // 浮動組字窗（PCB）顯示時，若打字模式提示（statusUI）仍在顯示則將其收起：
       // 提示為一過性、組字開始時任務已完成；PCB 於 activation 之後才出現、顯示當下的

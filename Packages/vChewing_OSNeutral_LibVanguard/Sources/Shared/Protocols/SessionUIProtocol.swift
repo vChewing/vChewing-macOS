@@ -47,6 +47,12 @@ public protocol CapsLockTogglerProtocol {
 
 public protocol PCBProtocol: AnyObject {
   var isTypingDirectionVertical: Bool { get set }
+  /// 是否應無視「收合所有面板」之請求而維持顯示。
+  ///
+  /// 「收合所有面板」為請求、非狀態：該請求可能遲於組字內容之顯示才兌現，
+  /// 故實作者於收到該請求時應先查此旗標，為真則不予收合（Phase 307）。
+  /// 唯一設定處為 `updatePopupDisplayWithCursor()`（`InputSession_HandleStates.swift`）。
+  var isRetainedOnCloseRequest: Bool { get set }
   /// 浮動組字窗目前是否顯示中。
   var isShown: Bool { get }
   /// 浮動組字窗目前的視窗 frame（螢幕座標）；僅於 `isShown` 時有意義。

@@ -230,6 +230,21 @@ extension SessionProtocol {
         inputMode = resolvedInputMode
       }
       state = .ofEmpty()
+      // 素材亦須一併丟棄：本路徑不經 `switchState`，而 `performServerDeactivation()` 對
+      // 「現行 Session」為空操作（`Self.current?.id == id` 即逕行返回），故組字途中之
+      // 重複啟用不會有中間的遞交或清空——殘留之組字器素材（如雙拼待配首鍵期間落入之
+      // 數字節）將在下一次組字時復辟。`clear()` 不觸碰閂滯旗標，與 `switchState` 同徑。
+      inputHandler?.clear()
+      // 狀態既逕行歸零（不經 `switchState`，故不會自動刷新客體顯示），須在此手動刷新：
+      // 客體（如 Spotlight）會於組字途中自發性地重新啟用輸入法，若不同步清空其內文組字區，
+      // 客體所見之未提交標記文字即與 Session 狀態脫鉤——其後之 BkSp／Esc 因狀態非
+      // `.ofInputting` 而放行給客體、亦不示警，該殘留文字遂無以鍵盤清除（Phase 307）。
+      // 無殘留時 `doSetMarkedText` 之去重快取會使本呼為空操作。此處只收拾客體內文組字區；
+      // 浮動組字窗（PCB）於下一次狀態轉移即自動收起，不在本處理之列（見〈已知界線〉）。
+      clearInlineDisplay()
+      // 免疫值與浮動組字窗之顯示同源；狀態既逕行歸零，此處亦須同步解除，
+      // 否則遲到的收合請求會收不掉一個已無組字內容之浮動組字窗（見 SS-Lifecycle-013）。
+      syncPopupCompositionBufferRetention()
       lastAppliedKeyboardLayout = nil
       setKeyLayout()
       return
@@ -303,6 +318,11 @@ extension SessionProtocol {
     }
 
     this.state = .ofEmpty()
+    // 同上：素材與客體顯示皆須手動收斂（詳見快速路徑之註）。
+    this.inputHandler?.clear()
+    this.clearInlineDisplay()
+    // 同上：免疫值亦須比照解除（狀態逕行歸零，不會經 `updateCompositionBufferDisplay()`）。
+    this.syncPopupCompositionBufferRetention()
     // 閂滯態不越出當前打字會話之 context：本函式不呼 `resetInputHandler()`，
     // 故須在此獨立重設（靜默）。
     this.inputHandler?.releaseLatchedAlnumState(announce: false)
@@ -338,11 +358,18 @@ extension SessionProtocol {
     } else {
       return
     }
+    // 提示態之直接賦值不得蓋過進行中之組字：本函式於 activation 之後 0.05 秒才執行，
+    // 使用者可能已在那之間開始打字；此時若硬把狀態換成 `.ofEmpty()`，客體所見之未提交
+    // 標記文字即與狀態脫鉤（其後之 BkSp／Esc 因狀態非 `.ofInputting` 而無以清除之，
+    // Phase 307）。已有組字素材時逕不提示——打字模式提示於此時本即多餘。
+    guard !state.hasComposition, inputHandler?.isComposerOrCalligrapherEmpty ?? true else { return }
     let hintTooltip = "► \(hintKey.i18n)"
     var hintState = IMEState.ofEmpty()
     hintState.tooltip = hintTooltip
     hintState.tooltipDuration = 0.7
     state = hintState
+    // 提示態亦為逕行賦值：免疫值比照啟用路徑同步解除（此際已確定無組字內容）。
+    syncPopupCompositionBufferRetention()
     guard let statusUI = ui?.statusUI else { return }
     // 顯示前依客體 accent 同步外觀（文字色／實色背景；StatusUI 實作、tooltip 為 no-op）。
     statusUI.sync(accent: clientAccentColor, locale: localeForFontFallbacks)

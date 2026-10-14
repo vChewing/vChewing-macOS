@@ -135,6 +135,7 @@ final class MockTooltipUI: TooltipUIProtocol {
 /// `PCBProtocol` 替身：可控顯示狀態與視窗 frame。
 final class MockPCB: PCBProtocol {
   var isTypingDirectionVertical: Bool = false
+  var isRetainedOnCloseRequest: Bool = false
   var isShown = false
   var frame: CGRect?
   var showCount = 0

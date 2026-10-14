@@ -304,6 +304,87 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(hintUI.status.isShown == false, "PCB 顯示時模式提示應被收起")
   }
 
+  /// 對接輸入客體時之啟用流程（`performServerActivation()`；快速路徑）不得令客體之
+  /// 內文組字區殘留未提交之標記文字：客體（Spotlight 之類）會於組字途中自發性地重新
+  /// 啟用輸入法，此時 Session 既已把組字狀態直接歸零（`state = .ofEmpty()`，不經
+  /// `switchState`），客體所見亦須同步歸零。否則其後之 BkSp／Esc 皆因狀態非
+  /// `.ofInputting` 而放行給客體（`OmitNSEvent`）、亦不示警，該殘留文字遂無以鍵盤清除。
+  @Test("SS-Lifecycle-012 Activation clears the client's stale inline marked text")
+  func test_SS_Lifecycle_012_ActivationClearsStaleInlineMarkedText() throws {
+    let originalHardened = PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer
+    let originalHint = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    defer {
+      PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = originalHardened
+      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalHint
+    }
+    // `clientMitigationLevel < 2`：標記文字方走客體（≥2 走 PCB 之處置態，測不得）。
+    PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = false
+    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = false
+    InputSession.current = testSession
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testSession.performServerActivation()
+    testClientProxy.clear()
+
+    typeSentenceOrCandidates("s")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(
+      testClientProxy.markedTexts.last?.isEmpty == false,
+      "組字中應於客體落下標記文字。"
+    )
+
+    // 同一客體、同一 Session 之再次啟用（快速路徑）：狀態歸零，客體亦須歸零。
+    testSession.performServerActivation()
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(
+      testClientProxy.markedTexts.last?.isEmpty == true,
+      "啟用後客體內文組字區不得殘留未提交之標記文字。"
+    )
+    #expect(
+      testHandler.composer.isEmpty && testHandler.assembler.isEmpty,
+      "啟用後組字素材（組音器與組字器）亦須一併丟棄，否則下一次組字時復辟。"
+    )
+  }
+
+  @Test("SS-Lifecycle-013 Stale close-all-panels request retains the visible popup composition buffer")
+  func test_SS_Lifecycle_013_StaleCloseAllPanelsRequestRetainsVisiblePopupCompositionBuffer() throws {
+    let originalHardened = PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer
+    defer {
+      PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = originalHardened
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    // 強化型組字區安全防護迫使客體改用浮動組字窗（clientMitigationLevel >= 2）。
+    PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = true
+    InputSession.current = testSession
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testSession.performServerActivation()
+    testClientProxy.clear()
+
+    typeSentenceOrCandidates("s")
+    #expect(testSession.state.hasComposition, "組字中應有組字內容。")
+    #expect(testPCB.isShown, "浮動組字窗應顯示組字內容。")
+    #expect(testPCB.isRetainedOnCloseRequest, "組字中時，浮動組字窗應對收合請求免疫。")
+
+    // 模擬遲到的「收合所有面板」請求（與 `PopupCompositionBuffer` 之觀察者同式）。
+    if !testPCB.isRetainedOnCloseRequest { testPCB.hide() }
+    #expect(testPCB.isShown, "遲到之收合請求不得收掉仍欲顯示之浮動組字窗。")
+
+    // 組字狀態歸零後，免疫隨之解除，收合請求方得生效。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(!testPCB.isRetainedOnCloseRequest, "無組字內容時，浮動組字窗不應對收合請求免疫。")
+    if !testPCB.isRetainedOnCloseRequest { testPCB.hide() }
+    #expect(!testPCB.isShown, "無組字內容時，收合請求應收掉浮動組字窗。")
+
+    // 啟用路徑係逕行歸零狀態（不經 `switchState`，故不會刷新客體顯示與此免疫值）。
+    // 素材既於啟用時丟棄，免疫亦須同步解除；否則遲到的收合請求會因殘留之免疫值
+    // 而收不掉一個已無組字內容之浮動組字窗。
+    typeSentenceOrCandidates("s")
+    #expect(testPCB.isRetainedOnCloseRequest, "組字中時，浮動組字窗應對收合請求免疫。")
+    testSession.performServerActivation()
+    #expect(!testPCB.isRetainedOnCloseRequest, "啟用後組字素材已丟棄，免疫應一併解除。")
+    if !testPCB.isRetainedOnCloseRequest { testPCB.hide() }
+    #expect(!testPCB.isShown, "啟用後之收合請求應收掉浮動組字窗。")
+  }
+
   // MARK: - Test harness
 
   /// 建立帶有可攔截 statusUI 的 SessionUI 替身，對應 Darwin 端的
