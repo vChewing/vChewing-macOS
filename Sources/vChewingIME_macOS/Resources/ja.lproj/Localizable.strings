@@ -95,6 +95,7 @@
 "i18n:InfoMessage.DefaultsWriteCassettePath" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
 "i18n:InfoMessage.DefaultsWriteUserDataFolder" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
 "i18n:InfoMessage.DeleteKeyNote" = "ご注意：Mac キーボードの「Delete ⌫」キーはここで「BackSpace ⌫」と呼ばれ、それはパソコンの常識としての本物の「Delete ⌦」と区別するためである。もし、テンキーの付いていない Mac キーボードで本物の「Delete ⌦」を使いたければ、代わりに「Fn+⌫」をご使用ください。";
+"i18n:InfoMessage.DragTargetInstruction" = "ご指定したいものは、先ほど押したボタンまたはパス欄へ Finder から直接にドラッグしてください。";
 "i18n:InfoMessage.EndOfIMKCandidatesExplanation" = "1) IMKCandidates は macOS だけで利用可能のシステム構成部品であり、ObjC Bridging Header にて特殊の内部 API を使う必要があるため、本アプリの「他のシステムへの移植計画」に妨げています。\n\n2) IMKCandidates には数多くのバグがあり、そして Apple 社に修復される可能性はほぼゼロだと見込めます。さらに、Apple 社の IMKCandidates 開発参与者たちはそれについての一切内容を Apple 社以外の人と話すのは、会社の規則によって禁則事項です。従って、IMKCandidates をこのまま使い続くのは、本当にうんざりです。況してや、これからも、Apple 社が IMKCandidates に何か内部変化を導入して、新たなる互換性支障が生ずる恐れがあると見込めます。Apple の公式の InputMethodKit サンプルプロジェクトに、IMKCandidates が使われていなかった理由はこれこそだと推測できます（2023年8月までの話）。";
 "i18n:InfoMessage.FeatureRequiresMacOS:%@" = "この機能の稼働には macOS %@ 以降のシステムが必要である。";
 "i18n:InfoMessage.FeaturesUnavailableForOlderMacOS" = "システム API 制限のため、一部の機能は macOS 10.15 と macOS 11 で提供できません。";
@@ -109,7 +110,7 @@
 "i18n:InfoMessage.POMDataCleaned" = "臨時記憶モジュールの観測行為による唯音入力アプリの意外中止は発生した。唯音入力アプリの無事利用のために、既存臨時記憶データは全てお消しした。";
 "i18n:InfoMessage.ProceedingToSystemPreferences" = "ご希望の入力モードのご利用の前に、それに対応するの入力ソースの追加が必要である。これからはシステム環境設定の該当ページへ案内します。";
 "i18n:InfoMessage.SecurityConcernsNoShellScript" = "セキュリティ上の懸念から、いかなるシェルスクリプトの実装も計画していません。App Sandbox の実装が無い場合には、関連する UserDefaults を容易に改ざんできることから、悪意のあるシェルスクリプトが実行される恐れがあり、従ってシステム全体に脆弱性を持つことは疑う余地がありません。唯音入力アプリの公式発行版は Sandbox 処理済みであり、そして唯音入力アプリは、このような脆弱性を持たないために、すでに（デザイン上の）安全処置済み。";
-"i18n:InfoMessage.TechnicalReasonNSOpenPanel" = "【技術上の原因説明】macOS 10.12 とそれ以前の macOS には、入力アプリが自ら NSOpenPanel を呼ぶと、入力アプリ自身も、全ての触れ合った客体アプリも、全部固まってしまう状態になります。こうなると、強引的にパソコン再起動や・或いは SSH で他のパソコンからこの入力アプリの強制停止が必要です。従って、弊アプリは macOS 10.12 とその以前の macOS には NSOpenPanel のアクセスの提供はできません。";
+"i18n:InfoMessage.TechnicalReasonNSOpenPanel" = "【技術上の原因説明】macOS 10.12 とそれ以前の macOS には、入力アプリが自ら NSOpenPanel / NSSavePanel を呼ぶと、入力アプリ自身も、全ての触れ合った客体アプリも、全部固まってしまう状態になります。こうなると、強引的にパソコン再起動や・或いは SSH で他のパソコンからこの入力アプリの強制停止が必要です。従って、弊アプリは macOS 10.12 とその以前の macOS には NSOpenPanel / NSSavePanel のアクセスの提供はできません。";
 "i18n:InfoMessage.UninstallConfirmation" = "これにて唯音入力アプリをこのアカウントから卸除しますが、宜しいですか。";
 "i18n:InfoMessage.UpdateToMainstreamRelease" = "これで今のこのアプリを Aqua 特別版から主流発行版と置き換えます。主流発行版は今の時代の macOS のために最適化したものであり、おすすめです。";
 "i18n:InfoMessage.UseDefaultsWrite" = "ターミナルコマンド「defaults write」で下記の String 値のご設定を:";

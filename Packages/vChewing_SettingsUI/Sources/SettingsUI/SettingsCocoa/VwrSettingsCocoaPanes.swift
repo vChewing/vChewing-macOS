@@ -55,7 +55,7 @@ extension SettingsPanesCocoa {
   }
 
   public static func warnAboutComDlg32Inavailability() {
-    let title = "i18n:ClientManager.DragTargetInstruction".i18n
+    let title = "i18n:InfoMessage.DragTargetInstruction".i18n
     let message = "i18n:InfoMessage.TechnicalReasonNSOpenPanel".i18n
     CtlSettingsCocoa.shared?.window.callAlert(title: title, text: message)
   }

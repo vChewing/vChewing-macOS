@@ -95,6 +95,7 @@
 "i18n:InfoMessage.DefaultsWriteCassettePath" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/不带尾部斜杠的档案路径\"";
 "i18n:InfoMessage.DefaultsWriteUserDataFolder" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/带尾部斜杠的资料夹路径/\"";
 "i18n:InfoMessage.DeleteKeyNote" = "注意：Mac 键盘的「Delete ⌫」键在此被称作「BackSpace 退格键 ⌫」以与 PC 键盘的真正的「Delete ⌦」键彼此区分开。若您想在没有数字小键盘的 Mac 电脑上使用真正的「Delete ⌦」按键的话，请改用「Fn+⌫」。";
+"i18n:InfoMessage.DragTargetInstruction" = "请将您想要的目标从 Finder 拽到您刚才按下的按钮或路径栏位上。";
 "i18n:InfoMessage.EndOfIMKCandidatesExplanation" = "1) 只有 macOS 才有 IMKCandidates 可用。该元件依赖特制的 ObjC Bridging Header 才能工作，这妨碍了唯音输入法的跨平台模组化。\n\n2) IMKCandidates 浑身是 Bug，且 Apple 不太可能修复之。甚至 InputMethodKit 的开发人员们都不被允许与任何非 Apple 员工讨论这些内容。于是 IMKCandidates 基本上用不下去了，更遑论 IMKCandidates 未来可能发生的会导致相容性问题的内部改动。这很可能也是 Apple 官方 InputMethodKit 示范专案当中没有用到 IMKCandidates 的原因之一（截至 2023 年 8 月）。";
 "i18n:InfoMessage.FeatureRequiresMacOS:%@" = "该功能要求系统版本至少 macOS %@。";
 "i18n:InfoMessage.FeaturesUnavailableForOlderMacOS" = "因系统 API 限制，个别功能无法对 macOS 10.15 和 macOS 11 提供。";
@@ -109,7 +110,7 @@
 "i18n:InfoMessage.POMDataCleaned" = "唯音输入法的使用者渐退记忆模组在观测时崩溃，相关渐退记忆资料档案内容已全部清空。";
 "i18n:InfoMessage.ProceedingToSystemPreferences" = "若要使用您想切换到的输入模式，您必须得先在系统偏好设定内启用对应的「输入方式」。接下来将会弹出对应的系统偏好设定画面。";
 "i18n:InfoMessage.SecurityConcernsNoShellScript" = "出于与资讯安全有关的考量，此处不提供任何与终端机脚本执行有关的功能。一款尚未经过 App Sandbox 沙箱处理的输入法，若提供了这种功能，便会带来系统层面上的资安缺陷：与该功能有关的 UserDefaults 可被任意篡改、以执行恶意脚本。唯音本身的设计使得其不会有这种资安缺陷，且官方发行的唯音有经过沙箱处理。";
-"i18n:InfoMessage.TechnicalReasonNSOpenPanel" = "【技术原因】macOS 10.13 之前的版本的系统会在输入法自身呼叫 NSOpenPanel 的时候令自身与客体应用陷入无限停止响应的状态。更甚者，此时任何尝试切换到的其他客体应用也会陷入同样的状态。除了强制断电重新开机以外，就只能借由远端 SSH 连到目前的电脑上、以终端命令强行终止输入法执行绪。因此，唯音输入法不能对 macOS 10.12 及之前的系统开放对 NSOpenPanel 的存取。";
+"i18n:InfoMessage.TechnicalReasonNSOpenPanel" = "【技术原因】macOS 10.13 之前的版本的系统会在输入法自身呼叫 NSOpenPanel / NSSavePanel 的时候令自身与客体应用陷入无限停止响应的状态。更甚者，此时任何尝试切换到的其他客体应用也会陷入同样的状态。除了强制断电重新开机以外，就只能借由远端 SSH 连到目前的电脑上、以终端命令强行终止输入法执行绪。因此，唯音输入法不能对 macOS 10.12 及之前的系统开放对 NSOpenPanel / NSSavePanel 的存取。";
 "i18n:InfoMessage.UninstallConfirmation" = "此举会将唯音自当前系统使用者帐户卸除。请确认。";
 "i18n:InfoMessage.UpdateToMainstreamRelease" = "该更新会将您当前的输入法由 Aqua 特别版置换为针对当前系统设计的主流发行版。";
 "i18n:InfoMessage.UseDefaultsWrite" = "请使用「defaults write」终端指令以修改 String 资料值:";
