@@ -45,8 +45,13 @@ extension InputHandlerProtocol {
     // 將落入混打之「整段緩衝 ＋ 半形空白字元」而令該讀音被當英文遞交（正是 P258 之病灶）。
     // 其歸屬（陰平確認抑或 Shift 之 ASCII 逃生口）一律由 `MixedAlnumSpaceDuty` 判定；
     // 凡該層已接管本鍵者，本固化塊即整塊讓位（見下）。
+    // ★ P309：雙拼之待配首鍵亦屬未完成之讀音 ⇒ 空白鍵於該拍比照拼音側固化前方讀音
+    // （事主 2026-10-14 裁定「雙拼的非碼鍵全部按照漢語拼音（非雙拼）的處理方式」）。
+    // 已成碼者（讀音已入注拼槽）不在此列：彼時之空白鍵仍為「無調確認組字」，與
+    // `isPinyinFuriousTypingModeEffective` 排除雙拼之原議一致。
     let spaceSolidifiesFuriousFront = isPinyinFuriousTypingModeEffective
       || mixedAlnumZhuyinFuriousInEffect
+      || (typingMode == .DualPin && dualpinPendingDisplayText != nil)
     // ★ P280：並存態下之空白鍵**兩種歸屬皆屬混打層**——不帶修飾鍵者為陰平確認鍵、帶 Shift 者
     // 為「整段 ASCII ＋ 半形空白字元」之逃生口（見 `MixedAlnumSpaceDuty`）。故凡混打層已接管本鍵者
     // （`isOwnedByMixedAlnumLayer`），本塊**整塊讓位**：既不固化其讀音、亦不早退，逕交下方之

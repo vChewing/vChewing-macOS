@@ -581,6 +581,24 @@ extension InputHandlerProtocol {
 
   /// 獲取與當前注音排列或拼音輸入種類有關的標點索引鍵，以英數下畫線「_」結尾。
   var currentKeyboardParser: String { currentKeyboardParserType.name + "_" }
+  /// 標點／符號查表所用之方案名前綴（通常與 `currentKeyboardParser` 同值）。
+  ///
+  /// ★ P309：雙拼雖有自己的方案槽，**其標點資料仍住漢語拼音方案之下**
+  /// （`_punctuation_HanyuPinyin_,`）：語言模型內既無 `_punctuation_DualpinMSPY_,`、
+  /// 亦無裸前綴之 `_punctuation_,` 可退（實測兩者 `hasUnigrams` 皆為 false，遂令雙拼狂打之
+  /// 標點鍵一律落於 `A9BFF20E` 之 error 退回、且素材不被消費）。事主 2026-10-14 裁定
+  /// 「雙拼的標點走漢語拼音標點處理方法」，故**雙拼狂打生效時**改報拼音槽之方案名。
+  ///
+  /// 非狂打之雙拼**不在**此列：彼時標點之查表本即落空，其後之 error 退回亦不觸發
+  /// （素材已於退位時消費），故本鍵逕交使用者端插入——正是 P302／P308 之語意，不可奪之。
+  var punctuationQueryParser: String {
+    guard currentKeyboardParserType.isDualpin, isFuriousTypingModeEffective else {
+      return currentKeyboardParser
+    }
+    let parser = KeyboardParser(rawValue: prefs.keyboardParser) ?? .ofHanyuPinyin
+    return parser.name + "_"
+  }
+
   /// 當前實際採用之注拼槽排列。
   ///
   /// 雙拼係**拼音打字之加掛模式**，不自成一種打字中樞：拼音側方案（`parser.isPinyin`）成立、
@@ -1054,7 +1072,7 @@ extension InputHandlerProtocol {
     }
     var result: [String] = []
     let inputText = input.text
-    let parser = currentKeyboardParser
+    let parser = punctuationQueryParser
     let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, inputText]
     let customPunctuation: String = arrCustomPunctuations.joined()
     result.append(customPunctuation)

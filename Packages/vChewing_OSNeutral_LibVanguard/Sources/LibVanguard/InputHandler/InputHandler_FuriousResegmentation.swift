@@ -323,11 +323,12 @@ extension InputHandlerProtocol {
   ///   ——後者之素材住緩衝區，而 `hasFuriousFrontPending` 讀的正是該緩衝，故固化後仍為真。
   @discardableResult
   func solidifyFuriousFrontReading() -> Bool {
-    // 雙拼之待配首鍵：半截之碼不成音節，故**無讀音可固化**。其桶係「該首鍵所能開啟之全部
-    // 詞幹之全部讀音」（數百鍵），逕插將令同一音節重複入庫——該首鍵仍待配，次鍵仍會與之成碼。
-    // 該拍之窗本就只為「Shift+選字鍵提前選字」而開（事主 2026-10-14 裁定），
-    // 故本函式於該情境一律讓位，由呼叫端決定本鍵之歸屬。
-    if typingMode == .DualPin, composer.romajiBuffer.isEmpty { return false }
+    // ★ P309：雙拼之待配首鍵亦屬「未完成之讀音」——雙拼之音節恆為兩鍵，故半截之碼即拼音側
+    // 「未完成前綴」之同構物，其桶即「該首鍵所能開啟之諸詞幹之諸讀音」
+    // （`dualpinPendingPrefixReadingKeys`：已依碼序去重，規模與拼音之未完成前綴同級）。
+    // 故本函式對雙拼**不再讓位**：非碼鍵之處置一律比照非雙拼之拼音（事主 2026-10-14 裁定
+    // 「雙拼的非碼鍵全部按照漢語拼音（非雙拼）的處理方式」），於本處先結算、再由呼叫端落本鍵。
+    // 素材住翻譯狀態機而非注拼槽，故固化成功後須連帶消費之（見本函式末）。
     guard let furiousContext = furiousFrontContext else {
       return solidifyAbbreviatedFrontReading()
     }
@@ -350,6 +351,9 @@ extension InputHandlerProtocol {
     }
     guard (try? assembler.insertKeys([.multipleKeys(bucket)])) != nil else { return false }
     composer.clear()
+    // ★ P309：雙拼之未完成素材住翻譯狀態機（非注拼槽）⇒ 固化成功即須連帶消費之。
+    // 不消費則該半截之碼仍待配，下一個碼鍵會被當成「首鍵」而非「次鍵」，與已固化之讀音重複入庫。
+    if typingMode == .DualPin { dualpinFlushPending() }
     if isMixedAlnumReading { mixedAlnumConfig.resetContent() }
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
     if isPinyin {

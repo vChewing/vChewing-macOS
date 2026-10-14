@@ -22,10 +22,13 @@ import Tekkon
 /// 無效之兩鍵序一律出聲示警並丟棄此二鍵，**不得**使其落為原文；示警除鈴聲外，另以
 /// Tooltip（`redAlert` 配色、1.2 秒）告知按鍵者方才之雙拼碼不合規。
 ///
-/// 待配之首鍵係「已顯示、尚未落地」之組字素材（以讀音欄呈現），故**凡丟棄該首鍵者，
-/// 皆須連帶刷新組字區**：否則它會以幽靈讀音留在顯示上，而其後之刪除鍵將因注拼槽與組字器
-/// 俱空而只出聲示警、不切換狀態，幽靈遂永留。退位予 `BPMFFullMatchTypewriter` 之三處
-/// 皆走 `delegateToBPMF(_:session:)`，由彼收拾此事。
+/// 待配之首鍵係「已顯示、尚未落地」之組字素材（以讀音欄呈現），且在狂打側即「未完成之讀音」。
+/// ★ P309：其存續與處置一律比照非雙拼之拼音——非碼鍵所觸發之「先結算、再落本鍵」各站點
+/// （標點／數字／Tab／Enter／方向鍵／空白鍵）會就地固化它並連帶消費之（見
+/// `solidifyFuriousFrontReading` 之 P309 分支）；未經消化之按鍵則不切態，該首鍵留待次鍵續配，
+/// 與拼音側之未完成讀音同命。故狂打側之退位路徑（`delegateToBPMF`）不再先行作廢首鍵、
+/// 亦不再代為切態；**非狂打側**則無固化之語義，仍照 P302／P308 逕行作廢並收拾顯示殘留。
+/// 刪除鍵（BkSp／Delete 之撤銷分支）仍為就地撤銷之終局動作。
 @frozen
 public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtocol {
   // MARK: Lifecycle
@@ -73,7 +76,8 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
     let inputText = (input.inputTextIgnoringModifiers ?? input.text).lowercased()
       .applyingTransformFW2HW(reverse: false)
     guard isCodeKeyCandidate(input, inputText: inputText), let key = inputText.first else {
-      // 非單一可列印字元者（修飾鍵、功能鍵、多字元輸入）一律照舊，但待配之首鍵就此作廢。
+      // 非單一可列印字元者（修飾鍵、功能鍵、多字元輸入）一律照舊轉交 BPMF 打字機；
+      // ★ P309：待配之首鍵不在此作廢——其處置交拼音側決定（見 `delegateToBPMF`）。
       return delegateToBPMF(input, session: session)
     }
     // 碼鍵：組音區內若尚有前一音節，先固化它——連同其同碼重碼詞幹。
@@ -131,33 +135,34 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
 
   // MARK: Private
 
-  /// 作廢待配之首鍵後退位予 `BPMFFullMatchTypewriter`，並收拾該首鍵之顯示殘留。
+  /// 退位予 `BPMFFullMatchTypewriter`：非碼鍵一律比照非雙拼之拼音處置。
   ///
-  /// 待配之首鍵係以組字區之讀音欄呈現（`dualpinPendingDisplayText` 參與
-  /// `generateStateOfInputting()` 之組裝），而 `dualpinFlushPending()` 只動翻譯狀態機、
-  /// **不觸狀態**。退位對象若消化了本鍵，其狀態切換即已帶走該顯示；但修飾鍵、功能鍵、
-  /// 方向鍵與多數標點皆非其所收（`consumeReadingInputIfNeeded` 之消費條件不合），
-  /// 本鍵遂落回分診，而那條路多半亦不切換狀態 ⇒ 幽靈首鍵永留顯示，其後之刪除鍵又因
-  /// 注拼槽與組字器俱空而落進 `handleBackSpace` 之早退分支，只出聲示警（9D69908D）。
+  /// ★ P309：**狂打側**之待配首鍵即「未完成之讀音」，故本層**不再**先行作廢之——其結算與消費
+  /// 一律交拼音側之處理路徑決定（事主 2026-10-14 裁定「雙拼的非碼鍵全部按照漢語拼音（非雙拼）
+  /// 的處理方式」）。拼音側凡設有「先結算、再落本鍵」之站點（標點／數字之
+  /// `handlePunctuation`、Tab 與方向鍵、Enter、空白鍵）皆會就地固化該首鍵並連帶消費之
+  /// （見 `solidifyFuriousFrontReading` 之 P309 分支）；未經消化之按鍵則照舊落回分診、由客體
+  /// 自行處置，此時該首鍵與拼音側之未完成讀音同命：留待次鍵續配，不另切態。
   ///
-  /// 故於退位對象回 `nil`（本鍵未經其消化、逕落回分診）時，由本處依常規刪除鍵之同一口徑
-  /// 切換狀態：素材盡去時收為 `.ofAbortion()`，否則刷新組字區。切態發生在退位對象之後，
-  /// 免得同一輪內切兩次狀態。
-  ///
-  /// 惟「客體顯示之刷新」須延後至本輪分診事件末（`deferringDisplayRefresh: true`）：
-  /// 本鍵旋即於分診中落筆（數字落為字面節、標點落字面節），屆時自有其顯示；若搶在此刻
-  /// 刷新，客體會先見「標記成空（⇒ 組字結束）」、再見新標記文字（⇒ 組字開始），
-  /// macOS 26+ 之客體因此白跑一輪 deactivate／reactivate，舊建置之 Spotlight 更會顯示
-  /// 殘影（P307 移交稿）。結算由 `settleDeferredCompositionDisplayIfNeeded()` 為之。
+  /// **非狂打側**無 copilot 候選窗、亦無「前方固化」之語義（`hasFuriousFrontPending` 恆假）：
+  /// 該首鍵純為顯示素材，故仍依 P302／P308 之口徑逕行作廢，並於退位對象未消化本鍵時切態收拾
+  /// 其顯示殘留（幽靈首鍵之病灶見 P307 移交稿）。
   private func delegateToBPMF(
     _ input: some InputSignalProtocol,
     session: Handler.Session
   )
     -> Bool? {
+    guard !handler.isFuriousTypingModeEffective else {
+      return BPMFFullMatchTypewriter(handler).handle(input)
+    }
     let hadPending = handler.dualpinPendingDisplayText != nil
     handler.dualpinFlushPending()
     let handled = BPMFFullMatchTypewriter(handler).handle(input)
     guard handled == nil, hadPending else { return handled }
+    // 顯示之刷新須延後至本輪分診事件末（`deferringDisplayRefresh: true`）：本鍵旋即於分診中
+    // 落筆（數字落為字面節、標點落字面節），屆時自有其顯示；若搶在此刻刷新，客體會先見
+    // 「標記成空（⇒ 組字結束）」、再見新標記文字（⇒ 組字開始），macOS 26+ 之客體因此白跑一輪
+    // deactivate／reactivate，舊建置之 Spotlight 更會顯示殘影（P307 移交稿）。
     session.switchState(
       handler.isConsideredEmptyForNow ? State.ofAbortion() : handler.generateStateOfInputting(),
       deferringDisplayRefresh: true

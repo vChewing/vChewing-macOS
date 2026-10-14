@@ -438,23 +438,41 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
         "客體所見應恰為「首鍵佔位 → 字面節」兩筆（furious＝\(furious)）：\(testClientProxy.markedTexts)"
       )
 
-      // 乙案：非碼鍵（逗號）。首鍵逕捨、逗號放行給客體；空筆只許一次、且為收尾之筆。
+      // 乙案：非碼鍵（逗號）。**非狂打**：首鍵逕捨、逗號放行給客體；空筆只許一次、且為收尾之筆。
+      // **狂打**（★ P309）：雙拼之標點比照拼音狂打——先結算前方讀音、再以本鍵落組字節，
+      // 故本鍵由輸入法消費、組字續存（顯示即「讀音桶，」），亦不得有空筆。
       testSession.resetInputHandler(forceComposerCleanup: true)
       testClientProxy.clear()
       typeSentenceOrCandidates("s")
-      handleKeyEvent(KBEvent.KeyEventData(chars: ","), shouldHandle: false)
-      #expect(
-        testClientProxy.markedTexts.filter(\.isEmpty).count == 1,
-        "非碼鍵之收尾空筆應恰一次（furious＝\(furious)）：\(testClientProxy.markedTexts)"
-      )
-      #expect(
-        testClientProxy.markedTexts.last?.isEmpty == true,
-        "收尾空筆應為最後一筆（furious＝\(furious)）：\(testClientProxy.markedTexts)"
-      )
-      #expect(
-        testSession.state.displayedText.isEmpty,
-        "退位後不得殘留待配首鍵之顯示（furious＝\(furious)）"
-      )
+      if furious {
+        handleKeyEvent(KBEvent.KeyEventData(chars: ","), shouldHandle: true)
+        #expect(
+          testClientProxy.markedTexts.allSatisfy { !$0.isEmpty },
+          "狂打之標點不得投機落空筆（furious＝\(furious)）：\(testClientProxy.markedTexts)"
+        )
+        #expect(
+          testSession.state.displayedText.contains("，"),
+          "狂打之標點應以組字節落下（furious＝\(furious)）：\(testSession.state.displayedText)"
+        )
+        #expect(
+          !testSession.state.displayedText.contains("s"),
+          "讀音既已結算，顯示不得殘留半碼之原文（furious＝\(furious)）：\(testSession.state.displayedText)"
+        )
+      } else {
+        handleKeyEvent(KBEvent.KeyEventData(chars: ","), shouldHandle: false)
+        #expect(
+          testClientProxy.markedTexts.filter(\.isEmpty).count == 1,
+          "非碼鍵之收尾空筆應恰一次（furious＝\(furious)）：\(testClientProxy.markedTexts)"
+        )
+        #expect(
+          testClientProxy.markedTexts.last?.isEmpty == true,
+          "收尾空筆應為最後一筆（furious＝\(furious)）：\(testClientProxy.markedTexts)"
+        )
+        #expect(
+          testSession.state.displayedText.isEmpty,
+          "退位後不得殘留待配首鍵之顯示（furious＝\(furious)）"
+        )
+      }
     }
   }
 

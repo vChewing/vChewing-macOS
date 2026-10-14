@@ -611,16 +611,18 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.composer.romajiBuffer == "zhong")
   }
 
-  // MARK: - 首鍵作廢後之顯示收拾
+  // MARK: - 非碼鍵一律比照非雙拼之拼音（P309）
 
-  /// 待配首鍵遭「非 BPMF 打字機所收」之鍵作廢時，組字區顯示必須同步刷新。
+  /// 狂打側之待配首鍵即「未完成之讀音」，故其非碼鍵之處置必須與**非雙拼之拼音**逐項一致
+  /// （事主 2026-10-14 裁定：「雙拼的標點走漢語拼音標點處理方法；雙拼的非碼鍵全部按照漢語
+  /// 拼音（非雙拼）的處理方式」）。本測試即該一致性之釘樁：同一顆非碼鍵分別落於
+  /// 「雙拼之半碼待配（微軟雙拼之 `v`＝聲母 zh）」與「拼音之未完成前綴（`zh`）」之下，
+  /// 比對其後之可觀察結果——是否被處理、示警、組字結果、狀態型別、顯示、素材是否被消費。
   ///
-  /// 該首鍵係以讀音欄呈現，`dualpinFlushPending()` 卻只動翻譯狀態機、不觸狀態，故若不刷新，
-  /// 它會成幽靈讀音留在顯示上，而注拼槽與組字器俱空 ⇒ 其後之刪除鍵落進
-  /// `handleBackSpace` 之早退分支，只出聲示警（9D69908D）且不切換狀態，幽靈遂永留
-  /// （收拾者見 `DualpinTypewriter.delegateToBPMF(_:session:)`）。
-  @Test("IH-Dualpin-011 Discarding a pending first key leaves no ghost display")
-  func test_IH_Dualpin_011_DiscardedPendingFirstKeyLeavesNoGhostDisplay() throws {
+  /// - Note: 顯示之嚴格比對只在「素材確已被消費」時成立：素材未被消費時，兩側之未完成原文
+  ///   （雙拼之半碼 vs 拼音之字母流）本即不同形，此差異非語義差異。
+  @Test("IH-Dualpin-011 Non-code keys follow the non-dualpin pinyin path")
+  func test_IH_Dualpin_011_NonCodeKeysFollowPinyinPath() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -634,34 +636,101 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.errorCallback = nil
       deactivateDualpin()
     }
-    testSession.resetInputHandler(forceComposerCleanup: true)
-    activateDualpin(keyboardParserRawValue: KeyboardParser.ofDualpinMSPY.rawValue)
 
-    // 諸鍵皆非雙拼之碼鍵、亦非 BPMF 打字機所收者：本鍵自身之示警不計，要緊的是
-    // 不得留下待配首鍵之殘影。
-    let unconsumedKeys: [KBEvent.KeyEventData] = [
-      .init(chars: ","), .init(chars: "/"), .dataTab,
-      .dataArrowLeft, .dataArrowRight, .forwardDelete,
-    ]
-    for furious in [true, false] {
+    func activatePinyin() {
+      testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+      testHandler.prefs.dualpinEnabledForPinyinTyping = false
+      testHandler.prefs.dualpinSchemaJSON = ""
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+      testHandler.currentLM.syncPrefs()
+    }
+
+    func observe(
+      dualpin: Bool,
+      furious: Bool,
+      key: KBEvent.KeyEventData
+    )
+      -> (
+        handled: Bool?, errors: [String], sentence: [String], display: String,
+        stateType: String, consumed: Bool
+      ) {
+      testSession.resetInputHandler(forceComposerCleanup: true)
       testHandler.prefs.furiousTypingEnabled4Pinyin = furious
-      for key in unconsumedKeys {
+      if dualpin {
+        activateDualpin(keyboardParserRawValue: KeyboardParser.ofDualpinMSPY.rawValue)
         typeSentence("v")
-        #expect(testHandler.dualpinPendingDisplayText == "v")
-        #expect(testSession.state.displayedText == "v")
-
-        _ = testHandler.triageInput(event: key.asEvent)
-        #expect(testHandler.dualpinPendingDisplayText == nil)
-        #expect(testHandler.composer.isEmpty)
-        #expect(testHandler.assembler.isEmpty)
-        #expect(testSession.state.displayedText.isEmpty)
-
-        // 幽靈既去，緊接之刪除鍵即無物可刪：不得誤發「空組字器」之蜂鳴，亦不得留殘影。
-        reportedErrors.removeAll()
-        _ = testHandler.triageInput(event: KBEvent.KeyEventData.backspace.asEvent)
-        #expect(!reportedErrors.contains { $0.hasPrefix("9D69908D") })
-        #expect(testSession.state.displayedText.isEmpty)
+      } else {
+        activatePinyin()
+        typeSentence("zh")
       }
+      reportedErrors.removeAll()
+      let handled = testHandler.triageInput(event: key.asEvent)
+      return (
+        handled: handled,
+        errors: reportedErrors,
+        sentence: testHandler.assembler.assembledSentence.map(\.value),
+        display: testSession.state.displayedText,
+        stateType: "\(testSession.state.type)",
+        consumed: dualpin
+          ? testHandler.dualpinPendingDisplayText == nil
+          : testHandler.composer.romajiBuffer.isEmpty
+      )
+    }
+
+    // 非碼鍵：既不屬雙拼之碼鍵、亦不屬拼音之讀音字母。
+    let nonCodeKeys: [(name: String, key: KBEvent.KeyEventData)] = [
+      ("comma", .init(chars: ",")),
+      ("slash", .init(chars: "/")),
+      ("tab", .dataTab),
+      ("arrowLeft", .dataArrowLeft),
+      ("arrowRight", .dataArrowRight),
+      ("digit9", .init(chars: "9")),
+      ("forwardDelete", .forwardDelete),
+      ("space", .init(chars: " ")),
+      ("enter", .dataEnterReturn),
+    ]
+    // 狂打側之奇偶比對：素材為「未完成之讀音」時，非碼鍵之處置必須逐項與拼音狂打一致。
+    for (name, key) in nonCodeKeys {
+      let context = "（狂打、鍵＝\(name)）"
+      let dp = observe(dualpin: true, furious: true, key: key)
+      let py = observe(dualpin: false, furious: true, key: key)
+      #expect(dp.handled == py.handled, "「是否被處理」不一致\(context)")
+      #expect(
+        dp.errors == py.errors,
+        "示警不一致\(context)：雙拼 \(dp.errors) vs 拼音 \(py.errors)"
+      )
+      #expect(
+        dp.sentence == py.sentence,
+        "組字結果不一致\(context)：雙拼 \(dp.sentence) vs 拼音 \(py.sentence)"
+      )
+      #expect(dp.stateType == py.stateType, "狀態型別不一致\(context)")
+      #expect(dp.consumed == py.consumed, "素材之消費不一致\(context)")
+      if dp.consumed, py.consumed {
+        #expect(
+          dp.display == py.display,
+          "顯示不一致\(context)：雙拼 \(dp.display) vs 拼音 \(py.display)"
+        )
+      }
+      // 幽靈顯示之禁令：素材既已被消費，顯示不得再現該半截之碼。
+      if dp.consumed {
+        #expect(
+          !dp.display.contains("v"),
+          "首鍵既已消費，不得留幽靈讀音於顯示\(context)：\(dp.display)"
+        )
+      }
+    }
+
+    // 非狂打側**不**比照拼音：彼時之非碼鍵為音節邊界，雙拼於 P302 定為「逕捨半碼、本鍵交予
+    // 使用者端」（拼音側則因未完成讀音仍在注拼槽而被示警吞下）。此差異係既有之設計抉擇，
+    // 不屬 P309 之範疇，惟其不變量——**半碼不留存**——於兩側皆須成立。
+    for (name, key) in nonCodeKeys {
+      let dp = observe(dualpin: true, furious: false, key: key)
+      #expect(dp.consumed, "非狂打之雙拼於非碼鍵後不得留存半碼（鍵＝\(name)）")
+      #expect(
+        !dp.display.contains("v"),
+        "非狂打之雙拼於非碼鍵後不得留幽靈讀音（鍵＝\(name)）：\(dp.display)"
+      )
     }
   }
 
@@ -777,18 +846,18 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
   }
 
-  // MARK: - 待配首鍵期間之數字鍵（既有語義之釘樁）
+  // MARK: - 待配首鍵期間之數字鍵（P309 之釘樁）
 
-  /// 待配首鍵（首鍵已顯示、尚未得碼）期間摁下數字鍵時，首鍵逕捨、該數字落為一般字面節。
+  /// 狂打側之待配首鍵即「未完成之讀音」：數字鍵到達時，先結算該讀音（與拼音側之
+  /// `handlePunctuation` 同一條路：先固化前方讀音、再落本鍵），該數字仍落為一般字面節；
+  /// 不示警、亦不留待配之首鍵（其素材已隨固化而去）。
   ///
-  /// 此係 P302 以來之既有語義（`.passthrough` ⇒ 拼音打字機不成讀音 ⇒ 標點鏈落字面節），
-  /// 本 phase 一字未改，此處僅為釘樁。數字鍵**非**本故障之病灶：事主所報者，係客體
-  /// （Spotlight）於組字途中自行重新啟用輸入法時，Session 逕將狀態歸零而不收拾客體之
-  /// 未提交標記文字——故聲調鍵 `2` 與非聲調鍵 `9` 所見皆同（見 `SS-Lifecycle-012`）。
-  /// 別客體之所以無此故障，正因彼不於組字途中重新啟用：該字面節於彼處係可為 BkSp 所刪
-  /// 之正常組字內容（狀態為 `.ofInputting`，`handleBackSpace` 方予受理）。
-  @Test("IH-Dualpin-017 Digit during a pending first key lands as a literal node")
-  func test_IH_Dualpin_017_DigitDuringPendingFirstKeyLandsAsLiteralNode() throws {
+  /// - Note: **非狂打側**不在此列——彼時無 copilot 候選窗、亦無「前方固化」之語義，
+  ///   該首鍵純為顯示素材，故依 P302／P308 之口徑逕行作廢：素材不留、數字仍落字面節。
+  ///   兩側之共同點（數字落字面節、狀態為 `.ofInputting` 而得為 BkSp 所刪）即
+  ///   `SS-Lifecycle-012` 所關切之病灶之外緣。
+  @Test("IH-Dualpin-017 Digit during a pending first key settles the front then lands literally")
+  func test_IH_Dualpin_017_DigitDuringPendingFirstKeySettlesThenLands() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -817,7 +886,6 @@ extension LibVanguardTestsRoot.InputHandlerTests {
         #expect(testHandler.assembler.isEmpty)
         #expect(testHandler.dualpinPendingDisplayText == "s")
 
-        // 次鍵為數字：首鍵逕捨，數字落為字面節；既有語義不示警。
         typeSentence(digit)
         #expect(
           testHandler.dualpinPendingDisplayText == nil,
@@ -827,13 +895,20 @@ extension LibVanguardTestsRoot.InputHandlerTests {
           reportedErrors.isEmpty,
           "數字鍵不示警（furious＝\(furious)、鍵＝\(digit)）：\(reportedErrors)"
         )
+        let sentence = testHandler.assembler.assembledSentence.map(\.value)
         #expect(
-          testHandler.assembler.assembledSentence.map(\.value) == [digit],
-          "數字應落為字面節（furious＝\(furious)、鍵＝\(digit)）"
+          sentence.last == digit,
+          "數字應落為字面節（furious＝\(furious)、鍵＝\(digit)）：\(sentence)"
         )
         #expect(
           testSession.state.type == .ofInputting,
           "落定後應為組字中，方得為 BkSp 所刪（furious＝\(furious)、鍵＝\(digit)）"
+        )
+        // 狂打側：首鍵之讀音先結算入庫，故除數字節外尚有一格；非狂打側：首鍵逕行作廢，
+        // 只餘數字節。
+        #expect(
+          sentence.count == (furious ? 2 : 1),
+          "狂打側應先結算讀音桶（furious＝\(furious)、鍵＝\(digit)）：\(sentence)"
         )
       }
     }
