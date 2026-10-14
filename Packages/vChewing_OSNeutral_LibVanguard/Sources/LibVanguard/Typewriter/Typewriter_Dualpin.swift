@@ -141,8 +141,14 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
   /// 注拼槽與組字器俱空而落進 `handleBackSpace` 之早退分支，只出聲示警（9D69908D）。
   ///
   /// 故於退位對象回 `nil`（本鍵未經其消化、逕落回分診）時，由本處依常規刪除鍵之同一口徑
-  /// 刷新狀態：素材盡去時收為 `.ofAbortion()`，否則刷新組字區。退位前**不**刷，免得
-  /// 同一輪內切兩次狀態。
+  /// 切換狀態：素材盡去時收為 `.ofAbortion()`，否則刷新組字區。切態發生在退位對象之後，
+  /// 免得同一輪內切兩次狀態。
+  ///
+  /// 惟「客體顯示之刷新」須延後至本輪分診事件末（`deferringDisplayRefresh: true`）：
+  /// 本鍵旋即於分診中落筆（數字落為字面節、標點落字面節），屆時自有其顯示；若搶在此刻
+  /// 刷新，客體會先見「標記成空（⇒ 組字結束）」、再見新標記文字（⇒ 組字開始），
+  /// macOS 26+ 之客體因此白跑一輪 deactivate／reactivate，舊建置之 Spotlight 更會顯示
+  /// 殘影（P307 移交稿）。結算由 `settleDeferredCompositionDisplayIfNeeded()` 為之。
   private func delegateToBPMF(
     _ input: some InputSignalProtocol,
     session: Handler.Session
@@ -153,7 +159,8 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
     let handled = BPMFFullMatchTypewriter(handler).handle(input)
     guard handled == nil, hadPending else { return handled }
     session.switchState(
-      handler.isConsideredEmptyForNow ? State.ofAbortion() : handler.generateStateOfInputting()
+      handler.isConsideredEmptyForNow ? State.ofAbortion() : handler.generateStateOfInputting(),
+      deferringDisplayRefresh: true
     )
     return handled
   }
