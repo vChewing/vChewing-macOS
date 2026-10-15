@@ -6,7 +6,8 @@ const assert = require('node:assert');
 const { loadCore } = require('./core-loader');
 
 // zh-Hans 一律為 **zh-Hans-TW**（臺灣華語、簡體字形）：只簡化字形，不得改用大陸用語。
-// 以下為本倉既有慣例所禁之詞（對照表見 vChewing-DevLogs/KnowledgeMemo4LLM.md §12.6）。
+// 以下為本倉既有慣例所禁之詞（對照表見
+// vChewing-DevLogs/KnowledgeMemo_SubArticles/16-WorkDetails-L10nAndTerminology.md §12.6）。
 const FORBIDDEN_MAINLAND_TERMS = [
   '剪贴板', '导入', '设置', '数据', '窗口', '菜单', '软件', '标识', '复制', '内存',
   '硬盘', '支持', '鼠标', '屏幕', '链接', '优化', '兼容', '通过', '默认', '用户',

@@ -95,7 +95,8 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 
 - **Commit format**: `ModuleName // SubModuleName: Change.` (Conventional Commit semantics kept terse.) Example: `LibVanguard // FSM: Fix cursor guard.`
 - **Devlogs prose is zh-Hant-TW**: `vChewing-DevLogs` records are written in Traditional Chinese
-  (Taiwan) -- `KnowledgeMemo4LLM.md`, `DevReqsHistory.md`, `Reqs4LLM/`, `Research/`. Do not narrate
+  (Taiwan) -- `KnowledgeMemo4LLM.md` and its sub-articles (`KnowledgeMemo_SubArticles/`),
+  `DevReqsHistory.md`, `Reqs4LLM/`, `Research/`. Do not narrate
   in Japanese, English, or Simplified Chinese. Exceptions: the owner's words quoted verbatim,
   i18n strings and terminology tables, and code/paths/API names. Replies to the owner are
   zh-Hant-TW too; the language they write in is not a cue to switch.
@@ -104,6 +105,7 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
   hashes and stop. Do not treat a push as having happened when judging whether `--amend`
   or a history rewrite is safe.
 - **Reviews**: Highlight functional impact, state machine ramifications, and test coverage. Mention regression risk if tests are missing.
+- **Devlogs entry point**: `vChewing-DevLogs/KnowledgeMemo4LLM.md` is an *index* now — when it is reachable, read it together with `KnowledgeMemo_SubArticles/00-RuleIndex.md`, then read in full the sub-articles the index routes your task to. Reading the index alone is not enough.
 - **Dependencies**: Prefer SwiftPM-targeted adjustments. When external patches are unavoidable, document rationale in code comments and PR description.
 - **Installer**: Keep pkg scripts idempotent. `pkgPreInstall.sh` / `pkgPostInstall.sh` must remain sandbox safe.
 
