@@ -13,7 +13,8 @@ extension SessionProtocol {
   public var attributedStringSecured: (value: NSAttributedString, range: NSRange) {
     // 這個針對 Discord 的 特殊相容策略對 Discord 網頁端無效。
     let isDiscordClient = clientBundleIdentifier.hasSuffix(".Discord")
-    let securedPlaceholder = isDiscordClient
+    let isMozillaApp = clientBundleIdentifier.hasPrefix("org.mozilla.")
+    let securedPlaceholder = (isDiscordClient || isMozillaApp)
       ? IMEStateParsed(state).getAttributedStringPlaceholder("_")
       : IMEStateParsed(state).attributedStringPlaceholder
     return clientMitigationLevel >= 2
