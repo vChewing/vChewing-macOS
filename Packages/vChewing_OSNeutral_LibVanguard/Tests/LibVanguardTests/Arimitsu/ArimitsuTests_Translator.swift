@@ -37,11 +37,35 @@ struct ArimitsuTranslatorTests {
 
   @Test("[Arimitsu] 兩鍵不成碼者報 invalid")
   func testInvalidPair() async throws {
+    let schema = DualpinParser.mspy
+    let report = schema.validate()
+    // 尋一組「合法首鍵＋不可能次鍵」之實鍵序：不假設任何特定鍵位之細節。
+    guard let firstKey = report.codeToStems.keys.compactMap(\.first).min(),
+          let secondKey = schema.alphabet.sorted().first(where: { candidate in
+            !report.codeToStems.keys.contains("\(firstKey)\(candidate)")
+              && !report.aliasCodeToStems.keys.contains("\(firstKey)\(candidate)")
+          })
+    else {
+      Issue.record("無法自方案中尋得不成碼之鍵序。")
+      return
+    }
     var translator = makeTranslator()
-    #expect(translator.ingest("a") == .bufferOnly(firstKey: "a"))
-    #expect(translator.ingest(";") == .invalid(firstKey: "a", secondKey: ";"))
+    #expect(translator.ingest(firstKey) == .bufferOnly(firstKey: firstKey))
+    #expect(translator.ingest(secondKey) == .invalid(firstKey: firstKey, secondKey: secondKey))
     #expect(translator.isIdle)
     #expect(translator.siblingStems.isEmpty)
+  }
+
+  @Test("[Arimitsu] 不可能起碼之首鍵當場作廢")
+  func testInvalidFirstKey() async throws {
+    var translator = makeTranslator()
+    // 微軟雙拼之零聲母前綴鍵為 `o`（啊＝`oa`），故 `a`／`e`／`;` 三者皆只能居次鍵之位。
+    for key in ["a", "e", ";"] as [Character] {
+      #expect(translator.ingest(key) == .invalidFirstKey(firstKey: key), "\(key)")
+      #expect(translator.isIdle, "\(key)")
+    }
+    #expect(translator.firstKeys.contains("o"))
+    #expect(translator.firstKeys.isDisjoint(with: ["a", "e", ";"] as Set<Character>))
   }
 
   @Test("[Arimitsu] 重碼：首選入組音區、其餘駐留於翻譯器")
@@ -125,10 +149,11 @@ struct ArimitsuTranslatorTests {
     #expect(translator.ingest("a") == .translate(firstKey: "a", secondKey: "a", stems: ["a"]))
     #expect(translator.isIdle)
 
-    // 未經方案宣告者仍不成碼——微軟雙拼之實鍵序「aa」即是此況。
+    // 未經方案宣告者則連首鍵都不成立——微軟雙拼之實鍵序「aa」即是此況：其 `a` 不成首鍵，
+    // 故「aa」連湊碼之機會都無（★ P310）。
     var undeclaredTranslator = makeTranslator()
-    #expect(undeclaredTranslator.ingest("a") == .bufferOnly(firstKey: "a"))
-    #expect(undeclaredTranslator.ingest("a") == .invalid(firstKey: "a", secondKey: "a"))
+    #expect(undeclaredTranslator.ingest("a") == .invalidFirstKey(firstKey: "a"))
+    #expect(undeclaredTranslator.isIdle)
   }
 
   // MARK: Private

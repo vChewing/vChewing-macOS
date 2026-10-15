@@ -81,6 +81,7 @@
 "i18n:ErrorMessage.InvalidAppBundle" = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。少なくとも、唯一識別子は検出できぬ。";
 "i18n:ErrorMessage.InvalidCodePoint" = "コードポイントは正しくない。";
 "i18n:ErrorMessage.InvalidDualpinCode" = "今入力した双拼コードは無効です。";
+"i18n:ErrorMessage.InvalidDualpinFirstKey" = "今入力した双拼の最初のキーでは、どのコードも始められません。破棄しました。";
 "i18n:ErrorMessage.InvalidSelectionKeys" = "候補用キーによる不具合。";
 "i18n:ErrorMessage.MaxCandidateKeys" = "言選り用キー陣列には最多９つキー登録できます。";
 "i18n:ErrorMessage.MaxResultsReturnable" = "参照結果は最初の15件のみ表示可能。";

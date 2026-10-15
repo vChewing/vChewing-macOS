@@ -20,6 +20,7 @@ public struct DualpinTranslator: Hashable, Sendable {
   public init(alphabet: Set<Character>, codeToStems: [String: [String]]) {
     self.alphabet = alphabet
     self.codeToStems = codeToStems
+    self.firstKeys = Set(codeToStems.keys.compactMap(\.first))
   }
 
   /// 以校驗報告建構。
@@ -48,10 +49,18 @@ public struct DualpinTranslator: Hashable, Sendable {
     case translate(firstKey: Character, secondKey: Character, stems: [String])
     /// 兩鍵不成碼：上層應出聲示警並丟棄此二鍵，**不得**使其落為原文。
     case invalid(firstKey: Character, secondKey: Character)
+    /// 該鍵不可能開啟任何碼（如微軟雙拼之 `a`／`e`／`;`：三者皆只能居次鍵之位）：上層應出聲
+    /// 示警並逕行丟棄該鍵，**不得**使其落為原文、亦**不得**使其成為待配之首鍵。
+    case invalidFirstKey(firstKey: Character)
   }
 
   /// 本方案可用之鍵。
   public let alphabet: Set<Character>
+  /// 可居首鍵之鍵（即「至少有一碼起於該鍵」者）。
+  ///
+  /// ★ P310：無碼起於其鍵者（微軟雙拼之 `a`／`e`／`;`）永不成碼，`ingest` 見之即回
+  /// `invalidFirstKey`，不使之入 `pending`。本集合由 `codeToStems` 反推，故別名碼亦在列。
+  public let firstKeys: Set<Character>
   /// 碼 → 詞幹集合。
   public let codeToStems: [String: [String]]
   /// 待配之首鍵；`nil` 表 `idle`。
@@ -69,10 +78,15 @@ public struct DualpinTranslator: Hashable, Sendable {
   /// 收一鍵。
   ///
   /// - Parameter key: 已正規化為小寫之鍵。
-  /// - Returns: 本次之動作。`.translate` 時，`siblingStems` 已同步更新。
+  /// - Returns: 本次之動作。`.translate` 時，`siblingStems` 已同步更新。首鍵若不可能開啟任何
+  ///   碼，則回 `invalidFirstKey`（★ P310）——該鍵不入 `pending`，狀態仍為 `idle`。
   public mutating func ingest(_ key: Character) -> Action {
     guard alphabet.contains(key) else { return .passthrough }
     guard let first = pendingFirstKey else {
+      // ★ P310：首鍵若不可能開啟任何碼（如微軟雙拼之 `a`／`e`／`;`），其存在永不成碼——收下
+      // 只會令次鍵必不成碼（乃至使後續之中斷鍵落於「有素材待結算、實則無物可結算」之窘境），
+      // 故當場示警並丟棄之。別名碼亦計入 `firstKeys`，故別名所增之輸入不受此限。
+      guard firstKeys.contains(key) else { return .invalidFirstKey(firstKey: key) }
       pendingFirstKey = key
       siblingStems = []
       return .bufferOnly(firstKey: key)

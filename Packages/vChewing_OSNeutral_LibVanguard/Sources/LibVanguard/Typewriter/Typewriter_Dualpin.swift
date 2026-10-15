@@ -22,6 +22,12 @@ import Tekkon
 /// 無效之兩鍵序一律出聲示警並丟棄此二鍵，**不得**使其落為原文；示警除鈴聲外，另以
 /// Tooltip（`redAlert` 配色、1.2 秒）告知按鍵者方才之雙拼碼不合規。
 ///
+/// ★ P310：**不可能開啟任何碼之首鍵**（微軟雙拼之 `a`／`e`／`;`：三者皆只能居次鍵之位）
+/// 亦比照此例，惟示警文案另有專屬者（`ErrorMessage.InvalidDualpinFirstKey`）——該鍵既永不成碼，
+/// 收下只會令次鍵必不成碼，並令中斷鍵落於「有素材待結算、實則無物可結算」之窘境
+/// （noop＋蜂鳴，P309 之遺構）。**本判準與狂打開關無涉**：一個鍵之能否起碼係方案鍵位之事實，
+/// 與狂打之種種語義皆不相干，故狂打與非狂打一律當場示警並丟棄之（事主 2026-10-15 明示範圍）。
+///
 /// 待配之首鍵係「已顯示、尚未落地」之組字素材（以讀音欄呈現），且在狂打側即「未完成之讀音」。
 /// ★ P309：其存續與處置一律比照非雙拼之拼音——非碼鍵所觸發之「先結算、再落本鍵」各站點
 /// （標點／數字／Tab／Enter／方向鍵／空白鍵）會就地固化它並連帶消費之（見
@@ -119,6 +125,19 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
       // `showStatusHint` doc 亦載此事），故逕於狀態切換後直接呼叫 Tooltip。
       session.showTooltip(
         "i18n:ErrorMessage.InvalidDualpinCode".i18n,
+        colorState: .redAlert,
+        duration: 1.2
+      )
+      return true
+    case let .invalidFirstKey(firstKey):
+      // ★ P310：該鍵不可能開啟任何碼（如微軟雙拼之 `a`／`e`／`;`），故本鍵不得入待配之列：
+      // 收下只會令次鍵必不成碼，且令中斷鍵（數字、標點、方向鍵）落於「有素材待結算、實則
+      // 無物可結算」之窘境——彼時諸路徑皆以「素材仍在」為憑據而不知其無可結算，遂生
+      // noop＋蜂鳴（P309 之遺構）。此處逕行示警並丟棄本鍵：無物入待配之列，故亦不必切態。
+      // 本例落在碼鍵判定之初、先於一切狂打分流，故狂打與非狂打皆然。
+      errorCallback("7B4C1E29：雙拼首鍵「\(firstKey)」不可能開啟任何碼，已丟棄。")
+      session.showTooltip(
+        "i18n:ErrorMessage.InvalidDualpinFirstKey".i18n,
         colorState: .redAlert,
         duration: 1.2
       )

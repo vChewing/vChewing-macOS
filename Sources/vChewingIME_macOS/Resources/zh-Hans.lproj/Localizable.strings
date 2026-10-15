@@ -81,6 +81,7 @@
 "i18n:ErrorMessage.InvalidAppBundle" = "当前所选之物并非 macOS 应用程式封包，至少无法发现其唯一标帜（Bundle Identifier）。";
 "i18n:ErrorMessage.InvalidCodePoint" = "内码不正确。";
 "i18n:ErrorMessage.InvalidDualpinCode" = "刚刚敲的双拼码不合规，已丢弃。";
+"i18n:ErrorMessage.InvalidDualpinFirstKey" = "刚刚敲的双拼首键不可能开启任何码，已丢弃。";
 "i18n:ErrorMessage.InvalidSelectionKeys" = "选字键参数资料值不规范。";
 "i18n:ErrorMessage.MaxCandidateKeys" = "选字键最多只能指定 9 个。";
 "i18n:ErrorMessage.MaxResultsReturnable" = "仅能给出前 15 笔结果。";
