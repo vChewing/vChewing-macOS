@@ -139,7 +139,21 @@ extension SessionProtocol {
     let lhRect = lineHeightRect()
     var tlPoint = CGPoint(x: lhRect.origin.x, y: lhRect.origin.y - 4.0)
     tlPoint.x += isVerticalTyping ? (lhRect.size.width + 4.0) : 0
-    return (topLeft: tlPoint, heightDelta: lhRect.size.height + 4.0)
+    var heightDelta = lhRect.size.height + 4.0
+    // 橫排之浮動組字窗以打字列底緣為窗底向上生長，其頂端必不高於（實則高於）打字列頂端；
+    // 而選字窗靠底翻轉後之底緣恰落在打字列頂端（＝錨點再上抬一個翻轉量），故兩者必然
+    // 相咬，重疊量即「組字窗高 − 打字列高」。遂將翻轉量抬至組字窗頂端之上：錨點已自
+    // 打字列底緣下沉 4 點，故需再留 4 點之間隙，合為 8 點。
+    // 直排之組字窗係自錨點向下生長，不在翻轉之迴避面上，故不與此。
+    // 翻轉量之上限 100 點係為免觸發選字窗實作之潰縮路徑（逾螢幕可見高之半者逕歸零）；
+    // 組字窗字級被調得過大之怪癖偏好無須格外照顧，該上限已足。
+    if !isVerticalTyping, let pcb = ui?.pcb, pcb.isShown, let pcbFrame = pcb.frame {
+      // 本模組為 OS-neutral，只看得到 Foundation 提供之 `CGRect`，其 `maxY` 一類便利屬性不在場，
+      // 故頂端一律以 origin 與 size 推得。
+      let pcbTop = pcbFrame.origin.y + pcbFrame.size.height
+      heightDelta = max(heightDelta, min(pcbTop - lhRect.origin.y + 8.0, 100.0))
+    }
+    return (topLeft: tlPoint, heightDelta: heightDelta)
   }
 
   public func resetCandidateWindowOrigin() {

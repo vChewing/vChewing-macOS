@@ -341,6 +341,58 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     }
   }
 
+  /// 選字窗靠螢幕底緣翻轉時，其翻轉量須抬至浮動組字窗（PCB）頂端之上，以免遮蓋組字窗。
+  /// 橫排限定（直排之組字窗自錨點向下生長，不在翻轉之迴避面上），且翻轉量設 100 點之上限。
+  @Test("SS-CandidateWindow-008 Candidate window flip clearance avoids the visible popup composition buffer")
+  func test_SS_CandidateWindow_008_CandidateWindowFlipClearanceAvoidsPopupCompositionBuffer() throws {
+    // 打字列：底緣 y = 200、高 20（頂端 y = 220）。
+    let lineRect = CGRect(origin: CGPoint(x: 100, y: 200), size: CGSize(width: 2, height: 20))
+    testClientProxy.lineHeightRectProvider = { _ in lineRect }
+    let originalVertical = testSession.isVerticalTyping
+    defer {
+      testSession.isVerticalTyping = originalVertical
+      testPCB.isShown = false
+      testPCB.frame = nil
+      testClientProxy.lineHeightRectProvider = nil
+    }
+    testSession.isVerticalTyping = false
+
+    // 無組字窗（或組字窗不可見）時，翻轉量即打字列高 ＋ 4。
+    testPCB.isShown = false
+    testPCB.frame = nil
+    let bare = testSession.candidateWindowOriginInfo()
+    #expect(abs(bare.heightDelta - 24.0) < 0.001)
+    #expect(abs(bare.topLeft.x - 100.0) < 0.001)
+    #expect(abs(bare.topLeft.y - 196.0) < 0.001)
+
+    // 組字窗可見且其頂端高於打字列頂端者，翻轉量抬至該頂端之上 4 點。
+    // 錨點已自打字列底緣下沉 4 點，故所求增量為「8 點 ＋ 組字窗頂端 − 打字列底緣」。
+    testPCB.isShown = true
+    testPCB.frame = CGRect(origin: CGPoint(x: 100, y: 200), size: CGSize(width: 120, height: 40)) // top = 240
+    let avoided = testSession.candidateWindowOriginInfo()
+    #expect(abs(avoided.heightDelta - 48.0) < 0.001)
+    // 錨點不受組字窗之影響（Foundation 側之 `CGPoint` 無 `Equatable`，故逐分量比對）。
+    #expect(abs(avoided.topLeft.x - bare.topLeft.x) < 0.001)
+    #expect(abs(avoided.topLeft.y - bare.topLeft.y) < 0.001)
+    // 翻轉後之底緣（錨點 y ＋ 翻轉量）落在組字窗頂端之上。
+    #expect(avoided.topLeft.y + avoided.heightDelta >= 240.0)
+
+    // 組字窗頂端不高於打字列頂端時，max 比較自然取原值。
+    testPCB.frame = CGRect(origin: CGPoint(x: 100, y: 100), size: CGSize(width: 120, height: 2)) // top = 102
+    #expect(abs(testSession.candidateWindowOriginInfo().heightDelta - 24.0) < 0.001)
+
+    // 翻轉量之上限 100 點：組字窗再高亦不令翻轉量隨之無限增長（未設限者將為 308）。
+    testPCB.frame = CGRect(origin: CGPoint(x: 100, y: 200), size: CGSize(width: 120, height: 300)) // top = 500
+    #expect(abs(testSession.candidateWindowOriginInfo().heightDelta - 100.0) < 0.001)
+
+    // 直排不與此：組字窗自錨點向下生長，翻轉量維持原值，錨點改取打字列右緣。
+    testSession.isVerticalTyping = true
+    testPCB.frame = CGRect(origin: CGPoint(x: 100, y: 200), size: CGSize(width: 120, height: 40))
+    let vertical = testSession.candidateWindowOriginInfo()
+    #expect(abs(vertical.heightDelta - 24.0) < 0.001)
+    #expect(abs(vertical.topLeft.x - 106.0) < 0.001)
+  }
+
   // MARK: - Test harness
 
   /// 在候選清單內高亮至一個「值至少 `minValueCount` 字、讀音鍵至少 `minKeyLength` 鍵」的候選。
