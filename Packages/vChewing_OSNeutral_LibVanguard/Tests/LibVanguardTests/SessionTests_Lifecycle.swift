@@ -385,6 +385,104 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(!testPCB.isShown, "啟用後之收合請求應收掉浮動組字窗。")
   }
 
+  // MARK: - SS-Lifecycle-014 / 015（P311：暫定狀態）
+
+  /// 暫定狀態（`isProvisional`）之契約：`switchState` 略去其客體顯示寫入，留待本輪派送
+  /// 結束時之結算補寫。如此，同一輪內旋即到來之新組字顯示只會落一次筆，客體遂免於
+  /// 「先見組字結束、再見組字開始」之閃爍。
+  @Test("SS-Lifecycle-014 Provisional state withholds the client display write until settled")
+  func test_SS_Lifecycle_014() throws {
+    InputSession.current = testSession
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testSession.performServerActivation()
+    testClientProxy.clear()
+
+    // ① 對照組：非暫定之作廢，客體當即收到空筆。
+    testSession.switchState(.ofInputting(displayTextSegments: ["s"], cursor: 1))
+    #expect(testClientProxy.markedTexts.last == "s")
+    testSession.switchState(.ofAbortion())
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(!testSession.state.data.isProvisional)
+    #expect(!testClientProxy.markedTexts.isEmpty)
+    #expect(testClientProxy.markedTexts.last?.isEmpty == true)
+
+    // ② 暫定之作廢：客體一無所獲（顯示仍為上一筆）；狀態既已正規化為空態，又帶著暫定之記。
+    testSession.switchState(.ofInputting(displayTextSegments: ["s"], cursor: 1))
+    let countBefore = testClientProxy.markedTexts.count
+    testSession.switchState(.ofAbortion(isProvisional: true))
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(testSession.state.data.isProvisional)
+    #expect(testClientProxy.markedTexts.count == countBefore, "暫定狀態不得寫入客體之組字區顯示。")
+    #expect(testClientProxy.markedTexts.last == "s")
+
+    // ③ 同一輪內旋即落筆：客體只見到新內容，其間並無空筆。
+    testSession.switchState(.ofInputting(displayTextSegments: ["9"], cursor: 1))
+    #expect(testClientProxy.markedTexts.suffix(2) == ["s", "9"])
+
+    // ④ 派送結束之結算：狀態已非暫定者，故結算為空操作、不覆寫客體已見之內容。
+    testSession.settleProvisionalStateIfNeeded()
+    #expect(testClientProxy.markedTexts.last == "9")
+
+    // ⑤ 暫定而無後續落筆者：結算補寫空筆，客體方知組字已結束。
+    testSession.switchState(.ofAbortion(isProvisional: true))
+    #expect(testSession.state.data.isProvisional)
+    testSession.settleProvisionalStateIfNeeded()
+    #expect(!testSession.state.data.isProvisional)
+    #expect(!testClientProxy.markedTexts.isEmpty)
+    #expect(testClientProxy.markedTexts.last?.isEmpty == true)
+  }
+
+  /// 雙拼（非狂打）之待配首鍵遇非碼鍵時，其收尾切態係暫定者：該狀態必於本輪派送結束時
+  /// 被結算，且客體所見之空筆只會居於末位——不復有「組字結束旋即重新開始」之閃爍。
+  @Test("SS-Lifecycle-015 Dualpin retirement settles its provisional state by the end of the dispatch")
+  func test_SS_Lifecycle_015() throws {
+    let originalParser = testHandler.prefs.keyboardParser
+    let originalParser4Dualpin = testHandler.prefs.keyboardParser4Dualpin
+    let originalDualpinEnabled = testHandler.prefs.dualpinEnabledForPinyinTyping
+    let originalDualpinSchema = testHandler.prefs.dualpinSchemaJSON
+    let originalFurious = testHandler.prefs.furiousTypingEnabled4Pinyin
+    defer {
+      testHandler.prefs.keyboardParser = originalParser
+      testHandler.prefs.keyboardParser4Dualpin = originalParser4Dualpin
+      testHandler.prefs.dualpinEnabledForPinyinTyping = originalDualpinEnabled
+      testHandler.prefs.dualpinSchemaJSON = originalDualpinSchema
+      testHandler.prefs.furiousTypingEnabled4Pinyin = originalFurious
+      testHandler.ensureKeyboardParser()
+      testHandler.currentLM.syncPrefs()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.prefs.keyboardParser4Dualpin = KeyboardParser.ofDualpinMSPY.rawValue
+    testHandler.prefs.dualpinEnabledForPinyinTyping = true
+    testHandler.prefs.dualpinSchemaJSON = ""
+    testHandler.prefs.furiousTypingEnabled4Pinyin = false
+    testHandler.ensureKeyboardParser()
+    testHandler.currentLM.syncPrefs()
+
+    InputSession.current = testSession
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testSession.performServerActivation()
+    testClientProxy.clear()
+
+    // 待配首鍵（微軟雙拼之 `s`）。
+    press(KBEvent.KeyEventData(chars: "s"))
+    #expect(!testSession.state.data.displayedText.isEmpty)
+
+    // 非碼鍵（逗號）觸發退位作廢：本鍵交予客體去落。
+    press(KBEvent.KeyEventData(chars: ","), shouldHandle: false)
+
+    // 收尾之切態係暫定者，已於本輪派送結束時被結算（否則此記猶在）。
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(!testSession.state.data.isProvisional, "暫定狀態須於本輪派送結束時結算。")
+
+    // 空筆只居末位：客體不會先見「組字結束」再見「組字開始」。
+    let emptyOffsets = testClientProxy.markedTexts.enumerated()
+      .filter { $0.element.isEmpty }.map(\.offset)
+    #expect(!emptyOffsets.isEmpty)
+    #expect(emptyOffsets.allSatisfy { $0 == testClientProxy.markedTexts.count - 1 })
+  }
+
   // MARK: - Test harness
 
   /// 建立帶有可攔截 statusUI 的 SessionUI 替身，對應 Darwin 端的

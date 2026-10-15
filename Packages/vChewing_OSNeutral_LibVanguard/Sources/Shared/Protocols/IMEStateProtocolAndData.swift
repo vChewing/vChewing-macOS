@@ -30,8 +30,22 @@ public protocol IMEStateProtocol {
 
 extension IMEStateProtocol {
   public static func ofDeactivated() -> Self { .init(type: .ofDeactivated) }
-  public static func ofEmpty() -> Self { .init(type: .ofEmpty) }
-  public static func ofAbortion() -> Self { .init(type: .ofAbortion) }
+
+  /// 生成「空」狀態。
+  /// - Parameter isProvisional: 該狀態是否為**暫定**者（見 `IMEStateData.isProvisional`）。
+  public static func ofEmpty(isProvisional: Bool = false) -> Self {
+    var result = Self(type: .ofEmpty)
+    result.data.isProvisional = isProvisional
+    return result
+  }
+
+  /// 生成「作廢」狀態。
+  /// - Parameter isProvisional: 該狀態是否為**暫定**者（見 `IMEStateData.isProvisional`）。
+  public static func ofAbortion(isProvisional: Bool = false) -> Self {
+    var result = Self(type: .ofAbortion)
+    result.data.isProvisional = isProvisional
+    return result
+  }
 
   public static func ofCommitting(textToCommit: String) -> Self {
     var result = Self(type: .ofCommitting)
@@ -274,6 +288,15 @@ public struct IMEStateData {
   public var tooltipDuration: Double = 1.0
   public var tooltipBackupForInputting: String = ""
   public var tooltipColorState: TooltipColorState = .normal
+
+  /// 本狀態是否為「暫定」者：即輸入法已決定其內容、但尚未知會客體者。
+  ///
+  /// `switchState(_:caller:line:)` 對暫定狀態不寫入客體之組字區顯示，而留待本輪事件派送
+  /// 結束時之結算（`settleProvisionalStateIfNeeded()`）一次寫足。同一輪事件內「先作廢、
+  /// 後落本鍵」之場合（見 `Typewriter_Dualpin.delegateToBPMF`），客體遂免於見到「組字
+  /// 結束旋即重新開始」之閃爍。本標記係狀態自身之資料，故任何非暫定之新狀態皆自然將其
+  /// 洗去；反之，被正規化為 `.ofEmpty()` 者須一併帶上本標記，否則客體將永遠留著殘影。
+  public var isProvisional: Bool = false
 
   /// 永遠儲存原始（未經 BPMFVS 投影）的文字資料。
   /// 當為 nil 時，退回至 displayTextSegments（即後者亦為原始資料）。

@@ -166,6 +166,11 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
   /// **非狂打側**無 copilot 候選窗、亦無「前方固化」之語義（`hasFuriousFrontPending` 恆假）：
   /// 該首鍵純為顯示素材，故仍依 P302 之口徑逕行作廢，並於退位對象未消化本鍵時切態收拾
   /// 其顯示殘留（幽靈首鍵之病灶見 P307 移交稿）。
+  ///
+  /// ★ P311：上述收拾所用之切態一律為**暫定**者（`State.ofAbortion(isProvisional: true)`）：
+  /// 本鍵旋即由分診之末段落筆（數字落字面節等），故此刻之空筆係同一輪內之過渡——寫給客體
+  /// 只會換來「組字結束旋即重新開始」之閃爍。改由本輪派送結束時之結算
+  /// （`settleProvisionalStateIfNeeded()`）一次寫足。
   private func delegateToBPMF(
     _ input: some InputSignalProtocol,
     session: Handler.Session
@@ -179,7 +184,9 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
     let handled = BPMFFullMatchTypewriter(handler).handle(input)
     guard handled == nil, hadPending else { return handled }
     session.switchState(
-      handler.isConsideredEmptyForNow ? State.ofAbortion() : handler.generateStateOfInputting()
+      handler.isConsideredEmptyForNow
+        ? State.ofAbortion(isProvisional: true)
+        : handler.generateStateOfInputting()
     )
     return handled
   }

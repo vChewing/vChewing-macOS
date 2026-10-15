@@ -101,7 +101,9 @@ extension SessionCoreProtocol {
       }
       inputHandler?.clear()
       if state.type != .ofEmpty {
-        state = .ofEmpty()
+        // 正規化時須帶上暫定標記：客體尚未見過此狀態，換成非暫定之 `.ofEmpty()` 的話，
+        // 本輪之結算（`settleProvisionalStateIfNeeded()`）將無從認出而未補寫顯示。
+        state = .ofEmpty(isProvisional: state.data.isProvisional)
       }
     case .ofInputting:
       commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
@@ -116,13 +118,33 @@ extension SessionCoreProtocol {
     // 狀態的內容——此時傳入本狀態的索引即屬越界，客體將無從量得而回報無效值
     // （`clientLineHeightRectForU16CursorPos:` 對無效值會逐位遞減探測，遂一律退回至
     // 前一個字元之座標）；症狀即為「面板擺在應有位置後方隔著一個字元的距離」。
-    updateCompositionBufferDisplay()
+    // 暫定狀態（見 `ofAbortion(isProvisional:)`）刻意不寫客體之組字區顯示：本輪事件尚未派送
+    // 完畢，此刻之內容多半旋即被同一輪之新狀態取代，寫入徒生「組字結束旋即重新開始」之
+    // 閃爍（macOS 26 之客體會白跑一輪 deactivate／reactivate，舊版 Spotlight 則顯殘影）。
+    // 補寫之責落在派送結束時之結算：`settleProvisionalStateIfNeeded()`。
+    if !state.data.isProvisional {
+      updateCompositionBufferDisplay()
+    }
     toggleCandidateUIVisibility(state.isCandidateContainer)
     showTooltip(
       state.tooltip,
       colorState: state.data.tooltipColorState,
       duration: state.tooltipDuration
     )
+  }
+
+  // MARK: settleProvisionalStateIfNeeded
+
+  /// 結算暫定狀態：當前狀態若為「尚未知會客體」之暫定者，則切換至 `.ofEmpty()`，使
+  /// `switchState` 補寫客體之組字區顯示。
+  ///
+  /// 暫定狀態由 `ofAbortion(isProvisional:)` 一族生成（`switchState` 會將其正規化為帶標記之
+  /// `.ofEmpty()`），專供「同一輪事件內先作廢、後落本鍵」之場合——目前唯一生成處為
+  /// `Typewriter_Dualpin.delegateToBPMF`。各宿主之事件入口應於派送結束時呼叫本函式：
+  /// 不結算的話，暫定狀態雖無害，客體卻會停在上一輪之顯示而不知所終。
+  public func settleProvisionalStateIfNeeded() {
+    guard state.data.isProvisional else { return }
+    switchState(.ofEmpty())
   }
 
   // MARK: resetInputHandler

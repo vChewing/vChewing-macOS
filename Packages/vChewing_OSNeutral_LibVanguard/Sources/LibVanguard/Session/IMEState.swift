@@ -25,8 +25,22 @@ extension IMEStateProtocol {
 // ChineseConverter.ensureCurrencyNumerals).
 extension IMEState {
   public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
-  public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
-  public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
+
+  /// 生成「空」狀態。
+  /// - Parameter isProvisional: 該狀態是否為**暫定**者（見 `IMEStateData.isProvisional`）。
+  public static func ofEmpty(isProvisional: Bool = false) -> IMEState {
+    var result = IMEState(type: .ofEmpty)
+    result.data.isProvisional = isProvisional
+    return result
+  }
+
+  /// 生成「作廢」狀態。
+  /// - Parameter isProvisional: 該狀態是否為**暫定**者（見 `IMEStateData.isProvisional`）。
+  public static func ofAbortion(isProvisional: Bool = false) -> IMEState {
+    var result = IMEState(type: .ofAbortion)
+    result.data.isProvisional = isProvisional
+    return result
+  }
 
   /// 用以手動遞交指定內容的狀態。
   /// - Remark: 直接切換至該狀態的話，會丟失上一個狀態的內容。

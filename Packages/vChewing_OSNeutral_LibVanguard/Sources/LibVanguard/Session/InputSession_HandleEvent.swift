@@ -80,6 +80,12 @@ extension SessionProtocol {
   }
 
   private func handleKeyDown(event: KBEvent) -> Bool {
+    // 本輪派送結束前務必結算暫定狀態：它們刻意略過了客體之組字區顯示寫入（見
+    // `SessionCoreProtocol.switchState`），若不在此補寫，客體會永遠停在上一輪之顯示。
+    // 用 `defer` 之故：本函式出口繁多（略過的按鍵、無客體、修飾鍵變更等），
+    // 而暫定狀態只可能在同一輪內被生成、故亦應在同輪內被結算。
+    defer { settleProvisionalStateIfNeeded() }
+
     // 先放過一些以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
     if state.type == .ofEmpty, event.isSingleCommandBasedLetterHotKey { return false }
 
