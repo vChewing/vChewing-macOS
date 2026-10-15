@@ -590,7 +590,7 @@ extension InputHandlerProtocol {
   /// 「雙拼的標點走漢語拼音標點處理方法」，故**雙拼狂打生效時**改報拼音槽之方案名。
   ///
   /// 非狂打之雙拼**不在**此列：彼時標點之查表本即落空，其後之 error 退回亦不觸發
-  /// （素材已於退位時消費），故本鍵逕交使用者端插入——正是 P302／P308 之語意，不可奪之。
+  /// （素材已於退位時消費），故本鍵逕交使用者端插入——正是 P302 之語意，不可奪之。
   var punctuationQueryParser: String {
     guard currentKeyboardParserType.isDualpin, isFuriousTypingModeEffective else {
       return currentKeyboardParser

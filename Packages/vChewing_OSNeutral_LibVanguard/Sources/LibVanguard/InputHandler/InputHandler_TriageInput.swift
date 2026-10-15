@@ -13,12 +13,6 @@ extension InputHandlerProtocol {
     var state: State { session.state }
     currentLM.syncPrefs()
 
-    // 客體顯示之補刷結算：雙拼首鍵退位時，其狀態切換不即時刷新客體顯示（免得客體先見
-    // 「標記成空」、再見新標記文字，而白跑一輪 deactivate／reactivate），改由本輪分診
-    // 事件末一次結算。旗標一次即清，故遞迴入口（`triageByState`／`handleCandidate`）
-    // 至多再作一次空操作。
-    defer { settleDeferredCompositionDisplayIfNeeded() }
-
     // 狂拼固化：前方候選窗顯示中、按下「可能叫出選字窗」的鍵（Space／翻頁／候選導航
     // 方向鍵）時，先把前方投機讀音固化進組字器（投機→實體：只插聲調桶、不覆寫，
     // trail 累積供重切分），再讓同一事件繼續走正常流程——正常流程自動開出正常選字窗

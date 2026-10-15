@@ -39,19 +39,12 @@ public struct DualpinConfig: Sendable {
   /// 鍵序翻譯狀態機。
   public var translator: DualpinTranslator
 
-  /// 「客體顯示之刷新已延後至本輪分診事件末」之旗標。
-  ///
-  /// 只由雙拼首鍵退位一路設定（見 `SessionCoreProtocol.switchState` 之
-  /// `deferringDisplayRefresh` 與 `settleDeferredCompositionDisplayIfNeeded()`）。
-  public var hasDeferredCompositionDisplayRefresh: Bool = false
-
   /// 當前方案是否可用（校驗無誤）。
   public var isUsable: Bool { report.isUsable }
 
   /// 重設整批執行期狀態。
   public mutating func resetAll() {
     translator.resetAll()
-    hasDeferredCompositionDisplayRefresh = false
   }
 }
 
@@ -115,32 +108,6 @@ extension InputHandlerProtocol {
     guard var config = dualpinConfig else { return }
     config.translator.flush()
     dualpinConfig = config
-  }
-
-  /// 見 `DualpinConfig.hasDeferredCompositionDisplayRefresh`。
-  var hasDeferredCompositionDisplayRefresh: Bool {
-    get { dualpinConfig?.hasDeferredCompositionDisplayRefresh ?? false }
-    set { dualpinConfig?.hasDeferredCompositionDisplayRefresh = newValue }
-  }
-
-  /// 標記「客體顯示須於本輪分診事件末補刷」。
-  ///
-  /// 由 `SessionCoreProtocol.switchState` 之 `deferringDisplayRefresh` 路徑呼叫：該路徑
-  /// 丟棄了素材卻又在同一輪事件內交給後續分診落筆，故此刻之客體顯示內容旋即失效，
-  /// 刷新應留待本輪事件末一次結算。
-  func markDeferredCompositionDisplayRefresh() {
-    hasDeferredCompositionDisplayRefresh = true
-  }
-
-  /// 結算 `markDeferredCompositionDisplayRefresh()` 所標記之補刷；旗標一次即清，
-  /// 重複呼叫為空操作（分診入口之 `defer` 亦可能因遞迴而多次觸及）。
-  ///
-  /// 補刷之落筆若與客體現下所見相同，會為 `doSetMarkedText` 之寫入快取逕行吞掉
-  /// （同文同範圍者不再送客體），故不至於多出一趟客體往返。
-  func settleDeferredCompositionDisplayIfNeeded() {
-    guard hasDeferredCompositionDisplayRefresh else { return }
-    hasDeferredCompositionDisplayRefresh = false
-    session?.updateCompositionBufferDisplay()
   }
 
   /// 丟棄未決碼所譯出之音節時，連帶清掉其重碼詞幹。

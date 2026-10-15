@@ -870,7 +870,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 不示警、亦不留待配之首鍵（其素材已隨固化而去）。
   ///
   /// - Note: **非狂打側**不在此列——彼時無 copilot 候選窗、亦無「前方固化」之語義，
-  ///   該首鍵純為顯示素材，故依 P302／P308 之口徑逕行作廢：素材不留、數字仍落字面節。
+  ///   該首鍵純為顯示素材，故依 P302 之口徑逕行作廢：素材不留、數字仍落字面節。
   ///   兩側之共同點（數字落字面節、狀態為 `.ofInputting` 而得為 BkSp 所刪）即
   ///   `SS-Lifecycle-012` 所關切之病灶之外緣。
   @Test("IH-Dualpin-017 Digit during a pending first key settles the front then lands literally")

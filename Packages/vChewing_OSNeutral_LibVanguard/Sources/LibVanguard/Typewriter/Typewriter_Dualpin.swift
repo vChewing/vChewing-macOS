@@ -33,7 +33,7 @@ import Tekkon
 /// （標點／數字／Tab／Enter／方向鍵／空白鍵）會就地固化它並連帶消費之（見
 /// `solidifyFuriousFrontReading` 之 P309 分支）；未經消化之按鍵則不切態，該首鍵留待次鍵續配，
 /// 與拼音側之未完成讀音同命。故狂打側之退位路徑（`delegateToBPMF`）不再先行作廢首鍵、
-/// 亦不再代為切態；**非狂打側**則無固化之語義，仍照 P302／P308 逕行作廢並收拾顯示殘留。
+/// 亦不再代為切態；**非狂打側**則無固化之語義，仍照 P302 逕行作廢並收拾顯示殘留。
 /// 刪除鍵（BkSp／Delete 之撤銷分支）仍為就地撤銷之終局動作。
 @frozen
 public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtocol {
@@ -164,7 +164,7 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
   /// 自行處置，此時該首鍵與拼音側之未完成讀音同命：留待次鍵續配，不另切態。
   ///
   /// **非狂打側**無 copilot 候選窗、亦無「前方固化」之語義（`hasFuriousFrontPending` 恆假）：
-  /// 該首鍵純為顯示素材，故仍依 P302／P308 之口徑逕行作廢，並於退位對象未消化本鍵時切態收拾
+  /// 該首鍵純為顯示素材，故仍依 P302 之口徑逕行作廢，並於退位對象未消化本鍵時切態收拾
   /// 其顯示殘留（幽靈首鍵之病灶見 P307 移交稿）。
   private func delegateToBPMF(
     _ input: some InputSignalProtocol,
@@ -178,13 +178,8 @@ public struct DualpinTypewriter<Handler: InputHandlerProtocol>: TypewriterProtoc
     handler.dualpinFlushPending()
     let handled = BPMFFullMatchTypewriter(handler).handle(input)
     guard handled == nil, hadPending else { return handled }
-    // 顯示之刷新須延後至本輪分診事件末（`deferringDisplayRefresh: true`）：本鍵旋即於分診中
-    // 落筆（數字落為字面節、標點落字面節），屆時自有其顯示；若搶在此刻刷新，客體會先見
-    // 「標記成空（⇒ 組字結束）」、再見新標記文字（⇒ 組字開始），macOS 26+ 之客體因此白跑一輪
-    // deactivate／reactivate，舊建置之 Spotlight 更會顯示殘影（P307 移交稿）。
     session.switchState(
-      handler.isConsideredEmptyForNow ? State.ofAbortion() : handler.generateStateOfInputting(),
-      deferringDisplayRefresh: true
+      handler.isConsideredEmptyForNow ? State.ofAbortion() : handler.generateStateOfInputting()
     )
     return handled
   }

@@ -54,12 +54,7 @@ public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
 
   // MARK: State Transition
 
-  func switchState(
-    _ newState: IMEState,
-    deferringDisplayRefresh: Bool,
-    caller: StaticString,
-    line: Int
-  )
+  func switchState(_ newState: IMEState, caller: StaticString, line: Int)
 
   /// 跨模組注入：清除 Trie 查詢快取的回呼閉包。
   /// 由 MainAssembly 注入，LibVanguard 層不直接依賴 LXMgr。
@@ -80,21 +75,9 @@ extension SessionCoreProtocol {
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   /// - Parameters:
   ///   - newState: 新狀態。
-  ///   - deferringDisplayRefresh: 是否把「客體顯示之刷新」延後到本輪分診事件末。
-  ///     僅供「素材已被丟棄、本鍵尚待後續分診落筆」之投機切態使用（雙拼待配首鍵退位）：
-  ///     若於此刻逕行刷新，客體會在數十毫秒內先見「標記成空（⇒ 組字結束）」、再見新標記
-  ///     文字（⇒ 組字開始），macOS 26+ 之客體會因此白跑一輪 deactivate／reactivate，
-  ///     舊建置之 Spotlight 更會顯示殘影。延後者由 `InputHandlerProtocol` 之
-  ///     `settleDeferredCompositionDisplayIfNeeded()` 於事件末結算。帶面板之狀態一律不延後
-  ///     （見下方錨定註記）。
   ///   - caller: 呼叫來源（自動推導為 #function）。
   ///   - line: 呼叫行號（自動推導為 #line）。
-  public func switchState(
-    _ newState: IMEState,
-    deferringDisplayRefresh: Bool = false,
-    caller: StaticString = #function,
-    line: Int = #line
-  ) {
+  public func switchState(_ newState: IMEState, caller: StaticString = #function, line: Int = #line) {
     if debugLogCondition || UserDefaults.pendingUnitTests {
       let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
       let callerTag = "\(caller)@[L\(line)]"
@@ -133,13 +116,7 @@ extension SessionCoreProtocol {
     // 狀態的內容——此時傳入本狀態的索引即屬越界，客體將無從量得而回報無效值
     // （`clientLineHeightRectForU16CursorPos:` 對無效值會逐位遞減探測，遂一律退回至
     // 前一個字元之座標）；症狀即為「面板擺在應有位置後方隔著一個字元的距離」。
-    // 候選狀態與帶 tooltip 之狀態因此一律不得延後刷新（見 `deferringDisplayRefresh`）。
-    // 註：`IMEState.tooltip` 對「無提示」者係**空字串**而非 `nil`——以 `!= nil` 判之將永不延後。
-    if deferringDisplayRefresh, !state.isCandidateContainer, state.tooltip.isEmpty {
-      inputHandler?.markDeferredCompositionDisplayRefresh()
-    } else {
-      updateCompositionBufferDisplay()
-    }
+    updateCompositionBufferDisplay()
     toggleCandidateUIVisibility(state.isCandidateContainer)
     showTooltip(
       state.tooltip,
