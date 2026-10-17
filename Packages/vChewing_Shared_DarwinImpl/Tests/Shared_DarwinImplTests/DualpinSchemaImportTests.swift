@@ -10,22 +10,22 @@ import Testing
 
 /// `DualpinSchemaStore`（雙拼方案匯入）之測試。
 ///
-/// 測試隔離比照 `PrefMgrReconciliationTests`：以本套件專屬 suite 覆蓋 `UserDefaults.current`
-/// （`UserDefaults.unitTests` ＋ `UserDefaults.pendingUnitTests`），並於 `deinit` 復原開關。
+/// 測試隔離比照 `PrefMgrReconciliationTests`：以記憶體容器 `InMemoryDefaultsStore` 覆蓋
+/// `OSUtils.defaultsStore`、並將 `OSUtils.isRunningUnitTests` 設為真；`deinit` 復原開關。
 /// `DualpinSchemaStore` 內部一律走 `PrefMgr.shared`，而 `@AppProperty.container` 係即時解析
-/// `UserDefaults.current`，故上述覆蓋足以隔離其寫入。
+/// `OSUtils.defaultsStore`，故上述覆蓋足以隔離其寫入。
 @Suite(.serialized)
 final class DualpinSchemaImportTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.SharedDarwinImpl.UnitTests")
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 
   deinit {
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal

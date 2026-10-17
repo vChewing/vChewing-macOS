@@ -10,8 +10,8 @@ import Testing
 /// `PrefMgr.reconcileAfterExternalPrefsImport()` 之測試。
 ///
 /// 測試隔離比照 `Packages/vChewing_SettingsUI/Tests/SettingsUITests/CtlSettingsUITests.swift`：
-/// 以本套件專屬 suite 覆蓋 `UserDefaults.current`（`UserDefaults.unitTests` ＋
-/// `UserDefaults.pendingUnitTests`），並於 `deinit` 復原開關。
+/// 以記憶體容器 `InMemoryDefaultsStore` 覆蓋 `OSUtils.defaultsStore`、並將
+/// `OSUtils.isRunningUnitTests` 設為真；`deinit` 復原開關。偏好不再落到磁碟上之具名 suite。
 ///
 /// 未含 `UserDef.importFromDictionary` 之端到端斷言：該 API 屬 L1
 /// （`Packages/vChewing_OSNeutral_LibVanguard`）之產物，本測試建立時尚未就緒。
@@ -20,13 +20,13 @@ final class PrefMgrReconciliationTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.SharedDarwinImpl.UnitTests")
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 
   deinit {
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal
@@ -62,9 +62,9 @@ final class PrefMgrReconciliationTests {
   func testReconcileNormalizesOutOfRangeValues() throws {
     let prefs = PrefMgr()
     // 直寫 `UserDefaults`：此即匯入路徑之行為，繞過 `@AppProperty` setter。
-    UserDefaults.current.set(9_999, forKey: UserDef.kCandidateListTextSize.rawValue)
-    UserDefaults.current.set(9_999, forKey: UserDef.kPopupCompositionBufferTextSize.rawValue)
-    UserDefaults.current.set("ABCDDD", forKey: UserDef.kCandidateKeys.rawValue)
+    OSUtils.defaultsStore.set(9_999, forKey: UserDef.kCandidateListTextSize.rawValue)
+    OSUtils.defaultsStore.set(9_999, forKey: UserDef.kPopupCompositionBufferTextSize.rawValue)
+    OSUtils.defaultsStore.set("ABCDDD", forKey: UserDef.kCandidateKeys.rawValue)
     prefs.reconcileAfterExternalPrefsImport()
     // 字級之自我夾限：12...196 與 18...40。
     #expect(prefs.candidateListTextSize == 196)

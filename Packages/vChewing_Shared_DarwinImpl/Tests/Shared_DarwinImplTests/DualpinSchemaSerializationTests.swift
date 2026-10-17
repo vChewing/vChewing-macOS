@@ -10,21 +10,19 @@ import Testing
 
 /// `DualpinSchemaStore` 之序列化與儲存（`serialize`／`save`）之測試。
 ///
-/// 測試隔離比照 `DualpinSchemaImportTests`：以本套件專屬 suite 覆蓋 `UserDefaults.current`。
+/// 測試隔離比照 `DualpinSchemaImportTests`：以本套件專屬 suite 覆蓋 `OSUtils.defaultsStore`。
 @Suite(.serialized)
 final class DualpinSchemaSerializationTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(
-      suiteName: "org.atelierInmu.vChewing.SharedDarwinImpl.SerializationUnitTests"
-    )
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 
   deinit {
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal

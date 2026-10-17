@@ -403,7 +403,7 @@
       // Therefore, the method dedicated for macOS 10.15 and later is not considered stable anymore.
       // Fortunately, the method for macOS 10.14 works well on later macOS releases.
       if #available(macOS 10.14, *),
-         let strAIS = UserDefaults.current.string(forKey: "AppleInterfaceStyle") {
+         let strAIS = OSUtils.defaultsStore.string(forKey: "AppleInterfaceStyle") {
         return strAIS.lowercased().contains("dark")
       } else {
         return false

@@ -195,7 +195,7 @@ extension IMEMenuSputnik {
               let strErrorMsg = LXMgr.cassetteAccessFailureDescription(
                 path: PrefMgr.shared.cassettePath
               )
-              if UserDefaults.pendingUnitTests {
+              if OSUtils.isRunningUnitTests {
                 vCLog("\(strErrorTitle) || \(strErrorMsg)")
               } else {
                 asyncOnMain {

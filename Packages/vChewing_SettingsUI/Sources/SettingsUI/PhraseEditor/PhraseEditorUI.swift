@@ -12,7 +12,8 @@
   import SwiftUI
 
   private let loc: String =
-    (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
+    (OSUtils.defaultsStore.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? []).first
+      ?? "auto"
 
   // MARK: - VwrPhraseEditorUI
 
@@ -229,7 +230,7 @@
     @AppStorage("PhraseEditorAutoReloadExternalModifications")
     private var autoReloadExternalModifications: Bool = true
     @State
-    private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
+    private var selAutoReloadExternalModifications: Bool = OSUtils.defaultsStore.bool(
       forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue
     )
     @State

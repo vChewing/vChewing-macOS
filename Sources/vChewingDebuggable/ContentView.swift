@@ -93,7 +93,7 @@ final class DiagnosticsViewModel {
     // 於 VM 建立當下同步啟用 pendingUnitTests（不等 bootstrap Task），
     // 確保任何設定窗顯示路徑都看到 true——CtlSettingsUI/Cocoa 的
     // 強制置前/層級 bypass 依賴此旗標。
-    UserDefaults.pendingUnitTests = true
+    OSUtils.isRunningUnitTests = true
     bootstrap()
   }
 
@@ -120,7 +120,7 @@ final class DiagnosticsViewModel {
       "SettingsUI (SwiftUI): \(isSettingsUIVisible ? "open" : "closed")",
       "SettingsCocoa (AppKit): \(isSettingsCocoaVisible ? "open" : "closed")",
       "Environment: \(Self.isBootstrapped ? "ready" : "not ready")",
-      "pendingUnitTests: \(UserDefaults.pendingUnitTests ? "on" : "off")",
+      "pendingUnitTests: \(OSUtils.isRunningUnitTests ? "on" : "off")",
     ].joined(separator: "   |   ")
   }
 
@@ -287,8 +287,8 @@ final class DiagnosticsViewModel {
   private let suiteName = "org.atelierInmu.vChewing.vChewingDebuggable.Diagnostics"
 
   private static func bootstrapSandbox(suiteName: String) throws {
-    UserDefaults.unitTests = .init(suiteName: suiteName)
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = UserDefaultsStore(UserDefaults(suiteName: suiteName) ?? .standard)
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
     LXMgr.prepareForUnitTests()
     LXAssembly.LXFacade.asyncLoadingUserData = false
@@ -403,7 +403,7 @@ final class DiagnosticsViewModel {
         try Self.bootstrapSandbox(suiteName: suiteName)
         Self.isBootstrapped = true
         log("Environment ready (unit-test suite: \(suiteName)). Factory lexicon connected.")
-        log("pendingUnitTests=\(UserDefaults.pendingUnitTests) (settings-window front/level bypass active).")
+        log("pendingUnitTests=\(OSUtils.isRunningUnitTests) (settings-window front/level bypass active).")
         log("Log file: \(Self.logFileURL.path)")
         log(
           "External control: open vchewingdbg://{openSettingsUI|closeSettingsUI|openSettingsCocoa|closeSettingsCocoa|page/<CocoaTab>|sample|heap|mh|reset|clear|reveal}"

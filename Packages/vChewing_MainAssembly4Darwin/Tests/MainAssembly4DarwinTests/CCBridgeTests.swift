@@ -20,7 +20,7 @@ final class CCBridgeTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
   }
 
   // MARK: Internal

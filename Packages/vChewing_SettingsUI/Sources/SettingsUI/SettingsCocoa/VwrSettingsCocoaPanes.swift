@@ -10,7 +10,7 @@ public final class SettingsPanesCocoa {
   /// 視窗內容寬度：非中文/日文 UI（即英文 UI）時，因英文文字較長、額外再加寬。
   public static let windowWidth: CGFloat = {
     let isEnglishUI: Bool = {
-      guard let lang = UserDefaults.current.stringArray(forKey: "AppleLanguages")?.first else {
+      guard let lang = UserDefaults.standard.stringArray(forKey: "AppleLanguages")?.first else {
         return true
       }
       return !(lang.hasPrefix("zh") || lang.hasPrefix("ja"))

@@ -211,7 +211,7 @@ extension LXMgr {
   )[0]
 
   public static func dataFolderPath(isDefaultFolder: Bool) -> String {
-    if #available(macOS 10.15, *), UserDefaults.pendingUnitTests {
+    if #available(macOS 10.15, *), OSUtils.isRunningUnitTests {
       return unitTestFolderPath(isDefaultFolder: isDefaultFolder)
     }
     var userDictPathSpecified = PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
@@ -225,7 +225,7 @@ extension LXMgr {
     // 不廣播失效事件，直接採用預設目錄；並順手清除殘留在 prefs 的空值與失效廣播。
     if Self.userDataFolderPathIsEffectivelyUnset(userDictPathSpecified) {
       if !isDefaultFolder {
-        UserDefaults.current.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
+        OSUtils.defaultsStore.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
         Broadcaster.shared.clearLmMgrDataFolderPathInvalidity()
       }
       return userDictPathDefault
@@ -235,19 +235,19 @@ extension LXMgr {
       || isDefaultFolder {
       return userDictPathDefault
     }
-    if UserDefaults.current.object(forKey: UserDef.kUserDataFolderSpecified.rawValue) != nil {
+    if OSUtils.defaultsStore.object(forKey: UserDef.kUserDataFolderSpecified.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
       if Self.checkIfSpecifiedUserDataFolderValid(userDictPathSpecified) {
         return userDictPathSpecified
       }
-      UserDefaults.current.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
+      OSUtils.defaultsStore.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
     }
     return userDictPathDefault
   }
 
   public static func cassettePath() -> String {
     let rawCassettePath = PrefMgr.shared.cassettePath.expandingTildeInPath
-    if UserDefaults.current.object(forKey: UserDef.kCassettePath.rawValue) != nil {
+    if OSUtils.defaultsStore.object(forKey: UserDef.kCassettePath.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
       if Self.checkCassettePathValidity(rawCassettePath) { return rawCassettePath }
       // External path failed (e.g. iCloud Drive bookmark stale); try internal cache.
@@ -256,7 +256,7 @@ extension LXMgr {
         Broadcaster.shared.clearLmMgrCassettePathInvalidity()
         return cached
       }
-      UserDefaults.current.removeObject(forKey: UserDef.kCassettePath.rawValue)
+      OSUtils.defaultsStore.removeObject(forKey: UserDef.kCassettePath.rawValue)
     }
     return ""
   }
@@ -270,7 +270,7 @@ extension LXMgr {
 
   /// Directory for cached cassette files inside App Support (no bookmark needed).
   public static var cassetteCacheDirectoryURL: URL {
-    if #available(macOS 10.15, *), UserDefaults.pendingUnitTests {
+    if #available(macOS 10.15, *), OSUtils.isRunningUnitTests {
       return unitTestDataURL(isDefaultFolder: true).appendingPathComponent("Cassettes")
     }
     return appSupportURL.appendingPathComponent("vChewing/Cassettes")
@@ -458,7 +458,7 @@ extension LXMgr {
     // 在重設前，請確保先停止所有先前啟動的 security-scoped 存取（避免殘留權限）
     BookmarkManager.shared.stopAllSecurityScopedAccesses()
 
-    UserDefaults.current.set(
+    OSUtils.defaultsStore.set(
       dataFolderPath(isDefaultFolder: true),
       forKey: UserDef.kUserDataFolderSpecified.rawValue
     )
@@ -476,7 +476,7 @@ extension LXMgr {
         try? FileManager.default.removeItem(atPath: cached)
       }
     }
-    UserDefaults.current.set("", forKey: UserDef.kCassettePath.rawValue)
+    OSUtils.defaultsStore.set("", forKey: UserDef.kCassettePath.rawValue)
     Self.loadCassetteData()
   }
 

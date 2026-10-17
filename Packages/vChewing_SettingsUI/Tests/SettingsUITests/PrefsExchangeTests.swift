@@ -12,8 +12,8 @@ import Testing
 
 /// `PrefsExchange`（剪貼簿匯入之解析、差異計算與套用）之測試。
 ///
-/// 隔離作法比照 `CtlSettingsUITests`：以本套件專屬 suite 覆蓋 `UserDefaults.current`
-/// （`UserDefaults.unitTests` ＋ `UserDefaults.pendingUnitTests`），並於 `deinit` 復原。
+/// 隔離作法比照 `CtlSettingsUITests`：以記憶體容器 `InMemoryDefaultsStore` 覆蓋
+/// `OSUtils.defaultsStore`、並將 `OSUtils.isRunningUnitTests` 設為真；`deinit` 復原。
 ///
 /// 須留意：測試目標不帶 lproj 資源，故 `.i18n` 一律回傳鍵名本身——本檔之斷言因此以鍵名為預期值。
 @Suite(.serialized)
@@ -21,17 +21,15 @@ final class PrefsExchangeTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(
-      suiteName: "org.atelierInmu.vChewing.SettingsUI.PrefsExchangeUnitTests"
-    )
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 
   deinit {
     // `deinit` 為 nonisolated，而 `UserDef.resetAll()` 繫於 MainActor，故僅在此復原旗標；
     // 各測試之 `init` 皆已自行 `UserDef.resetAll()`。
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal
@@ -101,7 +99,7 @@ final class PrefsExchangeTests {
       return
     }
     // 現值未寫入 `UserDefaults` 時，當前值即 `dataType` 之預設值。
-    UserDefaults.current.removeObject(forKey: target.rawValue)
+    OSUtils.defaultsStore.removeObject(forKey: target.rawValue)
     let raw = "{\"\(target.rawValue)\": \(defaultValue)}"
     guard case let .noDifferences(detail) = PrefsExchange.prepare(fromClipboardString: raw) else {
       Issue.record("包內值與當前值相同時，應判為 noDifferences。")
@@ -114,7 +112,7 @@ final class PrefsExchangeTests {
   @Test
   func testBoolCrossRepresentationIsNotADifference() throws {
     let target = UserDef.kShouldNotFartInLieuOfBeep
-    UserDefaults.current.set(true, forKey: target.rawValue)
+    OSUtils.defaultsStore.set(true, forKey: target.rawValue)
     let raw = "{\"\(target.rawValue)\": 1}"
     guard case let .noDifferences(detail) = PrefsExchange.prepare(fromClipboardString: raw) else {
       Issue.record("布林之跨表示法（1 ↔ true）不應被判為差異。")
@@ -128,7 +126,7 @@ final class PrefsExchangeTests {
   @Test
   func testConfirmApplyingContentAndLayout() throws {
     let target = UserDef.kRespectClientAccentColor
-    UserDefaults.current.set(false, forKey: target.rawValue)
+    OSUtils.defaultsStore.set(false, forKey: target.rawValue)
     let raw = """
     {"__UserDefMeta": {"title": "測試配置", "description": "這是說明。"},
       "\(target.rawValue)": true,
@@ -171,7 +169,7 @@ final class PrefsExchangeTests {
   @Test
   func testConfirmApplyingWithoutMetaUsesFallbacks() throws {
     let target = UserDef.kIsDebugModeEnabled
-    UserDefaults.current.set(false, forKey: target.rawValue)
+    OSUtils.defaultsStore.set(false, forKey: target.rawValue)
     let raw = "{\"\(target.rawValue)\": true}"
     guard case let .confirmApplying(meta, payload, changed, detail) = PrefsExchange.prepare(
       fromClipboardString: raw
@@ -232,11 +230,11 @@ final class PrefsExchangeTests {
   @Test
   func testApplyPayloadWritesIntoUserDefaults() throws {
     let target = UserDef.kRespectClientAccentColor
-    UserDefaults.current.set(false, forKey: target.rawValue)
+    OSUtils.defaultsStore.set(false, forKey: target.rawValue)
     let result = PrefsExchange.applyPayload([target.rawValue: true, "NoSuchKey": 1])
     #expect(result.successes == [target.rawValue])
     #expect(result.failures.map(\.key) == ["NoSuchKey"])
-    #expect(UserDefaults.current.object(forKey: target.rawValue) as? Bool == true)
+    #expect(OSUtils.defaultsStore.object(forKey: target.rawValue) as? Bool == true)
   }
 
   /// 開發者分頁之檔案／拖放路徑所走之收尾：解碼 → 摘除保留鍵 → 逐鍵驗證 → 和解。
@@ -249,7 +247,7 @@ final class PrefsExchangeTests {
     let result = PrefsExchange.applyPrefsJSONFromData(Data(json.utf8))
     #expect(result.successes == [target.rawValue])
     #expect(result.failures.map(\.key) == ["NoSuchKey"])
-    #expect(UserDefaults.current.object(forKey: target.rawValue) as? Bool == true)
+    #expect(OSUtils.defaultsStore.object(forKey: target.rawValue) as? Bool == true)
     // 解不出 JSON 時，不得崩潰、亦不得誤判為成功。
     let broken = PrefsExchange.applyPrefsJSONFromData(Data("hello".utf8))
     #expect(broken.successes.isEmpty)

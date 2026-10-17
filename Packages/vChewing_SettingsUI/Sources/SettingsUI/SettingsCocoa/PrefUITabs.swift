@@ -90,12 +90,13 @@ extension PrefUITabs {
   #endif
 
   public var i18nTitle: String {
-    switch PrefMgr.shared.appleLanguages[0] {
+    let lang = PrefMgr.shared.effectiveAppleLanguage
+    switch lang {
     case "ja": return Self.i18nTable[rawValue]?.Ja ?? rawValue
     default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Hans") {
+      if lang.contains("zh-Hans") {
         return Self.i18nTable[rawValue]?.Hans ?? rawValue
-      } else if PrefMgr.shared.appleLanguages[0].contains("zh-Hant") {
+      } else if lang.contains("zh-Hant") {
         return Self.i18nTable[rawValue]?.Hant ?? rawValue
       }
       return rawValue

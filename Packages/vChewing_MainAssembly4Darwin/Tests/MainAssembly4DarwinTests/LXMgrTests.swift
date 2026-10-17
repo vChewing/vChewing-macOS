@@ -20,8 +20,8 @@ final class LXMgrTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
     // 生產路徑的 LXMgr.shared 已改由 phraseEditorDelegateProvider 延遲實體化；
     // 測試需要其 KVO 觀察器在場以錄製路徑失效警示，故在此顯式武裝。
@@ -35,8 +35,7 @@ final class LXMgrTests {
       LXMgr.resetAfterUnitTests()
       LXMgr.resetRecordedPathInvalidityAlerts()
     }
-    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal
@@ -297,7 +296,7 @@ final class LXMgrTests {
   func test023_LXMgr_AppPropertyAutoSeedsEmptyDefaultIntoPrefs() {
     // 前提驗證：AppProperty 的 init 會在 key 缺席時把預設值寫入 prefs——這使「從未手動指定」
     // 的 kUserDataFolderSpecified 以空字串形式存在於 prefs，成為被誤讀成 "/" 的來源。
-    let defaults = UserDefaults.current
+    let defaults = OSUtils.defaultsStore
     defaults.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
     defer { defaults.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue) }
     _ = PrefMgr() // 每次實體化皆會重新觸發所有 @AppProperty 的 seeding。

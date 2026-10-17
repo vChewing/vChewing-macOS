@@ -41,7 +41,7 @@ public final class LXMgr {
   }
 
   public static func prepareForUnitTests() {
-    guard UserDefaults.pendingUnitTests else { return }
+    guard OSUtils.isRunningUnitTests else { return }
     iCloudPathDetectionOverride = nil
     if #available(macOS 10.15, *) {
       prepareUnitTestSandbox()
@@ -166,7 +166,7 @@ public final class LXMgr {
         )
       case .theFilter:
         // We have to enforce the toggle of async loading here for this case:
-        if UserDefaults.pendingUnitTests {
+        if OSUtils.isRunningUnitTests {
           Self.reloadUserFilterDirectly(mode: mode)
         } else {
           asyncOnMain {
@@ -357,7 +357,7 @@ public final class LXMgr {
 
   @available(macOS 10.15, *)
   internal static func prepareUnitTestSandbox() {
-    guard UserDefaults.pendingUnitTests else { return }
+    guard OSUtils.isRunningUnitTests else { return }
     if let defaultURL = unitTestDefaultURL, let customURL = unitTestCustomURL {
       ensureDirectoryExists(defaultURL)
       ensureDirectoryExists(customURL)
@@ -418,7 +418,7 @@ public final class LXMgr {
         if oldValue == newValue { return }
         // 只有在發現 invalidity（非 nil 且非空字串）時才顯示警示
         guard let path = newValue, !path.isEmpty else { return }
-        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+        asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
           self.callModalAlert(
             msg: "i18n:LXMgr.pathInvalidityFound.userDataFolder.title".i18n,
             infoText: Self.userDataFolderInvalidityDescription(path: path)
@@ -433,7 +433,7 @@ public final class LXMgr {
         // 若新舊值未實際變化（兩者皆為 nil，或字串完全相同），則不做任何處理。
         if oldValue == newValue { return }
         guard let path = newValue, !path.isEmpty else { return }
-        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+        asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
           self.callModalAlert(
             msg: "i18n:LXMgr.pathInvalidityFound.cassette.title".i18n,
             infoText: Self.cassettePathInvalidityDescription(path: path)
@@ -445,7 +445,7 @@ public final class LXMgr {
   nonisolated private func callModalAlert(msg: String, infoText: String) {
     // During unit tests suppress the modal dialog and capture the alert
     // so the test can assert on it.
-    guard !UserDefaults.pendingUnitTests else {
+    guard !OSUtils.isRunningUnitTests else {
       Self.recordedPathInvalidityAlerts.append(.init(msg: msg, infoText: infoText))
       return
     }

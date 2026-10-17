@@ -93,12 +93,12 @@
         sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
         // 單元測試／診斷宿主（pendingUnitTests）下略過「強制置前＋強迫視窗層級」，
         // 避免測試或 Instruments 錄製期間視窗搶焦點。
-        if !UserDefaults.pendingUnitTests {
+        if !OSUtils.isRunningUnitTests {
           sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
           sharedWindow.level = .statusBar
         }
         shared.showWindow(shared)
-        if !UserDefaults.pendingUnitTests {
+        if !OSUtils.isRunningUnitTests {
           NSApp.popup()
         }
       }
@@ -123,11 +123,12 @@
   @available(macOS 14, *)
   extension CtlSettingsUI {
     public static let sentenceSeparator: String = {
-      switch PrefMgr.shared.appleLanguages[0] {
+      let lang = PrefMgr.shared.effectiveAppleLanguage
+      switch lang {
       case "ja":
         return ""
       default:
-        if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        if lang.contains("zh-Han") {
           return ""
         } else {
           return " "
@@ -140,7 +141,8 @@
     public static let formWidth: Double = 614
 
     public static var isCJKInterface: Bool {
-      PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
+      let lang = PrefMgr.shared.effectiveAppleLanguage
+      return lang.contains("zh-Han") || lang == "ja"
     }
   }
 

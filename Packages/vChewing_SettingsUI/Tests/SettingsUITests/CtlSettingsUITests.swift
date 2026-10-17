@@ -21,8 +21,8 @@ final class CtlSettingsUITests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.SettingsUI.UnitTests")
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 

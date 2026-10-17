@@ -14,21 +14,19 @@ import Testing
 /// 雙拼方案編輯器之草稿模型（`DualpinSchemaDraft` 暨其共用素材）之測試。
 ///
 /// 兩版渲染器（SwiftUI／AppKit）共用本模型，故本檔即兩者之共同契約之固化。隔離作法比照
-/// `PrefsExchangeTests`：以本套件專屬 suite 覆蓋 `UserDefaults.current`。
+/// `PrefsExchangeTests`：以本套件專屬 suite 覆蓋 `OSUtils.defaultsStore`。
 @Suite(.serialized)
 final class DualpinSchemaDraftTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(
-      suiteName: "org.atelierInmu.vChewing.SettingsUI.DualpinDraftUnitTests"
-    )
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 
   deinit {
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal

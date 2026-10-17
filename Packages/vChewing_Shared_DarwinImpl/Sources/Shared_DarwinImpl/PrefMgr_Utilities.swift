@@ -15,13 +15,13 @@ extension PrefMgr {
     }
 
     if appleLanguages.isEmpty {
-      UserDefaults.current.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
+      OSUtils.defaultsStore.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
     }
     // 客體黑名單資料類型升級。
-    if let clients = UserDefaults.current.object(
+    if let clients = OSUtils.defaultsStore.object(
       forKey: UserDef.kClientsIMKTextInputIncapable.rawValue
     ) as? [String] {
-      UserDefaults.current.removeObject(forKey: UserDef.kClientsIMKTextInputIncapable.rawValue)
+      OSUtils.defaultsStore.removeObject(forKey: UserDef.kClientsIMKTextInputIncapable.rawValue)
       clients.forEach { neta in
         guard !clientsIMKTextInputIncapable.keys.contains(neta) else { return }
         clientsIMKTextInputIncapable[neta] = true
@@ -67,7 +67,7 @@ extension PrefMgr {
     phraseReplacementEnabled = phraseReplacementEnabled
     associatedPhrasesEnabled = associatedPhrasesEnabled
     // ③ 顯式同步：常駐行程雖有 cfprefsd 代理，顯式同步無害且便於測試。
-    UserDefaults.current.synchronize()
+    OSUtils.defaultsStore.synchronize()
     // ④ 另有一項推式狀態 `inputHandler.assembler.maxSegLength` 並非即時：
     //    其值於 `initInputHandler()` 時才重推，故須待下一次啟用輸入源時才會生效。
   }

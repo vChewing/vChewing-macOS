@@ -68,7 +68,7 @@ extension SessionHost {
     host.isControllerAddressAlive = { IMKControllerLifetimeTracker.shared().isAddressAlive($0) }
     host.resolveClientProxy = { addr in
       guard let opaque = UnsafeRawPointer(bitPattern: addr) else { return nil }
-      if !UserDefaults.pendingUnitTests {
+      if !OSUtils.isRunningUnitTests {
         guard SessionHost.shared.isControllerAddressAlive(addr) else { return nil }
       }
       let obj = Unmanaged<AnyObject>.fromOpaque(opaque).takeUnretainedValue()

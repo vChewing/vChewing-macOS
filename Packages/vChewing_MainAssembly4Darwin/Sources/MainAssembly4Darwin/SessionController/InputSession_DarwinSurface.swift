@@ -34,7 +34,7 @@ public struct ControllerAddrSentinel: Sendable {
   let addr: UInt
 
   var unwrapped: UInt? {
-    if UserDefaults.pendingUnitTests {
+    if OSUtils.isRunningUnitTests {
       guard addr == 0 else { return nil }
     } else {
       guard IMKControllerLifetimeTracker.shared().isAddressAlive(addr) else { return nil }
@@ -206,7 +206,7 @@ extension SessionProtocol {
       return
     }
     let status = "i18n:NotificationSwitch.Revolver".i18n
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+    asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
       SessionHost.shared.notify(
         nowMode.reversed.localizedDescription + "\n" + status
       )

@@ -113,12 +113,12 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
       sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
       // 單元測試／診斷宿主（pendingUnitTests）下略過「強制置前＋強迫視窗層級」，
       // 避免測試或 Instruments 錄製期間視窗搶焦點。
-      if !UserDefaults.pendingUnitTests {
+      if !OSUtils.isRunningUnitTests {
         sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
         sharedWindow.level = .statusBar
       }
       shared.showWindow(shared)
-      if !UserDefaults.pendingUnitTests {
+      if !OSUtils.isRunningUnitTests {
         NSApp.popup()
       }
     }

@@ -8,7 +8,7 @@ import Foundation
 
 extension IMKHelper {
   public static var currentBasicKeyboardLayout: String {
-    UserDefaults.current.string(forKey: "BasicKeyboardLayout") ?? ""
+    OSUtils.defaultsStore.string(forKey: "BasicKeyboardLayout") ?? ""
   }
 
   public static var isDynamicBasicKeyboardLayoutEnabled: Bool {

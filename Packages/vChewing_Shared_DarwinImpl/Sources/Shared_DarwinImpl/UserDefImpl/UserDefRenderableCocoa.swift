@@ -239,7 +239,7 @@ extension UserDefRenderableCocoa {
             }
             let newItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             newItem.representedObject = .init(obj)
-            if obj == UserDefaults.current.object(forKey: def.rawValue) as? String {
+            if obj == OSUtils.defaultsStore.object(forKey: def.rawValue) as? String {
               itemShouldBeChosen = newItem
             }
             dropMenu.addItem(newItem)
@@ -258,10 +258,10 @@ extension UserDefRenderableCocoa {
             }
             let newItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             newItem.tag = tag
-            if tag == UserDefaults.current.integer(forKey: def.rawValue) {
+            if tag == OSUtils.defaultsStore.integer(forKey: def.rawValue) {
               itemShouldBeChosen = newItem
             }
-            if Double(tag) == UserDefaults.current.double(forKey: def.rawValue) {
+            if Double(tag) == OSUtils.defaultsStore.double(forKey: def.rawValue) {
               itemShouldBeChosen = newItem
             }
             dropMenu.addItem(newItem)
