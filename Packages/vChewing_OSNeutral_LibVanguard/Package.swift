@@ -201,6 +201,9 @@ let package = Package(
       name: "vChewingSharedCLI",
       dependencies: buildTargetDependencies {
         "Shared"
+        Target.Dependency.product(
+          name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
+        )
       },
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation

@@ -543,12 +543,13 @@ gc:
 
 .PHONY: test
 
-# 單元測試一律 `--no-parallel`：本倉的測試共用大量行程內靜態狀態
-# （`LXFacade` 的 factoryTrie／卡匣、`PrefMgr`、`SessionHost` 等），並行執行即互相踩踏。
+# 單元測試不再於外層施加 `--no-parallel`：
+# 各 suite 自持其辭典、卡匣、偏好容器與會話宿主，故可並行。
+# 若某 suite 真需依序，令該 suite 自己掛 `.serialized`。
 # 逐包入口（`cd Packages/<pkg> && make test`）同理。
 test:
-	swift test --no-parallel
-	swift test --no-parallel --package-path ./Packages/vChewing_OSNeutral_LibVanguard
+	swift test
+	swift test --package-path ./Packages/vChewing_OSNeutral_LibVanguard
 
 xcode-test:
 	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test
