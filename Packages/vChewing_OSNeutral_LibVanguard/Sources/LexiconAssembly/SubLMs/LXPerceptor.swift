@@ -58,11 +58,12 @@ extension LXAssembly {
     public init(
       capacity: Int = 500,
       thresholdProvider: (() -> Double)? = nil,
-      dataURL: URL? = nil
+      dataURL: URL? = nil,
+      locator: any UserDataLocator = LXAssembly.userDataLocator
     ) {
       self.mutCapacity = max(capacity, 1) // 該參數得始終大於 0.
       self.thresholdProvider = thresholdProvider
-      self.persistor = .init(baseURL: dataURL)
+      self.persistor = .init(baseURL: dataURL, locator: locator)
     }
 
     // MARK: Public

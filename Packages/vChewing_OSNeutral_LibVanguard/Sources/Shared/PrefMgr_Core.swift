@@ -9,26 +9,174 @@ import Foundation
 public final class PrefMgr: PrefMgrProtocol, Sendable {
   // MARK: Lifecycle
 
+  /// 建立一份綁定於指定儲存後端之偏好管理器。
+  ///
+  /// 每一項 `@AppProperty` 於此處逐一改綁到 `store`：屬性包裝器之容器於建構時捕獲，
+  /// 之後不再改看行程級全域，故不同實例可各自服務不同的後端而不相擾。
+  /// - Parameter store: 儲存後端；預設為行程級之 `OSUtils.defaultsStore`。
   public init(
     didAskForSyncingLMPrefs: (() -> ())? = nil,
     didAskForRefreshingSpeechSputnik: (() -> ())? = nil,
     didAskForSyncingShiftKeyDetectorPrefs: (() -> ())? = nil,
-    candidateKeyValidator: ((String) -> (String?))? = nil
+    candidateKeyValidator: ((String) -> (String?))? = nil,
+    store: any DefaultsStore = OSUtils.defaultsStore
   ) {
     self.didAskForSyncingLMPrefs = didAskForSyncingLMPrefs
     self.didAskForRefreshingSpeechSputnik = didAskForRefreshingSpeechSputnik
     self.didAskForSyncingShiftKeyDetectorPrefs = didAskForSyncingShiftKeyDetectorPrefs
     self.candidateKeyValidator = candidateKeyValidator
+    self.store = store
+    _isDebugModeEnabled.store = store
+    _failureFlagForPOMObservation.store = store
+    _candidateServiceMenuContents.store = store
+    _respectClientAccentColor.store = store
+    _alwaysUsePCBWithElectronBasedClients.store = store
+    _securityHardenedCompositionBuffer.store = store
+    _checkAbusersOfSecureEventInputAPI.store = store
+    _disableIMKSwiftServerControllerPruning.store = store
+    _disableIMKSwiftEvictedClientInvalidation.store = store
+    _disableIMKSwiftClientWrapperTermination.store = store
+    _disableIMKSwiftControllerDelayedDeallocation.store = store
+    _deltaOfCalendarYears.store = store
+    _mostRecentInputMode.store = store
+    _checkUpdateAutomatically.store = store
+    _useExternalFactoryDict.store = store
+    _replaceSymbolMenuNodeWithUserSuppliedData.store = store
+    _cassettePath.store = store
+    _userDataFolderSpecified.store = store
+    _appleLanguages.store = store
+    _keyboardParser4Pinyin.store = store
+    _keyboardParser4Dualpin.store = store
+    _keyboardParser4Zhuyin.store = store
+    _pinyinTypingEnabled.store = store
+    _dualpinEnabledForPinyinTyping.store = store
+    _dualpinSchemaJSON.store = store
+    _kanjiConversionPreferences.store = store
+    _basicKeyboardLayout.store = store
+    _alphanumericalKeyboardLayout.store = store
+    _showModeDescriptionOnActivatingServer.store = store
+    _showNotificationsWhenTogglingCapsLock.store = store
+    _showNotificationsWhenTogglingEisu.store = store
+    _showNotificationsWhenTogglingShift.store = store
+    _specifiedNotifyUIColorScheme.store = store
+    _alwaysExpandCandidateWindow.store = store
+    _candidateWindowShowOnlyOneLine.store = store
+    _enforceSingleLineCandidateWindowLayout4SCPC.store = store
+    _shouldAutoReloadUserDataFiles.store = store
+    _useRearCursorMode.store = store
+    _candidateStateJKHLBehavior.store = store
+    _useShiftQuestionToCallServiceMenu.store = store
+    _cursorPlacementAfterSelectingCandidate.store = store
+    _dodgeInvalidEdgeCandidateCursorPosition.store = store
+    _useDynamicCandidateWindowOrigin.store = store
+    _useHorizontalCandidateList.store = store
+    _minCellWidthForHorizontalMatrix.store = store
+    _spaceKeyBehaviorAgainstICB.store = store
+    _allowRescoringSingleKanjiCandidates.store = store
+    _fetchSuggestionsFromPerceptionOverrideModel.store = store
+    _reducePOMLifetimeToNoMoreThan12Hours.store = store
+    _useFixedCandidateOrderOnSelection.store = store
+    _enforceETenDOSCandidateSequence.store = store
+    _autoCorrectReadingCombination.store = store
+    _alsoConfirmAssociatedCandidatesByEnter.store = store
+    _keepReadingUponCompositionError.store = store
+    _upperCaseLetterKeyBehavior.store = store
+    _numPadCharInputBehavior.store = store
+    _shiftEisuToggleOffTogetherWithCapsLock.store = store
+    _bypassNonAppleCapsLockHandling.store = store
+    _consolidateContextOnCandidateSelection.store = store
+    _preferredRevolverForceLevel.store = store
+    _hardenVerticalPunctuations.store = store
+    _trimUnfinishedReadingsOnCommit.store = store
+    _alwaysShowTooltipTextsHorizontally.store = store
+    _clientsIMKTextInputIncapable.store = store
+    _showTranslatedStrokesInCompositionBuffer.store = store
+    _forceCassetteChineseConversion.store = store
+    _showReverseLookupInCandidateUI.store = store
+    _showCodePointInCandidateUI.store = store
+    _autoCompositeWithLongestPossibleCassetteKey.store = store
+    _shareAlphanumericalModeStatusAcrossClients.store = store
+    _phraseEditorAutoReloadExternalModifications.store = store
+    _classicHaninKeyboardSymbolModeShortcutEnabled.store = store
+    _useSpaceToCommitHighlightedCandidate4SCPC.store = store
+    _enableCandidateWindowAnimation.store = store
+    _disableSegmentedThickUnderlineInMarkingModeForManagedClients.store = store
+    _maxCandidateLength.store = store
+    _beepSoundPreference.store = store
+    _shouldNotFartInLieuOfBeep.store = store
+    _showHanyuPinyinInCompositionBuffer.store = store
+    _inlineDumpPinyinInLieuOfZhuyin.store = store
+    _filterNonCNSReadingsForCHTInput.store = store
+    _filterFactoryKanjisOfNonCurrentInputMode.store = store
+    _romanNumeralOutputFormat.store = store
+    _currencyNumeralsEnabled.store = store
+    _halfWidthPunctuationEnabled.store = store
+    _escToCleanInputBuffer.store = store
+    _acceptLeadingIntonations.store = store
+    _specifyIntonationKeyBehavior.store = store
+    _suppressTooltipForIntonationKeyOverrideEvents.store = store
+    _specifyShiftBackSpaceKeyBehavior.store = store
+    _specifyShiftTabKeyBehavior.store = store
+    _specifyShiftSpaceKeyBehavior4CandidateWindow.store = store
+    _specifyShiftSpaceKeyBehavior4EmptyState.store = store
+    _specifyCmdOptCtrlEnterBehavior.store = store
+    _reflectBPMFVSInCompositionBuffer.store = store
+    _candidateTextFontName.store = store
+    _candidateNarrationToggleType.store = store
+    _usingHotKeySCPC.store = store
+    _usingHotKeyAssociates.store = store
+    _usingHotKeyCNS.store = store
+    _usingHotKeyKanjiConversionMode.store = store
+    _usingHotKeyPinyinZhuyinTypingSwitch.store = store
+    _usingHotKeyHalfWidthPunctuation.store = store
+    _usingHotKeyCurrencyNumerals.store = store
+    _usingHotKeyCassette.store = store
+    _usingHotKeyRevLookup.store = store
+    _usingHotKeyInputMode.store = store
+    _mixedAlphanumericalEnabled.store = store
+    _mixedAlnumJudgeReadingsBySequentialRawKeyOrder.store = store
+    _enableLatchedAlnumStateInMixedAlnumMode.store = store
+    _furiousTypingEnabled4Pinyin.store = store
+    _furiousTypingEnabled4Zhuyin.store = store
+    _userPhrasesDatabaseBypassed.store = store
+    _candidateListTextSize.store = store
+    _popupCompositionBufferTextSize.store = store
+    _readingNarrationCoverage.store = store
+    _togglingAlphanumericalModeWithLShift.store = store
+    _togglingAlphanumericalModeWithRShift.store = store
+    _cns11643Enabled.store = store
+    _symbolInputEnabled.store = store
+    _cassetteEnabled.store = store
+    _suppressFactoryUnigramsOfKanaSyllables.store = store
+    _candidateKeys.store = store
+    _useSCPCTypingMode.store = store
+    _phraseReplacementEnabled.store = store
+    _associatedPhrasesEnabled.store = store
   }
 
   // MARK: Public
 
-  public static let sharedSansDidSetOps = PrefMgr()
+  /// 依當前儲存後端取得共用之 `PrefMgr`：同一後端只會有一份實例，換過後端即換一份實例。
+  /// 如此一來，測試把 `OSUtils.defaultsStore` 換成記憶體容器時，拿到的亦是綁定該容器的新實例，
+  /// 不會沿用先前那個仍綁著舊後端的實例。
+  public static var sharedSansDidSetOps: PrefMgr {
+    let store = OSUtils.defaultsStore
+    let key = ObjectIdentifier(store as AnyObject)
+    return sharedSansDidSetOpsCache.withLock { cache -> PrefMgr in
+      if let cached = cache[key] { return cached }
+      let made = PrefMgr(store: store)
+      cache[key] = made
+      return made
+    }
+  }
 
   public var didAskForSyncingLMPrefs: (() -> ())?
   public var didAskForRefreshingSpeechSputnik: (() -> ())?
   public var didAskForSyncingShiftKeyDetectorPrefs: (() -> ())?
   public var candidateKeyValidator: ((String) -> String?)?
+
+  /// 本實例所綁定之儲存後端。
+  public let store: any DefaultsStore
 
   // MARK: - Settings (Tier 1)
 
@@ -489,6 +637,11 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   public var associatedPhrasesEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
+
+  // MARK: Private
+
+  /// 以儲存後端之身分為鍵之 `PrefMgr` 快取。
+  private static let sharedSansDidSetOpsCache = NSMutex<[ObjectIdentifier: PrefMgr]>([:])
 }
 
 extension PrefMgr {
@@ -562,7 +715,7 @@ extension PrefMgr {
   private func migrateDeprecatedSettings() {
     // 偏好之落點一律取自注入之儲存後端（生產環境即 `UserDefaults.standard`）：
     // 以往此處直讀 `.standard`，致單元測試之遷移用例實際讀寫使用者真機之偏好檔。
-    let defaults: any DefaultsStore = OSUtils.defaultsStore
+    let defaults: any DefaultsStore = store
     // 移除被刻意作廢的設定。
     defaults.removeObject(forKey: "AllowBoostingSingleKanjiAsUserPhrase")
     // 遷移舊設定：JK/HL 選字窗行為。

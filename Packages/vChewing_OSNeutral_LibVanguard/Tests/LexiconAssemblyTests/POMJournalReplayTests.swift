@@ -35,21 +35,25 @@ private func makeReplayPair(
 }
 
 /// 把一組日誌記錄逐行寫成日誌檔（檔名 = 快照檔名再加 `.journal`）。
-private func writeReplayJournal(_ records: [[String: Any]], to baseURL: URL) throws {
+private func writeReplayJournal(
+  _ records: [[String: Any]], to baseURL: URL,
+  locator: any UserDataLocator
+) throws {
   let lines: [String] = try records.map { record in
     let data = try JSONSerialization.data(withJSONObject: record)
     return String(decoding: data, as: UTF8.self)
   }
   let journalURL = baseURL.appendingPathExtension("journal")
-  try LXAssembly.userDataLocator.write(Data(lines.joined(separator: "\n").utf8), to: journalURL)
+  try locator.write(Data(lines.joined(separator: "\n").utf8), to: journalURL)
 }
 
 /// 把一組配對寫成快照檔。
 private func writeReplaySnapshot(
   _ pairs: [LXAssembly.LXPerceptor.KeyPerceptionPair],
-  to baseURL: URL
+  to baseURL: URL,
+  locator: any UserDataLocator
 ) throws {
-  try LXAssembly.userDataLocator.write(JSONEncoder().encode(pairs), to: baseURL)
+  try locator.write(JSONEncoder().encode(pairs), to: baseURL)
 }
 
 // MARK: - POMTestSuite.POMJournalReplayTests
@@ -60,20 +64,12 @@ extension POMTestSuite {
   /// 這批測試鎖定一類曾被實測到的退化：`replayJournal` 以「映射中的空值」表達移除，
   /// 而字典無從區分「未提及此鍵」與「此鍵已移除」，故移除與清空記錄全數於重播時丟失，
   /// 被 bleach 或逐出的鍵於是自快照復活。
-  @Suite(.serialized)
+  @Suite
   final class POMJournalReplayTests {
-    // MARK: Lifecycle
-
-    init() {
-      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
-      LXAssembly.userDataLocator = InMemoryUserDataLocator()
-    }
-
-    deinit {
-      LXAssembly.userDataLocator = DiskUserDataLocator()
-    }
-
-    // MARK: Internal
+    /// 本套房專屬之儲存後端：資料一律留在記憶體內、不落地，亦不經行程級全域，
+    /// 故與其他套房（乃至同一套房之其他測試用例）不共用任何硬碟區域。
+    /// 每一測試用例各得一份新的套房實例，故各得一份新的後端。
+    let locator = InMemoryUserDataLocator()
 
     // MARK: - 移除與清空
 
@@ -81,7 +77,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_01_RemovalRecordIsApplied() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -91,11 +87,12 @@ extension POMTestSuite {
           try makeReplayPair(key: keyA, candidate: "芭"),
           try makeReplayPair(key: keyB, candidate: "趴"),
         ],
-        to: dataURL
+        to: dataURL,
+        locator: locator
       )
-      try writeReplayJournal([["operation": "removeKey", "key": keyB]], to: dataURL)
+      try writeReplayJournal([["operation": "removeKey", "key": keyB]], to: dataURL, locator: locator)
 
-      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL, locator: locator)
       pom.loadData(fromURL: dataURL)
 
       #expect(pom.mutLRUMap.keys.contains(keyA))
@@ -107,7 +104,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_02_ClearRecordIsApplied() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -119,7 +116,8 @@ extension POMTestSuite {
           try makeReplayPair(key: keyA, candidate: "芭"),
           try makeReplayPair(key: keyB, candidate: "趴"),
         ],
-        to: dataURL
+        to: dataURL,
+        locator: locator
       )
       try writeReplayJournal(
         [
@@ -129,10 +127,11 @@ extension POMTestSuite {
             "pair": try JSONSerialization.jsonObject(with: JSONEncoder().encode(pairC)),
           ],
         ],
-        to: dataURL
+        to: dataURL,
+        locator: locator
       )
 
-      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL, locator: locator)
       pom.loadData(fromURL: dataURL)
 
       #expect(pom.mutLRUMap.keys.sorted() == [keyC])
@@ -143,14 +142,14 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_03_RecordOrderIsHonored() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
       let keyB = makeReplayUnigramKey(reading: "ㄆㄚ", value: "趴")
       let pairA = try makeReplayPair(key: keyA, candidate: "芭", timestamp: replayNow + 10)
       let pairB = try makeReplayPair(key: keyB, candidate: "趴", timestamp: replayNow + 11)
-      try writeReplaySnapshot([pairA], to: dataURL)
+      try writeReplaySnapshot([pairA], to: dataURL, locator: locator)
       // A 先被移除，再被重新記起 ⇒ 最終應存在；B 先被記起，再被移除 ⇒ 最終應不存在。
       try writeReplayJournal(
         [
@@ -165,10 +164,11 @@ extension POMTestSuite {
           ],
           ["operation": "removeKey", "key": keyB],
         ],
-        to: dataURL
+        to: dataURL,
+        locator: locator
       )
 
-      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL, locator: locator)
       pom.loadData(fromURL: dataURL)
 
       #expect(pom.mutLRUMap.keys.sorted() == [keyA])
@@ -184,20 +184,20 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_04_BleachRemovalSurvivesReload() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
       let candidateA = "芭"
 
-      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL, locator: locator)
       pom.memorizePerception((keyA, candidateA), timestamp: replayNow)
       #expect(pom.mutLRUMap.count == 1)
 
       pom.bleachSpecifiedSuggestions(targets: [(ngramKey: keyA, candidate: candidateA)])
       #expect(pom.mutLRUMap.isEmpty)
 
-      let reloaded = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL)
+      let reloaded = LXAssembly.LXPerceptor(capacity: 16, dataURL: dataURL, locator: locator)
       reloaded.loadData(fromURL: dataURL)
       #expect(reloaded.mutLRUMap.isEmpty)
     }
@@ -208,7 +208,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_05_ChangeStreamCarriesRemovalsAndClears() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -220,10 +220,10 @@ extension POMTestSuite {
       let jsonOf: (LXAssembly.LXPerceptor.KeyPerceptionPair) throws -> Any = {
         try JSONSerialization.jsonObject(with: JSONEncoder().encode($0))
       }
-      try writeReplaySnapshot([pairA], to: dataURL)
+      try writeReplaySnapshot([pairA], to: dataURL, locator: locator)
 
       var captured: [LXAssembly.PerceptionPersistor.JournalChange] = []
-      let persistor = LXAssembly.PerceptionPersistor(baseURL: dataURL)
+      let persistor = LXAssembly.PerceptionPersistor(baseURL: dataURL, locator: locator)
 
       // 第一輪：移除 A、記起 B。變化流必須照此序交付。
       try writeReplayJournal(
@@ -231,7 +231,8 @@ extension POMTestSuite {
           ["operation": "removeKey", "key": keyA],
           ["operation": "upsert", "pair": try jsonOf(pairB)],
         ],
-        to: dataURL
+        to: dataURL,
+        locator: locator
       )
       persistor.loadData(
         loadCallback: { _ in },
@@ -258,7 +259,8 @@ extension POMTestSuite {
           ["operation": "clear"],
           ["operation": "upsert", "pair": try jsonOf(pairB)],
         ],
-        to: dataURL
+        to: dataURL,
+        locator: locator
       )
       captured = []
       persistor.loadData(

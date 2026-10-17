@@ -20,7 +20,7 @@ import Foundation
 @testable import Shared
 import Testing
 
-@Suite("狂打開關之鍵遷移", .serialized)
+@Suite("狂打開關之鍵遷移")
 struct PrefMgrFuriousTypingMigrationTests {
   // MARK: Internal
 
@@ -28,7 +28,7 @@ struct PrefMgrFuriousTypingMigrationTests {
   func legacyTrueIsCarriedToPinyin() {
     withCleanDefaults { defaults in
       defaults.set(true, forKey: Self.legacyKey)
-      let prefs = PrefMgr()
+      let prefs = PrefMgr(store: defaults)
       // 建立之後才壓成 false ⇒ 若最終為 true，其來源必是遷移碼而非註冊。
       defaults.set(false, forKey: Self.pinyinKey)
       prefs.fixOddPreferencesCore()
@@ -42,7 +42,7 @@ struct PrefMgrFuriousTypingMigrationTests {
   func legacyFalseIsCarriedToPinyin() {
     withCleanDefaults { defaults in
       defaults.set(false, forKey: Self.legacyKey)
-      let prefs = PrefMgr()
+      let prefs = PrefMgr(store: defaults)
       defaults.set(true, forKey: Self.pinyinKey) // 先壓成 true，確保 false 來自遷移。
       prefs.fixOddPreferencesCore()
       #expect(!defaults.bool(forKey: Self.pinyinKey))
@@ -54,7 +54,7 @@ struct PrefMgrFuriousTypingMigrationTests {
   @Test("③ 舊鍵不存在 → 兩側皆不動（不重設為出廠值）")
   func absentLegacyKeyLeavesBothSidesAlone() {
     withCleanDefaults { defaults in
-      let prefs = PrefMgr()
+      let prefs = PrefMgr(store: defaults)
       // 人為把兩側都推離出廠值；若遷移碼誤以「無條件寫入」實作，這裡就會被抓到。
       defaults.set(false, forKey: Self.pinyinKey)
       defaults.set(true, forKey: Self.zhuyinKey)
@@ -70,7 +70,7 @@ struct PrefMgrFuriousTypingMigrationTests {
     for legacyValue in [true, false] {
       withCleanDefaults { defaults in
         defaults.set(legacyValue, forKey: Self.legacyKey)
-        let prefs = PrefMgr()
+        let prefs = PrefMgr(store: defaults)
         prefs.fixOddPreferencesCore()
         let afterFirst = Self.snapshot(defaults)
         prefs.fixOddPreferencesCore()
@@ -88,7 +88,7 @@ struct PrefMgrFuriousTypingMigrationTests {
     for legacyValue in [true, false] as [Bool?] + [nil] {
       withCleanDefaults { defaults in
         if let legacyValue { defaults.set(legacyValue, forKey: Self.legacyKey) }
-        let prefs = PrefMgr()
+        let prefs = PrefMgr(store: defaults)
         prefs.fixOddPreferencesCore()
         #expect(!prefs.furiousTypingEnabled4Zhuyin, "legacy=\(String(describing: legacyValue))")
         #expect(!defaults.bool(forKey: Self.zhuyinKey))
@@ -110,7 +110,7 @@ struct PrefMgrFuriousTypingMigrationTests {
       defaults.set(false, forKey: "ShiftJISShinjitaiOutputEnabled")
       defaults.set(false, forKey: "UsingHotKeyHalfWidthASCII")
 
-      let prefs = PrefMgr()
+      let prefs = PrefMgr(store: defaults)
       prefs.fixOddPreferencesCore()
 
       // ① 本案：拼音側承接、舊鍵消失。
@@ -160,8 +160,8 @@ struct PrefMgrFuriousTypingMigrationTests {
   /// 於**全新的記憶體容器**內執行：容器不觸及磁碟、不跨行程，故無須清理或還原任何鍵，
   /// 亦不存在「跨測試共用之 `UserDefaults.standard`」所導致的輸出鍵殘留問題。
   private func withCleanDefaults(_ body: (InMemoryDefaultsStore) -> ()) {
-    let store = InMemoryDefaultsStore()
-    OSUtils.defaultsStore = store
-    body(store)
+    // 每一測試用例各得一份全新的記憶體容器，且**不**經行程級全域：
+    // 偏好管理器直接綁定該容器，故用例之間、套房之間皆無共享狀態。
+    body(InMemoryDefaultsStore())
   }
 }

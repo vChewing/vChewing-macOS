@@ -21,8 +21,9 @@ extension LXAssembly {
   public final class PerceptionPersistor {
     // MARK: Lifecycle
 
-    public init(baseURL: URL? = nil) {
+    public init(baseURL: URL? = nil, locator: any UserDataLocator = LXAssembly.userDataLocator) {
       self.fileSaveLocationURL = baseURL
+      self.locator = locator
       self.previouslySavedHash = ""
     }
 
@@ -30,6 +31,10 @@ extension LXAssembly {
 
     /// 設定或覆蓋儲存路徑。
     public var fileSaveLocationURL: URL?
+
+    /// 本持久化器之儲存後端。預設沿用行程級之 `LXAssembly.userDataLocator`；
+    /// 注入專屬的後端即可讓快照與日誌完全留在記憶體內。
+    public let locator: any UserDataLocator
 
     // MARK: Internal
 
@@ -175,7 +180,7 @@ extension LXAssembly.PerceptionPersistor {
       return
     }
 
-    let fileExisted = LXAssembly.userDataLocator.exists(at: fileURL)
+    let fileExisted = locator.exists(at: fileURL)
     lock.withLock {
       if !fileExisted {
         needsFullSnapshot = true
@@ -245,9 +250,9 @@ extension LXAssembly.PerceptionPersistor {
     }
     let decoder = JSONDecoder()
 
-    if LXAssembly.userDataLocator.exists(at: fileURL) {
+    if locator.exists(at: fileURL) {
       do {
-        let data = try LXAssembly.userDataLocator.read(at: fileURL)
+        let data = try locator.read(at: fileURL)
         let dataString = String(data: data, encoding: .utf8) ?? ""
         vCLMLog("POM: Loading data from snapshot, content: '\(dataString.prefix(100))...'")
 
@@ -269,7 +274,7 @@ extension LXAssembly.PerceptionPersistor {
         }
       } catch {
         vCLMLog("POM Error: Unable to decode snapshot JSON. Details: \(error)")
-        if let data = try? String(data: LXAssembly.userDataLocator.read(at: fileURL), encoding: .utf8),
+        if let data = try? String(data: locator.read(at: fileURL), encoding: .utf8),
            data.trimmingCharacters(in: .whitespacesAndNewlines) == "{}" {
           vCLMLog("POM: Detected old invalid format '{}', clearing snapshot")
           clearDataOnDisk(fileURL: fileURL, dataProvider: { [] })
@@ -279,7 +284,7 @@ extension LXAssembly.PerceptionPersistor {
 
     replayJournal(from: fileURL, keyValidator: keyValidator, replayApplicator: replayApplicator)
 
-    if let snapshotData = try? LXAssembly.userDataLocator.read(at: fileURL) {
+    if let snapshotData = try? locator.read(at: fileURL) {
       previouslySavedHash = computeHexCRC32(snapshotData)
     } else {
       previouslySavedHash = ""
@@ -362,7 +367,7 @@ extension LXAssembly.PerceptionPersistor {
         payload.append(newline)
       }
     }
-    try LXAssembly.userDataLocator.append(payload, to: journalURL)
+    try locator.append(payload, to: journalURL)
 
     vCLMLog("POM Journal: Appended \(records.count) entries to \(journalURL.path)")
     let now = Date().timeIntervalSince1970
@@ -386,13 +391,13 @@ extension LXAssembly.PerceptionPersistor {
   /// 判斷是否需要以新快照壓縮日誌。呼叫時**不得**持有本類別的鎖（內部會做檔案 I/O）。
   private func shouldCompactJournal(for baseURL: URL) -> Bool {
     let journalURL = journalFileURL(for: baseURL)
-    guard LXAssembly.userDataLocator.exists(at: journalURL) else { return false }
+    guard locator.exists(at: journalURL) else { return false }
 
     if lock.withLock({ journalEntriesSinceLastCompaction }) >= Self.journalCompactionEntryThreshold {
       return true
     }
 
-    if let fileSize = LXAssembly.userDataLocator.byteSize(at: journalURL) {
+    if let fileSize = locator.byteSize(at: journalURL) {
       return fileSize >= Self.journalCompactionSizeThreshold
     }
 
@@ -418,7 +423,7 @@ extension LXAssembly.PerceptionPersistor {
     }
 
     if shouldWrite {
-      try LXAssembly.userDataLocator.write(jsonData, to: baseURL)
+      try locator.write(jsonData, to: baseURL)
       lock.withLock {
         previouslySavedHash = crc
       }
@@ -444,10 +449,10 @@ extension LXAssembly.PerceptionPersistor {
     replayApplicator: ([JournalChange]) -> ()
   ) {
     let journalURL = journalFileURL(for: baseURL)
-    guard LXAssembly.userDataLocator.exists(at: journalURL) else { return }
+    guard locator.exists(at: journalURL) else { return }
 
     do {
-      let data = try LXAssembly.userDataLocator.read(at: journalURL)
+      let data = try locator.read(at: journalURL)
       guard !data.isEmpty else { return }
       guard let content = String(data: data, encoding: .utf8) else { return }
       let decoder = JSONDecoder()
@@ -544,9 +549,9 @@ extension LXAssembly.PerceptionPersistor {
   /// 在成功壓縮後刪除日誌副檔。
   private func removeJournalFile(for baseURL: URL) {
     let journalURL = journalFileURL(for: baseURL)
-    guard LXAssembly.userDataLocator.exists(at: journalURL) else { return }
+    guard locator.exists(at: journalURL) else { return }
     do {
-      try LXAssembly.userDataLocator.remove(at: journalURL)
+      try locator.remove(at: journalURL)
       vCLMLog("POM Journal: Cleared journal at \(journalURL.path)")
     } catch {
       vCLMLog("POM Journal: Unable to delete journal. Details: \(error)")

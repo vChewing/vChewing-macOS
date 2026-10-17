@@ -9,27 +9,19 @@ import Testing
 @testable import LexiconAssembly
 
 extension POMTestSuite {
-  @Suite(.serialized)
+  @Suite
   final class POMFileHandleTests {
-    // MARK: Lifecycle
-
-    init() {
-      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
-      LXAssembly.userDataLocator = InMemoryUserDataLocator()
-    }
-
-    deinit {
-      LXAssembly.userDataLocator = DiskUserDataLocator()
-    }
-
-    // MARK: Internal
+    /// 本套房專屬之儲存後端：資料一律留在記憶體內、不落地，亦不經行程級全域，
+    /// 故與其他套房（乃至同一套房之其他測試用例）不共用任何硬碟區域。
+    /// 每一測試用例各得一份新的套房實例，故各得一份新的後端。
+    let locator = InMemoryUserDataLocator()
 
     @Test
     func testClearDataFormat() throws {
       // 測試修復後的 clearData 會寫入正確格式
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_fix.json")
 
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
 
       // 先添加一些數據
       pom.memorizePerception(
@@ -46,7 +38,7 @@ extension POMTestSuite {
 
       // 檢查文件內容
       do {
-        let fileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
+        let fileContent = try locator.readText(at: tempURL)
         #expect(fileContent == "[]")
       } catch {
         Issue.record("讀取清除後文件失敗: \(error)")
@@ -57,7 +49,7 @@ extension POMTestSuite {
       #expect(dataAfterClear.isEmpty)
 
       // 清理
-      try? LXAssembly.userDataLocator.remove(at: tempURL)
+      try? locator.remove(at: tempURL)
     }
 
     @Test
@@ -67,9 +59,9 @@ extension POMTestSuite {
       let journalURL = tempURL.appendingPathExtension("journal")
 
       // 創建舊格式文件
-      try LXAssembly.userDataLocator.write(Data("{}".utf8), to: tempURL)
+      try locator.write(Data("{}".utf8), to: tempURL)
 
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
 
       // 加載舊格式文件（應該被正確處理為空內容）
       pom.loadData(fromURL: tempURL)
@@ -87,7 +79,7 @@ extension POMTestSuite {
 
       // 檢查文件現在是正確的格式
       do {
-        let fileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
+        let fileContent = try locator.readText(at: tempURL)
         #expect(!(fileContent.trimmingCharacters(in: .whitespacesAndNewlines) == "{}"))
 
         let data = fileContent.data(using: .utf8) ?? .init()
@@ -101,23 +93,23 @@ extension POMTestSuite {
       }
 
       // 若快照仍為空，則日誌必須存在並包含變更
-      if let snapshot = try? LXAssembly.userDataLocator.read(at: tempURL),
+      if let snapshot = try? locator.read(at: tempURL),
          let decoded = try? JSONDecoder().decode(
            [LXAssembly.LXPerceptor.KeyPerceptionPair].self,
            from: snapshot
          ), decoded.isEmpty {
-        #expect(LXAssembly.userDataLocator.exists(at: journalURL))
-        let journalContent = try LXAssembly.userDataLocator.readText(at: journalURL)
+        #expect(locator.exists(at: journalURL))
+        let journalContent = try locator.readText(at: journalURL)
         #expect(!journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
       }
 
-      let reloaded = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let reloaded = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
       reloaded.loadData(fromURL: tempURL)
       #expect(reloaded.getSavableData().count == 1)
 
       // 清理
-      try? LXAssembly.userDataLocator.remove(at: tempURL)
-      try? LXAssembly.userDataLocator.remove(at: journalURL)
+      try? locator.remove(at: tempURL)
+      try? locator.remove(at: journalURL)
     }
 
     @Test
@@ -125,7 +117,7 @@ extension POMTestSuite {
       // 測試新的保存日誌功能
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_logging.json")
 
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
 
       // 添加測試數據
       let testData = [
@@ -142,7 +134,7 @@ extension POMTestSuite {
       pom.saveData(toURL: tempURL)
 
       // 驗證保存成功
-      let fileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
+      let fileContent = try locator.readText(at: tempURL)
       #expect(!fileContent.isEmpty)
 
       let data = fileContent.data(using: .utf8) ?? .init()
@@ -150,19 +142,19 @@ extension POMTestSuite {
       let decoded = try decoder.decode([LXAssembly.LXPerceptor.KeyPerceptionPair].self, from: data)
       let journalURL = tempURL.appendingPathExtension("journal")
       if decoded.count < testData.count {
-        #expect(LXAssembly.userDataLocator.exists(at: journalURL))
-        let journalContent = try LXAssembly.userDataLocator.readText(at: journalURL)
+        #expect(locator.exists(at: journalURL))
+        let journalContent = try locator.readText(at: journalURL)
         #expect(!journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
       }
 
-      let pomReloaded = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pomReloaded = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
       pomReloaded.loadData(fromURL: tempURL)
       let reloaded = pomReloaded.getSavableData()
       #expect(reloaded.count == testData.count)
 
       // 清理
-      try? LXAssembly.userDataLocator.remove(at: tempURL)
-      try? LXAssembly.userDataLocator.remove(at: journalURL)
+      try? locator.remove(at: tempURL)
+      try? locator.remove(at: journalURL)
     }
 
     @Test
@@ -170,27 +162,27 @@ extension POMTestSuite {
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_journal.json")
       let journalURL = tempURL.appendingPathExtension("journal")
       defer {
-        try? LXAssembly.userDataLocator.remove(at: tempURL)
-        try? LXAssembly.userDataLocator.remove(at: journalURL)
+        try? locator.remove(at: tempURL)
+        try? locator.remove(at: journalURL)
       }
 
       let timestamp = Date.now.timeIntervalSince1970
 
       // 初次保存會產生完整快照
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
       pom.memorizePerception(
         (ngramKey: "(k1,k1)&(k2,k2)&(k3,k3)", candidate: "c1"),
         timestamp: timestamp
       )
       pom.saveData(toURL: tempURL)
 
-      let baseSnapshotAfterFirstSave = try LXAssembly.userDataLocator.read(at: tempURL)
+      let baseSnapshotAfterFirstSave = try locator.read(at: tempURL)
       let decodedAfterFirstSave = try JSONDecoder().decode(
         [LXAssembly.LXPerceptor.KeyPerceptionPair].self,
         from: baseSnapshotAfterFirstSave
       )
       #expect(decodedAfterFirstSave.count == 1)
-      #expect(!LXAssembly.userDataLocator.exists(at: journalURL))
+      #expect(!locator.exists(at: journalURL))
 
       // 第二次保存會寫入追加式日誌
       pom.memorizePerception(
@@ -200,19 +192,19 @@ extension POMTestSuite {
       pom.saveData(toURL: tempURL)
 
       // 基礎快照仍保有舊資料，變更被寫入日誌
-      let baseSnapshotAfterSecondSave = try LXAssembly.userDataLocator.read(at: tempURL)
+      let baseSnapshotAfterSecondSave = try locator.read(at: tempURL)
       let decodedAfterSecondSave = try JSONDecoder().decode(
         [LXAssembly.LXPerceptor.KeyPerceptionPair].self,
         from: baseSnapshotAfterSecondSave
       )
       #expect(decodedAfterSecondSave.count == 1)
 
-      #expect(LXAssembly.userDataLocator.exists(at: journalURL))
-      let journalContent = try LXAssembly.userDataLocator.readText(at: journalURL)
+      #expect(locator.exists(at: journalURL))
+      let journalContent = try locator.readText(at: journalURL)
       #expect(!journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
       // 重新載入應能重放日誌並還原到最新狀態
-      let pomReloaded = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pomReloaded = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
       pomReloaded.loadData(fromURL: tempURL)
       let savableAfterReload = pomReloaded.getSavableData()
       #expect(savableAfterReload.count == 2)
@@ -224,8 +216,8 @@ extension POMTestSuite {
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_journal_invalid.json")
       let journalURL = tempURL.appendingPathExtension("journal")
       defer {
-        try? LXAssembly.userDataLocator.remove(at: tempURL)
-        try? LXAssembly.userDataLocator.remove(at: journalURL)
+        try? locator.remove(at: tempURL)
+        try? locator.remove(at: journalURL)
       }
 
       let now = Date.now.timeIntervalSince1970
@@ -268,14 +260,14 @@ extension POMTestSuite {
         if let s = String(data: data, encoding: .utf8) { lines.append(s) }
       }
       let journalContent = lines.joined(separator: "\n")
-      try LXAssembly.userDataLocator.write(Data(journalContent.utf8), to: journalURL)
+      try locator.write(Data(journalContent.utf8), to: journalURL)
 
       // 載入並重播日誌
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
       pom.loadData(fromURL: tempURL)
 
       // 當日誌中含有不合法記錄時，整個日誌應視為受損並被自動刪除
-      #expect(!LXAssembly.userDataLocator.exists(at: journalURL))
+      #expect(!locator.exists(at: journalURL))
 
       // 最終記憶體應該沒有項目（因為移除了日誌、未應用任何 upsert）
       let savable = pom.getSavableData()
@@ -287,8 +279,8 @@ extension POMTestSuite {
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_journal_corrupt.json")
       let journalURL = tempURL.appendingPathExtension("journal")
       defer {
-        try? LXAssembly.userDataLocator.remove(at: tempURL)
-        try? LXAssembly.userDataLocator.remove(at: journalURL)
+        try? locator.remove(at: tempURL)
+        try? locator.remove(at: journalURL)
       }
 
       let now = Date.now.timeIntervalSince1970
@@ -307,14 +299,14 @@ extension POMTestSuite {
       if let s = String(data: data, encoding: .utf8) { lines.append(s) }
       lines.append("THIS IS NOT JSON")
       let journalContent = lines.joined(separator: "\n")
-      try LXAssembly.userDataLocator.write(Data(journalContent.utf8), to: journalURL)
+      try locator.write(Data(journalContent.utf8), to: journalURL)
 
       // 載入並重播日誌
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
       pom.loadData(fromURL: tempURL)
 
       // 應該偵測到損毀並刪除日誌
-      #expect(!LXAssembly.userDataLocator.exists(at: journalURL))
+      #expect(!locator.exists(at: journalURL))
 
       // 並且記憶體應保持空
       let savable = pom.getSavableData()

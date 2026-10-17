@@ -39,20 +39,12 @@ extension POMTestSuite {
   /// 1. 日誌重播只把鍵寫進映射、卻沒寫進 LRU 序列，導致容量上限形同虛設，
   ///    記憶量隨每次啟動單調膨脹（使用者連續打字一兩週後愈來愈慢）。
   /// 2. 檢索逐一解析全體記憶鍵（`O(總記憶量)`），使每次敲鍵的成本與累積記憶量成正比。
-  @Suite(.serialized)
+  @Suite
   final class POMIndexedRetrievalTests {
-    // MARK: Lifecycle
-
-    init() {
-      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
-      LXAssembly.userDataLocator = InMemoryUserDataLocator()
-    }
-
-    deinit {
-      LXAssembly.userDataLocator = DiskUserDataLocator()
-    }
-
-    // MARK: Internal
+    /// 本套房專屬之儲存後端：資料一律留在記憶體內、不落地，亦不經行程級全域，
+    /// 故與其他套房（乃至同一套房之其他測試用例）不共用任何硬碟區域。
+    /// 每一測試用例各得一份新的套房實例，故各得一份新的後端。
+    let locator = InMemoryUserDataLocator()
 
     // MARK: - 容量收斂
 
@@ -60,7 +52,7 @@ extension POMTestSuite {
     @Test
     func testPOM_IndexedRetrieval_01_CapacityConvergesAcrossSessions() throws {
       let stagingDirectory = try makeIndexedStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let capacity = 50
@@ -69,7 +61,7 @@ extension POMTestSuite {
       var loadedCounts: [Int] = []
 
       for session in 0 ..< sessions {
-        let pom = LXAssembly.LXPerceptor(capacity: capacity, dataURL: dataURL)
+        let pom = LXAssembly.LXPerceptor(capacity: capacity, dataURL: dataURL, locator: locator)
         pom.loadData(fromURL: dataURL)
         // 載入後即必須落在容量內，且映射與序列同構。
         #expect(pom.mutLRUMap.count <= capacity)
@@ -96,10 +88,10 @@ extension POMTestSuite {
     @Test
     func testPOM_IndexedRetrieval_02_LoadConvergesWhenCapacityShrinks() throws {
       let stagingDirectory = try makeIndexedStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
-      let widePOM = LXAssembly.LXPerceptor(capacity: 40, dataURL: dataURL)
+      let widePOM = LXAssembly.LXPerceptor(capacity: 40, dataURL: dataURL, locator: locator)
       for serial in 0 ..< 40 {
         let key = makeUnigramKey(reading: "ㄅㄚ", value: "\(serial)")
         widePOM.memorizePerception((key, "值\(serial)"), timestamp: indexedNow + Double(serial))
@@ -107,7 +99,7 @@ extension POMTestSuite {
       #expect(widePOM.mutLRUMap.count == 40)
       widePOM.saveData(toURL: dataURL)
 
-      let narrowPOM = LXAssembly.LXPerceptor(capacity: 7, dataURL: dataURL)
+      let narrowPOM = LXAssembly.LXPerceptor(capacity: 7, dataURL: dataURL, locator: locator)
       narrowPOM.loadData(fromURL: dataURL)
       #expect(narrowPOM.mutLRUMap.count == 7)
       #expect(narrowPOM.mutLRUKeySeqList.count == 7)
@@ -120,11 +112,11 @@ extension POMTestSuite {
     @Test
     func testPOM_IndexedRetrieval_03_JournalReplayRespectsCapacity() throws {
       let stagingDirectory = try makeIndexedStagingDirectory()
-      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
+      defer { try? locator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       // 第一個 session：寫入完整快照，再追加日誌。
-      let firstPOM = LXAssembly.LXPerceptor(capacity: 12, dataURL: dataURL)
+      let firstPOM = LXAssembly.LXPerceptor(capacity: 12, dataURL: dataURL, locator: locator)
       for serial in 0 ..< 12 {
         let key = makeUnigramKey(reading: "ㄕ", value: "\(serial)")
         firstPOM.memorizePerception((key, "值\(serial)"), timestamp: indexedNow + Double(serial))
@@ -138,7 +130,7 @@ extension POMTestSuite {
       #expect(firstPOM.mutLRUMap.count == 12)
 
       // 第二個 session：載入快照並重播日誌後，仍必須收斂在容量內且同構。
-      let secondPOM = LXAssembly.LXPerceptor(capacity: 12, dataURL: dataURL)
+      let secondPOM = LXAssembly.LXPerceptor(capacity: 12, dataURL: dataURL, locator: locator)
       secondPOM.loadData(fromURL: dataURL)
       #expect(secondPOM.mutLRUMap.count == 12)
       #expect(secondPOM.mutLRUKeySeqList.count == secondPOM.mutLRUMap.count)
@@ -149,7 +141,7 @@ extension POMTestSuite {
     /// `.exact` 檢索必須涵蓋映射內所有 head 全等之記憶，不得因索引而漏項。
     @Test
     func testPOM_IndexedRetrieval_04_ExactLookupIsComplete() throws {
-      let pom = LXAssembly.LXPerceptor(capacity: 400, dataURL: indexedNullURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 400, dataURL: indexedNullURL, locator: locator)
 
       // 10 個互異的單段讀音，各配一個專屬候選字。
       let readings = ["ㄕ", "ㄨ", "ㄅㄚ", "ㄇㄚ", "ㄋㄧ", "ㄏㄠ", "ㄊㄧㄢ", "ㄖㄣ", "ㄉㄚ", "ㄒㄧㄠ"]
@@ -178,7 +170,7 @@ extension POMTestSuite {
     /// `.toneInsensitivePrefix` 檢索必須涵蓋去聲調後 head 全等之記憶。
     @Test
     func testPOM_IndexedRetrieval_05_ToneInsensitiveLookupIsComplete() throws {
-      let pom = LXAssembly.LXPerceptor(capacity: 100, dataURL: indexedNullURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 100, dataURL: indexedNullURL, locator: locator)
       // 「ㄕˊ（時）」「ㄕˇ（史）」與「ㄕ（無調）」互為去聲調等價。
       pom.memorizePerception((makeUnigramKey(reading: "ㄕˊ", value: "時"), "時"), timestamp: indexedNow)
       pom.memorizePerception((makeUnigramKey(reading: "ㄕˇ", value: "史"), "史"), timestamp: indexedNow)
@@ -200,7 +192,7 @@ extension POMTestSuite {
     /// 多段 head 於兩種檢索模式下皆不得漏項，且段數不同者不得互相污染。
     @Test
     func testPOM_IndexedRetrieval_06_MultiSegmentHeadsAreIndexedPerSegment() throws {
-      let pom = LXAssembly.LXPerceptor(capacity: 100, dataURL: indexedNullURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 100, dataURL: indexedNullURL, locator: locator)
       let key = "()&()&(ㄕˊ-ㄨㄛ,是我)"
       pom.memorizePerception((key, "是我"), timestamp: indexedNow)
       pom.memorizePerception((makeUnigramKey(reading: "ㄕˊ", value: "時"), "時"), timestamp: indexedNow)
@@ -217,7 +209,7 @@ extension POMTestSuite {
     /// `alternateKeys` 的輸出次序必須與 LRU 序列一致（維持逐鍵走訪時代的先後語義）。
     @Test
     func testPOM_IndexedRetrieval_07_AlternateKeysFollowLRUOrder() throws {
-      let pom = LXAssembly.LXPerceptor(capacity: 100, dataURL: indexedNullURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 100, dataURL: indexedNullURL, locator: locator)
       // 全部以兩段 head 開頭，使其成為「ㄕˊ-ㄨㄛ」的替代鍵候選。
       for serial in 0 ..< 8 {
         let key = "()&()&(ㄕˊ-ㄨㄛ,值\(serial))"
@@ -235,7 +227,7 @@ extension POMTestSuite {
     /// 逐出記憶時必須同時自索引除名，否則會撈到已不存在的鍵。
     @Test
     func testPOM_IndexedRetrieval_08_EvictedMemoriesLeaveTheIndex() throws {
-      let pom = LXAssembly.LXPerceptor(capacity: 3, dataURL: indexedNullURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 3, dataURL: indexedNullURL, locator: locator)
       let readings = ["ㄕ", "ㄨ", "ㄅㄚ", "ㄇㄚ", "ㄋㄧ"]
       let values = readings.indices.map { makeDistinctHanzi($0) }
       for (index, reading) in readings.prefix(3).enumerated() {
@@ -267,7 +259,7 @@ extension POMTestSuite {
     /// 會由微秒級退化為毫秒級（`O(總記憶量)`），因而超時而轉紅。
     @Test
     func testPOM_IndexedRetrieval_09_LookupCostDoesNotScaleWithMemorySize() throws {
-      let pom = LXAssembly.LXPerceptor(capacity: 6_000, dataURL: indexedNullURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 6_000, dataURL: indexedNullURL, locator: locator)
       for serial in 0 ..< 5_000 {
         let key = makeUnigramKey(reading: "ㄌㄨㄢ", value: "雜\(serial)")
         pom.memorizePerception(

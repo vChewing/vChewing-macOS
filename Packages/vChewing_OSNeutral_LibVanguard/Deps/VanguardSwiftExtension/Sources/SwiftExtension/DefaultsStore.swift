@@ -13,10 +13,11 @@ import Foundation
 /// 使用者真機之偏好檔。本協定把「容器」析出為可注入之存在型別，使測試得以改用完全不觸及
 /// 磁碟之 `InMemoryDefaultsStore`，且各套件可各持一份實例。
 ///
-/// - Important: 本協定**刻意不含 `Sendable`**：`object(forKey:)` 之回傳值為 `Any`。執行緒
-///   安全由各實作自行保證（`OSUtils.defaultsStore` 之交換亦經 `NSMutex`）。所有成員一律
-///   `nonisolated`，故可自任意隔離域存取。
-public protocol DefaultsStore: AnyObject {
+/// - Important: 本協定要求 `Sendable`：它會被 `AppProperty`（本身 `Sendable`）以**儲存屬性**
+///   持有，故每個實作都得分別以 `@unchecked Sendable` 自行擔保執行緒安全（`UserDefaultsStore`
+///   之 `UserDefaults` 本身即執行緒安全，`InMemoryDefaultsStore` 內部則以 `NSMutex` 收斂）。
+///   所有成員一律 `nonisolated`，故可自任意隔離域存取。
+public protocol DefaultsStore: AnyObject, Sendable {
   /// 讀取指定鍵之原始值；鍵不存在時回傳 `nil`。
   nonisolated func object(forKey key: String) -> Any?
 

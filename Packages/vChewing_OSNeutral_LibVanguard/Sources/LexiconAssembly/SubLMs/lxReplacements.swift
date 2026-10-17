@@ -24,6 +24,10 @@ extension LXAssembly {
 
     var filePath: String?
 
+    /// 本資料模組之儲存後端。預設沿用行程級之 `LXAssembly.userDataLocator`；
+    /// 注入專屬的後端即可讓該模組之讀寫完全脫離硬碟。
+    var locator: any UserDataLocator = LXAssembly.userDataLocator
+
     /// 原始資料的 UTF-8 位元組（取代舊版 `strData: String` 的實體儲存）。
     private(set) var rawData: [UInt8] = []
 
@@ -42,10 +46,13 @@ extension LXAssembly {
 
       do {
         // 直接以位元組讀入：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+        let backend = locator
         let newBytes: [UInt8] = try LXAssembly.withFileHandleQueueSync {
-          LXConsolidator.fixEOF(path: path)
-          LXConsolidator.consolidate(path: path, pragma: true)
-          return [UInt8](try LXAssembly.userDataLocator.read(at: URL(fileURLWithPath: path)))
+          if backend.isBackedByFileSystem {
+            LXConsolidator.fixEOF(path: path)
+            LXConsolidator.consolidate(path: path, pragma: true)
+          }
+          return [UInt8](try backend.read(at: URL(fileURLWithPath: path)))
         }
         replaceData(bytes: newBytes)
       } catch {
@@ -132,7 +139,7 @@ extension LXAssembly {
       LXAssembly.withFileHandleQueueSync {
         do {
           // 以原始位元組寫回：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
-          try LXAssembly.userDataLocator.write(Data(rawData), to: URL(fileURLWithPath: filePath))
+          try locator.write(Data(rawData), to: URL(fileURLWithPath: filePath))
         } catch {
           vCLMLog("Failed to save current database to: \(filePath)")
         }

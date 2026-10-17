@@ -241,11 +241,12 @@ extension UInt16 {
 public struct AppProperty<Value: Sendable>: Sendable {
   // MARK: Lifecycle
 
-  public init(key: String, defaultValue: Value) {
+  public init(key: String, defaultValue: Value, store: any DefaultsStore = OSUtils.defaultsStore) {
     self.key = key
     self.defaultValue = defaultValue
-    if container.object(forKey: key) == nil {
-      container.set(defaultValue, forKey: key)
+    self.store = store
+    if store.object(forKey: key) == nil {
+      store.set(defaultValue, forKey: key)
     }
   }
 
@@ -254,7 +255,11 @@ public struct AppProperty<Value: Sendable>: Sendable {
   public let key: String
   public let defaultValue: Value
 
-  public var container: any DefaultsStore { OSUtils.defaultsStore }
+  /// 該屬性所綁定之儲存後端。於建構時捕獲、之後不再改看行程級全域：
+  /// 如此一來每個 `PrefMgr` 實例都可以綁定自己的一份後端，測試之間互不相擾。
+  public var store: any DefaultsStore
+
+  public var container: any DefaultsStore { store }
   public var wrappedValue: Value {
     get {
       container.object(forKey: key) as? Value ?? defaultValue

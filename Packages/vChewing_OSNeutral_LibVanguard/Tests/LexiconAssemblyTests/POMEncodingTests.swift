@@ -11,20 +11,12 @@ import Testing
 @testable import LexiconAssembly
 
 extension POMTestSuite {
-  @Suite(.serialized)
+  @Suite
   final class POMEncodingTests {
-    // MARK: Lifecycle
-
-    init() {
-      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
-      LXAssembly.userDataLocator = InMemoryUserDataLocator()
-    }
-
-    deinit {
-      LXAssembly.userDataLocator = DiskUserDataLocator()
-    }
-
-    // MARK: Internal
+    /// 本套房專屬之儲存後端：資料一律留在記憶體內、不落地，亦不經行程級全域，
+    /// 故與其他套房（乃至同一套房之其他測試用例）不共用任何硬碟區域。
+    /// 每一測試用例各得一份新的套房實例，故各得一份新的後端。
+    let locator = InMemoryUserDataLocator()
 
     @Test
     func testJSONEncoding() throws {
@@ -32,7 +24,7 @@ extension POMTestSuite {
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_data.json")
       vCLMLog("測試文件路徑: \(tempURL.path)")
 
-      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, dataURL: tempURL, locator: locator)
 
       // 測試空數據情況
       vCLMLog("=== 測試空數據情況 ===")
@@ -55,7 +47,7 @@ extension POMTestSuite {
       // 測試保存空數據
       pom.saveData(toURL: tempURL)
       do {
-        let emptyFileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
+        let emptyFileContent = try locator.readText(at: tempURL)
         vCLMLog("空數據保存後的檔案內容: '\(emptyFileContent)'")
 
         // 如果檔案內容是 "{}"，那說明有問題
@@ -112,7 +104,7 @@ extension POMTestSuite {
 
       // 檢查文件內容
       do {
-        let fileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
+        let fileContent = try locator.readText(at: tempURL)
         vCLMLog("檔案內容:")
         vCLMLog(fileContent)
 
@@ -124,7 +116,7 @@ extension POMTestSuite {
       }
 
       // 清理暫存檔案
-      try? LXAssembly.userDataLocator.remove(at: tempURL)
+      try? locator.remove(at: tempURL)
     }
 
     @Test
@@ -132,7 +124,7 @@ extension POMTestSuite {
       // 測試數據完整性 - 確認數據是否真的被正確記憶和檢索
       vCLMLog("=== 測試數據完整性 ===")
 
-      let pom = LXAssembly.LXPerceptor(capacity: 10)
+      let pom = LXAssembly.LXPerceptor(capacity: 10, locator: locator)
 
       let testKey = "(test,測試)&(key,鍵)&(target,target)"
       let testCandidate = "目標"

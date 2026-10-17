@@ -61,10 +61,20 @@ extension LXAssembly {
     // 這句需要留著，不然無法被 package 外界存取。
     public init(
       isCHS: Bool = false,
-      pomDataURL: URL? = nil
+      pomDataURL: URL? = nil,
+      locator: any UserDataLocator = LXAssembly.userDataLocator,
+      prefs: (any PrefMgrProtocol)? = nil
     ) {
       self.isCHS = isCHS
-      self.lxPerceptor = LXPerceptor(dataURL: pomDataURL)
+      self.locator = locator
+      self.injectedPrefs = prefs
+      self.lxPerceptor = LXPerceptor(dataURL: pomDataURL, locator: locator)
+      // 五個使用者語言模組一律沿用本副本化模組之儲存後端：注入專屬後端即可整批脫離硬碟。
+      lxUserPhrases.locator = locator
+      lxFiltered.locator = locator
+      lxUserSymbols.locator = locator
+      lxAssociates.locator = locator
+      lxReplacements.locator = locator
     }
 
     // MARK: Public
@@ -262,6 +272,10 @@ extension LXAssembly {
 
     public static var isFactoryDictionaryLoaded: Bool { factoryTrie != nil }
 
+    /// 本副本化模組之儲存後端。生產環境即行程級之 `LXAssembly.userDataLocator`（磁碟）；
+    /// 測試可注入專屬之後端，使整個實例之使用者資料讀寫一概不落地。
+    public let locator: any UserDataLocator
+
     // 簡體中文模型？
     public let isCHS: Bool
 
@@ -282,7 +296,7 @@ extension LXAssembly {
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
           Self.lxCassette.clear()
-          Self.lxCassette.open(path)
+          Self.lxCassette.open(path, using: LXAssembly.userDataLocator)
           Self.cassetteGeneration &+= 1
           vCLMLog("lxCassette: \(Self.lxCassette.count) entries of data loaded from: \(path)")
         } else {
@@ -303,7 +317,7 @@ extension LXAssembly {
             }
             var newCassette = LXCassette()
             newCassette.candidateKeysValidator = validator
-            newCassette.open(path)
+            newCassette.open(path, using: LXAssembly.userDataLocator)
             let count = newCassette.count
             asyncOnMain {
               Self.lxCassette = newCassette
@@ -448,7 +462,7 @@ extension LXAssembly {
       unigramLRUCache.removeAll(keepingCapacity: true)
 
       func loadMain() {
-        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
+        if locator.exists(at: URL(fileURLWithPath: path)) {
           lxUserPhrases.open(path)
           vCLMLog("lxUserPhrases: \(lxUserPhrases.count) entries of data loaded from: \(path)")
         } else {
@@ -480,7 +494,7 @@ extension LXAssembly {
       }
       guard let filterPath = filterPath else { return }
       func loadFilter() {
-        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: filterPath)) {
+        if locator.exists(at: URL(fileURLWithPath: filterPath)) {
           lxFiltered.open(filterPath)
           vCLMLog("lxFiltered: \(lxFiltered.count) entries of data loaded from: \(path)")
         } else {
@@ -517,7 +531,7 @@ extension LXAssembly {
       lxFiltered.clear()
       unigramLRUCache.removeAll(keepingCapacity: true)
 
-      if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
+      if locator.exists(at: URL(fileURLWithPath: path)) {
         lxFiltered.open(path)
         vCLMLog("lxFiltered: \(lxFiltered.count) entries of data loaded from: \(path)")
       } else {
@@ -532,7 +546,7 @@ extension LXAssembly {
       unigramLRUCache.removeAll(keepingCapacity: true)
 
       func load() {
-        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
+        if locator.exists(at: URL(fileURLWithPath: path)) {
           lxUserSymbols.open(path)
           vCLMLog("lxUserSymbol: \(lxUserSymbols.count) entries of data loaded from: \(path)")
         } else {
@@ -561,7 +575,7 @@ extension LXAssembly {
       lxAssociates.clear()
 
       func load() {
-        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
+        if locator.exists(at: URL(fileURLWithPath: path)) {
           lxAssociates.open(path)
           vCLMLog("lxAssociates: \(lxAssociates.count) entries of data loaded from: \(path)")
         } else {
@@ -595,7 +609,7 @@ extension LXAssembly {
       lxReplacements.clear()
 
       func load() {
-        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
+        if locator.exists(at: URL(fileURLWithPath: path)) {
           lxReplacements.open(path)
           vCLMLog("lxReplacements: \(lxReplacements.count) entries of data loaded from: \(path)")
         } else {
@@ -1331,7 +1345,11 @@ extension LXAssembly {
 
     // MARK: - 工具函式
 
-    private let prefs = PrefMgr.sharedSansDidSetOps
+    /// 本實例所使用之偏好來源。未注入時，逐次向 `PrefMgr.sharedSansDidSetOps` 索取
+    /// （其本身即依當前 `OSUtils.defaultsStore` 解析）；注入之後則固定使用注入者。
+    private let injectedPrefs: (any PrefMgrProtocol)?
+
+    private var prefs: any PrefMgrProtocol { injectedPrefs ?? PrefMgr.sharedSansDidSetOps }
 
     /// 檢索快取（`unigramLRUCache`；其內容為 gram——含 POM 供應之 bigram／trigram——
     /// 故不以 unigram 名之）的世代指紋。**此為「哪些資料異動會令快取失效」的單一真源**：
