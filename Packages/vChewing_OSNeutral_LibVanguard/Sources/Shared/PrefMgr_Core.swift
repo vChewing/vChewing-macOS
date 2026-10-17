@@ -560,7 +560,9 @@ extension PrefMgr {
   }
 
   private func migrateDeprecatedSettings() {
-    let defaults = UserDefaults.standard
+    // 偏好之落點一律取自注入之儲存後端（生產環境即 `UserDefaults.standard`）：
+    // 以往此處直讀 `.standard`，致單元測試之遷移用例實際讀寫使用者真機之偏好檔。
+    let defaults: any DefaultsStore = OSUtils.defaultsStore
     // 移除被刻意作廢的設定。
     defaults.removeObject(forKey: "AllowBoostingSingleKanjiAsUserPhrase")
     // 遷移舊設定：JK/HL 選字窗行為。

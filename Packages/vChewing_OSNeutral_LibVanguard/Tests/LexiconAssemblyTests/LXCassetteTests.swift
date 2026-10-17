@@ -42,6 +42,25 @@ struct LXCassetteTests {
   }
 
   @Test
+  func testCassetteLoadViaInMemoryLocator() throws {
+    guard let pathCINFile = LXATestsData.getCINPath4Tests("wubi", ext: "cin"),
+          let raw = try? Data(contentsOf: URL(fileURLWithPath: pathCINFile))
+    else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：wubi.cin")
+      return
+    }
+    let locator = InMemoryUserDataLocator()
+    let url = URL(fileURLWithPath: pathCINFile)
+    try locator.write(raw, to: url)
+    var lxCassette = LXAssembly.LXCassette()
+    lxCassette.open(pathCINFile, using: locator)
+    // 與自磁碟串流讀取之結果須完全一致。
+    #expect(lxCassette.keyNameMap.count == 27)
+    #expect(lxCassette.charDefMap.count == 23_494)
+    #expect(lxCassette.nameShort == "WUBI")
+  }
+
+  @Test
   func testCassetteLoadArray30() throws {
     // "array30.cin2" 測試 quickphrase 時，用 `zzzj 歷歷在目` 這個測試例子即可。
     let pathCINFile = LXATestsData.getCINPath4Tests("array30", ext: "cin2")

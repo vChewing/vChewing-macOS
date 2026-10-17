@@ -323,7 +323,7 @@ extension LXAssembly {
       cassetteGeneration &+= 1
       lxPlainBopomofo = LXPlainBopomofo()
       guard restoreAsyncLoadingStrategy else { return }
-      asyncLoadingUserData = !UserDefaults.pendingUnitTests
+      asyncLoadingUserData = !OSUtils.isRunningUnitTests
     }
 
     /// 清除原廠辭典的所有 QueryBuffer 快取。
@@ -448,7 +448,7 @@ extension LXAssembly {
       unigramLRUCache.removeAll(keepingCapacity: true)
 
       func loadMain() {
-        if FileManager.default.isReadableFile(atPath: path) {
+        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
           lxUserPhrases.open(path)
           vCLMLog("lxUserPhrases: \(lxUserPhrases.count) entries of data loaded from: \(path)")
         } else {
@@ -480,7 +480,7 @@ extension LXAssembly {
       }
       guard let filterPath = filterPath else { return }
       func loadFilter() {
-        if FileManager.default.isReadableFile(atPath: filterPath) {
+        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: filterPath)) {
           lxFiltered.open(filterPath)
           vCLMLog("lxFiltered: \(lxFiltered.count) entries of data loaded from: \(path)")
         } else {
@@ -517,7 +517,7 @@ extension LXAssembly {
       lxFiltered.clear()
       unigramLRUCache.removeAll(keepingCapacity: true)
 
-      if FileManager.default.isReadableFile(atPath: path) {
+      if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
         lxFiltered.open(path)
         vCLMLog("lxFiltered: \(lxFiltered.count) entries of data loaded from: \(path)")
       } else {
@@ -532,7 +532,7 @@ extension LXAssembly {
       unigramLRUCache.removeAll(keepingCapacity: true)
 
       func load() {
-        if FileManager.default.isReadableFile(atPath: path) {
+        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
           lxUserSymbols.open(path)
           vCLMLog("lxUserSymbol: \(lxUserSymbols.count) entries of data loaded from: \(path)")
         } else {
@@ -561,7 +561,7 @@ extension LXAssembly {
       lxAssociates.clear()
 
       func load() {
-        if FileManager.default.isReadableFile(atPath: path) {
+        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
           lxAssociates.open(path)
           vCLMLog("lxAssociates: \(lxAssociates.count) entries of data loaded from: \(path)")
         } else {
@@ -595,7 +595,7 @@ extension LXAssembly {
       lxReplacements.clear()
 
       func load() {
-        if FileManager.default.isReadableFile(atPath: path) {
+        if LXAssembly.userDataLocator.exists(at: URL(fileURLWithPath: path)) {
           lxReplacements.open(path)
           vCLMLog("lxReplacements: \(lxReplacements.count) entries of data loaded from: \(path)")
         } else {

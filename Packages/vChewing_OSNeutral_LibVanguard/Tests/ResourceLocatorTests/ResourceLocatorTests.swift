@@ -13,7 +13,7 @@ private final class ResourceLocatorAnchor {}
 
 // MARK: - ResourceLocatorTests
 
-@Suite("ResourceLocatorTests", .serialized)
+@Suite("ResourceLocatorTests")
 struct ResourceLocatorTests {
   // MARK: Internal
 

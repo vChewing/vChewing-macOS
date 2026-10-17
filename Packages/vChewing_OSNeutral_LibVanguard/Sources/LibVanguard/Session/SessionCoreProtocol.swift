@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - SessionCoreProtocol
 
@@ -78,7 +79,7 @@ extension SessionCoreProtocol {
   ///   - caller: 呼叫來源（自動推導為 #function）。
   ///   - line: 呼叫行號（自動推導為 #line）。
   public func switchState(_ newState: IMEState, caller: StaticString = #function, line: Int = #line) {
-    if debugLogCondition || UserDefaults.pendingUnitTests {
+    if debugLogCondition || OSUtils.isRunningUnitTests {
       let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
       let callerTag = "\(caller)@[L\(line)]"
       let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")

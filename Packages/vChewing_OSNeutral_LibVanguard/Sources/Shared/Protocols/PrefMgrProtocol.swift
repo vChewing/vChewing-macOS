@@ -2,6 +2,10 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
+import Foundation
+
+// MARK: - PrefMgrProtocol
+
 public protocol PrefMgrProtocol {
   var isDebugModeEnabled: Bool { get set }
   var failureFlagForPOMObservation: Bool { get set }
@@ -129,4 +133,16 @@ public protocol PrefMgrProtocol {
   var usingHotKeyCassette: Bool { get set }
   var usingHotKeyRevLookup: Bool { get set }
   var usingHotKeyInputMode: Bool { get set }
+}
+
+extension PrefMgrProtocol {
+  /// 當前生效之語系標籤。
+  ///
+  /// `UserDef.kAppleLanguages` 之預設值為空陣列，而生產環境之所以仍讀得到語系，是因為
+  /// `UserDefaults` 會續查全域網域（`AppleLanguages` 通常住在 `NSGlobalDomain`）；
+  /// 記憶體容器沒有這層後援，故於偏好未設定時改取 `Locale.preferredLanguages`。
+  /// 未設定時之語意與系統語系一致，故行為不變；但空陣列不再造成越界。
+  public var effectiveAppleLanguage: String {
+    appleLanguages.first ?? Locale.preferredLanguages.first ?? "en"
+  }
 }

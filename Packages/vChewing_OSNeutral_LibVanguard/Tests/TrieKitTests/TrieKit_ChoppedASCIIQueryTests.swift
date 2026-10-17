@@ -10,7 +10,7 @@ import Foundation
 import Testing
 @testable import TrieKit
 
-@Suite(.serialized)
+@Suite
 struct TrieKitTextMapChoppedASCIIQueryTests {
   // MARK: Internal
 

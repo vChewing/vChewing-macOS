@@ -12,7 +12,6 @@ private let replayNow: Double = 114_514 * 10_000
 private func makeReplayStagingDirectory() throws -> URL {
   let dir = URL(fileURLWithPath: NSTemporaryDirectory())
     .appendingPathComponent("pom-journal-\(UUID().uuidString)", isDirectory: true)
-  try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
   return dir
 }
 
@@ -42,7 +41,7 @@ private func writeReplayJournal(_ records: [[String: Any]], to baseURL: URL) thr
     return String(decoding: data, as: UTF8.self)
   }
   let journalURL = baseURL.appendingPathExtension("journal")
-  try lines.joined(separator: "\n").write(to: journalURL, atomically: true, encoding: .utf8)
+  try LXAssembly.userDataLocator.write(Data(lines.joined(separator: "\n").utf8), to: journalURL)
 }
 
 /// 把一組配對寫成快照檔。
@@ -50,7 +49,7 @@ private func writeReplaySnapshot(
   _ pairs: [LXAssembly.LXPerceptor.KeyPerceptionPair],
   to baseURL: URL
 ) throws {
-  try JSONEncoder().encode(pairs).write(to: baseURL, options: .atomic)
+  try LXAssembly.userDataLocator.write(JSONEncoder().encode(pairs), to: baseURL)
 }
 
 // MARK: - POMTestSuite.POMJournalReplayTests
@@ -63,13 +62,26 @@ extension POMTestSuite {
   /// 被 bleach 或逐出的鍵於是自快照復活。
   @Suite(.serialized)
   final class POMJournalReplayTests {
+    // MARK: Lifecycle
+
+    init() {
+      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
+      LXAssembly.userDataLocator = InMemoryUserDataLocator()
+    }
+
+    deinit {
+      LXAssembly.userDataLocator = DiskUserDataLocator()
+    }
+
+    // MARK: Internal
+
     // MARK: - 移除與清空
 
     /// 日誌記載的移除必須生效：快照裡有、日誌裡被移除的鍵，重載後不得復活。
     @Test
     func testPOM_JournalReplay_01_RemovalRecordIsApplied() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -95,7 +107,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_02_ClearRecordIsApplied() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -131,7 +143,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_03_RecordOrderIsHonored() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -172,7 +184,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_04_BleachRemovalSurvivesReload() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")
@@ -196,7 +208,7 @@ extension POMTestSuite {
     @Test
     func testPOM_JournalReplay_05_ChangeStreamCarriesRemovalsAndClears() throws {
       let stagingDirectory = try makeReplayStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let keyA = makeReplayUnigramKey(reading: "ㄅㄚ", value: "芭")

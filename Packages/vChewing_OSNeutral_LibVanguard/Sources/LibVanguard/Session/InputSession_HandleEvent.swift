@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - Facade
 
@@ -37,7 +38,7 @@ extension SessionProtocol {
 
     // Caps Lock 通知與切換處理。
     if ui?.capsLockHitChecker?.check(event) ?? false {
-      asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+      asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) { [weak self] in
         guard let this = self else { return }
         vCLog("CapsLock key tap detected, toggling Alphanumerical Mode if should.")
         let isCapsLockTurnedOn = this.ui?.capsLockToggler?.isOn ?? false

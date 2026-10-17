@@ -17,7 +17,7 @@ import Testing
 /// 鎖定 Homa 組字器對「小 / 中型值型別」的記憶體行為：
 /// 節點必須維持值語義（Struct），反覆重新組句的堆分配次數必須收斂於有界常數。
 extension HomaTestsRoot {
-  @Suite(.serialized)
+  @Suite
   struct HomaTests_Heap: HomaTestSuite {
     /// 節點必須是值型別：修改值拷貝不得影響原始節點。
     /// （若有人把 Node 改回 Class，此測試會因引用共享而失敗。）

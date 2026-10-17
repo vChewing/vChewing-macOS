@@ -15,69 +15,57 @@ extension LXAssembly {
       "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍"
 
     /// 檢查給定檔案的標頭是否正常。
-    /// - Parameter path: 給定檔案路徑。
+    /// - Parameters:
+    ///   - path: 給定檔案路徑。
+    ///   - locator: 資料通道；預設為行程級之 `LXAssembly.userDataLocator`。
     /// - Returns: 結果正常則為真，其餘為假。
-    public static func checkPragma(path: String) -> Bool {
+    public static func checkPragma(
+      path: String,
+      using locator: any UserDataLocator = LXAssembly.userDataLocator
+    )
+      -> Bool {
       LXAssembly.withFileHandleQueueSync {
-        if FileManager.default.fileExists(atPath: path) {
-          do {
-            guard let fileHandle = FileHandle(forReadingAtPath: path) else {
-              throw FileErrors.fileHandleError("")
-            }
-            defer { try? fileHandle.closeTheFile() }
-            // 純前綴判定：檔頭須與 pragma 的 UTF-8 位元組完全一致，且其後須為斷行或 EOF。
-            guard let head = try fileHandle.read(upTo: kPragmaHeaderBytes.count),
-                  head.elementsEqual(kPragmaHeaderBytes) else {
-              vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
-              return false
-            }
-            let nextByte = try fileHandle.read(upTo: 1)?.first
-            guard nextByte == nil || nextByte == 0x0A || nextByte == 0x0D else {
-              vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
-              return false
-            }
-            vCLMLog("Header Verification Succeeded: \(kPragmaHeader).")
-            return true
-          } catch {
-            vCLMLog("Header Verification Failed: File Access Error.")
-            return false
-          }
+        guard let data = try? locator.read(at: URL(fileURLWithPath: path)) else {
+          vCLMLog("Header Verification Failed: File Missing.")
+          return false
         }
-        vCLMLog("Header Verification Failed: File Missing.")
-        return false
+        // 純前綴判定：檔頭須與 pragma 的 UTF-8 位元組完全一致，且其後須為斷行或 EOF。
+        guard hasIntactPragmaHeader(bytes: data) else {
+          vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
+          return false
+        }
+        vCLMLog("Header Verification Succeeded: \(kPragmaHeader).")
+        return true
       }
     }
 
     /// 檢查檔案是否以空行結尾，如果缺失則補充之。
-    /// - Parameter path: 給定檔案路徑。
+    /// - Parameters:
+    ///   - path: 給定檔案路徑。
+    ///   - locator: 資料通道；預設為行程級之 `LXAssembly.userDataLocator`。
     /// - Returns: 結果正常或修復順利則為真，其餘為假。
     @discardableResult
-    public static func fixEOF(path: String) -> Bool {
+    public static func fixEOF(
+      path: String,
+      using locator: any UserDataLocator = LXAssembly.userDataLocator
+    )
+      -> Bool {
       LXAssembly.withFileHandleQueueSync {
-        var fileSize: UInt64?
-        do {
-          let dict = try FileManager.default.attributesOfItem(atPath: path)
-          if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
-        } catch {
+        let url = URL(fileURLWithPath: path)
+        guard let data = try? locator.read(at: url) else {
           vCLMLog("EOF Fix Failed: File Missing at \(path).")
           return false
         }
-        guard let fileSize = fileSize else { return false }
-        guard let writeFile = FileHandle(forUpdatingAtPath: path) else {
-          vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
-          return false
-        }
-        defer { try? writeFile.closeTheFile() }
         /// 注意：Swift 版 LXConsolidator 並未在此安排對 EOF 的去重複工序。
         /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
-        if fileSize >= 1 {
-          try? writeFile.seek(to: fileSize - 1)
-        }
-        if (try? writeFile.readToEndOfFile())?.first != 0x0A {
+        if data.last != 0x0A {
           vCLMLog("EOF Missing Confirmed, Start Fixing.")
-          var newData = Data()
-          newData.append(0x0A)
-          try? writeFile.writeData(newData)
+          do {
+            try locator.append(Data([0x0A]), to: url)
+          } catch {
+            vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
+            return false
+          }
           vCLMLog("EOF Successfully Assured.")
         }
         return true
@@ -104,13 +92,18 @@ extension LXAssembly {
     ///   - shouldCheckPragma: 是否在檔案標頭完好無損的情況下略過對格式的整理。
     /// - Returns: 若整理順利或無須整理，則為真；反之為假。
     @discardableResult
+    /// - Parameters:
+    ///   - path: 給定檔案路徑。
+    ///   - shouldCheckPragma: 是否在檔案標頭完好無損的情況下略過對格式的整理。
+    ///   - locator: 資料通道；預設為行程級之 `LXAssembly.userDataLocator`。
     public static func consolidate(
       path: String,
-      pragma shouldCheckPragma: Bool
+      pragma shouldCheckPragma: Bool,
+      using locator: any UserDataLocator = LXAssembly.userDataLocator
     )
       -> Bool {
       LXAssembly.withFileHandleQueueSync {
-        let pragmaResult = checkPragma(path: path)
+        let pragmaResult = checkPragma(path: path, using: locator)
         if shouldCheckPragma {
           if pragmaResult {
             return true
@@ -118,21 +111,17 @@ extension LXAssembly {
         }
 
         let urlPath = URL(fileURLWithPath: path)
-        if FileManager.default.fileExists(atPath: path) {
-          do {
-            var buffer = [UInt8](try Data(contentsOf: urlPath))
-            buffer = Self.consolidateNormalize(bytes: buffer)
-            // 以原始位元組寫回：非法 UTF-8 內容原樣保留（不再經 String 解碼轉成 U+FFFD）。
-            try Data(buffer).write(to: urlPath)
-          } catch {
-            vCLMLog("Consolidation Failed w/ File: \(path), error: \(error)")
-            return false
-          }
-          vCLMLog("Either Consolidation Successful Or No-Need-To-Consolidate.")
-          return true
+        do {
+          var buffer = [UInt8](try locator.read(at: urlPath))
+          buffer = Self.consolidateNormalize(bytes: buffer)
+          // 以原始位元組寫回：非法 UTF-8 內容原樣保留（不再經 String 解碼轉成 U+FFFD）。
+          try locator.write(Data(buffer), to: urlPath)
+        } catch {
+          vCLMLog("Consolidation Failed w/ File: \(path), error: \(error)")
+          return false
         }
-        vCLMLog("Consolidation Failed: File Missing at \(path).")
-        return false
+        vCLMLog("Either Consolidation Successful Or No-Need-To-Consolidate.")
+        return true
       }
     }
 

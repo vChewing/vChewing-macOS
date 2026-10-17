@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - 狀態調度 (State Handling)
 
@@ -124,7 +125,7 @@ extension SessionProtocol {
       }
     }
 
-    asyncOnMain(bypassAsync: !isServingIMEItself || UserDefaults.pendingUnitTests) {
+    asyncOnMain(bypassAsync: !isServingIMEItself || OSUtils.isRunningUnitTests) {
       doCommit(buffer)
     }
   }
@@ -165,7 +166,7 @@ extension SessionProtocol {
     recentMarkedText = (string, range)
     // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。
     let newString = string.copy() as? NSAttributedString ?? .init(string: string.string)
-    var async = allowAsync && !UserDefaults.pendingUnitTests
+    var async = allowAsync && !OSUtils.isRunningUnitTests
     async = async && (isServingIMEItself || !isActivated)
     asyncOnMain(bypassAsync: !async) { [weak self] in
       guard let this = self else { return }

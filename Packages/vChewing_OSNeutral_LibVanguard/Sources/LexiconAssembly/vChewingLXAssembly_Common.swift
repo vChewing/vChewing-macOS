@@ -42,6 +42,15 @@ public enum LXAssembly {
     return queue
   }()
 
+  /// 使用者資料之檔案系統存取縫；生產環境即 ``DiskUserDataLocator``。
+  ///
+  /// 單元測試可於起手處換成 ``InMemoryUserDataLocator``（各用例各持一顆）或
+  /// ``DisabledUserDataLocator``，即可在不動生產碼的前提下把落盤語意整個關掉。
+  nonisolated public static var userDataLocator: any UserDataLocator {
+    get { _userDataLocator.withLockRead { $0 } }
+    set { _userDataLocator.withLock { $0 = newValue } }
+  }
+
   /// 經 fileHandleQueue 調度、於 MainActor 上就地執行閉包（同步、可重入）。
   /// - Note: 兩種情形一律就地執行、不進 `fileHandleQueue.sync`：
   ///   ① 呼叫方已在 fileHandleQueue 上——再 sync 同一條序列佇列即為遞迴 sync；
@@ -98,7 +107,7 @@ public enum LXAssembly {
               LXConsolidator.fixEOF(path: path)
               LXConsolidator.consolidate(path: path, pragma: true)
             }
-            let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+            let rawStrData = try readTextViaUserDataLocator(path: path)
             asyncOnMain { completion(rawStrData) }
           } catch {
             vCLMLog("readFileContentAsync failed at: \(path). Details: \(error)")
@@ -121,7 +130,7 @@ public enum LXAssembly {
               LXConsolidator.fixEOF(path: path)
               LXConsolidator.consolidate(path: path, pragma: true)
             }
-            let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+            let rawStrData = try readTextViaUserDataLocator(path: path)
             asyncOnMain { completion(rawStrData) }
           } catch {
             vCLMLog("readFileContentAsync failed at: \(path). Details: \(error)")
@@ -138,19 +147,31 @@ public enum LXAssembly {
     case fileHandleError(String)
   }
 
+  /// 經 ``userDataLocator`` 讀出 UTF-8 文字；非法位元組一律視為讀取失敗。
+  nonisolated static func readTextViaUserDataLocator(path: String) throws -> String {
+    let data = try Self.userDataLocator.read(at: URL(fileURLWithPath: path))
+    guard let text = String(data: data, encoding: .utf8) else {
+      throw FileErrors.fileHandleError(path)
+    }
+    return text
+  }
+
   // MARK: Private
 
   private static let fileHandleQueueKey = DispatchSpecificKey<UUID>()
   private static let fileHandleQueueIdentifier = UUID()
+  nonisolated private static let _userDataLocator: NSMutex<any UserDataLocator> = .init(
+    DiskUserDataLocator()
+  )
 }
 
 func vCLMLog(_ strPrint: StringLiteralType) {
   // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
   // 以免 mixedAlnum 等大量觸發 POM 儲存路徑的案例在完整測試時刷屏。
-  if UserDefaults.pendingUnitTests, !hasTestFilterArguments() {
+  if OSUtils.isRunningUnitTests, !hasTestFilterArguments() {
     return
   }
-  let toLog = UserDefaults.standard.object(forKey: "_DebugMode") as? Bool ?? true
+  let toLog = OSUtils.defaultsStore.object(forKey: "_DebugMode") as? Bool ?? true
   if toLog {
     OSUtils.consoleLog("vChewingDebug: \(strPrint)")
   }
@@ -167,7 +188,7 @@ private func hasTestFilterArguments() -> Bool {
 
 extension LXAssembly {
   public static func applyEnvironmentDefaults() {
-    LXAssembly.LXFacade.asyncLoadingUserData = !UserDefaults.pendingUnitTests
+    LXAssembly.LXFacade.asyncLoadingUserData = !OSUtils.isRunningUnitTests
   }
 
   public static func resetSharedState(restoreAsyncLoadingStrategy: Bool = true) {

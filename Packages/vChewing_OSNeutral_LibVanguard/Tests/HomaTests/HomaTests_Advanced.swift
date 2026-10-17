@@ -10,7 +10,7 @@ import Testing
 // MARK: - HomaTestsAdvanced
 
 extension HomaTestsRoot {
-  @Suite(.serialized)
+  @Suite
   public struct HomaTestsAdvanced: HomaTestSuite {
     /// 組字器的分詞功能測試，同時測試組字器的硬拷貝功能。
     @Test("[Homa] Assembler_HardCopyAndWordSegmentation")

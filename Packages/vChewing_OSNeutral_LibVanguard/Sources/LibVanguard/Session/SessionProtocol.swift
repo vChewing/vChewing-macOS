@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - SessionProtocol
 
@@ -124,7 +125,7 @@ extension SessionProtocol {
   public func construct(clientProxy theClientProxy: (any SessionClientProxy)? = nil) {
     // AsyncOnMain 自身的 Lambda Expression 可能與 Swift 6.2 的 Concurrency 相性不太好。
     // 於是這裡單獨判斷。
-    if UserDefaults.pendingUnitTests {
+    if OSUtils.isRunningUnitTests {
       constructSansAsync(clientProxy: theClientProxy)
     } else {
       asyncOnMain { [weak self] in
@@ -172,7 +173,7 @@ extension SessionProtocol {
         ? prefs.alphanumericalKeyboardLayout
         : prefs.basicKeyboardLayout
     guard targetLayout != lastAppliedKeyboardLayout else { return }
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+    asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) { [weak self] in
       guard let this = self else { return }
       if let clientProxy = this.clientProxy, !this.isServingIMEItself {
         clientProxy.clientOverrideKeyboard(withName: targetLayout)
@@ -210,7 +211,7 @@ extension SessionProtocol {
     // 的 setValue 連續技打斷（所有操作都在 MainActor 上，不會有時序錯亂）。
     // 快速路徑與完整路徑皆由此 defer 收尾，僅需撰寫一次；單元測試環境同步執行（bypass）。
     defer {
-      asyncOnMain(after: 0.05, bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+      asyncOnMain(after: 0.05, bypassAsync: OSUtils.isRunningUnitTests) { [weak self] in
         self?.maybeShowModeDescriptionHintUponActivation()
       }
     }
@@ -264,7 +265,7 @@ extension SessionProtocol {
       this.clientBundleIdentifier = senderBundleID
       // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
       if this.prefs.checkUpdateAutomatically {
-        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+        asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
           SessionHost.shared.checkUpdate(false) {
             senderBundleID == "com.apple.SecurityAgent"
           }
@@ -274,7 +275,7 @@ extension SessionProtocol {
       // isElectronBasedApp 涉及 NSRunningApplication 列舉、Bundle plist 讀取、
       // FileManager 目錄掃描等 I/O 操作，延遲至下一個 RunLoop 迭代以避免阻塞啟用流程。
       this.isClientElectronBased = false
-      asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+      asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) { [weak self] in
         self?.isClientElectronBased =
           SessionHost.shared.isElectronBasedApp(senderBundleID)
       }
@@ -282,7 +283,7 @@ extension SessionProtocol {
     this.updateClientProxyObjectIdentifier(clientProxy)
     // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
     // Date.isTodayTheDate 會建立 DateFormatter，延遲處理以避免阻塞。
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+    asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) { [weak self] in
       guard let this = self else { return }
       if !Date.isTodayTheDate(from: 0_401), !this.prefs.shouldNotFartInLieuOfBeep {
         this.prefs.shouldNotFartInLieuOfBeep = true
@@ -329,7 +330,7 @@ extension SessionProtocol {
     this.isActivated = true // 登記啟用狀態。
     this.setKeyLayout()
 
-    if !UserDefaults.pendingUnitTests {
+    if !OSUtils.isRunningUnitTests {
       asyncOnMain {
         SessionHost.shared.checkMemoryUsage()
       }
@@ -389,7 +390,7 @@ extension SessionProtocol {
       x: lineHeightRect.origin.x, y: topLeftY
     )
     let heightDelta = lineHeightRect.size.height + 4.0
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+    asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
       statusUI.show(
         tooltip: hintTooltip,
         at: topLeftPoint,
@@ -438,7 +439,7 @@ extension SessionCoreProtocol {
       x: lineHeightRect.origin.x, y: topLeftY
     )
     let heightDelta = lineHeightRect.size.height + 4.0
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+    asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
       statusUI.show(
         tooltip: text,
         at: topLeftPoint,

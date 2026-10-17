@@ -14,7 +14,6 @@ private let indexedNullURL = URL(fileURLWithPath: "/dev/null")
 private func makeIndexedStagingDirectory() throws -> URL {
   let dir = URL(fileURLWithPath: NSTemporaryDirectory())
     .appendingPathComponent("pom-indexed-\(UUID().uuidString)", isDirectory: true)
-  try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
   return dir
 }
 
@@ -42,13 +41,26 @@ extension POMTestSuite {
   /// 2. 檢索逐一解析全體記憶鍵（`O(總記憶量)`），使每次敲鍵的成本與累積記憶量成正比。
   @Suite(.serialized)
   final class POMIndexedRetrievalTests {
+    // MARK: Lifecycle
+
+    init() {
+      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
+      LXAssembly.userDataLocator = InMemoryUserDataLocator()
+    }
+
+    deinit {
+      LXAssembly.userDataLocator = DiskUserDataLocator()
+    }
+
+    // MARK: Internal
+
     // MARK: - 容量收斂
 
     /// 逐 session 反覆載入／存檔時，映射與 LRU 序列必須恆保持同構、且不得超出容量。
     @Test
     func testPOM_IndexedRetrieval_01_CapacityConvergesAcrossSessions() throws {
       let stagingDirectory = try makeIndexedStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let capacity = 50
@@ -84,7 +96,7 @@ extension POMTestSuite {
     @Test
     func testPOM_IndexedRetrieval_02_LoadConvergesWhenCapacityShrinks() throws {
       let stagingDirectory = try makeIndexedStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       let widePOM = LXAssembly.LXPerceptor(capacity: 40, dataURL: dataURL)
@@ -108,7 +120,7 @@ extension POMTestSuite {
     @Test
     func testPOM_IndexedRetrieval_03_JournalReplayRespectsCapacity() throws {
       let stagingDirectory = try makeIndexedStagingDirectory()
-      defer { try? FileManager.default.removeItem(at: stagingDirectory) }
+      defer { try? LXAssembly.userDataLocator.remove(at: stagingDirectory) }
       let dataURL = stagingDirectory.appendingPathComponent("pom.json")
 
       // 第一個 session：寫入完整快照，再追加日誌。

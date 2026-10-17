@@ -214,6 +214,28 @@ struct LXConsolidatorConsolidateTests {
     #expect(Array(result) == Array("\(header)\nfoo\n".utf8) + [0xFF, 0xFE] + Array("\nbar\n".utf8))
   }
 
+  @Test("[LXAssembly] ConsolidatePath_WorksOnInMemoryLocator")
+  func testConsolidatePathWorksOnInMemoryLocator() throws {
+    // 記憶體通道亦須走完整工序，且全程不觸及硬碟。
+    let locator = InMemoryUserDataLocator()
+    let url = URL(fileURLWithPath: "/vChewingTests/in-memory-consolidation.txt")
+    try locator.write(Data("foo   bar\nbaz  \n".utf8), to: url)
+    #expect(LXAssembly.LXConsolidator.consolidate(path: url.path, pragma: false, using: locator))
+    #expect(LXAssembly.LXConsolidator.checkPragma(path: url.path, using: locator))
+    #expect(!FileManager.default.fileExists(atPath: url.path))
+    #expect(try locator.readText(at: url).hasSuffix("\n"))
+  }
+
+  @Test("[LXAssembly] FixEOF_WorksOnInMemoryLocator")
+  func testFixEOFWorksOnInMemoryLocator() throws {
+    let locator = InMemoryUserDataLocator()
+    let url = URL(fileURLWithPath: "/vChewingTests/in-memory-eof.txt")
+    try locator.write(Data("no-trailing-newline".utf8), to: url)
+    #expect(LXAssembly.LXConsolidator.fixEOF(path: url.path, using: locator))
+    #expect(try locator.readText(at: url) == "no-trailing-newline\n")
+    #expect(!FileManager.default.fileExists(atPath: url.path))
+  }
+
   // MARK: Private
 
   private let header = LXAssembly.LXConsolidator.kPragmaHeader

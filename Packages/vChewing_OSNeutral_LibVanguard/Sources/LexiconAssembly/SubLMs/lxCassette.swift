@@ -927,16 +927,26 @@ extension LXAssembly.LXCassette {
   /// - Parameter path: 檔案路徑。
   /// - Returns: 是否載入成功。
   @discardableResult
-  mutating func open(_ path: String) -> Bool {
+  mutating func open(
+    _ path: String,
+    using locator: any UserDataLocator = LXAssembly.userDataLocator
+  )
+    -> Bool {
     if isLoaded { return false }
     let oldPath = filePath
     filePath = nil
-    if FileManager.default.fileExists(atPath: path) {
+    let fileURL = URL(fileURLWithPath: path)
+    if locator.exists(at: fileURL) {
       do {
-        guard let fileHandle = FileHandle(forReadingAtPath: path) else {
-          throw LXAssembly.FileErrors.fileHandleError("")
+        let lineIterator: ByteLineIterator
+        if locator.isBackedByFileSystem {
+          guard let fileHandle = FileHandle(forReadingAtPath: path) else {
+            throw LXAssembly.FileErrors.fileHandleError("")
+          }
+          lineIterator = ByteLineIterator(file: fileHandle)
+        } else {
+          lineIterator = ByteLineIterator(data: try locator.read(at: fileURL))
         }
-        let lineIterator = ByteLineIterator(file: fileHandle)
         var theMaxKeyLength = 1
         var loadingKeys = false
 

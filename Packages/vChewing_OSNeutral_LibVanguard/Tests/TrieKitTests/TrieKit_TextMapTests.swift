@@ -6,7 +6,7 @@ import Foundation
 import Testing
 @testable import TrieKit
 
-@Suite(.serialized)
+@Suite
 struct TrieKitTextMapTests {
   @Test("[TrieKit] TYPING TextMap 3-column numeric value disambiguation")
   func testTypingTextMapThreeColumnNumericValueDisambiguation() throws {

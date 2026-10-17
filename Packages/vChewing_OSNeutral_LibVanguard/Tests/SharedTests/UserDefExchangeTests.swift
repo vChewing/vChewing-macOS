@@ -11,15 +11,15 @@ final class UserDefExchangeTests {
   // MARK: Lifecycle
 
   init() {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.Shared.UnitTests")
-    UserDefaults.pendingUnitTests = true
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
   }
 
   deinit {
     // `deinit` 為 nonisolated，而 `UserDef.resetAll()` 繫於 MainActor，故僅在此復原旗標；
     // 各測試之 `init` 皆已自行 `UserDef.resetAll()`。
-    UserDefaults.pendingUnitTests = false
+    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal
@@ -41,8 +41,8 @@ final class UserDefExchangeTests {
   /// §3.2 匯出端不得輸出任何 `__` 起頭之鍵，且所有鍵皆為真偏好鍵。
   @Test
   func testExportAsJSONNeverEmitsReservedKeys() throws {
-    UserDefaults.current.set(true, forKey: UserDef.kUseRearCursorMode.rawValue)
-    UserDefaults.current.set(120, forKey: UserDef.kCandidateListTextSize.rawValue)
+    OSUtils.defaultsStore.set(true, forKey: UserDef.kUseRearCursorMode.rawValue)
+    OSUtils.defaultsStore.set(120, forKey: UserDef.kCandidateListTextSize.rawValue)
     let data = try #require(UserDef.exportAsJSON())
     let jsonObj = try JSONSerialization.jsonObject(with: data)
     let dict = try #require(jsonObj as? [String: Any])
@@ -130,8 +130,8 @@ final class UserDefExchangeTests {
     #expect(reasons[UserDef.kCassettePath.rawValue] == "Blacklisted key")
     #expect(reasons["Nope"] == "Unknown key")
     #expect(reasons[UserDef.kCandidateListTextSize.rawValue] != nil)
-    #expect(UserDefaults.current.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
-    #expect(UserDefaults.current.object(forKey: UserDef.kCandidateListTextSize.rawValue) == nil)
+    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
+    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kCandidateListTextSize.rawValue) == nil)
   }
 
   /// §3.6 `importFromJSON` 即 `importFromDictionary` 之薄殼。
@@ -180,7 +180,7 @@ final class UserDefExchangeTests {
     #expect(outcome.meta?.description == "D")
     #expect(outcome.result.successes == [UserDef.kUseRearCursorMode.rawValue])
     #expect(outcome.result.failures.isEmpty)
-    #expect(UserDefaults.current.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
+    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
 
     let invalid = UserDef.importFromExchangeJSON(Data("{{".utf8))
     #expect(invalid.meta == nil)
@@ -193,8 +193,8 @@ final class UserDefExchangeTests {
   /// §3.8 `diffAgainstCurrent` 之同值／值域外／黑名單／真差異四類。
   @Test
   func testDiffAgainstCurrent() {
-    UserDefaults.current.set(true, forKey: UserDef.kIsDebugModeEnabled.rawValue)
-    UserDefaults.current.set(2_024.0, forKey: UserDef.kDeltaOfCalendarYears.rawValue)
+    OSUtils.defaultsStore.set(true, forKey: UserDef.kIsDebugModeEnabled.rawValue)
+    OSUtils.defaultsStore.set(2_024.0, forKey: UserDef.kDeltaOfCalendarYears.rawValue)
 
     // 同值不算差異（含跨表示法：JSON 1 對 Bool true、JSON 2024 對 Double 2024.0）。
     let same = UserDef.diffAgainstCurrent([
@@ -224,8 +224,8 @@ final class UserDefExchangeTests {
     ])
     #expect(real.changed.map(\.rawValue) == real.changed.map(\.rawValue).sorted())
     #expect(real.changed == [.kUseHorizontalCandidateList, .kUseRearCursorMode])
-    #expect(UserDefaults.current.object(forKey: UserDef.kUseRearCursorMode.rawValue) == nil)
-    #expect(UserDefaults.current.object(forKey: UserDef.kUseHorizontalCandidateList.rawValue) == nil)
+    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseRearCursorMode.rawValue) == nil)
+    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseHorizontalCandidateList.rawValue) == nil)
   }
 
   /// 不變式：**凡 `metaData.options` 宣告之選項值，逐鍵驗證皆須接受**。
@@ -294,10 +294,10 @@ final class UserDefExchangeTests {
       // 無值域者非整數鍵（Bool／String），不在 `fixOddPreferencesCore()` 之夾值範圍內。
       guard userDef.validNumeralValueRange != nil else { continue }
       for value in options.keys.sorted() {
-        // 直接佈置於 `UserDefaults.current`（即 `@AppProperty` 之讀寫域），再驅動夾值邏輯。
-        UserDefaults.current.set(value, forKey: userDef.rawValue)
+        // 直接佈置於 `OSUtils.defaultsStore`（即 `@AppProperty` 之讀寫域），再驅動夾值邏輯。
+        OSUtils.defaultsStore.set(value, forKey: userDef.rawValue)
         prefs.fixOddPreferencesCore()
-        let after = UserDefaults.current.object(forKey: userDef.rawValue) as? Int
+        let after = OSUtils.defaultsStore.object(forKey: userDef.rawValue) as? Int
         #expect(
           after == value,
           "「\(userDef)」之選項 \(value) 竟被 `fixOddPreferencesCore()` 改為 \(after.map(\.description) ?? "nil")"

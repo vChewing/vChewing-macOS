@@ -16,7 +16,7 @@ extension HomaTestsRoot {
   /// 導致全拼長詞（>4 音節）永遠無法在單一節點組出。
   /// 精化後改以「窗內各鍵讀音數的乘積」判斷，乘積超過預算（625）才縮減，
   /// 讓免聲調的 4 音節組合（5⁴ = 625）得以整詞組出，同時保留 5 音節以上的防禦。
-  @Suite(.serialized)
+  @Suite
   public struct HomaTestsCartesianBudget: HomaTestSuite {
     /// 免聲調 4 音節（每鍵 5 個聲調桶、乘積 625 ≤ 625）：
     /// 不觸發縮減，四字詞得以在單一節點組出（P167 實測校準點：末代 Intel 上

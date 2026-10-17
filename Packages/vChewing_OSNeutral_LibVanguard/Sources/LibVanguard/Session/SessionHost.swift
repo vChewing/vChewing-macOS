@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - SessionHost
 
@@ -177,7 +178,7 @@ extension Shared.InputMode {
   private static var unitTestCache: LexiconCache?
 
   private static var activeCache: LexiconCache {
-    if UserDefaults.pendingUnitTests {
+    if OSUtils.isRunningUnitTests {
       if unitTestCache == nil {
         unitTestCache = LexiconCache()
       }

@@ -175,9 +175,9 @@ extension LXAssembly.PerceptionPersistor {
       return
     }
 
-    let fileManager = FileManager.default
+    let fileExisted = LXAssembly.userDataLocator.exists(at: fileURL)
     lock.withLock {
-      if !fileManager.fileExists(atPath: fileURL.path) {
+      if !fileExisted {
         needsFullSnapshot = true
       }
     }
@@ -243,12 +243,11 @@ extension LXAssembly.PerceptionPersistor {
       vCLMLog("POM loadData() failed. At least the file Load URL is not set for the current POM.")
       return
     }
-    let fileManager = FileManager.default
     let decoder = JSONDecoder()
 
-    if fileManager.fileExists(atPath: fileURL.path) {
+    if LXAssembly.userDataLocator.exists(at: fileURL) {
       do {
-        let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+        let data = try LXAssembly.userDataLocator.read(at: fileURL)
         let dataString = String(data: data, encoding: .utf8) ?? ""
         vCLMLog("POM: Loading data from snapshot, content: '\(dataString.prefix(100))...'")
 
@@ -270,7 +269,7 @@ extension LXAssembly.PerceptionPersistor {
         }
       } catch {
         vCLMLog("POM Error: Unable to decode snapshot JSON. Details: \(error)")
-        if let data = try? String(contentsOf: fileURL, encoding: .utf8),
+        if let data = try? String(data: LXAssembly.userDataLocator.read(at: fileURL), encoding: .utf8),
            data.trimmingCharacters(in: .whitespacesAndNewlines) == "{}" {
           vCLMLog("POM: Detected old invalid format '{}', clearing snapshot")
           clearDataOnDisk(fileURL: fileURL, dataProvider: { [] })
@@ -280,7 +279,7 @@ extension LXAssembly.PerceptionPersistor {
 
     replayJournal(from: fileURL, keyValidator: keyValidator, replayApplicator: replayApplicator)
 
-    if let snapshotData = try? Data(contentsOf: fileURL) {
+    if let snapshotData = try? LXAssembly.userDataLocator.read(at: fileURL) {
       previouslySavedHash = computeHexCRC32(snapshotData)
     } else {
       previouslySavedHash = ""
@@ -355,23 +354,15 @@ extension LXAssembly.PerceptionPersistor {
     guard !records.isEmpty else { return }
     let journalURL = journalFileURL(for: baseURL)
     let encoder = JSONEncoder()
-    let fileManager = FileManager.default
 
-    if !fileManager.fileExists(atPath: journalURL.path) {
-      _ = fileManager.createFile(atPath: journalURL.path, contents: nil, attributes: nil)
-    }
-
-    let handle = try FileHandle(forWritingTo: journalURL)
-    defer { try? handle.closeTheFile() }
-    _ = try? handle.seekToEOF()
-
+    var payload = Data()
     for record in records {
-      let data = try encoder.encode(record)
-      try? handle.writeData(data)
+      payload.append(try encoder.encode(record))
       if let newline = "\n".data(using: .utf8) {
-        try? handle.writeData(newline)
+        payload.append(newline)
       }
     }
+    try LXAssembly.userDataLocator.append(payload, to: journalURL)
 
     vCLMLog("POM Journal: Appended \(records.count) entries to \(journalURL.path)")
     let now = Date().timeIntervalSince1970
@@ -395,21 +386,14 @@ extension LXAssembly.PerceptionPersistor {
   /// 判斷是否需要以新快照壓縮日誌。呼叫時**不得**持有本類別的鎖（內部會做檔案 I/O）。
   private func shouldCompactJournal(for baseURL: URL) -> Bool {
     let journalURL = journalFileURL(for: baseURL)
-    let fileManager = FileManager.default
-    guard fileManager.fileExists(atPath: journalURL.path) else { return false }
+    guard LXAssembly.userDataLocator.exists(at: journalURL) else { return false }
 
     if lock.withLock({ journalEntriesSinceLastCompaction }) >= Self.journalCompactionEntryThreshold {
       return true
     }
 
-    do {
-      let attributes = try fileManager.attributesOfItem(atPath: journalURL.path)
-      if let fileSize = attributes[.size] as? NSNumber {
-        return fileSize.uint64Value >= Self.journalCompactionSizeThreshold
-      }
-    } catch {
-      vCLMLog("POM Journal: Unable to read attributes, forcing compaction. Details: \(error)")
-      return true
+    if let fileSize = LXAssembly.userDataLocator.byteSize(at: journalURL) {
+      return fileSize >= Self.journalCompactionSizeThreshold
     }
 
     return false
@@ -434,7 +418,7 @@ extension LXAssembly.PerceptionPersistor {
     }
 
     if shouldWrite {
-      try jsonData.write(to: baseURL, options: .atomic)
+      try LXAssembly.userDataLocator.write(jsonData, to: baseURL)
       lock.withLock {
         previouslySavedHash = crc
       }
@@ -460,11 +444,10 @@ extension LXAssembly.PerceptionPersistor {
     replayApplicator: ([JournalChange]) -> ()
   ) {
     let journalURL = journalFileURL(for: baseURL)
-    let fileManager = FileManager.default
-    guard fileManager.fileExists(atPath: journalURL.path) else { return }
+    guard LXAssembly.userDataLocator.exists(at: journalURL) else { return }
 
     do {
-      let data = try Data(contentsOf: journalURL)
+      let data = try LXAssembly.userDataLocator.read(at: journalURL)
       guard !data.isEmpty else { return }
       guard let content = String(data: data, encoding: .utf8) else { return }
       let decoder = JSONDecoder()
@@ -561,10 +544,9 @@ extension LXAssembly.PerceptionPersistor {
   /// 在成功壓縮後刪除日誌副檔。
   private func removeJournalFile(for baseURL: URL) {
     let journalURL = journalFileURL(for: baseURL)
-    let fileManager = FileManager.default
-    guard fileManager.fileExists(atPath: journalURL.path) else { return }
+    guard LXAssembly.userDataLocator.exists(at: journalURL) else { return }
     do {
-      try fileManager.removeItem(at: journalURL)
+      try LXAssembly.userDataLocator.remove(at: journalURL)
       vCLMLog("POM Journal: Cleared journal at \(journalURL.path)")
     } catch {
       vCLMLog("POM Journal: Unable to delete journal. Details: \(error)")

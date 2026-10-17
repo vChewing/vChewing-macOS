@@ -182,22 +182,22 @@ struct LXFacadeFuriousZhuyinwenTests {
 
   private static let boobsKey: [String] = ["ㄋㄟ", "ㄋㄟ"]
 
-  /// 於**隔離之偏好容器**內執行給定操作：以專用 suite 為 `UserDefaults.current`、
-  /// 清空全部 `UserDef`（故各偏好回取出廠預設），事後還原容器與 `pendingUnitTests`。
+  /// 於**隔離之偏好容器**內執行給定操作：換上一顆全新的記憶體容器、清空全部 `UserDef`
+  /// （故各偏好回取出廠預設），事後還原原本的容器與旗標。
   ///
-  /// 之所以必要：`PrefMgr.sharedSansDidSetOps` 之值即 `UserDefaults.current` 之內容
+  /// 之所以必要：`PrefMgr.sharedSansDidSetOps` 之值即 `OSUtils.defaultsStore` 之內容
   /// （`@AppProperty` 之 get／set 逐次讀寫容器），若直接在主容器上寫入，會把測試值
   /// 留在共用容器內而汙染同行程之其他 suite（P253 之跨 suite 汙染即此型）。
   private static func withIsolatedPrefs(_ body: () throws -> ()) rethrows {
-    let suiteName = "org.atelierInmu.vChewing.LexiconAssembly.UnitTests"
-    let savedPendingUnitTests = UserDefaults.pendingUnitTests
-    UserDefaults.unitTests = .init(suiteName: suiteName)
-    UserDefaults.pendingUnitTests = true
+    let savedStore = OSUtils.defaultsStore
+    let savedIsRunningUnitTests = OSUtils.isRunningUnitTests
+    OSUtils.defaultsStore = InMemoryDefaultsStore()
+    OSUtils.isRunningUnitTests = true
     UserDef.resetAll()
     defer {
       UserDef.resetAll()
-      UserDefaults.unitTests?.removeSuite(named: suiteName)
-      UserDefaults.pendingUnitTests = savedPendingUnitTests
+      OSUtils.defaultsStore = savedStore
+      OSUtils.isRunningUnitTests = savedIsRunningUnitTests
     }
     try body()
   }

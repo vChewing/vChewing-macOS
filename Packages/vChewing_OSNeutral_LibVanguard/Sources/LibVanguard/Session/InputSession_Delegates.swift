@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - Session + SessionProtocol
 
@@ -405,7 +406,7 @@ extension SessionProtocol {
     let succeeded = SessionHost.shared.writeUserPhrasesAtOnce(userPhrase, action == .toFilter)
 
     // 直接同步重載目前使用中的語言模組，以避免單元測試時不同 LM 實例之間資料不同步。
-    if UserDefaults.pendingUnitTests {
+    if OSUtils.isRunningUnitTests {
       let phrasesPath = SessionHost.shared.userDictDataURL(inputMode, .thePhrases).path
       if action == .toFilter {
         inputHandler.currentLM.reloadUserFilterDirectly(

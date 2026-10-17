@@ -12,7 +12,20 @@ import Testing
 
 extension POMTestSuite {
   @Suite(.serialized)
-  struct POMEncodingTests {
+  final class POMEncodingTests {
+    // MARK: Lifecycle
+
+    init() {
+      // 使用者資料一律留在記憶體內：不落地，故不與任何其他測試用例共用硬碟區域。
+      LXAssembly.userDataLocator = InMemoryUserDataLocator()
+    }
+
+    deinit {
+      LXAssembly.userDataLocator = DiskUserDataLocator()
+    }
+
+    // MARK: Internal
+
     @Test
     func testJSONEncoding() throws {
       // 創建一個暫存檔案路徑用於測試
@@ -42,7 +55,7 @@ extension POMTestSuite {
       // 測試保存空數據
       pom.saveData(toURL: tempURL)
       do {
-        let emptyFileContent = try String(contentsOf: tempURL, encoding: .utf8)
+        let emptyFileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
         vCLMLog("空數據保存後的檔案內容: '\(emptyFileContent)'")
 
         // 如果檔案內容是 "{}"，那說明有問題
@@ -99,7 +112,7 @@ extension POMTestSuite {
 
       // 檢查文件內容
       do {
-        let fileContent = try String(contentsOf: tempURL, encoding: .utf8)
+        let fileContent = try LXAssembly.userDataLocator.readText(at: tempURL)
         vCLMLog("檔案內容:")
         vCLMLog(fileContent)
 
@@ -111,7 +124,7 @@ extension POMTestSuite {
       }
 
       // 清理暫存檔案
-      try? FileManager.default.removeItem(at: tempURL)
+      try? LXAssembly.userDataLocator.remove(at: tempURL)
     }
 
     @Test

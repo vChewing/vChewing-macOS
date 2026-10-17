@@ -216,7 +216,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
     public init() {
       UserDef.allCases.forEach {
-        data[$0.rawValue] = UserDefaults.current.object(forKey: $0.rawValue)
+        data[$0.rawValue] = OSUtils.defaultsStore.object(forKey: $0.rawValue)
       }
     }
 
@@ -266,7 +266,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
   public static func resetAll() {
     Self.allCases.forEach {
-      UserDefaults.current.removeObject(forKey: $0.rawValue)
+      OSUtils.defaultsStore.removeObject(forKey: $0.rawValue)
     }
   }
 
@@ -274,7 +274,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     let data = snapshot.data
     guard !data.isEmpty else { return }
     Self.allCases.forEach {
-      UserDefaults.current.set(data[$0.rawValue], forKey: $0.rawValue)
+      OSUtils.defaultsStore.set(data[$0.rawValue], forKey: $0.rawValue)
     }
   }
 
@@ -285,7 +285,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
       guard !jsonExchangeBlacklist.contains(userDef) else { continue }
       // 命名紀律：`__` 前綴保留給交換格式之中介鍵，故永不輸出。
       guard !userDef.rawValue.hasPrefix(jsonExchangeReservedKeyPrefix) else { continue }
-      guard let value = UserDefaults.current.object(forKey: userDef.rawValue) else { continue }
+      guard let value = OSUtils.defaultsStore.object(forKey: userDef.rawValue) else { continue }
       dict[userDef.rawValue] = value
     }
     guard JSONSerialization.isValidJSONObject(dict) else { return nil }
@@ -541,7 +541,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
   /// 把當前值歸一化以資比較：該鍵不存在時以 `dataType` 之預設值代之。
   private static func currentNormalizedValue(userDef: Self) -> NormalizedValue? {
-    let currentValue = UserDefaults.current.object(forKey: userDef.rawValue)
+    let currentValue = OSUtils.defaultsStore.object(forKey: userDef.rawValue)
       ?? userDef.dataType.defaultValue
     switch validatedValue(userDef: userDef, value: currentValue) {
     case let .success(normalized): return normalized
@@ -552,12 +552,12 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   /// 將歸一化之值寫入 `UserDefaults`。
   private static func apply(_ normalized: NormalizedValue, forKey key: String) {
     switch normalized {
-    case let .bool(v): UserDefaults.current.set(v, forKey: key)
-    case let .int(v): UserDefaults.current.set(v, forKey: key)
-    case let .double(v): UserDefaults.current.set(v, forKey: key)
-    case let .string(v): UserDefaults.current.set(v, forKey: key)
-    case let .strings(v): UserDefaults.current.set(v, forKey: key)
-    case let .dictionary(v): UserDefaults.current.set(v, forKey: key)
+    case let .bool(v): OSUtils.defaultsStore.set(v, forKey: key)
+    case let .int(v): OSUtils.defaultsStore.set(v, forKey: key)
+    case let .double(v): OSUtils.defaultsStore.set(v, forKey: key)
+    case let .string(v): OSUtils.defaultsStore.set(v, forKey: key)
+    case let .strings(v): OSUtils.defaultsStore.set(v, forKey: key)
+    case let .dictionary(v): OSUtils.defaultsStore.set(v, forKey: key)
     }
   }
 }

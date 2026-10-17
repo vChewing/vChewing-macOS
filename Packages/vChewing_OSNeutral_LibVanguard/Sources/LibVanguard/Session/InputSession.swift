@@ -3,6 +3,7 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import SwiftExtension
 
 // MARK: - InputSession
 
@@ -127,7 +128,7 @@ public final class InputSession: SessionProtocol, Sendable {
     guard let addr = inputControllerAssignedAddr,
           let opaque = UnsafeRawPointer(bitPattern: addr)
     else { return nil }
-    if !UserDefaults.pendingUnitTests {
+    if !OSUtils.isRunningUnitTests {
       guard SessionHost.shared.isControllerAddressAlive(addr) else { return nil }
     }
     let obj = Unmanaged<AnyObject>.fromOpaque(opaque).takeUnretainedValue()
@@ -188,7 +189,7 @@ public final class InputSession: SessionProtocol, Sendable {
 
   /// 從 controller 位址查詢對應的 InputSession。
   public static func session(for controllerAddr: UInt) -> InputSession? {
-    if UserDefaults.pendingUnitTests {
+    if OSUtils.isRunningUnitTests {
       guard controllerAddr == 0 else { return nil }
     } else {
       guard SessionHost.shared.isControllerAddressAlive(controllerAddr) else { return nil }

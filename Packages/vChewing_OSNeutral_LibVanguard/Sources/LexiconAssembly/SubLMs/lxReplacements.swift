@@ -45,7 +45,7 @@ extension LXAssembly {
         let newBytes: [UInt8] = try LXAssembly.withFileHandleQueueSync {
           LXConsolidator.fixEOF(path: path)
           LXConsolidator.consolidate(path: path, pragma: true)
-          return [UInt8](try Data(contentsOf: URL(fileURLWithPath: path)))
+          return [UInt8](try LXAssembly.userDataLocator.read(at: URL(fileURLWithPath: path)))
         }
         replaceData(bytes: newBytes)
       } catch {
@@ -132,7 +132,7 @@ extension LXAssembly {
       LXAssembly.withFileHandleQueueSync {
         do {
           // 以原始位元組寫回：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
-          try Data(rawData).write(to: URL(fileURLWithPath: filePath), options: .atomic)
+          try LXAssembly.userDataLocator.write(Data(rawData), to: URL(fileURLWithPath: filePath))
         } catch {
           vCLMLog("Failed to save current database to: \(filePath)")
         }

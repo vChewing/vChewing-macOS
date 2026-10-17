@@ -27,6 +27,8 @@ import Foundation
 /// 同名命名空間。現一律收歸本中立的命名空間：宣告只此一份、不分平台，`Process` 亦還原為
 /// Foundation 的那個型別（下游對 `Process()` 之使用即不再與本模組的擴充混為一談）。
 public enum OSUtils {
+  // MARK: Public
+
   nonisolated public static let totalMemoryGiB: Int = {
     let rawBytes = Double(ProcessInfo.processInfo.physicalMemory)
     return Int((rawBytes / pow(1_024.0, 3)).rounded(.down))
@@ -56,6 +58,28 @@ public enum OSUtils {
     #endif
   }()
 
+  /// 當前行程之偏好設定儲存後端：生產環境為 `UserDefaults.standard`，單元測試可換成記憶體容器。
+  ///
+  /// 該值係**逐次求值**（`AppProperty` 之 get／set 每次都向此處取值），故一旦置換即刻全面生效、
+  /// 不經快取——單元測試之隔離即賴此性質。
+  ///
+  /// - Important: 本項連同下項原本以 `extension UserDefaults` 之形式掛在 Foundation 型別上，
+  ///   且**硬編碼 `.standard`／具名 suite**、無注入點。行程級之系統 API 一律住本命名空間
+  ///   （見 `17-WorkDetails-ProcessAndLint.md`），故一併收歸於此。
+  nonisolated public static var defaultsStore: any DefaultsStore {
+    get { _defaultsStore.value }
+    set { _defaultsStore.value = newValue }
+  }
+
+  /// 當前行程是否正執行單元測試。
+  ///
+  /// 此旗標只承載**排程與診斷語意**（略過 `asyncOnMain` 之延遲、令既有日誌靜音、關閉使用者
+  /// 資料之非同步載入）；偏好之**落點**自本次起改由 `defaultsStore` 決定，兩者不再一事二職。
+  nonisolated public static var isRunningUnitTests: Bool {
+    get { _isRunningUnitTests.value }
+    set { _isRunningUnitTests.value = newValue }
+  }
+
   /// 將訊息寫進當前行程之系統記錄：Apple 平台自 macOS／iOS 26 起走 OSLog（`Logger`），
   /// 更舊的系統與其餘平台走 `NSLog`／`print`。
   nonisolated public static func consoleLog<S: StringProtocol>(_ msg: S) {
@@ -75,6 +99,13 @@ public enum OSUtils {
       print(msgStr)
     #endif
   }
+
+  // MARK: Private
+
+  nonisolated private static let _defaultsStore: NSMutex<any DefaultsStore> = .init(
+    UserDefaultsStore(.standard)
+  )
+  nonisolated private static let _isRunningUnitTests = NSMutex(false)
 }
 
 // MARK: - Real Home Dir for Sandboxed Apps
@@ -202,31 +233,6 @@ extension UInt16 {
   }
 }
 
-// MARK: - User Defaults Storage
-
-extension UserDefaults {
-  nonisolated public static var pendingUnitTests: Bool {
-    get { _pendingUnitTests.value }
-    set { _pendingUnitTests.value = newValue }
-  }
-
-  nonisolated public static var unitTests: UserDefaults? {
-    get { _unitTests.value }
-    set { _unitTests.value = newValue }
-  }
-
-  nonisolated public static var current: UserDefaults {
-    pendingUnitTests ? (unitTests ?? .standard) : .standard
-  }
-
-  // MARK: - Private
-
-  nonisolated private static let _pendingUnitTests = NSMutex(false)
-  nonisolated private static let _unitTests: NSMutex<UserDefaults?> = .init(
-    UserDefaults(suiteName: "UnitTests")
-  )
-}
-
 // MARK: - AppProperty
 
 // Ref: https://www.avanderlee.com/swift/property-wrappers/
@@ -248,7 +254,7 @@ public struct AppProperty<Value: Sendable>: Sendable {
   public let key: String
   public let defaultValue: Value
 
-  public var container: UserDefaults { .current }
+  public var container: any DefaultsStore { OSUtils.defaultsStore }
   public var wrappedValue: Value {
     get {
       container.object(forKey: key) as? Value ?? defaultValue
@@ -749,12 +755,22 @@ extension FileHandle {
 
     nonisolated public init(file: FileHandle, chunkSize: Int = 4_096) {
       self.fileHandle = file
+      self.dataStorage = nil
+      self.chunkSize = chunkSize
+    }
+
+    /// 以記憶體內容初始化：供不落盤之資料來源（例如經 `UserDataLocator` 讀入之內容）逐行讀取。
+    nonisolated public init(data: Data, chunkSize: Int = 4_096) {
+      self.fileHandle = nil
+      self.dataStorage = data
       self.chunkSize = chunkSize
     }
 
     // MARK: Private
 
-    private let fileHandle: FileHandle
+    private let fileHandle: FileHandle?
+    private let dataStorage: Data?
+    private var dataOffset = 0
     private let chunkSize: Int
     private var buffer: [UInt8] = []
     private var consumed = 0
@@ -777,12 +793,22 @@ extension FileHandle {
 
     nonisolated public init(file: FileHandle, chunkSize: Int = 4_096) {
       self.fileHandle = file
+      self.dataStorage = nil
+      self.chunkSize = chunkSize
+    }
+
+    /// 以記憶體內容初始化：供不落盤之資料來源（例如經 `UserDataLocator` 讀入之內容）逐行讀取。
+    nonisolated public init(data: Data, chunkSize: Int = 4_096) {
+      self.fileHandle = nil
+      self.dataStorage = data
       self.chunkSize = chunkSize
     }
 
     // MARK: Private
 
-    private let fileHandle: FileHandle
+    private let fileHandle: FileHandle?
+    private let dataStorage: Data?
+    private var dataOffset = 0
     private let chunkSize: Int
     private var buffer: [UInt8] = []
     private var consumed = 0
@@ -858,11 +884,23 @@ extension ByteLineIterator: Sequence {
         return harvestLine(upTo: buffer.count, consuming: 0)
       }
       // 讀取下一個資料塊；讀取失敗或讀到空內容時視為 EOF。
-      guard let nextChunk = try? fileHandle.read(upTo: chunkSize), !nextChunk.isEmpty else {
+      guard let nextChunk = readNextChunk(), !nextChunk.isEmpty else {
         atEof = true
         continue
       }
       buffer.append(contentsOf: nextChunk)
     }
+  }
+
+  /// 取下一個資料塊：實體檔案走 `FileHandle`，記憶體來源走 `Data` 切片。
+  nonisolated private func readNextChunk() -> [UInt8]? {
+    if let fileHandle {
+      return (try? fileHandle.read(upTo: chunkSize)).map { [UInt8]($0) }
+    }
+    guard let dataStorage, dataOffset < dataStorage.count else { return nil }
+    let end = Swift.min(dataOffset + chunkSize, dataStorage.count)
+    let chunk = [UInt8](dataStorage[dataOffset ..< end])
+    dataOffset = end
+    return chunk
   }
 }

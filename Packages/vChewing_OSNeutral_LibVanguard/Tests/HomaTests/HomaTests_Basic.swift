@@ -23,7 +23,7 @@ extension HomaTestsRoot {
 
   // MARK: - HomaTestsBasic
 
-  @Suite(.serialized)
+  @Suite
   public struct HomaTestsBasic: HomaTestSuite {
     @Test("[Homa] SegmentAPIs")
     func testSegmentAPIs() async throws {

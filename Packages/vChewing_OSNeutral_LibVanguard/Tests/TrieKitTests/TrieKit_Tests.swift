@@ -10,7 +10,7 @@ import Testing
 
 // MARK: - TrieKitTests
 
-@Suite(.serialized)
+@Suite
 public struct TrieKitTests: TrieKitTestSuite {
   // MARK: Internal
 

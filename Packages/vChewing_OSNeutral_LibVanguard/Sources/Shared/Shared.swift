@@ -15,10 +15,10 @@ import Foundation
 public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
   // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
   // 以免 mixedAlnum 等大量觸發偵錯路徑的案例在完整測試時刷屏。
-  if UserDefaults.pendingUnitTests, !hasTestFilterArguments() {
+  if OSUtils.isRunningUnitTests, !hasTestFilterArguments() {
     return
   }
-  guard forced || UserDefaults.current.bool(forKey: "_DebugMode") else { return }
+  guard forced || OSUtils.defaultsStore.bool(forKey: "_DebugMode") else { return }
   OSUtils.consoleLog("vChewingDebug: \(strPrint)")
 }
 

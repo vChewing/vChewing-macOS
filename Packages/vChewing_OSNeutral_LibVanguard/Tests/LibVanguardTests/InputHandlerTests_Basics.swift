@@ -172,9 +172,9 @@ extension LibVanguardTestsRoot {
     // MARK: - 測試前後流程
 
     init() throws {
-      // 設定專用於單元測試的 UserDefaults
-      UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
-      UserDefaults.pendingUnitTests = true
+      // 設定專用於單元測試的偏好容器：記憶體、不落地、不跨行程，且本類別之每個用例各得一份。
+      OSUtils.defaultsStore = InMemoryDefaultsStore()
+      OSUtils.isRunningUnitTests = true
       UserDef.resetAll()
 
       // 初期化測試 LM
@@ -196,7 +196,6 @@ extension LibVanguardTestsRoot {
         testHandler?.errorCallback = nil
         testSession?.switchState(IMEState.ofAbortion())
         LXAssembly.resetSharedState()
-        UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.LibVanguard.UnitTests")
         UserDef.resetAll()
       }
     }

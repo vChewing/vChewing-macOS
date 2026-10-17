@@ -6,7 +6,7 @@
 import Foundation
 import Testing
 
-@Suite("BPMFVSTests", .serialized)
+@Suite("BPMFVSTests")
 struct BPMFVSTests {
   @Test
   func testBundledFileAccess() async throws {

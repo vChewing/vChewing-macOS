@@ -5,7 +5,7 @@
 @testable import BrailleSputnik
 import Testing
 
-@Suite("BrailleSputnik", .serialized)
+@Suite("BrailleSputnik")
 final class BrailleSputnikTests {
   @Test
   func testBrailleConversion() throws {

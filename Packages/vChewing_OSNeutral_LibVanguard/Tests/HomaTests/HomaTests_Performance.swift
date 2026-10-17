@@ -10,7 +10,7 @@ import Testing
 // MARK: - HomaPerformanceTests
 
 extension HomaTestsRoot {
-  @Suite(.serialized)
+  @Suite
   public struct HomaPerformanceTests: HomaTestSuite {
     // MARK: Internal
 

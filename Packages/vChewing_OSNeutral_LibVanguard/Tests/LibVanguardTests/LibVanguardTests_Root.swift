@@ -27,7 +27,7 @@ import Testing
 /// - Important: **凡涉及使用者資料載入（userdata）的測試，載入一律須為同步**——即
 ///   `LXFacade.asyncLoadingUserData == false`。測試要的是**確定性**：資料必須在斷言之前載入完畢，
 ///   不得留下「等等才會落定」的非同步尾巴。生產碼已把它與測試模式綁定
-///   （`resetSharedResources()`／`applyEnvironmentDefaults()` 皆寫 `= !UserDefaults.pendingUnitTests`，
+///   （`resetSharedResources()`／`applyEnvironmentDefaults()` 皆寫 `= !OSUtils.isRunningUnitTests`，
 ///   故單元測試下恆為 `false`）；**測試若自行改動此開關，必須以 `defer` 還原原值**
 ///   （見 `InputHandlerTests_Cassette` 之九處、`InputHandlerTests_MixedAlnum`、
 ///   `LXFacadeTests`、`LXFacade_TextMapTests`、`SessionTests_Basics`）。

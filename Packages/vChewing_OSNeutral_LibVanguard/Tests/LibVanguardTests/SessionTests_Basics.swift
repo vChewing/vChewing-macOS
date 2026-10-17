@@ -24,7 +24,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 客體遞交內容、選字窗導覽等）。
   ///
   /// 之所以宣告為 `InputHandlerTests` 的子 Suite，是因為兩者都會改動行程層級的全域狀態
-  /// （`UserDefaults.unitTests`、`UserDef`、`LXAssembly` 的測試辭典、`SessionHost.shared`）。
+  /// （`OSUtils.defaultsStore`、`UserDef`、`LXAssembly` 的測試辭典、`SessionHost.shared`）。
   /// Swift Testing 的 `.serialized` 會由父 Suite 繼承給子 Suite，兩者因此共用同一把鎖而
   /// 不會並行執行——這正是不讓它成為頂層 Suite 的原因。
   @Suite("SessionTests", .serialized)
@@ -32,8 +32,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // MARK: Lifecycle
 
     init() {
-      UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.LibVanguard.SessionTests")
-      UserDefaults.pendingUnitTests = true
+      OSUtils.defaultsStore = InMemoryDefaultsStore()
+      OSUtils.isRunningUnitTests = true
       UserDef.resetAll()
 
       LXAssembly.LXFacade.connectToTestFactoryDictionary(
@@ -111,8 +111,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     deinit {
       // 僅收拾本 Suite 自己的 Session，不碰其它 Suite 共用的全域狀態。
       // 理由：Swift Testing 的 `.serialized` 只保證 Suite 內部的執行順序，
-      // 不同 Suite 之間仍會並行；若在此重設 LXAssembly 共用狀態、UserDefaults 或
-      // pendingUnitTests，會與並行中的 `InputHandlerTests` 互相踩踏。
+      // 不同 Suite 之間仍會並行；若在此重設 LXAssembly 共用狀態或偏好容器，會與並行中的
+      // `InputHandlerTests` 互相踩踏。
       // 這些全域狀態會由每個測試自己的 `init` 重新建立，因此無需在此復原。
       mainSync {
         testSession.switchState(IMEState.ofAbortion())
