@@ -76,7 +76,7 @@ jobs:
               continue
             fi
             echo "Running tests for ${pkg}"
-            swift test --no-parallel --package-path "${pkg}"
+            swift test --package-path "${pkg}"
             code=$?
             if [ "$code" -eq 1 ]; then
               echo "No tests found for ${pkg}; continuing."

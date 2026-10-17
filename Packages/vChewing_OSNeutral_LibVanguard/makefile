@@ -155,10 +155,10 @@ lintFormatUncommitted:
 	fi
 
 test:
-	swift test -c release --no-parallel $(filter-out $@,$(MAKECMDGOALS))
+	swift test -c release $(filter-out $@,$(MAKECMDGOALS))
 
 test-debug:
-	swift test -c debug --no-parallel $(filter-out $@,$(MAKECMDGOALS))
+	swift test -c debug $(filter-out $@,$(MAKECMDGOALS))
 
 dockertest:
 	docker run --rm -v "$(shell pwd)":/workspace -w /workspace swift:latest swift test -c release --no-parallel $(filter-out $@,$(MAKECMDGOALS))

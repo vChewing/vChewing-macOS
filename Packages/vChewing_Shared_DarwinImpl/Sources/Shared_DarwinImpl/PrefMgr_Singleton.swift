@@ -16,15 +16,28 @@ extension PrefMgr {
   /// `didAskForRefreshingSpeechSputnik` 與 `candidateKeyValidator`；
   /// 而 `didAskForSyncingLMPrefs` 與 `didAskForSyncingShiftKeyDetectorPrefs`
   /// 則由宿主（MainAssembly4Darwin）於啟動時另行注入（見 SettingsUIHost 的 wiring）。
-  public static let shared: PrefMgr = {
-    var result = PrefMgr(
-      didAskForRefreshingSpeechSputnik: { SpeechSputnik.shared.refreshStatus() }
-    )
-    result.candidateKeyValidator = { candidateKeys in
-      result.validate(candidateKeys: candidateKeys)
+  /// 依當前儲存後端取得共用之 `PrefMgr`：同一後端只會有一份實例，換過後端即換一份實例。
+  /// 這與 `sharedSansDidSetOps` 之取法一致——兩者皆不得把建構當下之 `OSUtils.defaultsStore`
+  /// 永久捕獲，否則測試把全域換成記憶體容器之後，經此單例之讀寫仍會落在舊後端上
+  /// （`LXMgr` 之磁帶路徑即同時經此單例與 `OSUtils.defaultsStore` 讀寫，兩者必須看同一份）。
+  public static var shared: PrefMgr {
+    let store = OSUtils.defaultsStore
+    let key = ObjectIdentifier(store as AnyObject)
+    return sharedCache.withLock { cache -> PrefMgr in
+      if let cached = cache[key] { return cached }
+      let made = PrefMgr(
+        didAskForRefreshingSpeechSputnik: { SpeechSputnik.shared.refreshStatus() },
+        store: store
+      )
+      made.candidateKeyValidator = { candidateKeys in
+        made.validate(candidateKeys: candidateKeys)
+      }
+      cache[key] = made
+      return made
     }
-    return result
-  }()
+  }
+
+  private static let sharedCache = NSMutex<[ObjectIdentifier: PrefMgr]>([:])
 }
 
 // MARK: Guarded Method for Validating Candidate Keys.

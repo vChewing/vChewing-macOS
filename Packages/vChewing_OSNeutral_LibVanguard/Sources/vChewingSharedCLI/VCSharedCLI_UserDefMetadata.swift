@@ -4,6 +4,7 @@
 
 import Foundation
 import Shared
+import SwiftExtension
 
 // MARK: - dump-userdef-metadata
 
@@ -74,7 +75,9 @@ extension VCSharedCLI {
     var localeStrings = [String: [String: String]]()
     for entry in localePaths {
       let standardizedPath = (entry.path as NSString).standardizingPath
-      guard let dict = NSDictionary(contentsOfFile: standardizedPath) as? [String: String] else {
+      // 舊入口已列入 API_TO_BE_DEPRECATED，其繼任者卻要求 macOS 10.13——故由 OS-neutral 之擴充代收其異。
+      guard let dict = NSDictionary.loadOldStylePlistDictionary(atPath: standardizedPath) as? [String: String]
+      else {
         reportError("無法讀取 .strings 檔：\(standardizedPath)")
         return 1
       }

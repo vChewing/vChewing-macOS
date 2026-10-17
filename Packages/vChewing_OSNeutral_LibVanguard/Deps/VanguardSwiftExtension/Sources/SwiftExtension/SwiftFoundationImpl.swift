@@ -749,6 +749,27 @@ extension FileHandle {
   }
 }
 
+// MARK: - Loading old-style property lists without the deprecated entry point
+
+extension NSDictionary {
+  /// 以 old-style property list 之形制讀入字典（`.strings` 即此形制）。
+  ///
+  /// 收口之理由：`init(contentsOfFile:)` 已被 Foundation 列為棄用，但其「繼任者」
+  /// `init(contentsOf:error:)` 只存在於 Darwin（且要求 macOS 10.13），
+  /// FOSS 版 Foundation 根本沒有這個入口——故兩者都不能用。
+  /// 改走 `PropertyListSerialization`：它三系統皆有、皆能讀 old-style，
+  /// 且不帶任何可用性門檻（Darwin 之 10.9 地板與 Linux／WinNT 一體適用）。
+  ///
+  /// - Parameter path: old-style plist 之檔案路徑。
+  /// - Returns: 讀得之字典；檔案不存在或剖析失敗時為 `nil`。
+  nonisolated public static func loadOldStylePlistDictionary(atPath path: String) -> NSDictionary? {
+    guard let data = FileManager.default.contents(atPath: path),
+          let plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil)
+    else { return nil }
+    return plist as? NSDictionary
+  }
+}
+
 // MARK: - ByteLineIterator
 
 /// 以位元組為單位對檔案內容逐行迭代的迭代器。

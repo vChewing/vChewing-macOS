@@ -88,7 +88,7 @@ public final class DiskUserDataLocator: UserDataLocator, @unchecked Sendable {
   ///   於 legacy 側之建置目標會直接以 availability 錯誤擋下。
   nonisolated public func append(_ data: Data, to url: URL) throws {
     if !FileManager.default.fileExists(atPath: url.path) {
-      FileManager.default.createFile(atPath: url.path, contents: nil)
+      _ = FileManager.default.createFile(atPath: url.path, contents: nil)
     }
     let fileHandle = try FileHandle(forWritingTo: url)
     defer { try? fileHandle.closeTheFile() }

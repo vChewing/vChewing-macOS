@@ -383,7 +383,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 之單注音」與「注拼槽內待確認者」；③ **遇完整音節即停**（該鍵不是任何讀音之起頭候選）。
   @Test("IH-FuriousZhuyin-012 Zhuyin abbreviation cells")
   func test_IH_FuriousZhuyin_012_ZhuyinAbbreviationCells() throws {
-    guard let testHandler, let testSession else {
+    guard let testHandler, testSession != nil else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
@@ -1036,7 +1036,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// （ㄎㄜ 之窗不得出現 ㄎㄞ 等更長讀音之字）。
   @Test("IH-FuriousZhuyin-022 Incomplete prefix bucket matches pinyin side")
   func test_IH_FuriousZhuyin_022_IncompletePrefixBucketMatchesPinyinSide() throws {
-    guard let testHandler, let testSession else {
+    guard testHandler != nil, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
@@ -1287,7 +1287,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 對照組即純注音狂打（同一組按鍵會於第二鍵自動切出前一音節）。
   @Test("IH-FuriousZhuyin-027 Auto chop remains sealed under mixed alnum")
   func test_IH_FuriousZhuyin_027_AutoChopRemainsSealedUnderMixedAlnum() throws {
-    guard let testHandler, let testSession else {
+    guard let testHandler, testSession != nil else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
@@ -1309,7 +1309,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 對照組：純注音狂打（回退關）之下同一組按鍵**必須**自動切音節。
   @Test("IH-FuriousZhuyin-028 Auto chop still works without mixed alnum")
   func test_IH_FuriousZhuyin_028_AutoChopStillWorksWithoutMixedAlnum() throws {
-    guard let testHandler, let testSession else {
+    guard let testHandler, testSession != nil else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
@@ -2241,7 +2241,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   /// 還原：回退關、兩側狂打關、排列回標準注音、POM 回出廠。
   private func leaveMixedAlnumTestEnvironment() {
-    guard let testHandler, let testSession else { return }
+    guard let testHandler, testSession != nil else { return }
     testHandler.prefs.mixedAlphanumericalEnabled = false
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     leaveFuriousTestEnvironment()
