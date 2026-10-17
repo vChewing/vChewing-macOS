@@ -48,13 +48,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     ])
 
     defer {
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       testHandler.clear()
     }
 
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     testHandler.clear()
     testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
@@ -96,13 +96,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     ])
 
     defer {
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       testHandler.clear()
     }
 
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     testHandler.clear()
     testHandler.prefs.enforceETenDOSCandidateSequence = true
     testHandler.prefs.useSCPCTypingMode = false
@@ -136,13 +136,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     ])
 
     defer {
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       testHandler.clear()
     }
 
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     testHandler.clear()
     testHandler.prefs.enforceETenDOSCandidateSequence = true
     testHandler.prefs.useSCPCTypingMode = false
@@ -183,14 +183,14 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer {
       testHandler.prefs.filterNonCNSReadingsForCHTInput = false
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       testHandler.currentLM.syncPrefs()
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
 
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.filterNonCNSReadingsForCHTInput = true
     testHandler.prefs.enforceETenDOSCandidateSequence = false
@@ -244,13 +244,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.currentLM.setOptions { config in
         config.partialMatchEnabled = false
       }
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
 
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
@@ -290,13 +290,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.currentLM.setOptions { config in
         config.partialMatchEnabled = false
       }
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
 
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()

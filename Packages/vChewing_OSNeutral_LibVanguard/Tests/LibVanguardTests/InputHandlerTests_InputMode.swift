@@ -47,7 +47,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
         // 切換至 Abortion 狀態會自動清理 Handler，此時會連帶重設 typingMethod。
         testSession.switchState(IMEState.ofAbortion())
       }
-      PrefMgr.sharedSansDidSetOps.mostRecentInputMode = langMode.rawValue
+      testSession.inputMode = langMode
       #expect(testHandler.currentTypingMethod == .vChewingFactory)
       #expect(testHandler.triageInput(event: symbolMenuKeyEvent))
       #expect(testHandler.currentTypingMethod == .codePoint)

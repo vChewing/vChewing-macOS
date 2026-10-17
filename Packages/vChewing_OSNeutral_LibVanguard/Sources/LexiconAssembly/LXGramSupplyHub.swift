@@ -115,7 +115,7 @@ extension LXAssembly {
 extension LXAssembly {
   /// 把原廠辭典後端（`VanguardTrie.TextMapTrie`）包成可掛載的來源。
   ///
-  /// 每次查詢都即時向 `LXFacade.factoryTrie` 取值，故原廠辭典被重新連接或卸載之後，
+  /// 每次查詢都即時向所持 `FactoryDictionary` 之 `trie` 取值，故原廠辭典被重新連接或卸載之後，
   /// 本供應器無須重新掛載即反映最新狀態。
   ///
   /// - Warning: 本供應器提供的是**未經後處理**的原始元圖（不施假名抑制、不補半形變體、
@@ -124,9 +124,14 @@ extension LXAssembly {
   public final class LXFactoryGramSupplier: LexiconGramSupplierProtocol {
     // MARK: Lifecycle
 
-    public init() {}
+    public init(factory: FactoryDictionary = .shared) {
+      self.factory = factory
+    }
 
     // MARK: Public
+
+    /// 本供應器所觀測之辭典物件。
+    public let factory: FactoryDictionary
 
     public func hasGrams(
       _ keys: [String],
@@ -135,7 +140,7 @@ extension LXAssembly {
       partiallyMatchedKeysHandler: ((Set<[String]>) -> ())?
     )
       -> Bool {
-      guard let trie = LXAssembly.LXFacade.factoryTrie else { return false }
+      guard let trie = factory.trie else { return false }
       return trie.hasGrams(
         keys,
         filterType: filterType,
@@ -151,7 +156,7 @@ extension LXAssembly {
       partiallyMatchedKeysPostHandler: ((Set<[String]>) -> ())?
     )
       -> [Homa.Gram] {
-      guard let trie = LXAssembly.LXFacade.factoryTrie else { return [] }
+      guard let trie = factory.trie else { return [] }
       let trieGrams = trie.queryGrams(
         keys,
         filterType: filterType,
@@ -167,7 +172,7 @@ extension LXAssembly {
       filterType: VanguardTrie.Trie.EntryType
     )
       -> [Homa.Gram]? {
-      guard let trie = LXAssembly.LXFacade.factoryTrie else { return nil }
+      guard let trie = factory.trie else { return nil }
       return trie.queryAssociatedPhrasesAsGrams(
         previous,
         anterior: anteriorValue,

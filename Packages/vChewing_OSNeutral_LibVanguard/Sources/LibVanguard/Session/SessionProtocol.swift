@@ -37,6 +37,8 @@ public protocol SessionProtocol: AnyObject, CtlCandidateDelegate,
   static var isASCIIModeForEachClient: [String: Bool] { get set }
   /// 偏好設定。
   var prefs: PrefMgrProtocol { get set }
+  /// 本會話所屬之宿主（動作依賴注入點）。測試可注入專屬宿主以免與行程共用者互相干擾。
+  var host: SessionHost { get }
   /// 上一個被處理過的鍵盤事件。
   var previouslyHandledEvents: [KBEvent] { get set }
   /// 用來標記當前副本是否已處於活動狀態。
@@ -65,6 +67,12 @@ public protocol SessionProtocol: AnyObject, CtlCandidateDelegate,
 }
 
 extension SessionProtocol {
+  /// 未另行指定者一律落在行程級共享宿主。
+  public var host: SessionHost { host }
+
+  /// 本會話此刻所用之辭典副本（隨宿主與輸入模式解析；P316）。
+  public var currentLexicon: LXAssembly.LXFacade { host.lexicon(for: inputMode) }
+
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool { Self.current?.isVerticalTyping ?? false }
 
@@ -72,8 +80,8 @@ extension SessionProtocol {
     // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
       guard prefs.cassetteEnabled else { break cassetteQuick }
-      guard let cinCandidateKey = inputMode.lexicon.cassetteSelectionKey,
-            SessionHost.shared.validateCandidateKeys(prefs, cinCandidateKey) == nil
+      guard let cinCandidateKey = host.lexicon(for: inputMode).cassetteSelectionKey,
+            host.validateCandidateKeys(prefs, cinCandidateKey) == nil
       else {
         return "1234567890"
       }
@@ -169,7 +177,7 @@ extension SessionProtocol {
   ///   避免 async task 靜默失敗（例：clientProxy 為 nil）時緩存變成「已套用但未實際發生」的髒狀態。
   public func setKeyLayout() {
     let targetLayout: String =
-      (isASCIIMode && SessionHost.shared.isDynamicBasicKeyboardLayoutEnabled())
+      (isASCIIMode && host.isDynamicBasicKeyboardLayoutEnabled())
         ? prefs.alphanumericalKeyboardLayout
         : prefs.basicKeyboardLayout
     guard targetLayout != lastAppliedKeyboardLayout else { return }
@@ -266,7 +274,7 @@ extension SessionProtocol {
       // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
       if this.prefs.checkUpdateAutomatically {
         asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) {
-          SessionHost.shared.checkUpdate(false) {
+          this.host.checkUpdate(false) {
             senderBundleID == "com.apple.SecurityAgent"
           }
         }
@@ -277,7 +285,7 @@ extension SessionProtocol {
       this.isClientElectronBased = false
       asyncOnMain(bypassAsync: OSUtils.isRunningUnitTests) { [weak self] in
         self?.isClientElectronBased =
-          SessionHost.shared.isElectronBasedApp(senderBundleID)
+          self?.host.isElectronBasedApp(senderBundleID) ?? false
       }
     }
     this.updateClientProxyObjectIdentifier(clientProxy)
@@ -308,7 +316,7 @@ extension SessionProtocol {
         this.prefs
           .togglingAlphanumericalModeWithRShift
     }
-    if this.isASCIIMode, !SessionHost.shared.isKeyboardJIS() {
+    if this.isASCIIMode, !host.isKeyboardJIS() {
       if #available(macOS 10.15, *) {
         if let shiftKeyDetector, !shiftKeyDetector.enabled {
           this.isASCIIMode = false
@@ -332,7 +340,7 @@ extension SessionProtocol {
 
     if !OSUtils.isRunningUnitTests {
       asyncOnMain {
-        SessionHost.shared.checkMemoryUsage()
+        this.host.checkMemoryUsage()
       }
     }
   }

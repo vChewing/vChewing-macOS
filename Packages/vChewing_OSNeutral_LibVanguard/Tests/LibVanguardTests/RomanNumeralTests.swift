@@ -6,9 +6,9 @@ import Foundation
 @testable import LibVanguard
 import Testing
 
-// 歸入本測試目標唯一根 suite（見 `LibVanguardTests_Root.swift`）：本測試目標測試共用全域狀態，不得並行。
+// 歸入本測試目標唯一根 suite（見 `LibVanguardTests_Root.swift`）；各 suite 自持 `TestEnvironment`（P316），故可並行。
 extension LibVanguardTestsRoot {
-  @Suite("RomanNumeralTests", .serialized)
+  @Suite("RomanNumeralTests")
   struct RomanNumeralTests {
     @Test
     func testRomanNumeralConversion() {

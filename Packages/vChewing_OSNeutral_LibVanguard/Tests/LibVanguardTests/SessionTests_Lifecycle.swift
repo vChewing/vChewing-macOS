@@ -137,13 +137,13 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 測試環境 bypass 為同步，故可直接斷言。
   @Test("SS-Lifecycle-005 Mode description hint shown upon activation when enabled")
   func test_SS_Lifecycle_005_ModeDescriptionHintShownUponActivationWhenEnabled() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = true
+    testHandler.prefs.showModeDescriptionOnActivatingServer = true
     let hintUI = makeModeDescriptionHintUI(capsLockIsOn: false)
     testSession.ui = hintUI.ui
     InputSession.current = testSession
@@ -160,13 +160,13 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 關閉（預設為啟用，此處顯式關閉）時 performServerActivation 不得產生打字模式提示。
   @Test("SS-Lifecycle-006 Mode description hint suppressed upon activation when disabled")
   func test_SS_Lifecycle_006_ModeDescriptionHintSuppressedUponActivationWhenDisabled() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = false
+    testHandler.prefs.showModeDescriptionOnActivatingServer = false
     let hintUI = makeModeDescriptionHintUI(capsLockIsOn: false)
     testSession.ui = hintUI.ui
     InputSession.current = testSession
@@ -178,15 +178,15 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 啟用且英數模式時提示須用 ASCII 專屬 key（測試環境無 l10n、`.i18n` 回退鍵名）。
   @Test("SS-Lifecycle-007 Mode description hint shown upon activation in ASCII mode")
   func test_SS_Lifecycle_007_ModeDescriptionHintShownUponActivationInASCIIMode() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
     let originalASCIIMode = testSession.isASCIIMode
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
       testSession.isASCIIMode = originalASCIIMode
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = true
+    testHandler.prefs.showModeDescriptionOnActivatingServer = true
     testSession.isASCIIMode = true
     let hintUI = makeModeDescriptionHintUI(capsLockIsOn: false)
     testSession.ui = hintUI.ui
@@ -200,18 +200,18 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 啟用、非英數、Caps Lock 亮燈時提示須用 asciiCpLk 專屬 key（此際字母鍵可直接敲小寫英數）。
   @Test("SS-Lifecycle-008 Mode description hint shown upon activation with Caps Lock lit")
   func test_SS_Lifecycle_008_ModeDescriptionHintShownUponActivationWithCapsLockLit() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
-    let originalBypass = PrefMgr.sharedSansDidSetOps.bypassNonAppleCapsLockHandling
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
+    let originalBypass = testHandler.prefs.bypassNonAppleCapsLockHandling
     let originalASCIIMode = testSession.isASCIIMode
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
-      PrefMgr.sharedSansDidSetOps.bypassNonAppleCapsLockHandling = originalBypass
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.bypassNonAppleCapsLockHandling = originalBypass
       testSession.isASCIIMode = originalASCIIMode
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = true
-    PrefMgr.sharedSansDidSetOps.bypassNonAppleCapsLockHandling = false
+    testHandler.prefs.showModeDescriptionOnActivatingServer = true
+    testHandler.prefs.bypassNonAppleCapsLockHandling = false
     testSession.isASCIIMode = false
     let hintUI = makeModeDescriptionHintUI(capsLockIsOn: true)
     testSession.ui = hintUI.ui
@@ -226,13 +226,13 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 立即呼叫 setValue 模擬該連續技，提示仍應恰好顯示一次、不被蓋掉（flicker 回歸）。
   @Test("SS-Lifecycle-009 Mode description hint shows once despite a post-activation setValue")
   func test_SS_Lifecycle_009_ModeDescriptionHintShownOnceDespitePostActivationSetValue() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = true
+    testHandler.prefs.showModeDescriptionOnActivatingServer = true
     let hintUI = makeModeDescriptionHintUI(capsLockIsOn: false)
     testSession.ui = hintUI.ui
     InputSession.current = testSession
@@ -249,13 +249,13 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 避免與 PCB 重疊；PCB 頂端不高於打字列頂端時點位維持不變（max 比較自然不變）。
   @Test("SS-Lifecycle-010 Mode description hint clears popup composition buffer")
   func test_SS_Lifecycle_010_ModeDescriptionHintClearsPopupCompositionBuffer() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = true
+    testHandler.prefs.showModeDescriptionOnActivatingServer = true
     let pcbMock = MockPCB()
     pcbMock.isShown = true
     pcbMock.frame = CGRect(origin: CGPoint(x: 12, y: 100), size: CGSize(width: 96, height: 24)) // maxY = 124
@@ -276,18 +276,18 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// activation 之後才出現、顯示當下的抬升避讓鞭長莫及，直接收起避免提示窗擋住 PCB。
   @Test("SS-Lifecycle-011 Mode description hint dismissed when composition buffer appears")
   func test_SS_Lifecycle_011_ModeDescriptionHintDismissedWhenCompositionBufferAppears() throws {
-    let originalPref = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
-    let originalHardened = PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer
+    let originalPref = testHandler.prefs.showModeDescriptionOnActivatingServer
+    let originalHardened = testHandler.prefs.securityHardenedCompositionBuffer
     let originalMixedASCII = testHandler.prefs.mixedAlphanumericalEnabled
     let originalUI = testSession.ui
     defer {
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalPref
-      PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = originalHardened
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalPref
+      testHandler.prefs.securityHardenedCompositionBuffer = originalHardened
       testHandler.prefs.mixedAlphanumericalEnabled = originalMixedASCII
       testSession.ui = originalUI
     }
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = true
-    PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = true // clientMitigationLevel → 2（PCB 路徑）
+    testHandler.prefs.showModeDescriptionOnActivatingServer = true
+    testHandler.prefs.securityHardenedCompositionBuffer = true // clientMitigationLevel → 2（PCB 路徑）
     let pcbMock = MockPCB()
     let hintUI = makeModeDescriptionHintUI(capsLockIsOn: false, pcb: pcbMock)
     testSession.ui = hintUI.ui
@@ -311,15 +311,15 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// `.ofInputting` 而放行給客體（`OmitNSEvent`）、亦不示警，該殘留文字遂無以鍵盤清除。
   @Test("SS-Lifecycle-012 Activation clears the client's stale inline marked text")
   func test_SS_Lifecycle_012_ActivationClearsStaleInlineMarkedText() throws {
-    let originalHardened = PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer
-    let originalHint = PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer
+    let originalHardened = testHandler.prefs.securityHardenedCompositionBuffer
+    let originalHint = testHandler.prefs.showModeDescriptionOnActivatingServer
     defer {
-      PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = originalHardened
-      PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = originalHint
+      testHandler.prefs.securityHardenedCompositionBuffer = originalHardened
+      testHandler.prefs.showModeDescriptionOnActivatingServer = originalHint
     }
     // `clientMitigationLevel < 2`：標記文字方走客體（≥2 走 PCB 之處置態，測不得）。
-    PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = false
-    PrefMgr.sharedSansDidSetOps.showModeDescriptionOnActivatingServer = false
+    testHandler.prefs.securityHardenedCompositionBuffer = false
+    testHandler.prefs.showModeDescriptionOnActivatingServer = false
     InputSession.current = testSession
     testSession.resetInputHandler(forceComposerCleanup: true)
     testSession.performServerActivation()
@@ -347,13 +347,13 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
 
   @Test("SS-Lifecycle-013 Stale close-all-panels request retains the visible popup composition buffer")
   func test_SS_Lifecycle_013_StaleCloseAllPanelsRequestRetainsVisiblePopupCompositionBuffer() throws {
-    let originalHardened = PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer
+    let originalHardened = testHandler.prefs.securityHardenedCompositionBuffer
     defer {
-      PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = originalHardened
+      testHandler.prefs.securityHardenedCompositionBuffer = originalHardened
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
     // 強化型組字區安全防護迫使客體改用浮動組字窗（clientMitigationLevel >= 2）。
-    PrefMgr.sharedSansDidSetOps.securityHardenedCompositionBuffer = true
+    testHandler.prefs.securityHardenedCompositionBuffer = true
     InputSession.current = testSession
     testSession.resetInputHandler(forceComposerCleanup: true)
     testSession.performServerActivation()

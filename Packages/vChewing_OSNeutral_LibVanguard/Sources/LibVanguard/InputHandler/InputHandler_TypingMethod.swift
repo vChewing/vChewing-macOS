@@ -19,13 +19,13 @@ public enum TypingMethod: Int, CaseIterable {
     self = nextMethod
   }
 
-  func getTooltip(vertical: Bool = false) -> String {
+  func getTooltip(vertical: Bool = false, mode: Shared.InputMode) -> String {
     switch self {
     case .vChewingFactory: return ""
     case .codePoint:
       var commonTerm = ContiguousArray<String>()
       commonTerm.insert("i18n:Menu.CodePointInput".i18n, at: 0)
-      if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
+      if !vertical, let initials = mode.nonUTFEncodingInitials {
         commonTerm.insert("[\(initials)] ", at: 0)
       }
       return commonTerm.joined()
@@ -69,7 +69,10 @@ extension InputHandlerProtocol {
     session.switchState(State.ofCommitting(textToCommit: committableDisplayText(sansReading: true)))
     updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
-    updatedState.tooltip = newMethod.getTooltip(vertical: session.isVerticalTyping)
+    updatedState.tooltip = newMethod.getTooltip(
+      vertical: session.isVerticalTyping,
+      mode: session.inputMode
+    )
     session.switchState(updatedState)
     return true
   }

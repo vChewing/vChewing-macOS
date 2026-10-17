@@ -95,6 +95,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   public let id: UUID = .init()
   public var inputHandler: MockInputHandler?
   public var isASCIIMode: Bool = false
+  public var inputMode: Shared.InputMode = .imeModeNULL
   public var clientMitigationLevel: Int = 0
   /// 預設為 nil（候選窗不存在）；測試需要模擬候選窗已顯示時才指派。
   public var mockCandidateController: MockCandidateController?
@@ -151,7 +152,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
     let userPhrase = UserPhraseInsertable(
       keyArray: kvPair.keyArray,
       value: kvPair.value,
-      inputMode: IMEApp.currentInputMode
+      inputMode: inputMode
     )
     inputHandler.currentLM.insertTemporaryData(
       unigram: .init(

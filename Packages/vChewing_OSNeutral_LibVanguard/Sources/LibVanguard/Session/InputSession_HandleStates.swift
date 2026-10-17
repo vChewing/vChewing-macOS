@@ -114,9 +114,9 @@ extension SessionProtocol {
       replaced = true
       text = queried
     }
-    var buffer = SessionHost.shared.kanjiConversionIfRequired(text)
+    var buffer = host.kanjiConversionIfRequired(text)
     if phE, !replaced, let queried = inputHandler?.currentLM.lxQuerier.replacementValue(for: buffer) {
-      buffer = SessionHost.shared.kanjiConversionIfRequired(queried)
+      buffer = host.kanjiConversionIfRequired(queried)
     }
 
     func doCommit(_ theBuffer: String) {

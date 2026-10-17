@@ -23,28 +23,18 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   /// 這樣才能涵蓋 Session 層專屬的行為（啟用／停用、熱鍵放行、打字模式提示、
   /// 客體遞交內容、選字窗導覽等）。
   ///
-  /// 之所以宣告為 `InputHandlerTests` 的子 Suite，是因為兩者都會改動行程層級的全域狀態
-  /// （`OSUtils.defaultsStore`、`UserDef`、`LXAssembly` 的測試辭典、`SessionHost.shared`）。
-  /// Swift Testing 的 `.serialized` 會由父 Suite 繼承給子 Suite，兩者因此共用同一把鎖而
-  /// 不會並行執行——這正是不讓它成為頂層 Suite 的原因。
-  @Suite("SessionTests", .serialized)
+  /// 各用例自持一份 `TestEnvironment`（辭典、宿主、偏好容器），故與兄弟 Suite 可並行；
+  /// 仍宣告為 `InputHandlerTests` 的子 Suite，只是為了沿用其共用之輔助設施與命名層級。
+  @Suite("SessionTests")
   final class Session {
     // MARK: Lifecycle
 
     init() {
-      OSUtils.defaultsStore = InMemoryDefaultsStore()
-      OSUtils.isRunningUnitTests = true
-      UserDef.resetAll()
-
-      LXAssembly.LXFacade.connectToTestFactoryDictionary(
-        textMapData: LXATestsData.textMapTestCoreLXData
-      )
-      let lx = LXAssembly.LXFacade(isCHS: false)
-
-      // SessionHost 為全域注入點：先還原成預設值，再補上單元測試必要的宿主行為。
-      SessionHost.shared = SessionHost()
-      SessionHost.shared.isCoreDBConnected = { true }
-      SessionHost.shared.prefs = { PrefMgr.sharedSansDidSetOps }
+      // 各用例自持一份環境（辭典、宿主、偏好容器），故不再改寫任何行程級全域（P316）。
+      let env = TestEnvironment()
+      self.testEnv = env
+      let host = env.host
+      let lx = env.lx
 
       let proxy = MockClientProxy()
       let ui = MockSessionUI()
@@ -56,9 +46,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       ui.statusUI = statusUI
       ui.pcb = pcb
       ui.capsLockToggler = capsLockToggler
-      SessionHost.shared.ui = { [weak ui] in ui }
+      host.ui = { [weak ui] in ui }
 
-      let session = InputSession(preallocated: (), manuallyAssignedClientProxy: proxy)
+      let session = InputSession(preallocated: (), manuallyAssignedClientProxy: proxy, host: host)
       if session.inputMode == .imeModeNULL {
         session.inputMode = .imeModeCHT
       }
@@ -74,21 +64,21 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       self.writtenUserPhrases = []
 
       session.inputHandler?.currentLM = lx
-      session.inputHandler?.prefs = PrefMgr.sharedSansDidSetOps
-      session.inputHandler?.assembler.maxSegLength = PrefMgr.sharedSansDidSetOps.maxCandidateLength
+      session.inputHandler?.prefs = env.prefs
+      session.inputHandler?.assembler.maxSegLength = env.prefs.maxCandidateLength
       session.inputHandler?.ensureKeyboardParser()
       session.inputHandler?.errorCallback = { [weak self] message in
         self?.recordedErrors.append(message)
       }
-      session.inputHandler?.filterabilityChecker = SessionHost.shared.isStateDataFilterableForMarked
+      session.inputHandler?.filterabilityChecker = host.isStateDataFilterableForMarked
       session.inputHandler?.pomSaveCallback = {}
 
       // 使用者語彙寫入：單元測試以記憶體記錄取代磁碟 I/O。
-      SessionHost.shared.userDictDataURL = { _, type in
+      host.userDictDataURL = { _, type in
         let name = type == .theFilter ? "userdata_filter" : "userdata"
         return URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
       }
-      SessionHost.shared.writeUserPhrasesAtOnce = { [weak self] phrase, isFiltering in
+      host.writeUserPhrasesAtOnce = { [weak self] phrase, isFiltering in
         guard let self else { return false }
         if isFiltering {
           self.recordedFilteredPhrases.append(phrase)
@@ -97,33 +87,31 @@ extension LibVanguardTestsRoot.InputHandlerTests {
         }
         return true
       }
-      SessionHost.shared.crossConvert = { $0 }
-      SessionHost.shared.kanjiConversionIfRequired = { $0 }
-      SessionHost.shared.checkIfPhrasePairExists = { _, _, _ in false }
-      SessionHost.shared.checkIfPhrasePairIsFiltered = { _, _, _ in false }
-      SessionHost.shared.updateUserPhraseWeight = { phrase, _ in phrase }
-      SessionHost.shared.bleachSpecifiedSuggestions = { _, _, _ in }
-      SessionHost.shared.validateCandidateKeys = { _, _ in nil }
-      SessionHost.shared.postEventForClosingAllPanels = {}
-      SessionHost.shared.isKeyboardJIS = { false }
+      host.crossConvert = { $0 }
+      host.kanjiConversionIfRequired = { $0 }
+      host.checkIfPhrasePairExists = { _, _, _ in false }
+      host.checkIfPhrasePairIsFiltered = { _, _, _ in false }
+      host.updateUserPhraseWeight = { phrase, _ in phrase }
+      host.bleachSpecifiedSuggestions = { _, _, _ in }
+      host.validateCandidateKeys = { _, _ in nil }
+      host.postEventForClosingAllPanels = {}
+      host.isKeyboardJIS = { false }
     }
 
     deinit {
-      // 僅收拾本 Suite 自己的 Session，不碰其它 Suite 共用的全域狀態。
-      // 理由：Swift Testing 的 `.serialized` 只保證 Suite 內部的執行順序，
-      // 不同 Suite 之間仍會並行；若在此重設 LXAssembly 共用狀態或偏好容器，會與並行中的
-      // `InputHandlerTests` 互相踩踏。
-      // 這些全域狀態會由每個測試自己的 `init` 重新建立，因此無需在此復原。
+      // 僅收拾本用例自己的 Session：辭典、宿主、偏好容器皆由本用例之 `TestEnvironment`
+      // 自持（P316），故 `deinit` 不得、也無需碰觸任何行程級全域。
       mainSync {
         testSession.switchState(IMEState.ofAbortion())
         testSession.inputHandler?.errorCallback = nil
         testSession.inputHandler?.session = nil
-        SessionHost.shared = SessionHost()
+        testEnv = nil
       }
     }
 
     // MARK: Internal
 
+    var testEnv: TestEnvironment?
     let testSession: InputSession
     let testClientProxy: MockClientProxy
     let testUI: MockSessionUI

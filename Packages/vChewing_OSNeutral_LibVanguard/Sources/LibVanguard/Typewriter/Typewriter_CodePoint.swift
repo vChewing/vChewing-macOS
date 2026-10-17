@@ -34,15 +34,15 @@ public struct CodePointTypewriter<Handler: InputHandlerProtocol>: TypewriterProt
         var updatedState = handler.generateStateOfInputting(guarded: true)
         updatedState.tooltipDuration = 0
         updatedState.tooltip = TypingMethod.codePoint
-          .getTooltip(vertical: session.isVerticalTyping)
+          .getTooltip(vertical: session.isVerticalTyping, mode: session.inputMode)
         session.switchState(updatedState)
         return true
       }
       let hexSequence = "\(handler.strCodePointBuffer)\(input.text)"
       let parsedChar = CodePointDecoder.decode(
         hexString: hexSequence,
-        encodingID: IMEApp.currentInputMode.nonUTFEncoding,
-        encodingHint: IMEApp.currentInputMode.nonUTFEncodingInitials
+        encodingID: session.inputMode.nonUTFEncoding,
+        encodingHint: session.inputMode.nonUTFEncodingInitials
       )?.first?.description
       guard var char = parsedChar else {
         errorCallback("D220B880：輸入的字碼沒有對應的字元。")
@@ -59,7 +59,8 @@ public struct CodePointTypewriter<Handler: InputHandlerProtocol>: TypewriterProt
       var updatedState = handler.generateStateOfInputting(guarded: true)
       updatedState.tooltipDuration = 0
       updatedState.tooltip = TypingMethod.codePoint.getTooltip(
-        vertical: session.isVerticalTyping
+        vertical: session.isVerticalTyping,
+        mode: session.inputMode
       )
       session.switchState(updatedState)
       handler.currentTypingMethod = .codePoint

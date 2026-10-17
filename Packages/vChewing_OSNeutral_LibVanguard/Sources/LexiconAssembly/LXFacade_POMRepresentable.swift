@@ -11,7 +11,7 @@ extension LXAssembly.LXFacade {
     timestamp: Double,
     saveCallback: (() -> ())? = nil
   ) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.memorizePerception(
       perception,
       timestamp: timestamp,
@@ -42,7 +42,7 @@ extension LXAssembly.LXFacade {
   }
 
   public func loadPOMData(fromURL fileURL: URL? = nil) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.loadData(fromURL: fileURL)
   }
 
@@ -51,7 +51,7 @@ extension LXAssembly.LXFacade {
   }
 
   public func clearPOMData(withURL fileURL: URL? = nil) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.clearData(withURL: fileURL)
   }
 
@@ -60,7 +60,7 @@ extension LXAssembly.LXFacade {
     targets: [(ngramKey: String, candidate: String)],
     saveCallback: (() -> ())? = nil
   ) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.bleachSpecifiedSuggestions(
       targets: targets, saveCallback: saveCallback
     )
@@ -70,7 +70,7 @@ extension LXAssembly.LXFacade {
   public func bleachSpecifiedPOMSuggestions(
     targets: [String], saveCallback: (() -> ())? = nil
   ) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.bleachSpecifiedSuggestions(
       candidateTargets: targets, saveCallback: saveCallback
     )
@@ -81,14 +81,14 @@ extension LXAssembly.LXFacade {
     headReadings: [String],
     saveCallback: (() -> ())? = nil
   ) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.bleachSpecifiedSuggestions(
       headReadingTargets: headReadings, saveCallback: saveCallback
     )
   }
 
   public func bleachPOMUnigrams(saveCallback: (() -> ())? = nil) {
-    Self.pomGeneration &+= 1
+    pomGeneration &+= 1
     lxPerceptor.bleachUnigrams(saveCallback: saveCallback)
   }
 }

@@ -47,7 +47,7 @@ extension LXAssembly.LXFacade {
       return
     }
 
-    if !Self.asyncLoadingUserData {
+    if !asyncLoadingUserData {
       do {
         let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
         factoryTrie = try VanguardTrie.TextMapTrie(data: textMapData)
@@ -80,8 +80,13 @@ extension LXAssembly.LXFacade {
     }
   }
 
+  /// 斷開**本實例**所持之原廠辭典。
+  public func disconnectFactoryDictionary() {
+    factory.trie = nil
+  }
+
   public static func disconnectFactoryDictionary() {
-    factoryTrie = nil
+    FactoryDictionary.shared.trie = nil
   }
 
   /// 驗證外部 TextMap 工廠辭典檔案的 schema 正確性。
@@ -115,6 +120,16 @@ extension LXAssembly.LXFacade {
     textMapData: String
   )
     -> Bool {
+    connectToTestFactoryDictionary(textMapData: textMapData, into: .shared)
+  }
+
+  /// 把測試用 TextMap 連上指定之辭典物件（P316）：各測試套房可注入專屬者以免互相干擾。
+  @discardableResult
+  public static func connectToTestFactoryDictionary(
+    textMapData: String,
+    into factory: FactoryDictionary
+  )
+    -> Bool {
     guard !textMapData.isEmpty else { return false }
     guard !textMapData.contains("#PRAGMA:VANGUARD_REVLOOKUP_TSV") else {
       vCLMLog("External revlookup fixtures are no longer supported.")
@@ -122,13 +137,26 @@ extension LXAssembly.LXFacade {
     }
 
     do {
-      factoryTrie = try VanguardTrie.TextMapTrie(data: Data(textMapData.utf8))
+      factory.trie = try VanguardTrie.TextMapTrie(data: Data(textMapData.utf8))
       return true
     } catch {
       vCLMLog("Factory TextMap test fixture loading failed: \(error.localizedDescription)")
-      factoryTrie = nil
+      factory.trie = nil
       return false
     }
+  }
+
+  /// 把測試用 TextMap 連上**本實例**所持之辭典物件（P316）。
+  @discardableResult
+  public func connectToTestFactoryDictionary(textMapData: String) -> Bool {
+    Self.connectToTestFactoryDictionary(textMapData: textMapData, into: factory)
+  }
+
+  /// 就地造一份已連上給定 TextMap 的辭典物件（測試用）。
+  public static func makeTestFactoryDictionary(textMapData: String) -> FactoryDictionary {
+    let result = FactoryDictionary()
+    connectToTestFactoryDictionary(textMapData: textMapData, into: result)
+    return result
   }
 
   public static func getFactoryReverseLookupData(with kanji: String) -> [String]? {
@@ -137,7 +165,7 @@ extension LXAssembly.LXFacade {
   }
 
   func getHaninSymbolMenuUnigrams() -> [Homa.Gram] {
-    guard let trie = Self.factoryTrie else { return [] }
+    guard let trie = factory.trie else { return [] }
     let nodes = trie.getNodes(
       keyArray: ["_punctuation_list"],
       filterType: [],
@@ -197,7 +225,7 @@ extension LXAssembly.LXFacade {
   )
     -> [Homa.Gram] {
     if key == "_punctuation_list" { return [] }
-    guard let trie = Self.factoryTrie else { return [] }
+    guard let trie = factory.trie else { return [] }
     if config.partialMatchEnabled {
       return factoryPartiallyMatchedUnigramsFor(
         queryKeyArray: keyArray,
@@ -228,7 +256,7 @@ extension LXAssembly.LXFacade {
   )
     -> [Homa.Gram] {
     if subsetKey == "_punctuation_list" { return [] }
-    guard let trie = Self.factoryTrie else { return [] }
+    guard let trie = factory.trie else { return [] }
     let nodes = trie.getNodes(
       keyArray: subsetKeyArray,
       filterType: [],
@@ -286,7 +314,7 @@ extension LXAssembly.LXFacade {
     partiallyMatch: Bool
   )
     -> [Homa.Gram] {
-    guard let trie = Self.factoryTrie else { return [] }
+    guard let trie = factory.trie else { return [] }
     let entryGroups = trie.getEntryGroups(
       keysChopped: keyArray,
       filterType: entryType,
@@ -335,7 +363,7 @@ extension LXAssembly.LXFacade {
     case .configuredLookup:
       return factoryChoppedUnigramsFor(keyArray: keyArray, entryType: entryType)
     case .strictSuperset:
-      guard let trie = Self.factoryTrie else { return [] }
+      guard let trie = factory.trie else { return [] }
       let entryGroups = trie.getEntryGroups(
         keysChopped: keyArray,
         filterType: [],
@@ -380,7 +408,7 @@ extension LXAssembly.LXFacade {
 
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
     if key == "_punctuation_list" { return nil }
-    guard let trie = Self.factoryTrie else { return nil }
+    guard let trie = factory.trie else { return nil }
     let nodes = trie.getNodes(
       keyArray: [key],
       filterType: [],
@@ -394,7 +422,7 @@ extension LXAssembly.LXFacade {
   }
 
   func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
-    guard let trie = Self.factoryTrie else { return false }
+    guard let trie = factory.trie else { return false }
     let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
     if config.partialMatchEnabled {
       return trie.hasGrams(
@@ -414,13 +442,13 @@ extension LXAssembly.LXFacade {
 
   /// 輕量版 factoryUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
   func hasFactoryUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
-    guard let trie = Self.factoryTrie else { return false }
+    guard let trie = factory.trie else { return false }
     return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
   }
 
   /// 輕量版 factoryChoppedUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
   func hasFactoryChoppedUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
-    guard let trie = Self.factoryTrie else { return false }
+    guard let trie = factory.trie else { return false }
     return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
   }
 

@@ -282,12 +282,11 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   @Test("SS-CandidateWindow-007 Candidate filter shortcuts")
   func test_SS_CandidateWindow_007_CandidateFilterShortcuts() throws {
     restoreExtremeUserPhraseWeightHostBehavior()
-    // 生產環境下 `inputHandler.currentLM` 與 `inputMode.lexicon` 恆為同一實例
-    // （見 `SessionHostWiring` 與 `InputSession.initInputHandler`）；可攜 harness 於
-    // `init` 內另行建立了獨立的 LM 實例並指派給 `currentLM`，故在此還原該不變式：
-    // 否則 `candidatePairManipulated` 內對 `inputMode.lexicon` 的過濾資料寫入
+    // `inputHandler.currentLM` 與 `currentLexicon`（宿主所持副本）恆為同一實例
+    // （見 `InputSession.initInputHandler`）；此處還原該不變式：
+    // 否則 `candidatePairManipulated` 內對辭典的過濾資料寫入
     // 將與組字器實際查詢的 `currentLM` 不同步，過濾結果無法反映於候選清單。
-    testHandler.currentLM = Shared.InputMode.imeModeCHT.lexicon
+    testHandler.currentLM = testSession.currentLexicon
     // 該實例隸屬 `Shared.InputMode` 的單元測試快取、會跨個案存活，
     // 故於本個案結束時清除暫存語彙資料，避免汙染其它個案。
     defer {
@@ -487,7 +486,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
   /// 復刻宿主端行為。本個案的所有候選皆為二字詞、讀音皆為兩段，
   /// 故僅需極端值分支。
   private func restoreExtremeUserPhraseWeightHostBehavior() {
-    SessionHost.shared.updateUserPhraseWeight = { phrase, action in
+    testEnv?.host.updateUserPhraseWeight = { phrase, action in
       var phrase = phrase
       switch action {
       case .toBoost: phrase.weight = nil

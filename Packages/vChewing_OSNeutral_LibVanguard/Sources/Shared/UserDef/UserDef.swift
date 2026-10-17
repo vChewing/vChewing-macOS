@@ -214,9 +214,9 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   public struct Snapshot {
     // MARK: Lifecycle
 
-    public init() {
+    public init(store: any DefaultsStore = OSUtils.defaultsStore) {
       UserDef.allCases.forEach {
-        data[$0.rawValue] = OSUtils.defaultsStore.object(forKey: $0.rawValue)
+        data[$0.rawValue] = store.object(forKey: $0.rawValue)
       }
     }
 
@@ -264,28 +264,31 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
   // MARK: - SnapShot-Related Methods.
 
-  public static func resetAll() {
+  public static func resetAll(store: any DefaultsStore = OSUtils.defaultsStore) {
     Self.allCases.forEach {
-      OSUtils.defaultsStore.removeObject(forKey: $0.rawValue)
+      store.removeObject(forKey: $0.rawValue)
     }
   }
 
-  public static func load(from snapshot: Snapshot) {
+  public static func load(
+    from snapshot: Snapshot,
+    store: any DefaultsStore = OSUtils.defaultsStore
+  ) {
     let data = snapshot.data
     guard !data.isEmpty else { return }
     Self.allCases.forEach {
-      OSUtils.defaultsStore.set(data[$0.rawValue], forKey: $0.rawValue)
+      store.set(data[$0.rawValue], forKey: $0.rawValue)
     }
   }
 
   /// 將所有可匯出的 UserDefaults 偏好設定匯出為 JSON Data。
-  public static func exportAsJSON() -> Data? {
+  public static func exportAsJSON(store: any DefaultsStore = OSUtils.defaultsStore) -> Data? {
     var dict = [String: Any]()
     for userDef in Self.allCases {
       guard !jsonExchangeBlacklist.contains(userDef) else { continue }
       // 命名紀律：`__` 前綴保留給交換格式之中介鍵，故永不輸出。
       guard !userDef.rawValue.hasPrefix(jsonExchangeReservedKeyPrefix) else { continue }
-      guard let value = OSUtils.defaultsStore.object(forKey: userDef.rawValue) else { continue }
+      guard let value = store.object(forKey: userDef.rawValue) else { continue }
       dict[userDef.rawValue] = value
     }
     guard JSONSerialization.isValidJSONObject(dict) else { return nil }
@@ -297,7 +300,11 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   }
 
   /// 自既有之扁平字典逐鍵驗證並寫入——由現行 `importFromJSON` 之迴圈原封不動抽出。
-  public static func importFromDictionary(_ dict: [String: Any]) -> ImportResult {
+  public static func importFromDictionary(
+    _ dict: [String: Any],
+    store: any DefaultsStore = OSUtils.defaultsStore
+  )
+    -> ImportResult {
     var result = ImportResult()
     for (key, value) in dict {
       guard let userDef = Self(rawValue: key) else {
@@ -308,7 +315,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
         result.failures.append((key: key, reason: "Blacklisted key"))
         continue
       }
-      if let failReason = validateAndApply(userDef: userDef, value: value) {
+      if let failReason = validateAndApply(userDef: userDef, value: value, store: store) {
         result.failures.append((key: key, reason: failReason))
       } else {
         result.successes.append(key)
@@ -318,7 +325,11 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   }
 
   /// 從 JSON Data 匯入 UserDefaults 偏好設定，回傳匯入結果。
-  public static func importFromJSON(_ data: Data) -> ImportResult {
+  public static func importFromJSON(
+    _ data: Data,
+    store: any DefaultsStore = OSUtils.defaultsStore
+  )
+    -> ImportResult {
     guard let jsonObj = try? JSONSerialization.jsonObject(with: data),
           let dict = jsonObj as? [String: Any]
     else {
@@ -326,12 +337,13 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
       result.failures.append((key: "(root)", reason: "Invalid JSON format"))
       return result
     }
-    return importFromDictionary(dict)
+    return importFromDictionary(dict, store: store)
   }
 
   /// 交換格式之完整入口：解碼 → 摘除 `__UserDefMeta` → 逐鍵驗證。
   public static func importFromExchangeJSON(
-    _ data: Data
+    _ data: Data,
+    store: any DefaultsStore = OSUtils.defaultsStore
   )
     -> (meta: ExchangeMeta?, result: ImportResult) {
     guard let jsonObj = try? JSONSerialization.jsonObject(with: data),
@@ -342,13 +354,14 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
       return (nil, result)
     }
     let destructured = destructureExchange(dict)
-    return (destructured.meta, importFromDictionary(destructured.payload))
+    return (destructured.meta, importFromDictionary(destructured.payload, store: store))
   }
 
   /// 差異計算：僅回傳「會被實際寫入、且寫入後之值與當前值不同」之鍵（依 rawValue 升冪）。
   /// 此為純查詢，不寫入 `UserDefaults`。
   public static func diffAgainstCurrent(
-    _ dict: [String: Any]
+    _ dict: [String: Any],
+    store: any DefaultsStore = OSUtils.defaultsStore
   )
     -> (changed: [Self], result: ImportResult) {
     var changed = Set<Self>()
@@ -365,7 +378,7 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
       switch validatedValue(userDef: userDef, value: value) {
       case let .success(normalized):
         result.successes.append(key)
-        if normalized != currentNormalizedValue(userDef: userDef) {
+        if normalized != currentNormalizedValue(userDef: userDef, store: store) {
           changed.insert(userDef)
         }
       case let .failure(failure):
@@ -443,10 +456,15 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
   /// 驗證單一偏好值是否合理，合理則寫入 UserDefaults。
   /// - Returns: 若驗證失敗則回傳失敗原因；成功則回傳 nil。
-  private static func validateAndApply(userDef: Self, value: Any) -> String? {
+  private static func validateAndApply(
+    userDef: Self,
+    value: Any,
+    store: any DefaultsStore
+  )
+    -> String? {
     switch validatedValue(userDef: userDef, value: value) {
     case let .success(normalized):
-      apply(normalized, forKey: userDef.rawValue)
+      apply(normalized, forKey: userDef.rawValue, store: store)
       return nil
     case let .failure(failure):
       return failure.reason
@@ -540,8 +558,12 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   }
 
   /// 把當前值歸一化以資比較：該鍵不存在時以 `dataType` 之預設值代之。
-  private static func currentNormalizedValue(userDef: Self) -> NormalizedValue? {
-    let currentValue = OSUtils.defaultsStore.object(forKey: userDef.rawValue)
+  private static func currentNormalizedValue(
+    userDef: Self,
+    store: any DefaultsStore
+  )
+    -> NormalizedValue? {
+    let currentValue = store.object(forKey: userDef.rawValue)
       ?? userDef.dataType.defaultValue
     switch validatedValue(userDef: userDef, value: currentValue) {
     case let .success(normalized): return normalized
@@ -550,14 +572,18 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   }
 
   /// 將歸一化之值寫入 `UserDefaults`。
-  private static func apply(_ normalized: NormalizedValue, forKey key: String) {
+  private static func apply(
+    _ normalized: NormalizedValue,
+    forKey key: String,
+    store: any DefaultsStore
+  ) {
     switch normalized {
-    case let .bool(v): OSUtils.defaultsStore.set(v, forKey: key)
-    case let .int(v): OSUtils.defaultsStore.set(v, forKey: key)
-    case let .double(v): OSUtils.defaultsStore.set(v, forKey: key)
-    case let .string(v): OSUtils.defaultsStore.set(v, forKey: key)
-    case let .strings(v): OSUtils.defaultsStore.set(v, forKey: key)
-    case let .dictionary(v): OSUtils.defaultsStore.set(v, forKey: key)
+    case let .bool(v): store.set(v, forKey: key)
+    case let .int(v): store.set(v, forKey: key)
+    case let .double(v): store.set(v, forKey: key)
+    case let .string(v): store.set(v, forKey: key)
+    case let .strings(v): store.set(v, forKey: key)
+    case let .dictionary(v): store.set(v, forKey: key)
     }
   }
 }

@@ -6,20 +6,12 @@ import Foundation
 @testable import Shared
 import Testing
 
-@Suite("vChewing_Shared_UserDefExchange_Tests", .serialized)
+@Suite("vChewing_Shared_UserDefExchange_Tests")
 final class UserDefExchangeTests {
   // MARK: Lifecycle
 
   init() {
-    OSUtils.defaultsStore = InMemoryDefaultsStore()
     OSUtils.isRunningUnitTests = true
-    UserDef.resetAll()
-  }
-
-  deinit {
-    // `deinit` 為 nonisolated，而 `UserDef.resetAll()` 繫於 MainActor，故僅在此復原旗標；
-    // 各測試之 `init` 皆已自行 `UserDef.resetAll()`。
-    OSUtils.isRunningUnitTests = false
   }
 
   // MARK: Internal
@@ -41,9 +33,9 @@ final class UserDefExchangeTests {
   /// §3.2 匯出端不得輸出任何 `__` 起頭之鍵，且所有鍵皆為真偏好鍵。
   @Test
   func testExportAsJSONNeverEmitsReservedKeys() throws {
-    OSUtils.defaultsStore.set(true, forKey: UserDef.kUseRearCursorMode.rawValue)
-    OSUtils.defaultsStore.set(120, forKey: UserDef.kCandidateListTextSize.rawValue)
-    let data = try #require(UserDef.exportAsJSON())
+    store.set(true, forKey: UserDef.kUseRearCursorMode.rawValue)
+    store.set(120, forKey: UserDef.kCandidateListTextSize.rawValue)
+    let data = try #require(UserDef.exportAsJSON(store: store))
     let jsonObj = try JSONSerialization.jsonObject(with: data)
     let dict = try #require(jsonObj as? [String: Any])
     let allKeys = Set(UserDef.allCases.map(\.rawValue))
@@ -89,7 +81,7 @@ final class UserDefExchangeTests {
       #expect(broken.meta != nil)
       #expect(!(broken.meta?.warnings.isEmpty ?? true))
       #expect(broken.payload[UserDef.jsonExchangeMetaKey] == nil)
-      let result = UserDef.importFromDictionary(broken.payload)
+      let result = UserDef.importFromDictionary(broken.payload, store: store)
       #expect(result.successes == [UserDef.kUseRearCursorMode.rawValue])
       #expect(result.failures.isEmpty)
     }
@@ -124,14 +116,14 @@ final class UserDefExchangeTests {
       UserDef.kCassettePath.rawValue: "/tmp/whatever",
       UserDef.kCandidateListTextSize.rawValue: 9_999,
       "Nope": 1,
-    ])
+    ], store: store)
     #expect(result.successes == [UserDef.kUseRearCursorMode.rawValue])
     let reasons = Dictionary(uniqueKeysWithValues: result.failures.map { ($0.key, $0.reason) })
     #expect(reasons[UserDef.kCassettePath.rawValue] == "Blacklisted key")
     #expect(reasons["Nope"] == "Unknown key")
     #expect(reasons[UserDef.kCandidateListTextSize.rawValue] != nil)
-    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
-    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kCandidateListTextSize.rawValue) == nil)
+    #expect(store.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
+    #expect(store.object(forKey: UserDef.kCandidateListTextSize.rawValue) == nil)
   }
 
   /// §3.6 `importFromJSON` 即 `importFromDictionary` 之薄殼。
@@ -146,18 +138,18 @@ final class UserDefExchangeTests {
     }
     """
     let data = try #require(json.data(using: .utf8))
-    let viaJSON = UserDef.importFromJSON(data)
-    UserDef.resetAll()
+    let viaJSON = UserDef.importFromJSON(data, store: store)
+    UserDef.resetAll(store: store)
     let decodedObj = try JSONSerialization.jsonObject(with: data)
     let decoded = try #require(decodedObj as? [String: Any])
-    let viaDict = UserDef.importFromDictionary(decoded)
+    let viaDict = UserDef.importFromDictionary(decoded, store: store)
     #expect(viaJSON.successes.sorted() == viaDict.successes.sorted())
     #expect(
       viaJSON.failures.map { "\($0.key):\($0.reason)" }.sorted()
         == viaDict.failures.map { "\($0.key):\($0.reason)" }.sorted()
     )
 
-    let invalid = UserDef.importFromJSON(Data("not json".utf8))
+    let invalid = UserDef.importFromJSON(Data("not json".utf8), store: store)
     #expect(invalid.successes.isEmpty)
     #expect(invalid.failures.count == 1)
     #expect(invalid.failures.first?.key == "(root)")
@@ -175,12 +167,12 @@ final class UserDefExchangeTests {
     }
     """
     let data = try #require(json.data(using: .utf8))
-    let outcome = UserDef.importFromExchangeJSON(data)
+    let outcome = UserDef.importFromExchangeJSON(data, store: store)
     #expect(outcome.meta?.title == "T")
     #expect(outcome.meta?.description == "D")
     #expect(outcome.result.successes == [UserDef.kUseRearCursorMode.rawValue])
     #expect(outcome.result.failures.isEmpty)
-    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
+    #expect(store.object(forKey: UserDef.kUseRearCursorMode.rawValue) as? Bool == true)
 
     let invalid = UserDef.importFromExchangeJSON(Data("{{".utf8))
     #expect(invalid.meta == nil)
@@ -193,26 +185,26 @@ final class UserDefExchangeTests {
   /// §3.8 `diffAgainstCurrent` 之同值／值域外／黑名單／真差異四類。
   @Test
   func testDiffAgainstCurrent() {
-    OSUtils.defaultsStore.set(true, forKey: UserDef.kIsDebugModeEnabled.rawValue)
-    OSUtils.defaultsStore.set(2_024.0, forKey: UserDef.kDeltaOfCalendarYears.rawValue)
+    store.set(true, forKey: UserDef.kIsDebugModeEnabled.rawValue)
+    store.set(2_024.0, forKey: UserDef.kDeltaOfCalendarYears.rawValue)
 
     // 同值不算差異（含跨表示法：JSON 1 對 Bool true、JSON 2024 對 Double 2024.0）。
     let same = UserDef.diffAgainstCurrent([
       UserDef.kIsDebugModeEnabled.rawValue: 1,
       UserDef.kDeltaOfCalendarYears.rawValue: 2_024,
-    ])
+    ], store: store)
     #expect(same.changed.isEmpty)
     #expect(same.result.failures.isEmpty)
     #expect(same.result.successes.count == 2)
 
     // 值域外不算差異。
-    let outOfRange = UserDef.diffAgainstCurrent([UserDef.kCandidateListTextSize.rawValue: 9_999])
+    let outOfRange = UserDef.diffAgainstCurrent([UserDef.kCandidateListTextSize.rawValue: 9_999], store: store)
     #expect(outOfRange.changed.isEmpty)
     #expect(outOfRange.result.failures.count == 1)
     #expect(outOfRange.result.failures.first?.key == UserDef.kCandidateListTextSize.rawValue)
 
     // 黑名單不算差異。
-    let blacklisted = UserDef.diffAgainstCurrent([UserDef.kCassettePath.rawValue: "/tmp/whatever"])
+    let blacklisted = UserDef.diffAgainstCurrent([UserDef.kCassettePath.rawValue: "/tmp/whatever"], store: store)
     #expect(blacklisted.changed.isEmpty)
     #expect(blacklisted.result.failures.count == 1)
     #expect(blacklisted.result.failures.first?.reason == "Blacklisted key")
@@ -221,11 +213,11 @@ final class UserDefExchangeTests {
     let real = UserDef.diffAgainstCurrent([
       UserDef.kUseRearCursorMode.rawValue: true,
       UserDef.kUseHorizontalCandidateList.rawValue: false,
-    ])
+    ], store: store)
     #expect(real.changed.map(\.rawValue) == real.changed.map(\.rawValue).sorted())
     #expect(real.changed == [.kUseHorizontalCandidateList, .kUseRearCursorMode])
-    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseRearCursorMode.rawValue) == nil)
-    #expect(OSUtils.defaultsStore.object(forKey: UserDef.kUseHorizontalCandidateList.rawValue) == nil)
+    #expect(store.object(forKey: UserDef.kUseRearCursorMode.rawValue) == nil)
+    #expect(store.object(forKey: UserDef.kUseHorizontalCandidateList.rawValue) == nil)
   }
 
   /// 不變式：**凡 `metaData.options` 宣告之選項值，逐鍵驗證皆須接受**。
@@ -242,7 +234,7 @@ final class UserDefExchangeTests {
     for userDef in UserDef.allCases {
       guard let options = userDef.metaData?.options, !options.isEmpty else { continue }
       for value in options.keys.sorted() {
-        let outcome = UserDef.diffAgainstCurrent([userDef.rawValue: value])
+        let outcome = UserDef.diffAgainstCurrent([userDef.rawValue: value], store: store)
         #expect(
           outcome.result.failures.isEmpty,
           "「\(userDef)」之選項 \(value) 竟被逐鍵驗證拒絕：\(outcome.result.failures)"
@@ -266,11 +258,11 @@ final class UserDefExchangeTests {
       (UserDef.kNumPadCharInputBehavior, 0 ... 5),
     ] {
       for value in [range.lowerBound, range.upperBound] {
-        let outcome = UserDef.diffAgainstCurrent([userDef.rawValue: value])
+        let outcome = UserDef.diffAgainstCurrent([userDef.rawValue: value], store: store)
         #expect(outcome.result.failures.isEmpty, "「\(userDef)」之 \(value) 被拒")
       }
       let outside = range.upperBound + 1
-      let rejected = UserDef.diffAgainstCurrent([userDef.rawValue: outside])
+      let rejected = UserDef.diffAgainstCurrent([userDef.rawValue: outside], store: store)
       #expect(rejected.result.failures.count == 1, "「\(userDef)」之 \(outside) 竟被接受")
     }
   }
@@ -295,9 +287,9 @@ final class UserDefExchangeTests {
       guard userDef.validNumeralValueRange != nil else { continue }
       for value in options.keys.sorted() {
         // 直接佈置於 `OSUtils.defaultsStore`（即 `@AppProperty` 之讀寫域），再驅動夾值邏輯。
-        OSUtils.defaultsStore.set(value, forKey: userDef.rawValue)
+        store.set(value, forKey: userDef.rawValue)
         prefs.fixOddPreferencesCore()
-        let after = OSUtils.defaultsStore.object(forKey: userDef.rawValue) as? Int
+        let after = store.object(forKey: userDef.rawValue) as? Int
         #expect(
           after == value,
           "「\(userDef)」之選項 \(value) 竟被 `fixOddPreferencesCore()` 改為 \(after.map(\.description) ?? "nil")"
@@ -307,4 +299,9 @@ final class UserDefExchangeTests {
     }
     #expect(checked >= 40, "受檢之選項數過少：\(checked)")
   }
+
+  // MARK: Private
+
+  /// 本類別之每個用例各得一份記憶體容器（P316）：不再置換行程級全域。
+  private let store = InMemoryDefaultsStore()
 }

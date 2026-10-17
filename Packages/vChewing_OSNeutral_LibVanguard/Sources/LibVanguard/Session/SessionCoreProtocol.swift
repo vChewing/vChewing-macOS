@@ -28,6 +28,8 @@ public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
   var id: UUID { get }
   /// 用以記錄當前輸入法狀態的變數。(有 DidSet)
   var state: IMEState { get set }
+  /// 當前簡繁輸入模式：由會話自持（P316），不再經 `IMEApp.currentInputMode` 之行程級查詢。
+  var inputMode: Shared.InputMode { get }
   var isASCIIMode: Bool { get }
   var clientMitigationLevel: Int { get }
   var ui: SessionUIProtocol? { get }

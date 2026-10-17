@@ -935,13 +935,13 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     ])
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
-      LXAssembly.LXFacade.disconnectFactoryDictionary()
-      #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData))
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
       leaveFuriousTestEnvironment()
     }
     clearTestPOM()
-    LXAssembly.LXFacade.disconnectFactoryDictionary()
-    #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
     enterPinyinFuriousTestEnvironment()
 
     // ① 控頻配對：同值同讀音、兩倉皆有（使用者側權重遠高於原廠側）。

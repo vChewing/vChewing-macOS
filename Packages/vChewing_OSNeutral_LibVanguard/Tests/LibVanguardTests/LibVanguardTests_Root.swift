@@ -8,29 +8,22 @@ import Testing
 
 /// 本測試目標（`LibVanguardTests`）的**唯一根 suite**。
 ///
-/// - Important: **本測試目標內所有測試一律關在此根之下，且根標 `.serialized`。**
-///   理由（2026-09-15 實測）：本測試目標各 suite 共用大量**行程內全域狀態**——`LXFacade` 的
-///   `factoryTrie`／`lxCassette`、`PrefMgr.shared`、`SessionHost.shared`（`InputHandlerTests`
-///   與 `SessionTests` 各自的 `init` 都會重新指派它）。**只要有任何兩個 suite 並行，就會互相踩踏**，
-///   症狀是偶發的「handler 狀態殘留」型失敗（例：`mixedAlphanumericalBuffer` 該有值卻是空字串、
-///   `narrateCallCount` 該 ≥1 卻是 0），且**同一測試時過時不過**。
-///
-///   兩道防線的層級不同，須分清：
-///   1. **`swift test --no-parallel`**：CLI 層，擋「同時間多個測試函式」。**必要，但不充分**
-///      ——它不保證非同步測試在 `await` 暫停點不交錯，也不改變 suite 之間的關係。
-///   2. **單一根 suite ＋ `.serialized`**：型別層，`Swift Testing` 保證**該子樹內絕不並行**。
-///      這才是本測試目標真正需要的保證，故所有 suite 一律嵌於本根之下。
+/// - Important: **本測試目標內所有測試一律關在此根之下。** 本根**不再**標 `.serialized`（P316）：
+///   各 suite 自持其執行環境（`TestEnvironment`：辭典、宿主、偏好容器皆逐用例一份），
+///   故並行執行互不相擾；`SessionHost.shared`、`LXFacade` 的辭典／磁帶／注音文
+///   與 `OSUtils.defaultsStore` 皆不再被測試改寫。
+///   P315 之前那些「handler 狀態殘留」型偶發失敗之成因已隨之消失。
 ///
 ///   新增測試時：**把新 suite 寫成 `extension LibVanguardTestsRoot { … }` 並在其內宣告 `@Suite`**，
-///   不要新增游離於本根之外的頂層 suite。
+///   不要新增游離於本根之外的頂層 suite；並在 `init` 內以 `TestEnvironment()` 取得環境，
+///   **不得**改寫任何行程級全域（辭典、宿主、偏好容器一律逐用例自持）。
 ///
 /// - Important: **凡涉及使用者資料載入（userdata）的測試，載入一律須為同步**——即
 ///   `LXFacade.asyncLoadingUserData == false`。測試要的是**確定性**：資料必須在斷言之前載入完畢，
 ///   不得留下「等等才會落定」的非同步尾巴。生產碼已把它與測試模式綁定
 ///   （`resetSharedResources()`／`applyEnvironmentDefaults()` 皆寫 `= !OSUtils.isRunningUnitTests`，
-///   故單元測試下恆為 `false`）；**測試若自行改動此開關，必須以 `defer` 還原原值**
-///   （見 `InputHandlerTests_Cassette` 之九處、`InputHandlerTests_MixedAlnum`、
-///   `LXFacadeTests`、`LXFacade_TextMapTests`、`SessionTests_Basics`）。
+///   故單元測試下恆為 `false`）；該開關現在是類別層之**預設值**，實例未個別指定時即時反映之。
+///   **測試若自行改動此開關，必須以 `defer` 還原原值**。
 ///   **不得**為了「測到非同步路徑」而在單元測試中把它設成 `true`。
-@Suite("LibVanguardTestsRoot", .serialized)
+@Suite("LibVanguardTestsRoot")
 final class LibVanguardTestsRoot {}

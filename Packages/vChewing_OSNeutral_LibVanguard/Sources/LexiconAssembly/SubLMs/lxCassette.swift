@@ -20,6 +20,10 @@ extension LXAssembly {
   struct LXCassette: Sendable {
     // MARK: Internal
 
+    /// 本磁帶之儲存後端（P316）：`open(_:)` 未另行指定者即循此讀取。
+    /// 指派後，卡帶本身即不再「只有靜態入口才碰得到它」。
+    var locator: any UserDataLocator = LXAssembly.userDataLocator
+
     private(set) var filePath: String?
     private(set) var nameShort: String = ""
     private(set) var nameENG: String = ""
@@ -929,9 +933,10 @@ extension LXAssembly.LXCassette {
   @discardableResult
   mutating func open(
     _ path: String,
-    using locator: any UserDataLocator = LXAssembly.userDataLocator
+    using locatorOverride: (any UserDataLocator)? = nil
   )
     -> Bool {
+    let locator = locatorOverride ?? locator
     if isLoaded { return false }
     let oldPath = filePath
     filePath = nil

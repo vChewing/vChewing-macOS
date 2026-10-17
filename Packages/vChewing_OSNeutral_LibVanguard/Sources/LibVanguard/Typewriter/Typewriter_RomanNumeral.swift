@@ -73,7 +73,10 @@ public struct RomanNumeralTypewriter<Handler: InputHandlerProtocol>: TypewriterP
     // 更新狀態並顯示當前緩衝區內容
     var updatedState = handler.generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
-    updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(vertical: session.isVerticalTyping)
+    updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(
+      vertical: session.isVerticalTyping,
+      mode: session.inputMode
+    )
     session.switchState(updatedState)
     return true
   }

@@ -38,9 +38,9 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
-    let cassetteLX = LXAssembly.LXFacade.lxCassette
+    let cassetteLX = testHandler.currentLM.factory.cassette
     #expect(cassetteLX.isLoaded)
     #expect(!cassetteLX.charDefMap.isEmpty)
 
@@ -93,7 +93,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
     testHandler.clear()
     typeSentence(",,,,")
@@ -152,7 +152,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true
@@ -187,7 +187,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true
@@ -227,7 +227,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true
@@ -260,7 +260,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true
@@ -301,8 +301,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
-    #expect(LXAssembly.LXFacade.lxCassette.anySingleCharKey == "?")
+    testLX?.loadCassetteData(path: cassetteURL.path)
+    #expect(testHandler.currentLM.factory.cassette.anySingleCharKey == "?")
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true
@@ -356,8 +356,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
-    #expect(LXAssembly.LXFacade.lxCassette.wildcardKey == "*")
+    testLX?.loadCassetteData(path: cassetteURL.path)
+    #expect(testHandler.currentLM.factory.cassette.wildcardKey == "*")
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true
@@ -401,7 +401,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       return
     }
 
-    LXAssembly.LXFacade.loadCassetteData(path: cassetteURL.path)
+    testLX?.loadCassetteData(path: cassetteURL.path)
 
     testHandler.clear()
     testHandler.prefs.cassetteEnabled = true

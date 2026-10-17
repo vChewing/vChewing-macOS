@@ -50,7 +50,7 @@ extension SessionProtocol {
         guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
         guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
         let status = "i18n:NotificationSwitch.Revolver".i18n
-        SessionHost.shared.notify(
+        this.host.notify(
           isCapsLockTurnedOn
             ? "[Caps Lock ON] " + "i18n:Menu.AlphanumericalInputMode".i18n + "\n" + status
             : "[Caps Lock OFF] " + "i18n:Menu.ChineseInputMode".i18n + "\n" + status
@@ -147,7 +147,7 @@ extension SessionProtocol {
     }
 
     /// 除非核心辭典有載入，否則一律蜂鳴。
-    if !SessionHost.shared.isCoreDBConnected() {
+    if !host.isCoreDBConnected() {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: State = .ofEmpty()
       newState.tooltip = "i18n:DictionaryStatus.FactoryDictNotLoaded".i18n
@@ -176,7 +176,7 @@ extension SessionProtocol {
 
     // 在非拼音系模式（注音鍵盤；拼音系含狂拼則不需翻譯）的情況下，強制將當前鍵盤佈局
     // 翻譯為美規鍵盤（或指定的其它鍵盤佈局）。狂拼為拼音系，由 isPinyinFamilyTypingMode 涵蓋。
-    if !inputHandler.isPinyinFamilyTypingMode || SessionHost.shared.isDynamicBasicKeyboardLayoutEnabled() {
+    if !inputHandler.isPinyinFamilyTypingMode || host.isDynamicBasicKeyboardLayoutEnabled() {
       var defaultLayout = LatinKeyboardMappings(rawValue: prefs.basicKeyboardLayout) ??
         .qwerty
       if let parser = KeyboardParser(rawValue: prefs.keyboardParser) {
@@ -214,7 +214,7 @@ extension SessionProtocol {
       if [.ofEmpty].contains(state.type) { ui?.tooltipUI?.hide() }
 
       // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出，除非轉換結果與轉換前的內容一致。
-      if SessionHost.shared.isDynamicBasicKeyboardLayoutEnabled(), event.text != eventToDeal.text {
+      if host.isDynamicBasicKeyboardLayoutEnabled(), event.text != eventToDeal.text {
         switchState(.ofCommitting(textToCommit: eventToDeal.text))
         return true
       }
@@ -245,7 +245,7 @@ extension SessionProtocol {
 
       if popNotification {
         let status = "i18n:NotificationSwitch.Revolver".i18n
-        SessionHost.shared.notify(
+        host.notify(
           newValue
             ? "i18n:Menu.AlphanumericalInputMode".i18n + "\n" + status
             : "i18n:Menu.ChineseInputMode".i18n + "\n" + status

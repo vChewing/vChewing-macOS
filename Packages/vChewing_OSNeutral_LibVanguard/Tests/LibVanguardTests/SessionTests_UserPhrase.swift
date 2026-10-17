@@ -32,7 +32,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     testHandler.filterabilityChecker = { _ in true }
     // 復刻宿主（`UserPhraseImpl`）在 marking 按鍵下指派權重的契約：
     // 升權不填權重（視為 0）、降權賦以極端低權重、過濾不填權重。
-    SessionHost.shared.updateUserPhraseWeight = { phrase, action in
+    testEnv?.host.updateUserPhraseWeight = { phrase, action in
       var phrase = phrase
       switch action {
       case .toBoost: phrase.weight = nil
@@ -45,7 +45,7 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.currentLM.clearTemporaryData(isFiltering: true)
       testHandler.filterabilityChecker = originalFilterabilityChecker
-      SessionHost.shared.updateUserPhraseWeight = { phrase, _ in phrase }
+      testEnv?.host.updateUserPhraseWeight = { phrase, _ in phrase }
     }
 
     /// 以較低權重預置「年中」後敲出該讀音，作為就地加詞的觀測對象。

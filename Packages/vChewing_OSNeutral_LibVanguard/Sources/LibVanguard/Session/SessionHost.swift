@@ -141,22 +141,63 @@ public final class SessionHost {
     -> UserPhraseInsertable = { phrase, _ in phrase }
   /// 候選文字服務的 selector 回應。
   public var responseFromSelector: (CandidateTextService) -> String? = { _ in nil }
+
+  // MARK: Fileprivate
+
+  /// 辭典物件之儲存格（`nil` 表示尚未建置）。
+  fileprivate var lexiconFactoryStorage: LexiconAssembly.FactoryDictionary?
+  /// 辭典副本之儲存格。
+  fileprivate var lexiconStore: LexiconStore?
 }
 
-// MARK: - Shared.InputMode.lexicon（跨平台）
+// MARK: - 辭典資源（P316）
 
-extension Shared.InputMode {
-  private struct LexiconCache {
+extension SessionHost {
+  /// 本宿主所持之原廠辭典物件：`lexicon(for:)` 之兩份副本共享同一份 TextMap 與磁帶，
+  /// 故「連上測試辭典」只影響本宿主，不再波及行程內其他宿主與其他測試套房。
+  public var factoryDictionary: LexiconAssembly.FactoryDictionary {
+    get {
+      lexiconFactoryStorage ?? LexiconAssembly.FactoryDictionary.shared
+    }
+    set {
+      lexiconFactoryStorage = newValue
+      resetLexiconCache()
+    }
+  }
+
+  /// 取得指定模式下之辭典副本（首次索取時建置並快取）。
+  public func lexicon(for mode: Shared.InputMode) -> LXAssembly.LXFacade {
+    // 空模式亦落在此：回傳副本而非另建無辭典之實例，
+    // 否則會話層取到的辭典與宿主所持者不是同一個（P316）。
+    LXAssembly.applyEnvironmentDefaults()
+    if lexiconStore == nil {
+      lexiconStore = LexiconStore(pomDataURL: { self.pomDataURL($0) }, factory: factoryDictionary)
+    }
+    switch mode {
+    case .imeModeCHS: return lexiconStore!.chs
+    case .imeModeCHT, .imeModeNULL: return lexiconStore!.cht
+    }
+  }
+
+  /// 丟棄已建置之辭典副本（下次索取時重建）。
+  public func resetLexiconCache() {
+    lexiconStore = nil
+  }
+
+  /// 兩份辭典副本之持有者。
+  fileprivate final class LexiconStore {
     // MARK: Lifecycle
 
-    init() {
-      self.chs = LXAssembly.LXFacade(
-        isCHS: true,
-        pomDataURL: SessionHost.shared.pomDataURL(.imeModeCHS)
-      )
+    init(pomDataURL: (Shared.InputMode) -> URL?, factory: LexiconAssembly.FactoryDictionary) {
       self.cht = LXAssembly.LXFacade(
         isCHS: false,
-        pomDataURL: SessionHost.shared.pomDataURL(.imeModeCHT)
+        pomDataURL: pomDataURL(.imeModeCHT),
+        factory: factory
+      )
+      self.chs = LXAssembly.LXFacade(
+        isCHS: true,
+        pomDataURL: pomDataURL(.imeModeCHS),
+        factory: factory
       )
     }
 
@@ -164,49 +205,20 @@ extension Shared.InputMode {
 
     let cht: LXAssembly.LXFacade
     let chs: LXAssembly.LXFacade
-
-    func model(for mode: Shared.InputMode) -> LXAssembly.LXFacade {
-      switch mode {
-      case .imeModeCHS: return chs
-      case .imeModeCHT: return cht
-      case .imeModeNULL: return .init()
-      }
-    }
   }
+}
 
-  private static var productionCache = LexiconCache()
-  private static var unitTestCache: LexiconCache?
+// MARK: - Shared.InputMode.lexicon（跨平台）
 
-  private static var activeCache: LexiconCache {
-    if OSUtils.isRunningUnitTests {
-      if unitTestCache == nil {
-        unitTestCache = LexiconCache()
-      }
-      LXAssembly.applyEnvironmentDefaults()
-      return unitTestCache!
-    }
-    LXAssembly.applyEnvironmentDefaults()
-    return productionCache
-  }
-
+extension Shared.InputMode {
   public static func resetLexiconCache(forUnitTests: Bool? = nil) {
-    switch forUnitTests {
-    case true?:
-      unitTestCache = nil
-    case false?:
-      productionCache = LexiconCache()
-    case nil:
-      productionCache = LexiconCache()
-      unitTestCache = nil
-    }
+    _ = forUnitTests
+    SessionHost.shared.resetLexiconCache()
   }
 
+  /// 當前模式所對應之辭典副本：一律經由 `SessionHost.shared` 取得。
+  /// 需要與行程共用者隔離時（例如測試），請改走 `host.lexicon(for:)`。
   public var lexicon: LXAssembly.LXFacade {
-    switch self {
-    case .imeModeNULL:
-      return .init()
-    default:
-      return Self.activeCache.model(for: self)
-    }
+    SessionHost.shared.lexicon(for: self)
   }
 }

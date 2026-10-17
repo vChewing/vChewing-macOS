@@ -63,11 +63,13 @@ extension LXAssembly {
       isCHS: Bool = false,
       pomDataURL: URL? = nil,
       locator: any UserDataLocator = LXAssembly.userDataLocator,
-      prefs: (any PrefMgrProtocol)? = nil
+      prefs: (any PrefMgrProtocol)? = nil,
+      factory: FactoryDictionary = .shared
     ) {
       self.isCHS = isCHS
       self.locator = locator
       self.injectedPrefs = prefs
+      self.factory = factory
       self.lxPerceptor = LXPerceptor(dataURL: pomDataURL, locator: locator)
       // 五個使用者語言模組一律沿用本副本化模組之儲存後端：注入專屬後端即可整批脫離硬碟。
       lxUserPhrases.locator = locator
@@ -176,13 +178,13 @@ extension LXAssembly {
         switch strategy {
         case .configuredLookup:
           if lxFacade.config.partialMatchEnabled {
-            return LXFacade.lxPlainBopomofo.partiallyMatchedValuesFor(prefix: reading, isCHS: lxFacade.isCHS)
+            return lxFacade.factory.plainBopomofo.partiallyMatchedValuesFor(prefix: reading, isCHS: lxFacade.isCHS)
           }
-          return LXFacade.lxPlainBopomofo.valuesFor(key: reading, isCHS: lxFacade.isCHS)
+          return lxFacade.factory.plainBopomofo.valuesFor(key: reading, isCHS: lxFacade.isCHS)
         case .exactMatch:
-          return LXFacade.lxPlainBopomofo.valuesFor(key: reading, isCHS: lxFacade.isCHS)
+          return lxFacade.factory.plainBopomofo.valuesFor(key: reading, isCHS: lxFacade.isCHS)
         case .partialMatch:
-          return LXFacade.lxPlainBopomofo.partiallyMatchedValuesFor(prefix: reading, isCHS: lxFacade.isCHS)
+          return lxFacade.factory.plainBopomofo.partiallyMatchedValuesFor(prefix: reading, isCHS: lxFacade.isCHS)
         }
       }
 
@@ -261,11 +263,12 @@ extension LXAssembly {
         lxFacade.countKeyValuePairs(keyArray: keyArray, factoryDictionaryOnly: factoryDictionaryOnly)
       }
 
-      // MARK: Fileprivate
+      // MARK: Internal
 
-      fileprivate let lxFacade: LXFacade
+      let lxFacade: LXFacade
     }
 
+    /// 類別層之載入策略初值（生產執行緒恆為 true；單元測試可暫時關閉）。
     public static var asyncLoadingUserData: Bool = true
     // 與關聯詞語有關的惰性載入器，可由外部登記。
     public static var associatesLazyLoader: (() -> ())?
@@ -276,6 +279,10 @@ extension LXAssembly {
     /// 測試可注入專屬之後端，使整個實例之使用者資料讀寫一概不落地。
     public let locator: any UserDataLocator
 
+    /// 原廠辭典／磁帶／注音文三項資源之持有者（P316）。預設為行程級共享者；
+    /// 注入專屬者即可令本實例之辭典狀態與他處無涉（測試即藉此並行）。
+    public let factory: FactoryDictionary
+
     // 簡體中文模型？
     public let isCHS: Bool
 
@@ -284,58 +291,36 @@ extension LXAssembly {
 
     public internal(set) var inputTokenHashesArray: Set<Int> = []
 
+    /// 本實例是否以非同步方式載入使用者資料。預設取類別層之策略（見 `asyncLoadingUserData`）。
+    /// 未經個別指定時，恆反映類別層之策略（`asyncLoadingUserData`）。
+    /// 個別指定後即固定於該值：`ensureAssociatesLoaded()` 之暫時關閉亦然。
+    public var asyncLoadingUserData: Bool {
+      get { asyncLoadingOverride ?? Self.asyncLoadingUserData }
+      set { asyncLoadingOverride = newValue }
+    }
+
     public var lxQuerier: LXQuerier { .init(lxFacade: self) }
 
-    public var isCassetteDataLoaded: Bool { Self.lxCassette.isLoaded }
+    public var isCassetteDataLoaded: Bool { factory.cassette.isLoaded }
 
     public static func setCassetCandidateKeyValidator(_ validator: @Sendable @escaping (String) -> Bool) {
-      Self.lxCassette.candidateKeysValidator = validator
+      FactoryDictionary.shared.cassette.candidateKeysValidator = validator
     }
 
+    /// 載入磁帶資料至行程級共享之辭典物件（歷史入口）。
     public static func loadCassetteData(path: String) {
-      func load() {
-        if FileManager.default.isReadableFile(atPath: path) {
-          Self.lxCassette.clear()
-          Self.lxCassette.open(path, using: LXAssembly.userDataLocator)
-          Self.cassetteGeneration &+= 1
-          vCLMLog("lxCassette: \(Self.lxCassette.count) entries of data loaded from: \(path)")
-        } else {
-          // 載入失敗時磁帶內容未變，故不動世代計數器（非同步路徑亦同此語義）。
-          vCLMLog("lxCassette: File access failure: \(path)")
-        }
-      }
-      if !Self.asyncLoadingUserData {
-        load()
-      } else {
-        // CIN 解析經背景佇列調度、實際仍在 MainActor 上完成。
-        let validator = Self.lxCassette.candidateKeysValidator
-        LXAssembly.fileHandleQueue.async {
-          mainSync {
-            guard FileManager.default.isReadableFile(atPath: path) else {
-              vCLMLog("lxCassette: File access failure: \(path)")
-              return
-            }
-            var newCassette = LXCassette()
-            newCassette.candidateKeysValidator = validator
-            newCassette.open(path, using: LXAssembly.userDataLocator)
-            let count = newCassette.count
-            asyncOnMain {
-              Self.lxCassette = newCassette
-              Self.cassetteGeneration &+= 1
-              vCLMLog("lxCassette: \(count) entries of data loaded from: \(path)")
-            }
-          }
-        }
-      }
+      loadCassetteData(
+        path: path,
+        into: FactoryDictionary.shared,
+        useAsyncStrategy: asyncLoadingUserData,
+        locator: LXAssembly.userDataLocator
+      )
     }
-
-    // MARK: Shared Resource Lifecycle
 
     public static func resetSharedResources(restoreAsyncLoadingStrategy: Bool = true) {
       disconnectFactoryDictionary()
-      lxCassette = LXCassette()
-      cassetteGeneration &+= 1
-      lxPlainBopomofo = LXPlainBopomofo()
+      FactoryDictionary.shared.cassette = LXCassette()
+      FactoryDictionary.shared.plainBopomofo = LXPlainBopomofo()
       guard restoreAsyncLoadingStrategy else { return }
       asyncLoadingUserData = !OSUtils.isRunningUnitTests
     }
@@ -343,19 +328,42 @@ extension LXAssembly {
     /// 清除原廠辭典的所有 QueryBuffer 快取。
     /// 應在適當的時機呼叫，避免舊查詢結果污染新的查詢。
     public static func flushTrieCaches() {
-      factoryTrie?.flushCaches()
+      FactoryDictionary.shared.trie?.flushCaches()
     }
 
     /// 釋放原廠辭典反查索引佔用的記憶體。
     /// 關閉獨立 RevLookup 視窗後可呼叫；下次反查會自動重新建立。
     public static func flushFactoryReverseLookupIndex() {
-      factoryTrie?.flushReverseLookupIndex()
+      FactoryDictionary.shared.trie?.flushReverseLookupIndex()
     }
 
     /// 預先建立原廠辭典反查索引。
     /// 在 RevLookup 視窗顯示時呼叫，使首次查詢無需等待 lazy build。
     public static func preloadFactoryReverseLookupIndex() {
-      factoryTrie?.ensureReverseLookupIndex()
+      FactoryDictionary.shared.trie?.ensureReverseLookupIndex()
+    }
+
+    public func setCassetCandidateKeyValidator(_ validator: @Sendable @escaping (String) -> Bool) {
+      factory.cassette.candidateKeysValidator = validator
+    }
+
+    /// 載入磁帶資料至**本實例**所持之辭典物件。
+    public func loadCassetteData(path: String) {
+      Self.loadCassetteData(
+        path: path,
+        into: factory,
+        useAsyncStrategy: asyncLoadingUserData,
+        locator: locator
+      )
+    }
+
+    // MARK: Shared Resource Lifecycle
+
+    /// 重置**本實例**所持之辭典資源。
+    public func resetResources() {
+      disconnectFactoryDictionary()
+      factory.cassette = LXCassette()
+      factory.plainBopomofo = LXPlainBopomofo()
     }
 
     @discardableResult
@@ -447,7 +455,7 @@ extension LXAssembly {
     }
 
     public func loadUserPhrasesData(path: String, filterPath: String?, async: Bool? = nil) {
-      let shouldAsync = async ?? Self.asyncLoadingUserData
+      let shouldAsync = async ?? asyncLoadingUserData
 
       // 舊資料的清除時機：同步載入者逕行清除；非同步載入者延後——成功時由 `replaceData` 全量取代
       // （臨時資料亦於該處一併清除），失敗時由失敗回呼清除。
@@ -553,7 +561,7 @@ extension LXAssembly {
           vCLMLog("lxUserSymbol: File access failure: \(path)")
         }
       }
-      if !Self.asyncLoadingUserData {
+      if !asyncLoadingUserData {
         load()
       } else {
         LXAssembly.readFileContentAsync(
@@ -582,7 +590,7 @@ extension LXAssembly {
           vCLMLog("lxAssociates: File access failure: \(path)")
         }
       }
-      if !Self.asyncLoadingUserData {
+      if !asyncLoadingUserData {
         load()
       } else {
         loadUserAssociatesDataAsync(path: path)
@@ -616,7 +624,7 @@ extension LXAssembly {
           vCLMLog("lxReplacements: File access failure: \(path)")
         }
       }
-      if !Self.asyncLoadingUserData {
+      if !asyncLoadingUserData {
         load()
       } else {
         // LXReplacements.open() 一律 consolidate，故 shouldConsolidate: true。
@@ -720,29 +728,33 @@ extension LXAssembly {
     /// 但是，LXCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
     /// 於是 LXCoreJSON 就出場了，專門用來讀取原廠的 JSON 格式的辭典。
 
-    // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
-    static var lxCassette = LXCassette()
-    static var lxPlainBopomofo = LXPlainBopomofo()
+    // MARK: 舊制靜態入口（轉發至 `FactoryDictionary.shared`）
 
-    /// 原廠辭典世代計數器：每次原廠辭典被重新載入或解除安裝時遞增。
-    /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保切換原廠辭典後舊快取自動失效。
-    static var factoryGeneration: Int = 0
+    /// 歷史遺留之靜態入口：一律落在 `FactoryDictionary.shared`。
+    /// 新碼請改走逐實例之 `factory`，否則「換一份辭典」仍會波及所有實例。
+    static var lxCassette: LXCassette {
+      get { FactoryDictionary.shared.cassette }
+      set { FactoryDictionary.shared.cassette = newValue }
+    }
 
-    /// 漸退記憶（POM）世代計數器：每次記憶內容變更（記憶／清除／漂白／載入）時遞增。
-    /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保 POM 更新後查詢即反映新記憶。
-    static var pomGeneration: Int = 0
+    static var lxPlainBopomofo: LXPlainBopomofo {
+      get { FactoryDictionary.shared.plainBopomofo }
+      set { FactoryDictionary.shared.plainBopomofo = newValue }
+    }
 
-    /// 磁帶資料世代計數器：每次磁帶資料被載入、取代或清空時遞增。
-    /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保磁帶資料更新後查詢即反映新內容。
-    /// 磁帶資料為靜態、而查詢快取為**逐實例**，靜態端無法逐一通知既有實例，
-    /// 故只能經由世代計數器（而非直接 `removeAll`）令各實例的舊快取自動作廢。
-    static var cassetteGeneration: Int = 0
+    static var factoryGeneration: Int { FactoryDictionary.shared.dictionaryGeneration }
+
+    static var cassetteGeneration: Int { FactoryDictionary.shared.cassetteGeneration }
 
     static var factoryTrie: VanguardTrie.TextMapTrie? {
-      didSet {
-        factoryGeneration &+= 1
-      }
+      get { FactoryDictionary.shared.trie }
+      set { FactoryDictionary.shared.trie = newValue }
     }
+
+    /// 漸退記憶（POM）之世代計數器：影響 `unigramsFor` 快取之有效性。
+    /// POM 係逐實例之資源，故計數器亦逐實例（舊制為全域，任何一份實例動了記憶，
+    /// 其他實例之快取亦一併作廢——無害、但屬無謂）。
+    var pomGeneration: Int = 0
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
@@ -845,7 +857,7 @@ extension LXAssembly {
         // 該旗標控制的是候選字排序，而非讀音有效性。
         if keyArray.count == 1,
            let firstKey = keyArray.first,
-           Self.lxPlainBopomofo.hasValuesFor(key: firstKey) {
+           factory.plainBopomofo.hasValuesFor(key: firstKey) {
           return true
         }
 
@@ -889,7 +901,7 @@ extension LXAssembly {
         if lxUserPhrases.hasUnigramsFor(key: keyChain) { return true }
         if config.isSymbolEnabled, lxUserSymbols.hasUnigramsFor(key: keyChain) { return true }
       }
-      if config.isCassetteEnabled, Self.lxCassette.hasUnigramsFor(key: keyChain) { return true }
+      if config.isCassetteEnabled, factory.cassette.hasUnigramsFor(key: keyChain) { return true }
 
       // NumPad keys are dynamically generated by supplyNumPadUnigrams.
       if keyChain.hasPrefix("_NumPad_"), config.numPadFWHWStatus != nil { return true }
@@ -1025,7 +1037,7 @@ extension LXAssembly {
             // 查 contradictory mode（與當前模式相反）的特有字：
             //   CHT 模式 (isCHS=false) → 查簡體特有 (isCHS: true)
             //   CHS 模式 (isCHS=true)  → 查繁體特有 (isCHS: false)
-            return Self.lxPlainBopomofo.isExclusive(
+            return factory.plainBopomofo.isExclusive(
               isCHS: !isCHS,
               reading: keyChain,
               target: firstChar
@@ -1118,11 +1130,11 @@ extension LXAssembly {
 
       if config.isCassetteEnabled {
         rawAllUnigrams.insert(
-          contentsOf: Self.lxCassette.unigramsFor(key: keyChain, keyArray: flatKeyArray),
+          contentsOf: factory.cassette.unigramsFor(key: keyChain, keyArray: flatKeyArray),
           at: 0
         )
       } else if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams {
-        rawAllUnigrams += Self.lxPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+        rawAllUnigrams += factory.plainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
           Homa.Gram(
             keyArray: flatKeyArray,
             value: $0,
@@ -1131,10 +1143,10 @@ extension LXAssembly {
         }
       } else if rawAllUnigrams.isEmpty,
                 keyArray.count == 1,
-                Self.lxPlainBopomofo.hasValuesFor(key: keyChain) {
+                factory.plainBopomofo.hasValuesFor(key: keyChain) {
         // 原廠辭典查無此讀音、但 lxPlainBopomofo 確認為合法 BPMF 讀音時，
         // 附加低權重候選以履行 hasUnigramsForFast 的語義保證。
-        rawAllUnigrams += Self.lxPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+        rawAllUnigrams += factory.plainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
           Homa.Gram(keyArray: flatKeyArray, value: $0, score: -9.5)
         }
       }
@@ -1199,10 +1211,10 @@ extension LXAssembly {
     // 確保關聯詞語資料在首次剛需時得以即時載入。
     internal func ensureAssociatesLoaded() {
       if !lxAssociates.isLoaded {
-        let wasAsync = Self.asyncLoadingUserData
-        Self.asyncLoadingUserData = false
+        let wasAsync = asyncLoadingUserData
+        asyncLoadingUserData = false
         Self.associatesLazyLoader?()
-        Self.asyncLoadingUserData = wasAsync
+        asyncLoadingUserData = wasAsync
       }
     }
 
@@ -1339,6 +1351,8 @@ extension LXAssembly {
     /// Intel 硬體實測再校準：4,000 仍卡、625（=5⁴）順暢——維持免聲調 4 音節查詢）。
     private static let kCartesianProductBudgetLimit = 625
 
+    private var asyncLoadingOverride: Bool?
+
     // LRU cache for unigramsFor
     private var unigramCacheFingerprint: Int = 0
     private var unigramLRUCache: [String: [Homa.Gram]] = [:]
@@ -1359,11 +1373,54 @@ extension LXAssembly {
     private var currentGramCacheFingerprint: Int {
       var hasher = Hasher()
       hasher.combine(config)
-      hasher.combine(Self.factoryGeneration)
-      hasher.combine(Self.pomGeneration)
-      hasher.combine(Self.cassetteGeneration)
+      hasher.combine(factory.dictionaryGeneration)
+      hasher.combine(pomGeneration)
+      hasher.combine(factory.cassetteGeneration)
       hasher.combine(gramSupplyHub.generation)
       return hasher.finalize()
+    }
+
+    private static func loadCassetteData(
+      path: String,
+      into factory: FactoryDictionary,
+      useAsyncStrategy: Bool,
+      locator: any UserDataLocator
+    ) {
+      func load() {
+        if FileManager.default.isReadableFile(atPath: path) {
+          factory.cassette.clear()
+          factory.cassette.locator = locator
+          factory.cassette.open(path)
+          factory.bumpCassetteGeneration()
+          vCLMLog("lxCassette: \(factory.cassette.count) entries of data loaded from: \(path)")
+        } else {
+          // 載入失敗時磁帶內容未變，故不動世代計數器（非同步路徑亦同此語義）。
+          vCLMLog("lxCassette: File access failure: \(path)")
+        }
+      }
+      if !useAsyncStrategy {
+        load()
+      } else {
+        // CIN 解析經背景佇列調度、實際仍在 MainActor 上完成。
+        let validator = factory.cassette.candidateKeysValidator
+        LXAssembly.fileHandleQueue.async {
+          mainSync {
+            guard FileManager.default.isReadableFile(atPath: path) else {
+              vCLMLog("lxCassette: File access failure: \(path)")
+              return
+            }
+            var newCassette = LXCassette()
+            newCassette.candidateKeysValidator = validator
+            newCassette.locator = locator
+            newCassette.open(path)
+            let count = newCassette.count
+            asyncOnMain {
+              factory.cassette = newCassette
+              vCLMLog("lxCassette: \(count) entries of data loaded from: \(path)")
+            }
+          }
+        }
+      }
     }
 
     /// 計算給定 PossibleKey 陣列的笛卡爾積展開總數（飽和計算、超過預算即早停）。
@@ -1457,7 +1514,7 @@ extension LXAssembly {
           factoryCoreUnigramsResult.removeAll { thisUnigram in
             guard let firstChar = thisUnigram.current.first else { return false }
             return expandedKeyArrays.allSatisfy { subKeyArray in
-              Self.lxPlainBopomofo.isExclusive(
+              factory.plainBopomofo.isExclusive(
                 isCHS: !isCHS,
                 reading: subKeyArray.joined(separator: "-"),
                 target: firstChar
@@ -1549,14 +1606,14 @@ extension LXAssembly {
         for subKeyArray in expandedKeyArrays {
           let subKeyChain = subKeyArray.joined(separator: "-")
           rawAllUnigrams.insert(
-            contentsOf: Self.lxCassette.unigramsFor(key: subKeyChain, keyArray: subKeyArray),
+            contentsOf: factory.cassette.unigramsFor(key: subKeyChain, keyArray: subKeyArray),
             at: 0
           )
         }
       } else if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams {
         for subKeyArray in expandedKeyArrays {
           let subKeyChain = subKeyArray.joined(separator: "-")
-          rawAllUnigrams += Self.lxPlainBopomofo.valuesFor(key: subKeyChain, isCHS: isCHS).map {
+          rawAllUnigrams += factory.plainBopomofo.valuesFor(key: subKeyChain, isCHS: isCHS).map {
             Homa.Gram(
               keyArray: flatKeyArray,
               value: $0,
@@ -1567,8 +1624,8 @@ extension LXAssembly {
       } else if rawAllUnigrams.isEmpty {
         for subKeyArray in expandedKeyArrays {
           let subKeyChain = subKeyArray.joined(separator: "-")
-          if Self.lxPlainBopomofo.hasValuesFor(key: subKeyChain) {
-            rawAllUnigrams += Self.lxPlainBopomofo.valuesFor(key: subKeyChain, isCHS: isCHS).map {
+          if factory.plainBopomofo.hasValuesFor(key: subKeyChain) {
+            rawAllUnigrams += factory.plainBopomofo.valuesFor(key: subKeyChain, isCHS: isCHS).map {
               Homa.Gram(keyArray: flatKeyArray, value: $0, score: -9.5)
             }
           }
