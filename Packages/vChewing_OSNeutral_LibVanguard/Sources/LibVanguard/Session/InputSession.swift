@@ -10,7 +10,7 @@ import SwiftExtension
 public final class InputSession: SessionProtocol, Sendable {
   // MARK: Lifecycle
 
-  /// 預配置 session（極性雙緩衝用）：不繫結任何 controller/client，僅初始化內部引擎。
+  /// 預配置 session（會話池用）：不繫結任何 controller/client，僅初始化內部引擎。
   /// 後續經由 `reassign(toAddr:)` 與具體 controller 綁定。
   public init(
     preallocated: (),
@@ -21,13 +21,11 @@ public final class InputSession: SessionProtocol, Sendable {
     self.host = host
     if let controllerAddr {
       self.inputControllerAssignedAddr = controllerAddr
-      Self.registerSessionAddr(self, for: controllerAddr)
     }
     if let manuallyAssignedClientProxy {
       let obj = manuallyAssignedClientProxy as AnyObject
       let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(obj).toOpaque())
       self.inputControllerAssignedAddr = controllerAddr
-      Self.registerSessionAddr(self, for: controllerAddr)
       construct(clientProxy: manuallyAssignedClientProxy)
     }
     adoptHostDefaults()
@@ -55,13 +53,6 @@ public final class InputSession: SessionProtocol, Sendable {
   public static var isASCIIModeForAllClients = false
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
   public static var isASCIIModeForEachClient: [String: Bool] = [:]
-
-  // MARK: - 極性雙緩衝 Session 池
-
-  /// 偶數 generation controller 專用 session。
-  public static let sessionEven = InputSession(preallocated: ())
-  /// 奇數 generation controller 專用 session。
-  public static let sessionOdd = InputSession(preallocated: ())
 
   public static var current: InputSession? {
     get { _current }
@@ -171,7 +162,7 @@ public final class InputSession: SessionProtocol, Sendable {
   /// 在 parity 雙緩衝 singleton pair 體制下，兩個 Session 實例共用同一個 `prefs` 引用。
   /// `willSet` 將新模式寫入 `prefs.mostRecentInputMode`（全局唯一），另一方在
   /// `performServerActivation()` 啟動時自動從 `IMEApp.currentInputMode` 同步，
-  /// 確保簡繁模式在雙極性 Session 之間一致。
+  /// 確保簡繁模式在各會話格之間一致。
   public var inputMode: Shared.InputMode = .imeModeNULL {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 模組。IMEApp 模組會據此計算正確的資料值。
@@ -191,43 +182,6 @@ public final class InputSession: SessionProtocol, Sendable {
         synchronizer4LMPrefs?()
       }
     }
-  }
-
-  /// 從 controller 位址查詢對應的 InputSession。
-  public static func session(for controllerAddr: UInt) -> InputSession? {
-    if OSUtils.isRunningUnitTests {
-      guard controllerAddr == 0 else { return nil }
-    } else {
-      guard SessionHost.shared.isControllerAddressAlive(controllerAddr) else { return nil }
-    }
-    guard let ssnAddr = sessionAddrByControllerAddr[controllerAddr],
-          let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
-    else { return nil }
-    return Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
-  }
-
-  /// 登記 controller → session 對照關係。
-  public static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
-    let ssnKey = UInt(bitPattern: Unmanaged.passUnretained(session).toOpaque())
-    sessionAddrByControllerAddr[controllerAddr] = ssnKey
-  }
-
-  /// 以純記憶體位址移除 controller 對照關係（供 `onDealloc` block 使用，避免捕獲 self）。
-  public static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
-    guard let ssnKey = sessionAddrByControllerAddr[ctlKey],
-          let opaque = UnsafeRawPointer(bitPattern: ssnKey) else { return }
-    sessionAddrByControllerAddr[ctlKey] = nil
-    let session = Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
-    // 僅在 session 仍屬於該 controller 時才清空 inputControllerAssignedAddr。
-    // reassign 後 session 已歸新 controller 所有，舊 controller 的 dealloc 不應干擾。
-    if session.inputControllerAssignedAddr == ctlKey {
-      session.inputControllerAssignedAddr = nil
-    }
-  }
-
-  /// 以 generation parity 查詢對應的 InputSession singleton。
-  public static func session(forParity parity: Int) -> InputSession {
-    (parity & 1) == 0 ? sessionEven : sessionOdd
   }
 
   public func initInputHandler() {
@@ -269,23 +223,16 @@ public final class InputSession: SessionProtocol, Sendable {
   }
 
   /// 重新綁定至新的 controller 位址。
-  /// 更新 controller→session 對照表並清理舊 controller 的殘留 mapping。
   public func reassign(toAddr newAddr: UInt) {
-    let oldAddr = inputControllerAssignedAddr
     inputControllerAssignedAddr = newAddr
-    if let oldAddr {
-      Self.sessionAddrByControllerAddr[oldAddr] = nil
-    }
-    Self.registerSessionAddr(self, for: newAddr)
   }
 
   /// 令觸發本次回呼的 controller 成為本會話之客體綁定正本。
   ///
-  /// 極性雙緩衝下全行程只有兩枚 session，同一奇偶性者可能先後（甚至同時）服務多枚
-  /// controller；`inputControllerAssignedAddr` 若只在 `activateServer` 時更新，則 IMK 之
-  /// 排程交錯（A 退場 → A 之副本延遲拆除 → B 接手）會把它留在已撕裂的值上：或為 nil、
-  /// 或指向客體已遭終止的副本。凡帶 controller 位址之回呼皆先呼叫本函式，撕裂即不可能
-  /// 跨過一次回呼——因為下一次回呼一定會把正本拉回觸發者。
+  /// 會話格會被不同 controller 先後（甚至同時）使用；`inputControllerAssignedAddr` 若只在
+  /// `activateServer` 時更新，則 IMK 之排程交錯（A 退場 → A 之副本延遲拆除 → B 接手）會把它
+  /// 留在已撕裂的值上：或為 nil、或指向客體已遭終止的副本。凡帶 controller 位址之回呼皆先
+  /// 呼叫本函式，撕裂即不可能跨過一次回呼——因為下一次回呼一定會把正本拉回觸發者。
   ///
   /// - Returns: 是否真的發生了重綁（已一致時為 `false`，故可無條件逐回呼呼叫）。
   @discardableResult
@@ -357,12 +304,6 @@ public final class InputSession: SessionProtocol, Sendable {
   // MARK: Private
 
   private static var _current: InputSession?
-
-  /// 以 controller NSObject 的記憶體位址整數值為鍵的對照字典。
-  /// 資料值是 Session 的記憶體位址。
-  /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
-  ///   此處不保留強引用，避免靜態字典參與 ARC。
-  private static var sessionAddrByControllerAddr = [UInt: UInt]()
 
   /// 依 `host` 改綁所有動作依賴（含偏好設定與辭典副本）。
   private func adoptHostDefaults() {

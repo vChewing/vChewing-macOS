@@ -483,11 +483,11 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     #expect(emptyOffsets.allSatisfy { $0 == testClientProxy.markedTexts.count - 1 })
   }
 
-  /// 回歸：IMK 極性雙緩衝之交錯會把客體綁定留在撕裂值上（2026-10 客訴 #618）。
+  /// 回歸：客體綁定被抽走後，任一條帶 controller 位址之回呼即把它拉回觸發者。
   ///
-  /// 撕裂的成因不在「誰拿到 session」，而在「誰是此刻的客體正本」：`activateServer`
-  /// 之外的回呼原本只讀 `inputControllerAssignedAddr`。本用例固定兩件事——回呼帶來的
-  /// controller 一律成為正本，且同一 controller 之連番回呼不反覆翻動對照表。
+  /// 病灶之原形見 P317：`inputControllerAssignedAddr` 原只在 `activateServer` 寫，
+  /// 故「A 退場 → 其副本延遲拆除 → B 接手」之交錯會把它留在 nil 或已死之副本上。
+  /// 本用例固定兩件事——收養即正本，且同一 controller 之連番回呼不反覆改寫。
   @Test("SS-Lifecycle-016 Callback adoption reclaims a torn client binding")
   func test_SS_Lifecycle_016_CallbackAdoptionReclaimsTornClientBinding() throws {
     // 以兩枚存活物件代表先後到來的 controller：只用其位址，不經 IMK 派發。
@@ -497,24 +497,19 @@ extension LibVanguardTestsRoot.InputHandlerTests.Session {
     let addrB = UInt(bitPattern: Unmanaged.passUnretained(ctrlB).toOpaque())
     #expect(addrA != addrB)
 
-    // 起點即客訴之撕裂態：副本延遲拆除已把綁定清成 nil，controller 本身仍存活。
+    // 起點即客訴之撕裂態：綁定已被清成 nil，而 controller 本身仍存活。
     testSession.inputControllerAssignedAddr = nil
     #expect(testSession.adoptClientAddr(addrA))
     #expect(testSession.inputControllerAssignedAddr == addrA)
 
-    // 同一 controller 之連番回呼：不重綁，免得逐事件改寫對照表。
+    // 同一 controller 之連番回呼：不重綁。
     #expect(!testSession.adoptClientAddr(addrA))
 
     // 另一枚 controller 接手（A 退場、B 上場）：立即改指。
     #expect(testSession.adoptClientAddr(addrB))
     #expect(testSession.inputControllerAssignedAddr == addrB)
+    #expect(!testSession.adoptClientAddr(addrB))
 
-    // 舊 controller 之延遲拆除不得奪走新綁定。
-    InputSession.registerSessionAddr(testSession, for: addrA)
-    InputSession.unregisterSessionAddr(forControllerAddr: addrA)
-    #expect(testSession.inputControllerAssignedAddr == addrB)
-
-    InputSession.unregisterSessionAddr(forControllerAddr: addrB)
     testSession.inputControllerAssignedAddr = nil
   }
 
