@@ -279,6 +279,22 @@ public final class InputSession: SessionProtocol, Sendable {
     Self.registerSessionAddr(self, for: newAddr)
   }
 
+  /// 令觸發本次回呼的 controller 成為本會話之客體綁定正本。
+  ///
+  /// 極性雙緩衝下全行程只有兩枚 session，同一奇偶性者可能先後（甚至同時）服務多枚
+  /// controller；`inputControllerAssignedAddr` 若只在 `activateServer` 時更新，則 IMK 之
+  /// 排程交錯（A 退場 → A 之副本延遲拆除 → B 接手）會把它留在已撕裂的值上：或為 nil、
+  /// 或指向客體已遭終止的副本。凡帶 controller 位址之回呼皆先呼叫本函式，撕裂即不可能
+  /// 跨過一次回呼——因為下一次回呼一定會把正本拉回觸發者。
+  ///
+  /// - Returns: 是否真的發生了重綁（已一致時為 `false`，故可無條件逐回呼呼叫）。
+  @discardableResult
+  public func adoptClientAddr(_ controllerAddr: UInt) -> Bool {
+    guard inputControllerAssignedAddr != controllerAddr else { return false }
+    reassign(toAddr: controllerAddr)
+    return true
+  }
+
   public func hidePalettes() {
     asyncOnMain {
       self.host.postEventForClosingAllPanels()
