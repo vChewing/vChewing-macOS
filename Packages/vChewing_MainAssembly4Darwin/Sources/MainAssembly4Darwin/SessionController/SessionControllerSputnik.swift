@@ -99,28 +99,29 @@ extension SessionControllerSputnik {
   /// 對 IMKInputSessionController 註冊 18 個類別層級 static block。
   /// 每個 block 均從 raw controller/client 記憶體位址解析對應的 InputSession，
   /// 再將呼叫轉發至 Session 的對應方法。
+  /// 凡讀寫客體狀態之回呼，解析後一律以觸發者重綁客體正本（見 `sessionAdoptingClient(_:)`）。
   @MainActor
   private static let _configureClassLevelBlocks: () = {
     // ---- 伺服器生命週期 ----
 
     /// 啟用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController activateServer:]`。
     /// - Note: 設計不變式：session 解析成功之後、`performServerActivation()` 之前，必須把
-    ///   `inputControllerAssignedAddr` 重設為此次觸發 activateServer 的 controller 位址。
+    ///   `inputControllerAssignedAddr` 重設為此次觸發回呼的 controller 位址（由
+    ///   `InputSession.adoptClientAddr(_:)` 承擔，與其餘回呼共用同一份實作）。
     ///   理由：極性雙緩衝模式下全行程只有 sessionEven / sessionOdd 兩枚 session，同一奇偶性者
     ///   可能已被其他 controller 的 `callCoreAtLeastOnce` 重新指位；位址未重設時，
     ///   `client()` 會經由舊 controller 解讀而回傳 nil，使 `doCommit` / `doSetMarkedText` 靜默失效。
     ///   此順序即規格本身，而非對某一已知故障的權宜描述。
     IMKInputSessionController.configureActivatingServer { ctlAddr in
-      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
+      guard let session = SessionControllerSputnik.sessionAdoptingClient(ctlAddr) else {
         SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "activateServer")
         return
       }
-      session.inputControllerAssignedAddr = ctlAddr
       session.performServerActivation()
     }
     /// 停用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController deactivateServer:]`。
     IMKInputSessionController.configureDeactivatingServer { ctlAddr in
-      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else {
+      guard let session = SessionControllerSputnik.sessionAdoptingClient(ctlAddr) else {
         SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "deactivateServer")
         return
       }
@@ -143,12 +144,12 @@ extension SessionControllerSputnik {
     /// 自動提交當前組字內容（例如使用者在組字中途切換焦點時）。
     /// 對應 `-[IMKInputController commitComposition:]`。
     IMKInputSessionController.configureAutoCommittingComposition { ctlAddr in
-      SessionControllerSputnik.session(forAddr: ctlAddr)?.commitComposition()
+      SessionControllerSputnik.sessionAdoptingClient(ctlAddr)?.commitComposition()
     }
     /// 向 IMK 提供當前組字緩衝區的 NSAttributedString。
     /// 對應 `-[IMKInputController composedString:]`。
     IMKInputSessionController.configureProvidingComposedString { ctlAddr in
-      SessionControllerSputnik.session(forAddr: ctlAddr)?.composedString()
+      SessionControllerSputnik.sessionAdoptingClient(ctlAddr)?.composedString()
     }
 
     // ---- 鍵盤事件處理 ----
@@ -171,6 +172,7 @@ extension SessionControllerSputnik {
     ///
     /// - Note: 每次進入此回呼時（解析 session 之前）均留下一行 `EventEntry:` 診斷日誌，
     ///   以便分辨「事件根本未抵達本行程」與「已抵達、但被路由到別枚 controller」。
+    ///   該行刻意錄於重綁客體正本之前，故其 `slot(assigned: …)` 反映的是撕裂態本身。
     IMKInputSessionController.configureHandlingGivenNullableEvent { evPtr, ctlAddr in
       let event: NSEvent? = evPtr != 0
         ? Unmanaged<NSEvent>.fromOpaque(UnsafeRawPointer(bitPattern: evPtr)!).takeUnretainedValue()
@@ -181,6 +183,7 @@ extension SessionControllerSputnik {
         SessionControllerSputnik.logUnresolvableController(ctlAddr, at: "handleEvent")
         return false
       }
+      session.adoptClientAddr(ctlAddr)
       let result = session.handleNSEvent(event)
       if !result, PrefMgr.shared.isDebugModeEnabled {
         let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
@@ -195,7 +198,7 @@ extension SessionControllerSputnik {
     /// 設定 IMK 狀態值（例如標記文字屬性）。
     /// 對應 `-[IMKInputController setValue:forTag:client:]`。
     IMKInputSessionController.configureSettingObjCValue { vp, tag, ctlAddr in
-      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else { return }
+      guard let session = SessionControllerSputnik.sessionAdoptingClient(ctlAddr) else { return }
       let value: Any? = vp != 0
         ? Unmanaged<AnyObject>.fromOpaque(UnsafeRawPointer(bitPattern: vp)!).takeUnretainedValue()
         : nil
@@ -218,7 +221,7 @@ extension SessionControllerSputnik {
 
     /// 向 IMK 提供當前選取範圍。對應 `-[IMKInputController selectionRange]`。
     IMKInputSessionController.configureProvidingSelectionRange { ctlAddr in
-      SessionControllerSputnik.session(forAddr: ctlAddr)?.selectionRange() ?? .notFound
+      SessionControllerSputnik.sessionAdoptingClient(ctlAddr)?.selectionRange() ?? .notFound
     }
     /// 向 IMK 提供輸入法選單。對應 `-[IMKInputController menu]`。
     IMKInputSessionController.configureProvidingIMEMenu { ctlAddr in
@@ -258,6 +261,26 @@ extension SessionControllerSputnik {
       PrefMgr.shared.disableIMKSwiftControllerDelayedDeallocation
     }
   }()
+
+  /// 解析回呼所屬之 session，並令觸發本次回呼的 controller 成為客體綁定之正本。
+  ///
+  /// 極性雙緩衝下同一枚 session 會先後（甚至同時）服務兩枚 controller；若只在
+  /// `activateServer` 時改寫 `inputControllerAssignedAddr`，IMK 之排程交錯
+  /// （A 退場 → A 之副本延遲拆除 → B 接手）就會把它留在已撕裂的值上，於是 B 的事件
+  /// 被送進一枚沒有客體的 session——此即 2026-10 客訴 #618 之「CapsLock 吃按鍵，
+  /// 直到切一次客體才恢復」。
+  ///
+  /// 綁定正本隨每一條讀寫客體狀態之回呼更新，撕裂即不可能跨過一次回呼。奇偶路由不受
+  /// 影響：此處不改動 `session(forAddr:)` 之判定，僅補上「誰是此刻的客體正本」。
+  ///
+  /// - Parameter ctlAddr: 觸發回呼的 controller 記憶體位址。
+  /// - Returns: 解析所得之 session；nil 表示該位址已不可解析，呼叫端照舊記
+  ///   `logUnresolvableController(_:at:)`。
+  private static func sessionAdoptingClient(_ ctlAddr: UInt) -> InputSession? {
+    guard let session = session(forAddr: ctlAddr) else { return nil }
+    session.adoptClientAddr(ctlAddr)
+    return session
+  }
 
   /// 診斷用：回報一處原本完全靜默的分支——以 controller 位址查無對應 session。
   ///
