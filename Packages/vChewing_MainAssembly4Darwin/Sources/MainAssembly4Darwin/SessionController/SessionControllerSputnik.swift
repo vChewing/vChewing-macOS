@@ -4,51 +4,26 @@
 
 // MARK: - SessionControllerSputnik
 
-public struct SessionControllerSputnik {
-  // MARK: Lifecycle
-
-  public init?(controllerAddr: UInt?) {
-    guard let controllerAddr else { return nil }
-    self.controllerSentinel = ControllerAddrSentinel(addr: controllerAddr)
-  }
-
+public enum SessionControllerSputnik {
   // MARK: Public
-
-  public var core: InputSession? {
-    guard let controllerAddr = controllerSentinel.unwrapped else { return nil }
-    let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: controllerAddr) & 1)
-    let session = InputSession.session(forParity: parity)
-    // 若 session 尚未被任何 controller 佔用（preallocated 狀態），走完整初始化。
-    guard session.inputControllerAssignedAddr != nil else {
-      guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
-      let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
-      let newValue = Self.callCoreAtLeastOnce(controller)
-      replaceCore(newValue)
-      return newValue
-    }
-    return session
-  }
 
   public static func injectPostConstructionHandler() {
     _ = _installConstructorHook
     _ = _configureClassLevelBlocks
   }
 
-  /// 以 generation parity 從雙緩衝池中選取 InputSession singleton 並完成 reassign。
+  /// 為該 controller 領一枚會話格並完成 reassign（建構期唯一之配槽點）。
+  ///
+  /// 與舊極性雙緩衝之別：槽以 controller 位址為鍵（見 `SessionPool`），故兩枚並存之
+  /// controller 各自持有一枚 session，不再因世代同奇偶而共用。
   public static func callCoreAtLeastOnce(_ controller: IMKInputSessionController) -> InputSession {
-    let parity = Int(IMKInputSessionController.currentGeneration() & 1)
-    let session = InputSession.session(forParity: parity)
+    let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    let session = SessionPool.shared.acquire(for: controllerAddr)
     session.reassign(to: controller)
     session.state = IMEState.ofEmpty()
     session.resetInputHandler()
     InputSession.current = session
     return session
-  }
-
-  public func replaceCore(_ newCore: InputSession?) {
-    if let session = newCore, let controllerAddr = controllerSentinel.unwrapped {
-      InputSession.registerSessionAddr(session, for: controllerAddr)
-    }
   }
 
   // MARK: Private
@@ -82,15 +57,10 @@ public struct SessionControllerSputnik {
       guard let ctl else { return }
       // IMKInputSessionController.initWithServer: 已自動透過 IMKControllerLifetimeTracker
       // 完成追蹤登記與 generation 分配，無需手動呼叫 track。
-      let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(ctl).toOpaque())
-      if let sputnik = Self(controllerAddr: controllerAddr) {
-        sputnik.replaceCore(Self.callCoreAtLeastOnce(ctl))
-      }
+      _ = Self.callCoreAtLeastOnce(ctl)
     }
     class_addMethod(IMKInputSessionController.self, sel, imp_implementationWithBlock(block), "v@:@@@")
   }()
-
-  private let controllerSentinel: ControllerAddrSentinel
 }
 
 // MARK: - 一次性類別層級 Block 配置（於輸入法啟動時執行）
@@ -108,8 +78,8 @@ extension SessionControllerSputnik {
     /// - Note: 設計不變式：session 解析成功之後、`performServerActivation()` 之前，必須把
     ///   `inputControllerAssignedAddr` 重設為此次觸發回呼的 controller 位址（由
     ///   `InputSession.adoptClientAddr(_:)` 承擔，與其餘回呼共用同一份實作）。
-    ///   理由：極性雙緩衝模式下全行程只有 sessionEven / sessionOdd 兩枚 session，同一奇偶性者
-    ///   可能已被其他 controller 的 `callCoreAtLeastOnce` 重新指位；位址未重設時，
+    ///   理由：會話格會被不同 controller 先後使用，同一格可能已被其他 controller 的
+    ///   `callCoreAtLeastOnce` 重新指位；位址未重設時，
     ///   `client()` 會經由舊 controller 解讀而回傳 nil，使 `doCommit` / `doSetMarkedText` 靜默失效。
     ///   此順序即規格本身，而非對某一已知故障的權宜描述。
     IMKInputSessionController.configureActivatingServer { ctlAddr in
@@ -127,10 +97,11 @@ extension SessionControllerSputnik {
       }
       session.performServerDeactivation()
     }
-    /// Controller 被釋放時的最終清理。對應 `-[IMKInputController dealloc]`。
-    IMKInputSessionController.configureDealloc { ctlAddr in
-      InputSession.unregisterSessionAddr(forControllerAddr: ctlAddr)
-    }
+    /// Controller 被釋放時之清理：本 phase 起**不**再藉此交還會話格或解除客體綁定。
+    /// 理由：`_IMKSwift_onDealloc` 同時服務真 dealloc 與延遲拆除（停用後三秒），而後者
+    /// 不代表 controller 已亡（P317 之實證）；槽之回收改由 `SessionPool` 以 tracker 之
+    /// liveness 判定，客體綁定則由每一條回呼之 `adoptClientAddr` 維持。
+    /// 該 ObjC 鉤子因而保持未安裝（`IMKSwift.m` 之呼叫端已判空）。
 
     // ---- 偏好設定 ----
 
@@ -264,8 +235,8 @@ extension SessionControllerSputnik {
 
   /// 解析回呼所屬之 session，並令觸發本次回呼的 controller 成為客體綁定之正本。
   ///
-  /// 極性雙緩衝下同一枚 session 會先後（甚至同時）服務兩枚 controller；若只在
-  /// `activateServer` 時改寫 `inputControllerAssignedAddr`，IMK 之排程交錯
+  /// 同一枚 session 會先後（甚至同時）服務不同 controller；若只在 `activateServer` 時改寫
+  /// `inputControllerAssignedAddr`，IMK 之排程交錯
   /// （A 退場 → A 之副本延遲拆除 → B 接手）就會把它留在已撕裂的值上，於是 B 的事件
   /// 被送進一枚沒有客體的 session——此即 2026-10 客訴 #618 之「CapsLock 吃按鍵，
   /// 直到切一次客體才恢復」。
@@ -332,15 +303,12 @@ extension SessionControllerSputnik {
     )
   }
 
-  /// 由 controller 記憶體位址查詢對應的 InputSession（以 parity routing 決定）。
-  /// Class-level blocks 統一走 parity 路徑，避免與 `sessionAddrByControllerAddr`
-  /// 產生 split-brain：同一枚 parity session 被新 controller reassign 後，
-  /// 舊 controller 的事件應仍路由至同一枚 session（而非因 address mapping 被清空而掉事件）。
+  /// 由 controller 記憶體位址查詢其會話格（`SessionPool`，以 controller 位址為鍵）。
   ///
-  /// 若 controller 未被 tracker 登記（例如已 dealloc 後仍收到 IMK callback），回傳 nil。
+  /// 只查不配：未曾領格者回 nil，呼叫端照舊記 `logUnresolvableController`。
+  /// 若 controller 未被 tracker 登記（例如已 dealloc 後仍收到 IMK callback），亦回 nil。
   private static func session(forAddr ctlAddr: UInt) -> InputSession? {
     guard IMKControllerLifetimeTracker.shared().isAddressAlive(ctlAddr) else { return nil }
-    let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: ctlAddr) & 1)
-    return InputSession.session(forParity: parity)
+    return SessionPool.shared.session(for: ctlAddr)
   }
 }

@@ -24,9 +24,8 @@ struct IMEMenuSputnik {
 
   private var core: InputSession? {
     guard let controllerAddr = controllerSentinel.unwrapped else { return nil }
-    let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: controllerAddr) & 1)
-    let session = InputSession.session(forParity: parity)
-    guard session.inputControllerAssignedAddr != nil else { return nil }
+    let session = SessionPool.shared.session(for: controllerAddr)
+    guard session?.inputControllerAssignedAddr != nil else { return nil }
     return session
   }
 
