@@ -31,9 +31,11 @@ jobs:
       - name: Cache SPM build
         uses: actions/cache@v4
         with:
+          # Dependency checkouts only. `.build` (root and per package) is
+          # deliberately not cached: `make spmClean` below wipes it anyway, so
+          # caching it only paid for the restore, and a restored tree could keep a
+          # stale build alive across commits or toolchains.
           path: |
-            Packages/*/.build
-            .build
             ~/.swiftpm
           key: ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved', '**/Packages/*/Package.swift') }}
           restore-keys: |
