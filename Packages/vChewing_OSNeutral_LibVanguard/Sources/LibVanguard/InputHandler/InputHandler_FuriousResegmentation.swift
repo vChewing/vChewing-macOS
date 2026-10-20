@@ -458,9 +458,13 @@ extension InputHandlerProtocol {
   /// - Parameter inputText: 本拍正在處理的拼音字元（尚未送入注拼槽）——cells 計算
   ///   須涵蓋之，否則最後一鍵永遠不被納入簡拼整詞判定。
   /// - Returns: 是否已自動套用（true＝本拍已被消費，呼叫端不再把按鍵送入注拼槽）。
+  ///
+  /// - Important: **拼音專屬**（P319）——cells 由拼音字母流推得，而注音側之字母流只是聲介韻之
+  ///   拼音投影（且刪鍵後不回寫，見 `furiousAbbreviatedCells`），故注音側不得自動套用：
+  ///   注音側之簡拼對位（`furiousZhuyinAbbreviationCells`）僅供候選陳列、從不自動套用。
   @discardableResult
   func autoApplyFuriousAbbreviationIfClearWinner(appending inputText: String) -> Bool {
-    guard isFuriousTypingModeEffective else { return false }
+    guard isFuriousTypingModeEffective, isPinyinFamilyTypingMode else { return false }
     guard composer.intonation.isEmpty else { return false }
     guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return false }
     let romaji = composer.romajiBuffer + inputText
