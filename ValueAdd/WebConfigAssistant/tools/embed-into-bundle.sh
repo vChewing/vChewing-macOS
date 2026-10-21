@@ -35,19 +35,39 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ASSISTANT_DIR="$(cd "$HERE/.." && pwd)"
 DEST="$APP/Contents/Resources/assistant"
 
-# ── 唯一的閘：tsc 是否存在 ────────────────────────────────────────────────
-if ! command -v tsc >/dev/null 2>&1; then
-  warn "未偵測到 tsc，略過教學文章之編譯與收錄（輸入法之建置不受影響）。"
+# ── 唯一的閘：原生 tsc 是否存在 ───────────────────────────────────────────
+# 不可只信 `command -v tsc`：Xcode 之 Run Script phase 只帶開發者工具鏈與
+# `/usr/local/bin` 等系統路徑（**不含 `~/.local/bin`**），故 README §三.1 建議之落點
+# 在 Xcode 側恆不可見；而 `/usr/local/bin/tsc` 往往是 npm 版之 `#!/usr/bin/env node`
+# 啟動器。故逐一探測候選、取第一個「非腳本」者，並以 `TSC=` 明確傳給 make。
+is_native_tsc() {
+  [ -x "$1" ] || return 1
+  [ "$(head -c 2 "$1" 2>/dev/null)" = '#!' ] && return 1
+  return 0
+}
+
+TSC_PATH=""
+for candidate in "${TSC:-}" "$(command -v tsc 2>/dev/null)" \
+  "$HOME/.local/bin/tsc" /opt/homebrew/bin/tsc /usr/local/bin/tsc /usr/bin/tsc; do
+  [ -n "$candidate" ] || continue
+  if is_native_tsc "$candidate"; then
+    TSC_PATH="$candidate"
+    break
+  fi
+done
+
+if [ -z "$TSC_PATH" ]; then
+  warn "未偵測到原生 tsc，略過教學文章之編譯與收錄（輸入法之建置不受影響）。"
   warn "如需收錄，請安裝 TypeScript 7 之原生執行檔——見 ValueAdd/WebConfigAssistant/README.md §三。"
   exit 0
 fi
 
-echo "[教學文章] 偵測到 tsc：$(command -v tsc)"
+echo "[教學文章] 偵測到 tsc：$TSC_PATH"
 echo "[教學文章] 編譯中…（$(basename "$ASSISTANT_DIR")）"
 
 # `make bundle` 內含 `check-tsc`：npm 版之 tsc（`#!/usr/bin/env node` 之啟動器）會被擋下，
 # 因其需 node 而本鏈已免除 node。該失敗與其他失敗一視同仁——警告後續行。
-if ! make -C "$ASSISTANT_DIR" bundle; then
+if ! make -C "$ASSISTANT_DIR" bundle TSC="$TSC_PATH"; then
   warn "助手之編譯失敗，略過收錄（輸入法之建置不受影響）。"
   warn "若上方為「偵測到 tsc 是腳本」，請改用原生 tsc 7——見 ValueAdd/WebConfigAssistant/README.md §三。"
   exit 0
