@@ -178,7 +178,7 @@ LexiconAssembly 對多個子語言模型進行匯整、去重、替換與增益�
 
 ## 字典與語料：VanguardLexicon
 
-本專案的字典與語料由外部倉庫 `vChewing-VanguardLexicon` 維護。工廠詞庫由遠端 Swift Package plugin `VanguardTextMapPlugin` 編譯為 Vanguard TextMap 格式（`.txtMap`），但**不在 app 自身的建置圖內**：`LexiconZone/LexiconBuildTrigger`（`make lexiconModern`，host-only）只建一次、集中到 `LexiconZone/Build/`，再由 `vChewing_MainAssembly4Darwin` 的本地 `LexiconAssetRelayPlugin` 複製進資源 bundle（非 git 子模組）；執行期後端為 `VanguardTrie.TextMapTrie`。
+本專案的字典與語料由外部倉庫 `vChewing-VanguardLexicon` 維護。工廠詞庫由遠端 Swift Package plugin `VanguardTextMapPlugin` 編譯為 Vanguard TextMap 格式（`.txtMap`），但**不在 app 自身的建置圖內**：`LexiconZone/LexiconBuildTrigger`（`make lexiconModern`，host-only）只建一次、集中到 `LexiconZone/Build/`，再由 `vChewing_MainAssembly4Darwin` 的本地 `LexiconAssetRelayPlugin` 複製進資源 bundle（非 git 子模組）；Xcode 一側由三個 `.xcscheme` 的 BuildAction pre-action 跑 `Scripts/ensure-lexicon-assets.sh`，以 `LexiconZone/Build/` 內的 pin 戳記判斷是否需要重建（`make` 目標則直接前置 `lexiconModern`）；執行期後端為 `VanguardTrie.TextMapTrie`。
 
 開發者一般不建議在本倉庫中直接修改大型辭典腳本或編譯產物，除非有特定任務。
 
