@@ -105,8 +105,31 @@ public enum ResourceLocator {
     return nil
   }
 
+  // MARK: Internal
+
+  /// 以互斥鎖暫時接管資源查找設定；區塊結束後還原成進入前的設定。
+  ///
+  /// 全域設定若只以「單次讀寫」的鎖保護，別的執行緒仍可能在兩次呼叫之間把它整個清空
+  /// （`clearSpecifiedResources()`）。故凡需要「設定好、再查、再還原」連續語意者，一律走此
+  /// 入口：區塊獨佔整份設定，其他區塊排隊等候。
+  static func withTemporarySpecifications<T>(_ body: () throws -> T) rethrows -> T {
+    try mtxSpecificationsScope.withLock { _ in
+      let savedRoot = mtxResourceRoot.withLockRead { $0 }
+      let savedBundles = mtxSpecifiedBundles.withLockRead { $0 }
+      mtxResourceRoot.withLock { $0 = nil }
+      mtxSpecifiedBundles.withLock { $0.removeAll() }
+      defer {
+        mtxResourceRoot.withLock { $0 = savedRoot }
+        mtxSpecifiedBundles.withLock { $0 = savedBundles }
+      }
+      return try body()
+    }
+  }
+
   // MARK: Private
 
+  /// 保護 `withTemporarySpecifications(_:)` 之整個區塊的互斥鎖。
+  private static let mtxSpecificationsScope = NSMutex<()>(())
   private static let mtxResourceRoot = NSMutex<URL?>(nil)
   private static let mtxSpecifiedBundles = NSMutex([String: URL]())
 

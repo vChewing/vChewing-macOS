@@ -4,7 +4,7 @@
 
 import Foundation
 @testable import LibVanguard
-import ResourceLocator
+@testable import ResourceLocator
 import Testing
 
 // MARK: - ResourceProvisionAnchor
@@ -55,16 +55,17 @@ extension LibVanguardTestsRoot {
 
     @Test("[ResourceProvision] ResourceRootAndBundleSpecificationsAreForwarded")
     func testResourceRootAndBundleSpecificationsAreForwarded() throws {
-      ResourceProvision.clearAllSpecifications()
-      defer { ResourceProvision.clearAllSpecifications() }
-      let probeRoot = URL(fileURLWithPath: "/nonexistent-vChewing/resource-root")
-      ResourceProvision.specifyResourceRoot(probeRoot)
-      #expect(ResourceLocator.resourceRootURL == probeRoot)
-      ResourceProvision.specifyResourceBundle(probeRoot, forBundleNamed: "ProbeBundle")
-      #expect(ResourceLocator.specifiedResourceBundleURL(forBundleNamed: "ProbeBundle") == probeRoot)
-      ResourceProvision.clearAllSpecifications()
-      #expect(ResourceLocator.resourceRootURL == nil)
-      #expect(ResourceLocator.specifiedResourceBundleURL(forBundleNamed: "ProbeBundle") == nil)
+      // 這組設定是全域名狀態，需整段獨佔：否則並行執行的別支用例會把設定清掉。
+      try ResourceLocator.withTemporarySpecifications {
+        let probeRoot = URL(fileURLWithPath: "/nonexistent-vChewing/resource-root")
+        ResourceProvision.specifyResourceRoot(probeRoot)
+        #expect(ResourceLocator.resourceRootURL == probeRoot)
+        ResourceProvision.specifyResourceBundle(probeRoot, forBundleNamed: "ProbeBundle")
+        #expect(ResourceLocator.specifiedResourceBundleURL(forBundleNamed: "ProbeBundle") == probeRoot)
+        ResourceProvision.clearAllSpecifications()
+        #expect(ResourceLocator.resourceRootURL == nil)
+        #expect(ResourceLocator.specifiedResourceBundleURL(forBundleNamed: "ProbeBundle") == nil)
+      }
     }
   }
 }
