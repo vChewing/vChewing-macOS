@@ -32,6 +32,11 @@ COLLECT_DIR ?= Build
 MODERN_SWIFT_EXTRA_FLAGS ?=
 LEGACY_SWIFT_EXTRA_FLAGS ?=
 
+# lexicon 之版本 pin（manifest 內 `.package(url: …, exact: "x.y.z")`）。`collect` 會把它寫進產物目錄的
+# `.lexicon-stamp`，供 `Scripts/ensure-lexicon-assets.sh` 判斷資產是否仍對得上 pin：對得上即 no-op，
+# 對不上（例如 `make update` 剛換版）就重編一次。
+LEXICON_PIN := $(shell sed -n 's/.*exact: "\([0-9][0-9.]*\)".*/\1/p' Package.swift | head -1)
+
 # 5.10 工具鏈可能落在兩處：官方安裝器寫進 `/Library`，`swiftly` 則自管 `$HOME` 那份。兩者係同一發行版、
 # 識別子相同，並存會令 Xcode 拒絕註冊而所有 `xcodebuild` 於套件解析前即敗。故自動擇一：優先系統那份
 #（不受 `swiftly uninstall` 影響），次取使用者空間那份。`?=` 仍可顯式覆寫。
@@ -101,7 +106,8 @@ collect: build
 	if [ "$$copied" -eq 0 ]; then \
 		echo "未找到任何 plugin 產物，請確認建置是否成功。"; exit 1; \
 	fi; \
-	echo "已集中 $$copied 個產物至 $(COLLECT_DIR)/。"
+	printf '%s\n' "$(LEXICON_PIN)" > "$(COLLECT_DIR)/.lexicon-stamp"; \
+	echo "已集中 $$copied 個產物至 $(COLLECT_DIR)/（pin $(LEXICON_PIN)）。"
 
 collect510: build510
 	@export LC_ALL=C; \
@@ -123,4 +129,5 @@ collect510: build510
 	if [ "$$copied" -eq 0 ]; then \
 		echo "未找到任何 plugin 產物，請確認建置是否成功。"; exit 1; \
 	fi; \
-	echo "已集中 $$copied 個產物至 $(COLLECT_DIR)/。"
+	printf '%s\n' "$(LEXICON_PIN)" > "$(COLLECT_DIR)/.lexicon-stamp"; \
+	echo "已集中 $$copied 個產物至 $(COLLECT_DIR)/（pin $(LEXICON_PIN)）。"

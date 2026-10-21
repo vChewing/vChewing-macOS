@@ -6,6 +6,24 @@
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
       buildArchitectures = "Automatic">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Ensure the lexicon assets"
+               scriptText = "ASSETS_GUARD=&quot;${SRCROOT}/Scripts/ensure-lexicon-assets.sh&quot;&#10;if [ -x &quot;$ASSETS_GUARD&quot; ]; then&#10;  &quot;$ASSETS_GUARD&quot; &quot;${SRCROOT}&quot;&#10;else&#10;  echo &quot;warning: ${ASSETS_GUARD} is missing; the lexicon assets may be absent, and the build stops at the relay plugin.&quot;&#10;fi">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "5BC0A1052FA1000100D0AA01"
+                     BuildableName = "vChewingDebuggable.app"
+                     BlueprintName = "vChewingDebuggable"
+                     ReferencedContainer = "container:vChewing.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
