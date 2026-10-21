@@ -46,10 +46,10 @@
 // `@executable_path/../Frameworks` appended to its rpath, which is exactly the two-tier lookup the
 // legacy Xcode build installs.
 //
-// The IME bundle takes its lexicon assets from `LegacyZone/LexiconBuildTrigger/Build/` — the 5.10
-// build carries no lexicon dependency of its own (`Packages/vChewing_MainAssembly4Darwin/
-// Package@swift-5.10.swift` omits it), so those three files are produced out of band by that
-// throwaway package.
+// The IME bundle takes its lexicon assets from `LegacyZone/Build/` — the 5.10 build carries no
+// lexicon dependency of its own (`Packages/vChewing_MainAssembly4Darwin/
+// Package@swift-5.10.swift` omits it), so those three files are produced out of band by
+// `LexiconZone/LexiconBuildTrigger` built with the 5.10 toolchain (`make lexiconLegacy`).
 //
 // `--archive` finally writes an `.xcarchive` of those bundles next to them under
 // `Build/Products/`, in the same shape `BundleApps` writes for the modern distro, so that the
@@ -400,7 +400,6 @@ extension BundleAppsLegacyPlugin {
     )
     let lexiconDir = packageDir
       .appendingPathComponent("LegacyZone")
-      .appendingPathComponent("LexiconBuildTrigger")
       .appendingPathComponent("Build")
     // Failing here with the fix spelled out beats the raw `copyItem` error a missing directory would
     // raise later: both build targets chain into this one, so an unbuilt lexicon stops `make
@@ -408,7 +407,7 @@ extension BundleAppsLegacyPlugin {
     guard fm.fileExists(atPath: lexiconDir.path) else {
       throw PluginError(
         "Lexicon assets not found at \(lexiconDir.path).\nBuild them first:\n"
-          + "  make -C LegacyZone/LexiconBuildTrigger build510 collect"
+          + "  make lexiconLegacy"
       )
     }
     // Resolved once and handed to both bundles: the same toolchain assembled both,
@@ -814,7 +813,7 @@ extension BundleAppsLegacyPlugin {
   }
 
   /// Places the factory lexicon and the associated-phrase templates produced by
-  /// `LegacyZone/LexiconBuildTrigger` inside `MainAssembly4Darwin_MainAssembly4Darwin.bundle`.
+  /// `LexiconZone/LexiconBuildTrigger` inside `MainAssembly4Darwin_MainAssembly4Darwin.bundle`.
   ///
   /// That bundle is what `Bundle.currentSPM` resolves, and the `.txtMap` is read from it by
   /// `LXMgr.getBundleDataPath`; the associated-phrase templates sit next to it because that is
@@ -1602,7 +1601,8 @@ private let spmResourceBundleName = "MainAssembly4Darwin_MainAssembly4Darwin.bun
 /// Identifier prefix for the flat resource bundles SwiftPM 5.10 emits without an `Info.plist`.
 private let legacyResourceBundleIdentifierPrefix = "org.atelierInmu.vChewing.legacy"
 
-/// What `LegacyZone/LexiconBuildTrigger` yields and the IME app consumes.
+/// What `make lexiconLegacy` (the 5.10 build of `LexiconZone/LexiconBuildTrigger`) yields and the
+/// IME app consumes.
 private let lexiconAssetNames = [
   "VanguardFactoryDict4Typing.txtMap",
   "template-associatedPhrases-cht.txt",

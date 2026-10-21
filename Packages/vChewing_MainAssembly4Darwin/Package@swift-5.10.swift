@@ -18,22 +18,24 @@ import PackageDescription
 //    `MainAssembly4DarwinTests` 整段略去。
 // 4. **不使用 6.x 才有的設定**：`.defaultIsolation(MainActor.self)` 與 `swiftLanguageModes` 皆為 tools 6.2
 //    起才存在；本側語言模式即 5.10 toolchain 之預設（Swift 5），另以 `swiftLanguageVersions: [.v5]` 明示。
-// 5. **不收遠端 lexicon 依賴、也不收其兩支 build plugin**（本側與 `Package.swift` 之刻意不對稱）：
-//    `Package.swift` 收 `.package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git",
-//    exact: "4.8.0")` 與 `TextTemplateAssetInjectorPlugin`／`VanguardTextMapPlugin`，本側一概不收。
+// 5. **不收遠端 lexicon 依賴、也不收其兩支 build plugin**：
+//    本側從來就不收；`Package.swift` 自 Phase 320 起也不再收——那兩支 plugin 已改由獨立的帶外套件
+//    `LexiconZone/LexiconBuildTrigger`（host-only 建置一次）產製，再由本套件內的
+//    `Plugins/LexiconAssetRelay` 純複製注入。兩份 manifest 在「不收 lexicon 依賴」這點上因而一致。
 //
-//    理由（2026-09-16 實測）：本側產物是靜態 `.a`，其宿主是 legacy app，詞庫另有來源，這兩支 buildTool
-//    plugin 在本側沒有功能；而只要收下該依賴，5.10 側就無論如何過不了——先是 4.7.4 及以前 `CSQLite3`
-//    帶 `.unsafeFlags(["-w"])`（5.10 SwiftPM 對非根套件的 unsafe flags 一律硬拒），4.8.0 雖已移除 SQLite，
-//    卻又卡在平台下限：該套件兩份 manifest 都宣告 `platforms: [.macOS(.v10_15)]`（其 deploy 工具真的用到
-//    concurrency，`AsyncThrowingStream`／`withTaskGroup`／`Actor` 等一律自 10.15 起算——把該宣告降到
-//    10.13 會炸出 125 筆 availability 錯誤，其中 82 筆是 `concurrency is only available in macOS 10.15`），
-//    而本側是 `platforms: nil`（SwiftPM 地板 10.13），解析期即報
+//    本側為何從不能收（2026-09-16 實測，理由對任何在本側收下該依賴的嘗試仍然成立）：本側產物是靜態
+//    `.a`，其宿主是 legacy app，詞庫另有來源，這兩支 buildTool plugin 在本側沒有功能；而只要收下該依賴，
+//    5.10 側就無論如何過不了——先是 4.7.4 及以前 `CSQLite3` 帶 `.unsafeFlags(["-w"])`（5.10 SwiftPM 對
+//    非根套件的 unsafe flags 一律硬拒），4.8.0 雖已移除 SQLite，卻又卡在平台下限：該套件兩份 manifest
+//    都宣告 `platforms: [.macOS(.v10_15)]`（其 deploy 工具真的用到 concurrency，`AsyncThrowingStream`／
+//    `withTaskGroup`／`Actor` 等一律自 10.15 起算——把該宣告降到 10.13 會炸出 125 筆 availability 錯誤，
+//    其中 82 筆是 `concurrency is only available in macOS 10.15`），而本側是 `platforms: nil`（SwiftPM
+//    地板 10.13），解析期即報
 //    `depends on the product 'VanguardTextMapPlugin' which requires macos 10.15`。
 //
 //    本側亦無法改用「宣告 `.macOS(.v10_15)`」來繞：SwiftPM 是**按各套件自身的 `platforms`** 決定其 target
 //    的 deployment target，把本側抬到 10.15 並不會抬起 lexicon 自己的地板，那 125 筆錯誤照樣發生。
-//    故此不對稱維持至 lexicon 願拆包（plugin 與資料庫分成兩套件）或把 deploy 工具改成非並發寫法為止。
+//    故本側維持不收，直至 lexicon 願拆包（plugin 與資料庫分成兩套件）或把 deploy 工具改成非並發寫法。
 //
 // 環境配對與各項差異的機理見 vChewing-DevLogs/Research/Phase217_SOP.md §三／§四。
 

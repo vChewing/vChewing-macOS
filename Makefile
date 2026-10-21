@@ -142,7 +142,7 @@ LEGACY_BUILD_FLAGS = --package-path . --scratch-path "$(LEGACY_SCRATCH_ROOT)" --
 # 額外傳給 SwiftPM 的旗標（預設空）。典型用途是 `--disable-sandbox`：本側之 `swift build` 於部分環境
 # （自身已受外層沙箱拘束者）會在 manifest 編譯那關失敗——`sandbox-exec: sandbox_apply: Operation not
 # permitted`、繼而 `error: Invalid manifest`——該處即由呼叫端傳入本旗標。`lexiconLegacy` 會把它轉遞給
-# `LegacyZone/LexiconBuildTrigger` 的 `swift build`（見下）；兩條版本提升鏈路（`update` 與 `gitrelease`）
+# `LexiconZone/LexiconBuildTrigger` 的 `swift build`（見下）；兩條版本提升鏈路（`update` 與 `gitrelease`）
 # 則以 `SWIFT_EXTRA_FLAGS` 之名把它轉遞給其 `swift package resolve`（同樣會在 manifest 編譯那關失敗）。
 # 預設不動：正常環境不該削弱 SwiftPM 之 manifest 沙箱。`LEGACY_BUILD_FLAGS` 同理，只是後者已由既有各
 # target 直接用於 `swift build`。
@@ -235,8 +235,10 @@ releaseLegacy:
 #
 # `LexiconBuildTrigger` has to have run first.  The 5.10 root manifest carries no lexicon
 # dependency (its plugin products require macOS 10.15), so the factory lexicon and the two
-# associated-phrase templates come from that separate package instead.  `lexiconLegacy` below runs
-# it for you — both build targets end by calling this target, so nothing needs doing by hand.
+# associated-phrase templates come from that separate package instead (`LexiconZone/
+# LexiconBuildTrigger` — the same package the modern chain uses, built here with the 5.10
+# toolchain).  `lexiconLegacy` below runs it for you — both build targets end by calling this
+# target, so nothing needs doing by hand.
 bundleLegacy: lexiconLegacy
 	@export LC_ALL=C; export DEVELOPER_DIR="$(LEGACY_XCODE)"; \
 	echo "Assembling the legacy .app bundles from $(LEGACY_PRODUCTS_DIR)…"; \
@@ -247,8 +249,13 @@ bundleLegacy: lexiconLegacy
 		-- --build-dir "$(LEGACY_PRODUCTS_DIR)" --sdk "$(LEGACY_SDK)"
 
 # 產出並集中辭典資產（原廠辭典 `.txtMap` ＋ 兩份使用者片語範本）。它是 `bundleLegacy` 的必經前置，
-# 故 `debugLegacy`／`releaseLegacy` 一併自動滿足；單獨跑 `make -C LegacyZone/LexiconBuildTrigger
-# build510 collect` 仍然可行，`bundleLegacy` 之 plugin 在資產缺席時也會明示這句話。
+# 故 `debugLegacy`／`releaseLegacy` 一併自動滿足；單獨跑 `make lexiconLegacy` 仍然可行，
+# `bundleLegacy` 之 plugin 在資產缺席時也會明示這句話。
+#
+# 建置入口與現代鏈共用同一個套件（`LexiconZone/LexiconBuildTrigger`）：manifest 停在 Swift tools 5.10，
+# 兩顆工具鏈都讀得懂，故不必再養第二份同構套件。兩條鏈只差工具鏈與 scratch path，產物各自集中
+# （legacy 在 `LegacyZone/Build`、現代在 `LexiconZone/Build`）。
+#
 # 該套件以 `LEXICON_CONFIG`（預設 release）建置——辭典產製 CPU 密集，debug 產物慢上許多。該變數名與
 # 本檔的 `LEGACY_CONFIG` 刻意不同：後者指 *app* 的 config，且會以 target-specific 變數外洩到 sub-make，
 # 同名會讓 `make debugLegacy` 把詞典建置一起拖回 debug。
@@ -256,7 +263,8 @@ bundleLegacy: lexiconLegacy
 # `LEGACY_SWIFT_EXTRA_FLAGS` 顯式轉遞：命令列變數雖會經 `MAKEFLAGS` 傳進 sub-make，但本檔是同名的定義
 # 所在，顯式傳遞才看得出這條線是刻意接上的（見檔首該變數之註解）。
 lexiconLegacy:
-	@$(MAKE) --no-print-directory -C LegacyZone/LexiconBuildTrigger build510 collect \
+	@$(MAKE) --no-print-directory -C LexiconZone/LexiconBuildTrigger build510 collect510 \
+		COLLECT_DIR="$(CURDIR)/$(LEGACY_LEXICON_ASSETS_DIR)" \
 		LEGACY_SWIFT_EXTRA_FLAGS="$(LEGACY_SWIFT_EXTRA_FLAGS)"
 
 # ── archiveLegacy ───────────────────────────────────────────────────
@@ -295,6 +303,33 @@ archiveLegacy: releaseLegacy
 cleanLegacy:
 	@rm -rf "$(LEGACY_SCRATCH_ROOT)" ./Build/Products/Legacy
 
+# ── 現代側語料庫資產產製（帶外一次、兩架構共用）────────────────────
+
+# 產出原廠辭典（`.txtMap`）與兩份使用者片語範本。關鍵在於它**只建置一次、且與 `--arch` 無關**：
+# 遠端 lexicon 的兩支 buildTool plugin 之 build command 沒有 `inputFiles`，SwiftPM 因而對每個
+# destination 各跑一次；只要把它們掛在 app 自己的建置目標上，`make release` 的 arm64／x86_64 兩個
+# slice 就會各編一次辭典（實測各 35–49 秒）。改由 `LexiconZone/LexiconBuildTrigger`（host-only）
+# 產製、集中到 `$(LEXICON_ASSETS_DIR)` 後，app 側只剩一個純複製的本地 plugin
+#（`Packages/vChewing_MainAssembly4Darwin/Plugins/LexiconAssetRelay`），成本以毫秒計。
+#
+# 這與 `lexiconLegacy`（Swift 5.10 側）共用同一個套件與同一個 `collect` 家族；差別僅在工具鏈——本側
+# 用當前 shell 的 `swift`，不需 5.10 那組 toolchain／SDK／triple。兩側的資產目錄分開（本側
+# `$(LEXICON_ASSETS_DIR)`、legacy 側 `$(LEGACY_LEXICON_ASSETS_DIR)`），互不覆寫；兩者皆已被
+# `.gitignore` 既有的 `[Bb]uild` 通用規則涵蓋。
+#
+# `MODERN_SWIFT_EXTRA_FLAGS` 對位 `LEGACY_SWIFT_EXTRA_FLAGS`：自身已受外層沙箱拘束的環境需傳
+# `--disable-sandbox`，否則 manifest 編譯即敗（`sandbox-exec: sandbox_apply: Operation not permitted`）。
+LEXICON_ASSETS_DIR := LexiconZone/Build
+LEGACY_LEXICON_ASSETS_DIR := LegacyZone/Build
+MODERN_SWIFT_EXTRA_FLAGS ?=
+
+.PHONY: lexiconModern
+
+lexiconModern:
+	@$(MAKE) --no-print-directory -C LexiconZone/LexiconBuildTrigger build collect \
+		COLLECT_DIR="$(CURDIR)/$(LEXICON_ASSETS_DIR)" \
+		MODERN_SWIFT_EXTRA_FLAGS="$(MODERN_SWIFT_EXTRA_FLAGS)"
+
 # ── App Bundle Assembly (via SwiftPM CommandPlugin) ──────────────────
 
 UNIVERSAL_DIR := .build/universal-release
@@ -306,7 +341,7 @@ NEXUS_DIR     := .build/out/Products/release
 # IME as a legacy app and disables the Liquid Glass appearance; bundle-apps re-signs afterward.
 MACOS_SDK_VER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null)
 
-universal-build:
+universal-build: lexiconModern
 	@# Remove previously-built binary artifacts from ARM64_DIR, X86_64_DIR, and NEXUS_DIR.
 	@rm -f $(ARM64_DIR)/vChewing $(ARM64_DIR)/vChewingInstaller
 	@rm -f $(X86_64_DIR)/vChewing $(X86_64_DIR)/vChewingInstaller
@@ -422,7 +457,7 @@ archive: universal-build
 		fi; \
 	done
 
-debug:
+debug: lexiconModern
 	@echo "Building and assembling app bundles (Debug)..."
 	swift package --allow-writing-to-package-directory bundle-apps -- --debug
 
@@ -547,9 +582,12 @@ gc:
 # 各 suite 自持其辭典、卡匣、偏好容器與會話宿主，故可並行。
 # 若某 suite 真需依序，令該 suite 自己掛 `.serialized`。
 # 逐包入口（`cd Packages/<pkg> && make test`）同理。
-test:
-	swift test
-	swift test --package-path ./Packages/vChewing_OSNeutral_LibVanguard
+# `--cache-path "$(CURDIR)/.build/cache"`：SwiftPM 之 manifest 快取預設寫 `~/Library/org.swift.swiftpm`，
+# 在 CI 或受拘束的 shell 內不可寫（`failed storing manifest … readonly database`），退化成每個 manifest
+# 都重編；落倉內後既不碰使用者目錄，也免去為此傳 `--disable-sandbox`。
+test: lexiconModern
+	swift test --cache-path "$(CURDIR)/.build/cache"
+	swift test --package-path ./Packages/vChewing_OSNeutral_LibVanguard --cache-path "$(CURDIR)/.build/cache"
 
 xcode-test:
 	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test

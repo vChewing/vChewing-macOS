@@ -29,9 +29,16 @@ let package = Package(
     .package(path: "../vChewing_TooltipUI"),
     .package(path: "../vChewing_Uninstaller"),
     .package(path: "../vChewing_UpdateSputnik"),
-    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.9.1"),
   ],
   targets: [
+    // 語料庫資產的注入已改由本地 plugin 純複製完成（來源是 `LexiconZone/LexiconBuildTrigger` 之
+    // 帶外產物）：遠端 lexicon 的兩支 buildTool plugin 每遇一個 destination 就重跑一次辭典編譯，
+    // 令 `make release` 的兩個 slice 各建一次。詳見 `Plugins/LexiconAssetRelay/plugin.swift`。
+    .plugin(
+      name: "LexiconAssetRelayPlugin",
+      capability: .buildTool(),
+      path: "Plugins/LexiconAssetRelay"
+    ),
     .target(
       name: "MainAssembly4Darwin",
       dependencies: [
@@ -59,8 +66,7 @@ let package = Package(
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ],
       plugins: [
-        .plugin(name: "TextTemplateAssetInjectorPlugin", package: "vChewing-VanguardLexicon"),
-        .plugin(name: "VanguardTextMapPlugin", package: "vChewing-VanguardLexicon"),
+        .plugin(name: "LexiconAssetRelayPlugin"),
       ]
     ),
     .testTarget(

@@ -135,27 +135,30 @@ let updateCommitMsg = "DictionaryData - \(commitTime)"
 
 // MARK: - LexiconPinSite
 
+/// 語料庫版本在本倉的落地點。路徑全由套件目錄推導，不另存——三個相對路徑本就是同一件事
+/// （`<dir>/Package.swift`、`<dir>/Package.resolved`、`<dir>`），分頭寫死只會漂移。
 struct LexiconPinSite {
-  let packageSwiftRelPath: String
-  let packageResolvedRelPath: String
   let packageDirRelPath: String
+
+  var packageSwiftRelPath: String {
+    "\(packageDirRelPath)/Package.swift"
+  }
+
+  var packageResolvedRelPath: String {
+    "\(packageDirRelPath)/Package.resolved"
+  }
 }
 
 /// 語料庫版本在本倉的全部落地點。新增依賴宣告時必須一併加進來，否則該鏈路會靜默落後。
+///
+/// 目前只有一筆：兩條建置鏈共用 `LexiconZone/LexiconBuildTrigger` 這一支套件（其 manifest 停在
+/// `swift-tools-version: 5.10`，5.10 與 6.4 兩顆工具鏈都讀得懂），差別只在工具鏈與產物目錄，
+/// 故依賴宣告也只有一處。
 let lexiconPinSites = [
-  LexiconPinSite(
-    packageSwiftRelPath: "Packages/vChewing_MainAssembly4Darwin/Package.swift",
-    packageResolvedRelPath: "Packages/vChewing_MainAssembly4Darwin/Package.resolved",
-    packageDirRelPath: "Packages/vChewing_MainAssembly4Darwin"
-  ),
-  LexiconPinSite(
-    packageSwiftRelPath: "LegacyZone/LexiconBuildTrigger/Package.swift",
-    packageResolvedRelPath: "LegacyZone/LexiconBuildTrigger/Package.resolved",
-    packageDirRelPath: "LegacyZone/LexiconBuildTrigger"
-  ),
+  LexiconPinSite(packageDirRelPath: "LexiconZone/LexiconBuildTrigger"),
 ]
 
-let vanguardURL = "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git"
+let vanguardURL = "https://gitee.com/vChewing/vChewing-VanguardLexicon.git"
 
 /// 轉遞給 `swift package resolve` 的額外旗標，來源為環境變數 `SWIFT_EXTRA_FLAGS`（`Makefile` 自
 /// `LEGACY_SWIFT_EXTRA_FLAGS` 映射而來）。預設空：正常環境不該削弱 SwiftPM 之 manifest 沙箱。
@@ -165,9 +168,8 @@ let swiftExtraFlags =
 
 // 1) 檢查並更新 DictionaryData (VanguardLexicon)
 // 由於不再使用 submodule，我們直接檢查各 manifest 的 Package.swift 是否需要更新 Dependency。
-// 語料庫版本的落地點有兩處，且兩者必須同步：現代鏈路（`MainAssembly4Darwin`）與 legacy 鏈路
-// （`LegacyZone/LexiconBuildTrigger`）。後者是另一份獨立的依賴宣告，若不在此一併更新，legacy 側
-// 的 TextMap 會永遠停在被忽略的舊版語料庫上。
+// 語料庫的依賴宣告只有一處（`LexiconZone/LexiconBuildTrigger`），且兩條建置鏈共用它——現代鏈路以
+// 當前工具鏈建置、legacy 鏈路以 5.10 建置，故提升版本時不會出現「一邊升、一邊停在舊版」。
 
 func performDictionaryUpdate() {
   // 尋找目前的 version
@@ -179,7 +181,7 @@ func performDictionaryUpdate() {
     exit(2)
   }
 
-  // 取得 Remote tags，設定 15 秒 timeout 避免 atomgit.com 無回應時無限掛住。
+  // 取得 Remote tags，設定 15 秒 timeout 避免 gitee.com 無回應時無限掛住。
   var remoteVer: String?
   let lsRemote = Shell.runExec(
     "/usr/bin/git",
