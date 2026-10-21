@@ -47,7 +47,7 @@
 - Packages/vChewing_OSNeutral_LibVanguard/Sources/Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
 - Packages/vChewing_OSNeutral_LibVanguard/Sources/Homa：句子組裝（DAG-DP 動態規劃求最大分數路徑、候選覆寫與上下文鞏固）。
 - Packages/vChewing_OSNeutral_LibVanguard/Sources/LexiconAssembly：語言模型匯流與資料來源整合。
-- Lexicon 資料：由遠端 `vChewing-VanguardLexicon` 倉庫的 `VanguardTextMapPlugin` Swift Package plugin 於建置時編譯注入（非 git 子模組）。
+- Lexicon 資料：由 `LexiconZone/LexiconBuildTrigger`（`make lexiconModern`，host-only 只建一次）以遠端 `vChewing-VanguardLexicon` 倉庫的 `VanguardTextMapPlugin` 編譯成 `.txtMap` 並集中產出，再由本地 `LexiconAssetRelayPlugin` 複製注入（非 git 子模組）。
 
 ### 事件到輸出的基本流程
 
@@ -178,7 +178,7 @@ LexiconAssembly 對多個子語言模型進行匯整、去重、替換與增益�
 
 ## 字典與語料：VanguardLexicon
 
-本專案的字典與語料由外部倉庫 `vChewing-VanguardLexicon` 維護。工廠詞庫由遠端 Swift Package plugin `VanguardTextMapPlugin` 於建置時編譯為 Vanguard TextMap 格式（`.txtMap` + `.revlookup` 對）並注入至 `vChewing_MainAssembly4Darwin`（非 git 子模組）；執行期後端為 `VanguardTrie.TextMapTrie`。
+本專案的字典與語料由外部倉庫 `vChewing-VanguardLexicon` 維護。工廠詞庫由遠端 Swift Package plugin `VanguardTextMapPlugin` 編譯為 Vanguard TextMap 格式（`.txtMap`），但**不在 app 自身的建置圖內**：`LexiconZone/LexiconBuildTrigger`（`make lexiconModern`，host-only）只建一次、集中到 `LexiconZone/Build/`，再由 `vChewing_MainAssembly4Darwin` 的本地 `LexiconAssetRelayPlugin` 複製進資源 bundle（非 git 子模組）；執行期後端為 `VanguardTrie.TextMapTrie`。
 
 開發者一般不建議在本倉庫中直接修改大型辭典腳本或編譯產物，除非有特定任務。
 
