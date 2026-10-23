@@ -1,8 +1,8 @@
 excluded:
   - .git**
   - Packages/Build/**
-  - Build
-  - .index-build
+  - Build/**
+  - Packages/**/.build/**
   - resource_bundle_accessor.swift
   - Pods
   - R.generated.swift
@@ -72,3 +72,8 @@ opt_in_rules:
   #- vertical_whitespace_closing_braces
   #- vertical_whitespace_opening_braces
   - void_return
+
+# 本套件必須維持 Swift 5.10 可編（見 Package@swift-5.swift）：集合字面值與引數串列的
+# 尾隨逗號自 Swift 6.1 起才合法，故此規則必須關掉，否則 autocorrect 會把 5.10 弄壞。
+trailing_comma:
+  mandatory_comma: false
