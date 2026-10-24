@@ -35,11 +35,19 @@ extension VanguardTrie {
       self.isTyping = header.isTyping
       self.defaultProbs = header.defaultProbs
 
-      self.valuesLineOffsets = Self.scanValueLineOffsets(
+      let valuesLineOffsets = Self.scanValueLineOffsets(
         in: data,
         from: bounds.valuesContentStart,
         to: bounds.keyMapLineStart
       )
+      try Self.validateValueLines(
+        in: data,
+        offsets: valuesLineOffsets,
+        valuesEndOffset: bounds.keyMapLineStart,
+        isTyping: header.isTyping,
+        defaultProbs: header.defaultProbs
+      )
+      self.valuesLineOffsets = valuesLineOffsets
       self.valuesEndOffset = bounds.keyMapLineStart
 
       let (parsedEntries, initialsBuckets) = Self.parseKeyLineMapContent(
@@ -266,24 +274,51 @@ extension VanguardTrie.TextMapTrie {
       omittingEmptySubsequences: false,
       whereSeparator: \.isNewline
     ).first.map(String.init) ?? ""
-    guard !isUnsupportedLegacyTextMapVersionLine(versionLine) else {
+    let parts = versionLine.split(separator: "\t", omittingEmptySubsequences: false)
+    guard parts.count == 2, parts[0] == "VERSION",
+          parts[1].trimmingCharacters(in: .whitespaces) == "2.0"
+    else {
       throw makeUnsupportedTextMapVersionError()
     }
-  }
-
-  private static func isUnsupportedLegacyTextMapVersionLine(_ versionLine: String) -> Bool {
-    // Phase 324 起只認 `2.x`：型別 C 的第 4 欄由「單一前驗詞」改為「前驗詞鏈」，
-    // 舊檔若仍以 1.x 標記讀入，其 bigram 語義會被錯解成另一種鏈長。
-    let versionCell = versionLine.split(separator: "\t", maxSplits: 1).last.map(String.init) ?? ""
-    return !versionCell.trimmingCharacters(in: .whitespaces).hasPrefix("2.")
   }
 
   private static func makeUnsupportedTextMapVersionError() -> VanguardTrie.TrieIO.Exception {
     VanguardTrie.TrieIO.Exception.deserializationFailed(
       NSError(domain: "VanguardTrie.TextMapTrie", code: -1, userInfo: [
-        NSLocalizedDescriptionKey: "TextMap format versions other than 2.x are no longer supported.",
+        NSLocalizedDescriptionKey: "TextMap v2.0 requires an explicit VERSION 2.0 header line.",
       ])
     )
+  }
+
+  private static func validateValueLines(
+    in data: Data,
+    offsets: [UInt32],
+    valuesEndOffset: Int,
+    isTyping: Bool,
+    defaultProbs: [Int32: Double]
+  )
+    throws {
+    for lineIndex in offsets.indices {
+      let start = Int(offsets[lineIndex])
+      var end = lineIndex + 1 < offsets.count ? Int(offsets[lineIndex + 1]) : valuesEndOffset
+      while end > start, data[end - 1] == 0x0A || data[end - 1] == 0x0D {
+        end -= 1
+      }
+      let line = extractString(from: data, start: start, end: end)
+      do {
+        _ = try VanguardTrie.TrieIO.parseValidatedValueLine(
+          line,
+          isTyping: isTyping,
+          defaultProbs: defaultProbs
+        )
+      } catch {
+        throw VanguardTrie.TrieIO.Exception.deserializationFailed(
+          NSError(domain: "VanguardTrie.TextMapTrie", code: -1, userInfo: [
+            NSLocalizedDescriptionKey: "Invalid VALUES line \(lineIndex): \(error.localizedDescription)",
+          ])
+        )
+      }
+    }
   }
 
   private static func parseHeaderContent(_ content: String) -> HeaderInfo {
@@ -634,6 +669,22 @@ extension VanguardTrie.TextMapTrie {
         in: data, start: chtStart, end: chtEnd, ideographicOnly: true
       ))
       return chars
+    }
+
+    if firstByte == 0x21, tabPositions.count == 4 { // '!' = Format D
+      // `!value\ttypeID\tprob\tcontext[…]`；此掃描器只需 value 與 typeID。
+      let typeIDRaw = parsePositiveInt32(
+        from: data,
+        start: tabPositions[0] + 1,
+        end: tabPositions[1]
+      ) ?? -1
+      guard typeIDRaw == cnsEntryType.rawValue else { return [] }
+      return collectCharsFromPlainCellBytes(
+        in: data,
+        start: start + 1,
+        end: tabPositions[0],
+        ideographicOnly: false
+      )
     }
 
     // --- Format C: `value\tprob\ttypeID[\tprevious]` ---
