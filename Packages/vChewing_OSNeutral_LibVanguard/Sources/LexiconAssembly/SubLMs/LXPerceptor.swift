@@ -1456,18 +1456,15 @@ extension LXAssembly.LXPerceptor {
     // 先計算基礎概率
     let prob = Double(eventCount) / Double(max(totalCount, 1))
 
-    // 如果是即時或未來的時間戳，直接返回概率
-    if timestamp <= eventTimestamp {
-      return min(-1.0, prob * -1.0) // 確保返回負數
-    }
+    // 計算天數差（即時或未來之事件一律視為「剛生成」，daysDiff 歸零）。
+    let daysDiff = max(0, (timestamp - eventTimestamp) / (24 * 3_600))
 
-    // 計算天數差
-    let daysDiff = (timestamp - eventTimestamp) / (24 * 3_600)
-
-    // 不使用半衰期模型：採用「線性年齡核 + 次線性頻率」的組合，並在 8 天做硬截止。
-    // 1) 年齡因子（線性核、可調凸度）：ageFactor = max(0, 1 - age/T)^pAge
-    // 2) 頻率因子（次線性）：freqFactor = 0.5*sqrt(prob) + 0.5*(log1p(count)/log(10))，上限 1
-    // 3) 分數：score = -0.114514 * (freqFactor * ageFactor)
+    // 不使用半衰期模型：採用「分數隨年齡單調下探」的線性插值，並在 8 天做硬截止。
+    // 分數語義（事主裁定）：剛生成之記憶永遠壓過語料；隨時間推移而下探，至視窗末端已低於
+    // 常見語料分數（約 −8.5 ~ −13），故老記憶可能輸給語料——「不一定壓過」。
+    // 1) 起點：-kWeightMultiplier（約 −0.1145，高於任何語料分數）。
+    // 2) 終點：threshold（淘汰閾值，約 −13，低於絕大多數語料分數）。
+    // 3) 插值參數：t = (age/wT)^convexity，convexity ∈ [0.5, 1] 由頻率調節——用得越多、下探越慢。
 
     // 調整有效視窗 wT，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
     // 根據偏好設定決定基礎時間窗 wT：如果啟用急速遺忘模式，則從約一週降低至 12 小時內
@@ -1478,22 +1475,18 @@ extension LXAssembly.LXPerceptor {
     // 超過或抵達視窗即淘汰
     if daysDiff >= wT { return threshold - 0.001 }
 
-    // 年齡因子（非半衰）：線性核 + 指數 pAge（pAge>1 時較快衰減）
-    let pAge = 2.0
-    let ageNorm = max(0.0, 1.0 - (daysDiff / wT))
-    let ageFactor = pow(ageNorm, pAge)
-
     // 頻率因子：概率取平方根（次線性），疊加對事件數的對數增益，並截頂至 1
     let freqByProb = sqrt(max(0.0, prob))
     let freqByCount = log1p(Double(eventCount)) / log(10.0)
     let freqFactor = min(1.0, 0.5 * freqByProb + 0.5 * max(0.0, freqByCount))
 
-    // 維持分數為負，越接近 0 越好。用 0.114514 進行縮放（水印常數）。
-    let base = max(1e-9, freqFactor * ageFactor)
-    let score = -base * Self.kWeightMultiplier
-
-    // 避免返回比閾值還低的極小值。
-    return max(score, threshold + 0.001)
+    // 分數自「剛生成」單調下探至淘汰閾值：t=0 ⇒ −kWeightMultiplier、t→1 ⇒ threshold（仍高於閾值）。
+    let ageRatio = min(1.0, daysDiff / wT)
+    let convexity = 0.5 + 0.5 * freqFactor
+    let t = pow(ageRatio, convexity)
+    let freshScore = -Self.kWeightMultiplier
+    let agedScore = threshold + 0.002
+    return freshScore + t * (agedScore - freshScore)
   }
 
   static func isPunctuation(_ node: Homa.GramInPath) -> Bool {

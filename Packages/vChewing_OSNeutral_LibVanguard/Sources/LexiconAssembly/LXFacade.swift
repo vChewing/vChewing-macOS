@@ -1187,19 +1187,15 @@ extension LXAssembly {
       // 記憶對 DP 無貢獻（節點 unigramScore 取陣列首筆、不選中尾端注入）且會污染選字窗
       // 原始候選清單（fetchCandidates 僅排除 contextual grams）；unigram 記憶改由
       // LibVanguard 建議通道浮現（受 fetch／「固定順序」等把守）。
+      // 分數＝POM 自身的對數分數（見 `pomContextualGrams`）：剛生成者近 0、隨時間下探。
       if config.fetchSuggestionsFromPerceptionOverrideModel {
-        let pomGrams = lxPerceptor.perceptionsFor(
-          headReading: keyChain, timestamp: Date().timeIntervalSince1970
-        ).compactMap { pom -> Homa.Gram? in
-          guard pom.previous != nil || pom.anterior != nil else { return nil }
-          return Homa.Gram(
-            keyArray: pom.headReading.split(separator: "-").map(String.init),
-            current: pom.candidate,
-            previous: pom.previous, anterior: pom.anterior,
-            probability: pom.probability
+        rawAllUnigrams.append(
+          contentsOf: pomContextualGrams(
+            headReading: keyChain,
+            timestamp: Date().timeIntervalSince1970,
+            matchMode: .exact
           )
-        }
-        rawAllUnigrams.append(contentsOf: pomGrams)
+        )
       }
       // Store in LRU cache with size limit
       unigramLRUCache[cacheKey] = rawAllUnigrams
@@ -1458,6 +1454,33 @@ extension LXAssembly {
       return result
     }
 
+    /// 把 POM 的 contextual 記憶接成 gram（S2）。
+    ///
+    /// POM 之分數與語料側同為「對數分數」語義（見 `LXPerceptor.calculateWeight`）：
+    /// 剛生成者近 0（永遠壓過語料），隨時間單調下探至淘汰閾值（老記憶可能輸給語料）。
+    /// 故此處直接以其分數為 gram 機率，不做任何換算或補正——`Node` 與 DP 只比數值，
+    /// 兩者因而落在同一數線上，且不需「同值語料分數」作底。
+    private func pomContextualGrams(
+      headReading: String,
+      timestamp: Double,
+      matchMode: LXAssembly.POMQueryMode
+    )
+      -> [Homa.Gram] {
+      lxPerceptor.perceptionsFor(
+        headReading: headReading,
+        timestamp: timestamp,
+        matchMode: matchMode
+      ).compactMap { pom -> Homa.Gram? in
+        guard pom.previous != nil || pom.anterior != nil else { return nil }
+        return Homa.Gram(
+          keyArray: pom.headReading.split(separator: "-").map(String.init),
+          current: pom.candidate,
+          previous: pom.previous, anterior: pom.anterior,
+          probability: pom.probability
+        )
+      }
+    }
+
     /// 處理含替代讀音的鍵陣列查詢。
     /// 對原廠辭典 trie 使用 chopped（"&" 連接）路徑，對使用者資料使用展開路徑。
     private func unigramsForWithAlternatives(keyArray: [Homa.PossibleKey], partiallyMatch: Bool) -> [Homa.Gram] {
@@ -1675,20 +1698,13 @@ extension LXAssembly {
       // 故 POM head 比對**顯式**以 `.toneInsensitivePrefix`（去聲調等值）進行——桶查詢本就不能
       // 釘定聲調；fast path 的單鍵具體讀音（含第一聲）則維持 `.exact` 逐字等值。
       if config.fetchSuggestionsFromPerceptionOverrideModel {
-        let pomGrams = lxPerceptor.perceptionsFor(
-          headReading: keyChain,
-          timestamp: Date().timeIntervalSince1970,
-          matchMode: .toneInsensitivePrefix
-        ).compactMap { pom -> Homa.Gram? in
-          guard pom.previous != nil || pom.anterior != nil else { return nil }
-          return Homa.Gram(
-            keyArray: pom.headReading.split(separator: "-").map(String.init),
-            current: pom.candidate,
-            previous: pom.previous, anterior: pom.anterior,
-            probability: pom.probability
+        rawAllUnigrams.append(
+          contentsOf: pomContextualGrams(
+            headReading: keyChain,
+            timestamp: Date().timeIntervalSince1970,
+            matchMode: .toneInsensitivePrefix
           )
-        }
-        rawAllUnigrams.append(contentsOf: pomGrams)
+        )
       }
       unigramLRUCache[cacheKey] = rawAllUnigrams
       if unigramLRUCache.count > 1_024 {

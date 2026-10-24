@@ -27,7 +27,15 @@ struct POMNGramSourceTests {
       Issue.record("POM bigram gram not injected for head ㄇㄚ.")
       return
     }
-    #expect(pomGram.probability < 0) // 衰減權重為負
+    // 分數＝POM 自身之對數分數；剛生成者近 0，故高於同值之語料分數（永遠壓過語料）。
+    guard let corpusScore = grams.first(where: {
+      $0.current == "媽" && $0.previous == nil && $0.anterior == nil
+    })?.probability else {
+      Issue.record("Corpus lacks 媽 at ㄇㄚ.")
+      return
+    }
+    #expect(pomGram.probability < 0)
+    #expect(pomGram.probability > corpusScore)
   }
 
   /// 主開關關閉（fetch 鏡像 config=false）時，POM 不向組字引擎提供任何 n-gram 資料。
