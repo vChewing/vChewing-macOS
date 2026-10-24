@@ -8,6 +8,8 @@ import Testing
 
 @Suite
 struct TrieKitTextMapTests {
+  // MARK: Internal
+
   @Test("[TrieKit] TYPING TextMap 3-column numeric value disambiguation")
   func testTypingTextMapThreeColumnNumericValueDisambiguation() throws {
     let textMap = """
@@ -45,13 +47,78 @@ struct TrieKitTextMapTests {
       readings: ["foo"]
     )
 
-    let textMap = VanguardTrie.TrieIO.serializeToTextMap(trie)
+    let textMap = try VanguardTrie.TrieIO.serializeToTextMap(trie)
     #expect(textMap.contains("VERSION\t2.0"))
     let roundTripped = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
     let values = roundTripped.nodes.values.first(where: { $0.readingKey == "foo" })?
       .entries.map(\.value).sorted() ?? []
 
     #expect(values == ["A B", "C|D"])
+  }
+
+  @Test("[TrieKit] ZWJ emoji and ideographic space survive grouped and contextual round trips")
+  func testZWJEmojiAndIdeographicSpaceRoundTrips() throws {
+    let trie = VanguardTrie.Trie(separator: "-")
+    let emoji = "🙅‍♀️"
+    let ideographicSpace = "\u{3000}"
+    let combiningMarkEmoticon = "( ͒˃⌂˂ ͒)"
+    for value in [emoji, ideographicSpace, combiningMarkEmoticon] {
+      trie.insert(
+        entry: .init(value: value, typeID: .init(rawValue: 4), probability: 0, previous: nil),
+        readings: ["foo"]
+      )
+    }
+    for (index, context) in ["要", emoji, ideographicSpace].enumerated() {
+      trie.insert(
+        entry: .init(
+          value: emoji,
+          typeID: .init(rawValue: 6),
+          probability: -Double(index + 1),
+          previous: context
+        ),
+        readings: ["foo"]
+      )
+    }
+
+    let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
+    #expect(serialized.contains(#"(\s͒˃⌂˂\s͒)"#))
+    for trie in try [
+      VanguardTrie.TrieIO.deserializeFromTextMap(serialized) as any VanguardTrieProtocol,
+      VanguardTrie.TextMapTrie(data: Data(serialized.utf8)) as any VanguardTrieProtocol,
+    ] {
+      #expect(trie.queryGrams(["foo"], filterType: .init(rawValue: 4)).map(\.value) == [
+        emoji, ideographicSpace, combiningMarkEmoticon,
+      ])
+      let contextual = trie.queryGrams(["foo"], filterType: .init(rawValue: 6))
+      #expect(contextual.map(\.value) == Array(repeating: emoji, count: 3))
+      #expect(contextual.compactMap(\.previous) == ["要", emoji, ideographicSpace])
+    }
+  }
+
+  @Test("[TrieKit] Type C bare values may begin with reserved markers")
+  func testTypeCBareValuesWithReservedMarkers() throws {
+    let values = ["!詞", "@詞", ">詞"]
+    let contexts = ["甲", "乙", "丙"]
+    let trie = VanguardTrie.Trie(separator: "-")
+    for (value, context) in zip(values, contexts) {
+      trie.insert(
+        entry: .init(value: value, typeID: .init(rawValue: 6), probability: -1, previous: context),
+        readings: ["foo"]
+      )
+    }
+
+    let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
+    let typing = serialized.replacingOccurrences(of: "TYPE\tTRIE_TEXTMAP", with: "TYPE\tTYPING")
+    for content in [serialized, typing] {
+      for trie in try [
+        VanguardTrie.TrieIO.deserializeFromTextMap(content) as any VanguardTrieProtocol,
+        VanguardTrie.TextMapTrie(data: Data(content.utf8)) as any VanguardTrieProtocol,
+      ] {
+        let grams = trie.queryGrams(["foo"], filterType: .init(rawValue: 6))
+        #expect(grams.map(\.value) == values)
+        #expect(grams.compactMap(\.previous) == contexts)
+      }
+    }
   }
 
   @Test("[TrieKit] TextMap parsing tolerates CRLF line endings")
@@ -209,7 +276,7 @@ struct TrieKitTextMapTests {
       readings: ["bar"]
     )
 
-    let serialized = VanguardTrie.TrieIO.serializeToTextMap(trie)
+    let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
     let lazyTrie = try VanguardTrie.TextMapTrie(data: Data(serialized.utf8))
 
     let fooValues = lazyTrie.queryGrams(
@@ -369,7 +436,7 @@ struct TrieKitTextMapTests {
     #expect(trie.reverseLookup(for: "𡜅") == ["lv3"])
   }
 
-  @Test("[TrieKit] TextMap 型別 C 的第 4 欄承載前驗詞鏈（任意層數 n-gram）")
+  @Test("[TrieKit] TextMap 型別 C 的第 4 欄承載至多兩層前驗詞鏈")
   func testTextMapTypeCContextCellCarriesMultigramChain() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
@@ -397,5 +464,262 @@ struct TrieKitTextMapTests {
     #expect(trigrams.map(\.value) == ["樣"])
     #expect(trigrams.first?.previous == "再")
     #expect(trigrams.first?.anterior == "不要")
+  }
+
+  @Test("[TrieKit] Type D groups by value and type while preserving expansion order")
+  func testTypeDGroupingAndRoundTripOrder() throws {
+    let trie = VanguardTrie.Trie(separator: "-")
+    let entries = [
+      VanguardTrie.Trie.Entry(value: "再", typeID: .init(rawValue: 6), probability: -3.405, previous: "要"),
+      VanguardTrie.Trie.Entry(
+        value: "再",
+        typeID: .init(rawValue: 6),
+        probability: -3.502,
+        previous: "要",
+        anterior: "不"
+      ),
+      VanguardTrie.Trie.Entry(value: "再", typeID: .init(rawValue: 5), probability: -2, previous: "要"),
+      VanguardTrie.Trie.Entry(value: "樣", typeID: .init(rawValue: 6), probability: -4, previous: "再"),
+      VanguardTrie.Trie.Entry(value: "再", typeID: .init(rawValue: 6), probability: -1, previous: "呢"),
+    ]
+    for entry in entries { trie.insert(entry: entry, readings: ["foo"]) }
+
+    let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
+    #expect(valueLines(from: serialized) == [
+      "!再\t6\t-3.405\t要\t-3.502\t不|要\t-1\t呢",
+      "再\t-2\t5\t要",
+      "樣\t-4\t6\t再",
+    ])
+
+    let full = try VanguardTrie.TrieIO.deserializeFromTextMap(serialized)
+    let lazy = try VanguardTrie.TextMapTrie(data: Data(serialized.utf8))
+    for typeID in [Int32(5), 6] {
+      let filter = VanguardTrie.Trie.EntryType(rawValue: typeID)
+      #expect(signatures(full.queryGrams(["foo"], filterType: filter)) == signatures(
+        lazy.queryGrams(["foo"], filterType: filter)
+      ))
+    }
+    let contextual = lazy.queryGrams(["foo"], filterType: .init(rawValue: 6))
+    #expect(contextual.map(\.value) == ["再", "再", "再", "樣"])
+    #expect(contextual.map(\.previous) == ["要", "要", "呢", "再"])
+    #expect(contextual.map(\.anterior) == [nil, "不", nil, nil])
+  }
+
+  @Test("[TrieKit] Type D is identical in TYPING and TRIE_TEXTMAP modes")
+  func testTypeDWorksInBothTextMapModes() throws {
+    let line = "!再\t6\t-3.405\t要\t-3.502\t不|要"
+    for type in ["TYPING", "TRIE_TEXTMAP"] {
+      let textMap = makeTextMap(values: [line], type: type, keyMap: ["foo\t0\t1"])
+      let full = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
+      let lazy = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+      let fullGrams = full.queryGrams(["foo"], filterType: .init(rawValue: 6))
+      let lazyGrams = lazy.queryGrams(["foo"], filterType: .init(rawValue: 6))
+      #expect(signatures(fullGrams) == signatures(lazyGrams))
+      #expect(lazyGrams.map(\.previous) == ["要", "要"])
+      #expect(lazyGrams.map(\.anterior) == [nil, "不"])
+      #expect(lazyGrams.map(\.probability) == [-3.405, -3.502])
+    }
+  }
+
+  @Test("[TrieKit] Type D preserves bare values and all grouped-cell escapes")
+  func testTypeDEscapesRoundTrip() throws {
+    let trie = VanguardTrie.Trie(separator: "-")
+    let value = "!詞|\\"
+    let contexts = ["A B", "C|D", "E\\F", "G\u{7}H"]
+    for (index, context) in contexts.enumerated() {
+      trie.insert(
+        entry: .init(
+          value: value,
+          typeID: .init(rawValue: 6),
+          probability: -Double(index + 1),
+          context: [context]
+        ),
+        readings: ["foo"]
+      )
+    }
+
+    let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
+    let line = try #require(valueLines(from: serialized).first)
+    #expect(line.hasPrefix("!!詞|\\"))
+    #expect(line.contains("A\\sB"))
+    #expect(line.contains("C\\|D"))
+    #expect(line.contains("E\\\\F"))
+    #expect(line.contains("G\\aH"))
+
+    for trie in try [
+      VanguardTrie.TrieIO.deserializeFromTextMap(serialized) as any VanguardTrieProtocol,
+      VanguardTrie.TextMapTrie(data: Data(serialized.utf8)) as any VanguardTrieProtocol,
+    ] {
+      let grams = trie.queryGrams(["foo"], filterType: .init(rawValue: 6))
+      #expect(grams.map(\.value) == Array(repeating: value, count: 4))
+      #expect(grams.compactMap(\.previous) == contexts)
+    }
+  }
+
+  @Test("[TrieKit] Type D chunks 17 and 33 entries without a singleton tail")
+  func testTypeDChunking() throws {
+    for count in [17, 33] {
+      let trie = VanguardTrie.Trie(separator: "-")
+      for index in 0 ..< count {
+        trie.insert(
+          entry: .init(
+            value: "再",
+            typeID: .init(rawValue: 6),
+            probability: -1,
+            previous: "P\(index)"
+          ),
+          readings: ["foo"]
+        )
+      }
+      let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
+      let lines = valueLines(from: serialized)
+      #expect(lines.map { ($0.components(separatedBy: "\t").count - 2) / 2 } == (
+        count == 17 ? [15, 2] : [16, 15, 2]
+      ))
+      let full = try VanguardTrie.TrieIO.deserializeFromTextMap(serialized)
+      let lazy = try VanguardTrie.TextMapTrie(data: Data(serialized.utf8))
+      let expected = (0 ..< count).map { "P\($0)" }
+      #expect(full.queryGrams(["foo"], filterType: .init(rawValue: 6)).compactMap(\.previous) == expected)
+      #expect(lazy.queryGrams(["foo"], filterType: .init(rawValue: 6)).compactMap(\.previous) == expected)
+    }
+  }
+
+  @Test("[TrieKit] Contextual entries do not suppress default probabilities")
+  func testDefaultProbabilityExcludesContextualEntries() throws {
+    let trie = VanguardTrie.Trie(separator: "-")
+    for value in ["A", "B"] {
+      trie.insert(
+        entry: .init(value: value, typeID: .init(rawValue: 6), probability: -5, previous: nil),
+        readings: ["foo"]
+      )
+    }
+    trie.insert(
+      entry: .init(value: "A", typeID: .init(rawValue: 6), probability: -9, previous: "P"),
+      readings: ["foo"]
+    )
+
+    let serialized = try VanguardTrie.TrieIO.serializeToTextMap(trie)
+    #expect(serialized.contains("DEFAULT_PROB_6\t-5\n"))
+    #expect(serialized.contains(">6\tA|B"))
+    let full = try VanguardTrie.TrieIO.deserializeFromTextMap(serialized)
+    let unigrams = full.queryGrams(["foo"], filterType: .init(rawValue: 6)).filter {
+      $0.previous == nil && $0.anterior == nil
+    }
+    #expect(unigrams.map(\.value) == ["A", "B"])
+    #expect(unigrams.allSatisfy { $0.probability == -5 })
+  }
+
+  @Test("[TrieKit] Full and lazy loaders reject every malformed VALUES line")
+  func testMalformedValueLinesAreRejectedEagerly() throws {
+    let d17 = "!A\t6\t" + (0 ..< 17).map { "-1\tP\($0)" }.joined(separator: "\t")
+    let malformed = [
+      ">4\tA\textra",
+      "@-1\tA\tB\textra",
+      "A\t-1",
+      "A\t-1\t6\tP\textra",
+      "!A\t6\t-1\tP\t-2",
+      d17,
+      "A\tnan\t6",
+      "A\tinf\t6",
+      "A\t-1\t6\t",
+      "A\t-1\t6\tP|Q|R",
+      "A\t-1\t6\tP\\q",
+      "A\t-1\t6\tP\\",
+      "A\t-1\t6\tP||Q",
+      "A\t-1\t6\tP Q",
+      "A\t-1\t6\tP\u{1}",
+    ]
+    for line in malformed {
+      let textMap = makeTextMap(values: [line])
+      #expect(throws: (any Error).self) {
+        try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
+      }
+      #expect(throws: (any Error).self) {
+        try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+      }
+    }
+  }
+
+  @Test("[TrieKit] Version gate requires explicit 2.0 and empty B sides stay valid")
+  func testVersionGateAndEmptyTypingCells() throws {
+    for version in [nil, "VERSION\t2.1", "VERSION\t2.0.1"] {
+      let textMap = makeTextMap(values: ["A\t-1\t6"], version: version)
+      #expect(throws: (any Error).self) {
+        try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
+      }
+      #expect(throws: (any Error).self) {
+        try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+      }
+    }
+
+    let valid = makeTextMap(
+      values: ["@-1\t\t\u{7}"],
+      keyMap: ["foo\t0\t1"]
+    )
+    let full = try VanguardTrie.TrieIO.deserializeFromTextMap(valid)
+    let lazy = try VanguardTrie.TextMapTrie(data: Data(valid.utf8))
+    #expect(full.queryGrams(["foo"], filterType: .init(rawValue: 5)).isEmpty)
+    #expect(lazy.queryGrams(["foo"], filterType: .init(rawValue: 5)).isEmpty)
+  }
+
+  @Test("[TrieKit] Serializer rejects long contexts, controls, and non-finite probabilities")
+  func testSerializerRejectsUnrepresentableEntries() {
+    let entries = [
+      VanguardTrie.Trie.Entry(
+        value: "A", typeID: .init(rawValue: 6), probability: -1, context: ["P", "Q", "R"]
+      ),
+      VanguardTrie.Trie.Entry(
+        value: "A\nB", typeID: .init(rawValue: 6), probability: -1, previous: "P"
+      ),
+      VanguardTrie.Trie.Entry(
+        value: "A", typeID: .init(rawValue: 6), probability: -1, context: ["P\tQ"]
+      ),
+      VanguardTrie.Trie.Entry(
+        value: "A", typeID: .init(rawValue: 6), probability: .nan, previous: "P"
+      ),
+    ]
+    for entry in entries {
+      let trie = VanguardTrie.Trie(separator: "-")
+      trie.insert(entry: entry, readings: ["foo"])
+      #expect(throws: (any Error).self) {
+        try VanguardTrie.TrieIO.serializeToTextMap(trie)
+      }
+    }
+  }
+
+  // MARK: Private
+
+  private func makeTextMap(
+    values: [String],
+    version: String? = "VERSION\t2.0",
+    type: String = "TYPING",
+    keyMap: [String] = []
+  )
+    -> String {
+    var lines = ["#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER"]
+    if let version { lines.append(version) }
+    lines.append("TYPE\t\(type)")
+    lines.append("READING_SEPARATOR\t-")
+    lines.append("ENTRY_COUNT\t\(values.count)")
+    lines.append("KEY_COUNT\t\(keyMap.count)")
+    lines.append("#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES")
+    lines.append(contentsOf: values)
+    lines.append("#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP")
+    lines.append(contentsOf: keyMap)
+    return lines.joined(separator: "\n")
+  }
+
+  private func valueLines(from textMap: String) -> [String] {
+    guard let values = textMap.range(of: "#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\n"),
+          let keyMap = textMap.range(of: "#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP")
+    else { return [] }
+    return textMap[values.upperBound ..< keyMap.lowerBound].split(whereSeparator: \.isNewline).map(String.init)
+  }
+
+  private func signatures(_ grams: [VanguardTrie.TrieGram]) -> [String] {
+    grams.map {
+      [$0.value, $0.previous ?? "nil", $0.anterior ?? "nil", $0.probability.description]
+        .joined(separator: "|")
+    }
   }
 }

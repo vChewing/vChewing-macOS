@@ -239,7 +239,7 @@ public struct TrieKitTests: TrieKitTestSuite {
       )
       trie.insert(entry: entry, readings: readings)
     }
-    let textMap = VanguardTrie.TrieIO.serializeToTextMap(trie)
+    let textMap = try VanguardTrie.TrieIO.serializeToTextMap(trie)
     let trieFinal: VanguardTrieProtocol = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
     let mockLX = TestLX4Trie(trie: trieFinal)
     #expect(mockLX.hasGrams(["ㄧˋ", "ㄌㄩˇ"]))
