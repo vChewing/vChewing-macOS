@@ -14,16 +14,17 @@ import Testing
 ///
 /// 測試樣本（`vanguardTextMap_test.txtMap`）自 Phase 324 起為 `VERSION 2.0`，
 /// 且整份由 `vChewing-VanguardLexicon` 的 `create_tiny_sample_txtMap.sh` 產出後原樣拷入
-/// （勿手改）。它含有 `phrases-ngram-cht.txt` 烘進來的下列條目：
-///   - `再\t-3.405\t6\t要`（bigram：前文「要」）
-///   - `再\t-3.502\t6\t不|要`（trigram：前文「要」、前前文「不」）
+/// （勿手改）。Phase 331 起它含 `phrases-ngram-cht.txt` 烘進來的下列兩條條目，
+/// 兩者同源（同一批 zh.wikipedia 分詞語料）、只差在鏈長：
+///   - `館\t-1.642\t6\t書`（bigram：前文「書」；分母取 count(書)，legacy）
+///   - `館\t-0.362\t6\t圖|書`（trigram：前文「書」、前前文「圖」；分母取 count(圖,書)）
 ///
-/// 這兩個分數是條件機率 `p(再｜要)` 的 log10 值：分母是「要」的詞頻（樣本內約 6528），
-/// 不是 `_NORM`（374388831.9686408）。Phase 324 之前存的是無條件機率，那種寫法下
-/// `count(要,再) ≤ count(再)` 恆成立，bigram 永遠贏不過自己的 unigram，故改為條件機率。
+/// 兩者皆為 `log10(e^(1/3−1) × count / 分母)` 之值，`scale = e^(1/3−1) = 0.51342`。
+/// bigram 沿用 count(前一個詞) 作分母（P331 僅修正 trigram 的分母：改取完整前文
+/// count(圖,書)，故 trigram 之分數必然高於同源的 bigram）。
 ///
-/// 示範詞特意選「在／再」這組同音歧義：`ㄗㄞˋ` 下「在」是 unigram（-5.009），
-/// 「再」只有帶前文的條目；於是 `ㄅㄨˋ-ㄧㄠˋ-ㄗㄞˋ` 的末字選誰，完全由這條 bigram 決定。
+/// 示範詞特意選「館」：其讀音 `ㄍㄨㄢˇ` 下另有「管／官」等單元圖候選，故「館」能否
+/// 勝出，完全取決於前文是否為「(圖)書」——這正是 multigram 條目存在的理由。
 @Suite(.serialized)
 struct LXFacadeMultigramTests {
   @Test
@@ -47,14 +48,13 @@ struct LXFacadeMultigramTests {
       config.bypassUserPhrasesData = true
     }
 
-    let bigramGrams = instance.unigramsFor(keyArray: ["ㄗㄞˋ"])
-    let bigram = bigramGrams.first { $0.current == "再" && $0.previous == "要" }
+    let grams = instance.unigramsFor(keyArray: ["ㄍㄨㄢˇ"])
+    let bigram = grams.first { $0.current == "館" && $0.previous == "書" && $0.anterior == nil }
     #expect(bigram != nil, "TextMap 的 bigram 條目必須以帶 previous 的 Gram 形式抵達 LXFacade。")
     #expect(bigram?.anterior == nil)
 
-    let trigramGrams = instance.unigramsFor(keyArray: ["ㄗㄞˋ"])
-    let trigram = trigramGrams.first { $0.current == "再" && $0.previous == "要" && $0.anterior == "不" }
+    let trigram = grams.first { $0.current == "館" && $0.previous == "書" && $0.anterior == "圖" }
     #expect(trigram != nil, "TextMap 的 trigram 條目必須保留 previous 與 anterior。")
-    #expect(trigram?.anterior == "不")
+    #expect(trigram?.anterior == "圖")
   }
 }
