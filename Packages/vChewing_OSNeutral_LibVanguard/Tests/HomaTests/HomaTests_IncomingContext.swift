@@ -144,3 +144,38 @@ extension HomaTestsRoot.HomaTests_IncomingContext {
     return Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
   }
 }
+// MARK: - HomaTestsRoot.HomaTests_FallbackUnigram
+
+extension HomaTestsRoot {
+  /// 節點必有單元圖。
+  ///
+  /// 正常詞庫下，任何幅節都會查得到單元圖；但若資料異常、節點只帶回帶語境的元圖，
+  /// 下游的「單元圖基線」就沒有錨，兩引擎會給出不同的分數。此處以保險單元圖釘住不變式。
+  struct HomaTests_FallbackUnigram: HomaTestSuite {
+    @Test("[Homa] Node: Seed a Fallback Unigram When None Is Attested")
+    func testFallbackUnigramSeeding() throws {
+      let contextual = Homa.Gram(keyArray: ["ㄅ"], current: "八", previous: "這", probability: -2)
+      let node = Homa.Node(keyArray: ["ㄅ"], grams: [contextual])
+      #expect(node.grams.count == 2)
+      guard let seeded = node.grams.first(where: { $0.isUnigram }) else {
+        Issue.record("節點沒有補上保險單元圖")
+        return
+      }
+      #expect(seeded.probability == Homa.Node.fallbackUnigramProbability)
+      #expect(seeded.current == "八")
+      #expect(seeded.previous == nil)
+      #expect(seeded.anterior == nil)
+    }
+
+    /// 已有單元圖時不得再多補。
+    @Test("[Homa] Node: Do Not Seed a Fallback Unigram When One Exists")
+    func testNoFallbackUnigramWhenAttested() throws {
+      let grams: [Homa.Gram] = [
+        .init(keyArray: ["ㄅ"], current: "八", probability: -3),
+        .init(keyArray: ["ㄅ"], current: "拔", previous: "這", probability: -2),
+      ]
+      let node = Homa.Node(keyArray: ["ㄅ"], grams: grams)
+      #expect(node.grams.count == 2)
+    }
+  }
+}

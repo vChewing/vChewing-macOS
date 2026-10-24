@@ -40,8 +40,8 @@ extension Homa {
     internal init(keyArray: [String] = [], grams: [Homa.Gram] = []) {
       self.id = FIUUID()
       self.keyArray4Query = keyArray
-      self.grams = grams
-      self.allActualKeyArraysCached = Set(grams.map(\.keyArray))
+      self.grams = Self.seedingFallbackUnigram(in: grams)
+      self.allActualKeyArraysCached = Set(self.grams.map(\.keyArray))
       self.currentOverrideType = nil
     }
 
@@ -317,13 +317,30 @@ extension Homa.Node {
   /// - Parameter source: 新的元圖陣列資料，必須不能為空（否則必定崩潰）。
   internal mutating func syncingGrams(from source: [Homa.Gram]) {
     let oldCurrentValue = grams[currentGramIndex].current
-    grams = source
-    // 保險，請按需啟用。
-    // if unigrams.isEmpty { unigrams.append(.init(value: key, score: -114.514)) }
+    grams = Self.seedingFallbackUnigram(in: source)
     currentGramIndex = max(min(grams.count - 1, currentGramIndex), 0)
     let newCurrentValue = grams[currentGramIndex].current
     if oldCurrentValue != newCurrentValue { reset() }
   }
+
+  /// 節點必有單元圖：若給定的元圖陣列連一條單元圖都沒有，就在最前面補一條
+  /// 「無語境證成」的單元圖（分值 `-114.514`）。
+  ///
+  /// 之所以要補：下游的「單元圖基線」是節點估值的錨。節點若沒有單元圖，基線只能
+  /// 退化成 `0` 或借用同節點其他元圖之分數，同一份資料在兩個引擎上就會得出不同的分數。
+  /// 這是舊版 `syncingGrams(from:)` 內標註「保險」之註解碼的啟用版。
+  private static func seedingFallbackUnigram(in grams: [Homa.Gram]) -> [Homa.Gram] {
+    guard !grams.isEmpty, !grams.contains(where: \.isUnigram) else { return grams }
+    let fallback = Homa.Gram(
+      keyArray: grams[0].keyArray,
+      current: grams[0].current,
+      probability: fallbackUnigramProbability
+    )
+    return [fallback] + grams
+  }
+
+  /// 上述保險補入之單元圖所用的分值。
+  internal static let fallbackUnigramProbability: Double = -114.514
 
   /// 指定要覆寫的元圖資料值、以及覆寫行為種類。
   /// - Parameters:
