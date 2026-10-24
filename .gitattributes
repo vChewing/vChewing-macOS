@@ -1,0 +1,2 @@
+# TextMap 測試樣本以 LF 進出；Windows 的 checkout 不得把它轉成 CRLF。
+*.txtMap text eol=lf
