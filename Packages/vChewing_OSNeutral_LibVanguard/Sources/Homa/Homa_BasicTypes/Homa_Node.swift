@@ -184,43 +184,47 @@ extension Homa.Node {
   /// 給出該節點內部元圖陣列內目前被索引位置所指向的元圖的資料值。
   public var value: String? { currentGram?.current }
 
-  /// 給出目前的最高權重單元圖當中的權重值。該結果可能會受節點覆寫狀態所影響。
-  private var unigramScore: Double {
-    guard !grams.isEmpty else { return 0 }
-    // 單次線性掃描、只取陣列順序上的第一個單元圖機率，不建立任何一次性 filter 陣列。
-    var firstUnigramProbability: Double?
-    for gram in grams {
-      guard (gram.previous ?? "").isEmpty, (gram.anterior ?? "").isEmpty else { continue }
-      firstUnigramProbability = gram.probability
-      break
-    }
-    guard let firstUnigramProbability else { return 0 }
-    switch currentOverrideType {
-    case .withSpecified: return overridingScore
-    case .withTopGramScore: return firstUnigramProbability
-    default:
-      // 無覆寫狀態時以當前選取之元圖計分；惟當前選取若為**帶語境之元圖**（雙元圖／三元圖），
-      // 則語境無從確認（本路徑正是「無前述內容」之情形）⇒ 退回單元圖基線，避免該語境分數
-      // 在無語境處生效。該狀態僅可能出自 `getScore(previous:anterior:)` 之自動語境選取
-      // （見 `adoptGramForContext(keyArray:value:previous:anterior:)`）。
-      if let currentGram, (currentGram.previous ?? "").isEmpty, (currentGram.anterior ?? "").isEmpty {
-        return currentGram.probability
-      }
-      return firstUnigramProbability
-    }
+  /// 該節點在給定前文下的估值結果。
+  ///
+  /// 這是 `getScore(previous:anterior:)` 的純函式版本：**完全不改動節點狀態**，
+  /// 只回報「該得多少分」與「該把選取移到哪一條元圖」。組句的動態規劃需要對同一個
+  /// 節點以多組前文反覆估值（右文脈 DP），若估值帶副作用，則結果會取決於估值順序。
+  internal struct Evaluation {
+    /// 此次估值得出的分數。
+    internal let score: Double
+    /// 該把 `currentGramIndex` 移到哪一條元圖；`nil` 表示維持現有選取
+    /// （弱釘選，以及節點內連一條單元圖都沒有的情形）。
+    internal let targetIndex: Int?
   }
 
   /// 給出目前的最高權元圖當中的權重值（包括雙元圖與三元圖）。該結果可能會受節點覆寫狀態所影響。
   /// - Remark: 這個函式會根據比對到的前述節點內容，來查詢可能的雙元／三元圖資料。
   /// 一旦有比對到相符的雙元／三元圖資料，就會比較其權重與當前節點的權重，並選擇
-  /// 權重較高的那個、然後**據此視情況自動修改這個節點的覆寫狀態種類**。
+  /// 權重較高的那個、然後**據此視情況移動這個節點的選取**。
+  /// - Important: 這是「估值＋寫回」的合體版，只適合**單一路徑**的場合。需要同時評估
+  ///   多條假設時（右文脈 DP），請改用 `evaluate(previous:anterior:)` 取得純量結果，
+  ///   再於確定勝出路徑之後呼叫 `adopt(gram:)`；否則節點狀態會被「最後一次估值」污染。
   /// - Parameters:
   ///   - previous: 前述節點內容，用以查詢可能的雙元圖資料。
   ///   - anterior: 前述節點再往前一格的內容，用以查詢可能的三元圖資料（可選）。
   /// - Returns: 權重。
   internal mutating func getScore(previous: String?, anterior: String? = nil) -> Double {
-    guard !grams.isEmpty else { return 0 }
-    guard let previous, !previous.isEmpty else { return unigramScore }
+    let evaluation = evaluate(previous: previous, anterior: anterior)
+    if let targetIndex = evaluation.targetIndex { currentGramIndex = targetIndex }
+    return evaluation.score
+  }
+
+  /// 以給定前文估值，但不改動任何狀態（`getScore(previous:anterior:)` 的純函式版本）。
+  ///
+  /// 右文脈 DP 需要對同一個節點以多組前文反覆估值（「在」與「再」兩條假設都得活到
+  /// 右邊的詞進來），若估值本身帶副作用，結果就會取決於估值順序、無法重現。
+  /// - Parameters:
+  ///   - previous: 前述節點內容。
+  ///   - anterior: 前述節點再往前一格的內容（可選）。
+  /// - Returns: 分數與「該把選取移到哪一條元圖」。
+  internal func evaluate(previous: String?, anterior: String? = nil) -> Evaluation {
+    guard !grams.isEmpty else { return .init(score: 0, targetIndex: nil) }
+    let hasPrevious = !(previous ?? "").isEmpty
 
     // 單次線性掃描元圖陣列：同步捕捉「陣列順序上的首個單元圖機率」、「前述內容相符的
     // 最高權重雙元圖」與「前驅二位相符的最高權重三元圖」。匹配不與 currentGram 綁定
@@ -234,7 +238,7 @@ extension Homa.Node {
         firstUnigramProbability = gram.probability
         firstUnigramIndex = index
       }
-      guard gram.previous == previous else { continue }
+      guard hasPrevious, gram.previous == previous else { continue }
       // 三元圖：需 exact 匹配前驅二位（anterior 語境存在時才可比對）。
       if let anterior, !anterior.isEmpty, gram.anterior == anterior {
         guard let currentBest = bestTrigram else {
@@ -261,35 +265,40 @@ extension Homa.Node {
     let unigramBaseline = firstUnigramProbability ?? 0
     switch currentOverrideType {
     case .withSpecified:
-      return overridingScore
+      return .init(score: overridingScore, targetIndex: nil)
     case .withTopGramScore:
       // 弱釘選語義（與既有行為一致）：維持既有選取（currentGramIndex 不動）、
       // 以 unigram 基線計分——`withTopGramScore` 只釘「選取了哪個 gram」、不釘分數。
-      return unigramBaseline
+      return .init(score: unigramBaseline, targetIndex: nil)
     default:
+      // 無前述內容：語境無從確認，一律以陣列順序的首條單元圖計分（該節點連一條單元圖
+      // 都沒有的話，退回首條 gram）。這裡刻意不讀任何殘留選取狀態：右文脈 DP 會對同一
+      // 節點以多組前文反覆估值，無前文分數若隨 `currentGramIndex` 漂移，組句就不再可重現。
+      guard hasPrevious else {
+        let fallbackProbability = firstUnigramProbability ?? grams[0].probability
+        return .init(score: fallbackProbability, targetIndex: firstUnigramIndex ?? 0)
+      }
       // 有匹配加分且高於 unigram 基線 → 選中 bonus gram；否則將選取指向最佳單元圖
       // （未匹配語境的 top bigram／trigram 不應留駐輸出）。
-      if let bestBonus, bestBonus.probability > unigramBaseline {
-        do {
-          // 語境加分是**當次推導**之結果，不得記成覆寫狀態：`withTopGramScore` 之計分臂
-          // 逕以 unigram 基線計分，一旦記上，下一次組句就不會重算加分、該節點隨即退回
-          // 無語境之選取（症狀：記憶詞只出現一拍、下一個按鍵即被詞庫長詞取代）。
-          try adoptGramForContext(
-            keyArray: bestBonus.keyArray,
-            value: bestBonus.current,
-            previous: bestBonus.previous,
-            anterior: bestBonus.anterior
-          )
-          return bestBonus.probability
-        } catch {
-          // 覆寫失敗：退回 unigram 基線。
-        }
+      if let bestBonus, bestBonus.probability > unigramBaseline,
+         let bonusIndex = grams.firstIndex(of: bestBonus) {
+        // 語境加分是**當次推導**之結果，不得記成覆寫狀態：`withTopGramScore` 之計分臂
+        // 逕以 unigram 基線計分，一旦記上，下一次組句就不會重算加分、該節點隨即退回
+        // 無語境之選取（症狀：記憶詞只出現一拍、下一個按鍵即被詞庫長詞取代）。
+        // 故這裡只回報「該把選取移到哪」，實際移動交給組句器在回溯勝出路徑時呼叫的
+        // `adopt(gram:)`。
+        return .init(score: bestBonus.probability, targetIndex: bonusIndex)
       }
-      if let firstUnigramIndex {
-        currentGramIndex = firstUnigramIndex
-      }
-      return unigramBaseline
+      return .init(score: unigramBaseline, targetIndex: firstUnigramIndex)
     }
+  }
+
+  /// 把 `currentGramIndex` 移到指定元圖上；只移動選取、不動覆寫狀態。
+  /// - Remark: 右文脈 DP 只在**確定的勝出路徑**上呼叫此函式，且時機在整個動態規劃
+  ///   結束之後——同一節點在推導期間會被多組前文估值，不得被任一組污染。
+  internal mutating func adopt(gram: Homa.Gram) {
+    guard let index = grams.firstIndex(of: gram) else { return }
+    currentGramIndex = index
   }
 
   /// 重設該節點的覆寫狀態、及其內部的元圖索引位置指向。
