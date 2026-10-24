@@ -256,13 +256,17 @@ extension Homa.Node {
       }
       if gram.probability > currentBest.probability { bestBigram = gram }
     }
-    // 依序取「三元圖 → 雙元圖」中權重最高者作為加分項。
+    let unigramBaseline = firstUnigramProbability ?? 0
+    // 依序取「三元圖 → 雙元圖」中（按鏈長計次後）增益最高者作為加分項。
+    // 取捨用計次後的分數：trigram 的增益算兩次（P326），故原始機率較低的 trigram 可能反而勝出。
     var bestBonus: Homa.Gram?
     if let bestTrigram { bestBonus = bestTrigram }
-    if let bestBigram, bestBonus == nil || bestBigram.probability > (bestBonus?.probability ?? 0) {
+    if let bestBigram,
+       bestBonus == nil
+       || bestBigram.weightedScore(against: unigramBaseline)
+       > (bestBonus?.weightedScore(against: unigramBaseline) ?? -.infinity) {
       bestBonus = bestBigram
     }
-    let unigramBaseline = firstUnigramProbability ?? 0
     switch currentOverrideType {
     case .withSpecified:
       return .init(score: overridingScore, targetIndex: nil)
@@ -287,7 +291,7 @@ extension Homa.Node {
         // 無語境之選取（症狀：記憶詞只出現一拍、下一個按鍵即被詞庫長詞取代）。
         // 故這裡只回報「該把選取移到哪」，實際移動交給組句器在回溯勝出路徑時呼叫的
         // `adopt(gram:)`。
-        return .init(score: bestBonus.probability, targetIndex: bonusIndex)
+        return .init(score: bestBonus.weightedScore(against: unigramBaseline), targetIndex: bonusIndex)
       }
       return .init(score: unigramBaseline, targetIndex: firstUnigramIndex)
     }

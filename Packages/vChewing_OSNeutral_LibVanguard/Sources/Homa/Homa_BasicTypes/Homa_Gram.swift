@@ -78,6 +78,10 @@ extension Homa {
 
     public var isUnigram: Bool { previous == nil && anterior == nil }
 
+    /// 該元圖的前文鏈長（1 = 單元圖、2 = 雙元圖、3 = 三元圖）。
+    /// - Note: 這是「詞鏈」的長度，不是讀音長度：多音節詞的單元圖仍然是 1。
+    public var chainLength: Int { 1 + (previous == nil ? 0 : 1) + (anterior == nil ? 0 : 1) }
+
     public var description: String {
       describe(keySeparator: "-")
     }
@@ -119,6 +123,20 @@ extension Homa {
         lhs.anterior == rhs.anterior &&
         lhs.probability == rhs.probability &&
         lhs.backoff == rhs.backoff
+    }
+
+    /// 把 n-gram 的原始分數換算成「相對同名節點單元圖基線的增益」，並按鏈長計次。
+    ///
+    /// 計分模型（P326）：`baseline + (chainLength − 1) × (probability − baseline)`。
+    /// - 雙元圖（chainLength = 2）的結果與舊行為完全相同：`probability`。
+    /// - 三元圖（chainLength = 3）把增益算兩次：`2 × probability − baseline`。
+    ///
+    /// 之所以要按鏈長計次：在「總分 = 各節點分數之和」的模型裡，若高階 n-gram 的增益
+    /// 只算一次，兩條假設的勝負就只取決於各自增益之比（PMI 之比），與詞鏈長度無關。
+    /// 如此一來，長鏈證據與短鏈證據等權，右文脈即使成立也扳不動左文脈。
+    /// - Parameter baseline: 同名節點之單元圖基線分數（通常是該節點最高分的單元圖）。
+    public func weightedScore(against baseline: Double) -> Double {
+      baseline + Double(chainLength - 1) * (probability - baseline)
     }
 
     /// 生成內容雷同、但識別碼（FIUUID）全新的一份拷貝。

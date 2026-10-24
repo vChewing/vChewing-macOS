@@ -17,6 +17,8 @@ extension HomaTestsRoot {
   /// 多組前文反覆估值，故「得多少分」與「該選哪一條元圖」必須分開說清楚。兩引擎在這一層
   /// 若有分歧，Lexicon 倉庫組得出來的句子在輸入法裡就打不出來。
   struct HomaTests_NodeOverrideEvaluation: HomaTestSuite {
+    // MARK: Internal
+
     /// 弱釘選（`withTopGramScore`）只把分數壓回 unigram 基線，**不得**改動當前選取。
     @Test("[Homa] Node Override: Weak Pin Keeps Selection")
     func testWeakPinKeepsSelection() throws {
@@ -51,6 +53,8 @@ extension HomaTestsRoot {
       #expect(abs(evaluation.score - node.overridingScore) < 1e-6)
       #expect(node.currentGram?.current == "著")
     }
+
+    // MARK: Private
 
     /// 一條「單讀音、兩條元圖」的節點：「這」（單元圖 −2.5）與「著」（`再` 之後的雙元圖、−1.0）。
     private static func makeNode() -> Homa.Node {
