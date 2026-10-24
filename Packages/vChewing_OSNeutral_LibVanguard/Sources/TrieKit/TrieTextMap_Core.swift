@@ -272,13 +272,16 @@ extension VanguardTrie.TextMapTrie {
   }
 
   private static func isUnsupportedLegacyTextMapVersionLine(_ versionLine: String) -> Bool {
-    versionLine.hasPrefix("VERSION\t1") && !versionLine.contains(".")
+    // Phase 324 起只認 `2.x`：型別 C 的第 4 欄由「單一前驗詞」改為「前驗詞鏈」，
+    // 舊檔若仍以 1.x 標記讀入，其 bigram 語義會被錯解成另一種鏈長。
+    let versionCell = versionLine.split(separator: "\t", maxSplits: 1).last.map(String.init) ?? ""
+    return !versionCell.trimmingCharacters(in: .whitespaces).hasPrefix("2.")
   }
 
   private static func makeUnsupportedTextMapVersionError() -> VanguardTrie.TrieIO.Exception {
     VanguardTrie.TrieIO.Exception.deserializationFailed(
       NSError(domain: "VanguardTrie.TextMapTrie", code: -1, userInfo: [
-        NSLocalizedDescriptionKey: "TextMap format versions below 1.1 are no longer supported.",
+        NSLocalizedDescriptionKey: "TextMap format versions other than 2.x are no longer supported.",
       ])
     )
   }

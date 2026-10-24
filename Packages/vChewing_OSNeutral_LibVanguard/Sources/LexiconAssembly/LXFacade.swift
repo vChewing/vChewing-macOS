@@ -1163,10 +1163,13 @@ extension LXAssembly {
           let oldUnigram = rawAllUnigrams[i]
           let newValue = lxReplacements.valuesFor(key: oldUnigram.current)
           guard !newValue.isEmpty else { continue }
+          // 語彙置換不改動前驗詞鏈：multigram 條目的前文語境仍屬有效。
           let newUnigram = Homa.Gram(
             keyArray: oldUnigram.keyArray,
             value: newValue,
-            score: oldUnigram.probability
+            score: oldUnigram.probability,
+            previous: oldUnigram.previous,
+            anterior: oldUnigram.anterior
           )
           rawAllUnigrams[i] = newUnigram
         }
@@ -1646,10 +1649,13 @@ extension LXAssembly {
           let oldUnigram = rawAllUnigrams[i]
           let newValue = lxReplacements.valuesFor(key: oldUnigram.current)
           guard !newValue.isEmpty else { continue }
+          // 語彙置換不改動前驗詞鏈：multigram 條目的前文語境仍屬有效。
           let newUnigram = Homa.Gram(
             keyArray: oldUnigram.keyArray,
             value: newValue,
-            score: oldUnigram.probability
+            score: oldUnigram.probability,
+            previous: oldUnigram.previous,
+            anterior: oldUnigram.anterior
           )
           rawAllUnigrams[i] = newUnigram
         }

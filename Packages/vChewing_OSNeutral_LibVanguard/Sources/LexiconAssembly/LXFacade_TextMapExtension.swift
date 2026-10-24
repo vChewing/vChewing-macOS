@@ -338,16 +338,18 @@ extension LXAssembly.LXFacade {
     // 排在「喔」等低權重單字之後。此處以「最高機率者勝出」去重，
     // 使「我」以真實權重（ㄨㄛˇ）浮出於候選前列。
     // 呼叫端最終仍會依機率排序（unigramsFor 的 sort），此處迭代順序不影響結果。
+    // 去重身分含前驗詞鏈（Phase 324）：同一詞值在前文不同時是不同的統計條目。
     var bestByValue: [String: Homa.Gram] = [:]
     bestByValue.reserveCapacity(grams.count)
     for gram in grams {
       guard !gram.current.isEmpty else { continue }
-      if let existing = bestByValue[gram.current] {
+      let identity = "\(gram.current)\u{1}\(gram.previous ?? "")\u{1}\(gram.anterior ?? "")"
+      if let existing = bestByValue[identity] {
         if gram.probability > existing.probability {
-          bestByValue[gram.current] = gram
+          bestByValue[identity] = gram
         }
       } else {
-        bestByValue[gram.current] = gram
+        bestByValue[identity] = gram
       }
     }
     return Array(bestByValue.values)
@@ -513,7 +515,15 @@ extension LXAssembly.LXFacade {
         score *= -1
       }
 
-      grams.append(.init(keyArray: keyArray, value: entry.value, score: score))
+      // Phase 324：TextMap 的型別 C 條目可帶前驗詞鏈；此處必須原樣帶進 Homa.Gram，
+      // 否則 bigram／trigram 會在建構候選節點時被壓成普通 unigram。
+      grams.append(.init(
+        keyArray: keyArray,
+        value: entry.value,
+        score: score,
+        previous: entry.previous,
+        anterior: entry.anterior
+      ))
 
       guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
       let halfWidthValue = entry.value.applyingTransformFW2HW(reverse: false)

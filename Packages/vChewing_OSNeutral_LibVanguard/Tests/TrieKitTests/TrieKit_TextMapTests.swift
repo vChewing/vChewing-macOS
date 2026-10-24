@@ -12,7 +12,7 @@ struct TrieKitTextMapTests {
   func testTypingTextMapThreeColumnNumericValueDisambiguation() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t1
@@ -46,10 +46,7 @@ struct TrieKitTextMapTests {
     )
 
     let textMap = VanguardTrie.TrieIO.serializeToTextMap(trie)
-    if textMap.hasPrefix("VERSION\t1") {
-      #expect(!textMap.contains("VERSION\t1\n"))
-      #expect(!textMap.contains("VERSION\t1\r\n"))
-    }
+    #expect(textMap.contains("VERSION\t2.0"))
     let roundTripped = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
     let values = roundTripped.nodes.values.first(where: { $0.readingKey == "foo" })?
       .entries.map(\.value).sorted() ?? []
@@ -60,7 +57,7 @@ struct TrieKitTextMapTests {
   @Test("[TrieKit] TextMap parsing tolerates CRLF line endings")
   func testTextMapParsingToleratesCRLFLineEndings() throws {
     let textMap =
-      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t1.1\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nhe4\t0\t1\r\n"
+      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t2.0\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nhe4\t0\t1\r\n"
 
     let trie = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
     let entries = trie.nodes.values.first(where: { $0.readingKey == "he4" })?.entries ?? []
@@ -78,7 +75,7 @@ struct TrieKitTextMapTests {
     let emptyGroupedCellPlaceholder = String(UnicodeScalar(7)!)
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t1
@@ -126,7 +123,7 @@ struct TrieKitTextMapTests {
   func testLegacyTypingGroupedLineStillParses() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t1
@@ -152,7 +149,7 @@ struct TrieKitTextMapTests {
   func testTextMapTrieEquivalence() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t5
@@ -232,7 +229,7 @@ struct TrieKitTextMapTests {
   func testTextMapTriePartialAndLongerSegment() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTRIE_TEXTMAP
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -277,7 +274,7 @@ struct TrieKitTextMapTests {
     let revLookupType = VanguardTrie.Trie.EntryType(rawValue: 3)
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -309,7 +306,7 @@ struct TrieKitTextMapTests {
   func testTextMapTrieExistentialQueryAPIs() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION	1.1
+    VERSION	2.0
     TYPE	TRIE_TEXTMAP
     READING_SEPARATOR	-
     ENTRY_COUNT	4
@@ -349,7 +346,7 @@ struct TrieKitTextMapTests {
   func testTextMapTrieFlushReverseLookupIndexRebuildsOnDemand() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -370,5 +367,35 @@ struct TrieKitTextMapTests {
     trie.flushReverseLookupIndex()
     #expect(trie.reverseLookup(for: "宜") == ["i2"])
     #expect(trie.reverseLookup(for: "𡜅") == ["lv3"])
+  }
+
+  @Test("[TrieKit] TextMap 型別 C 的第 4 欄承載前驗詞鏈（任意層數 n-gram）")
+  func testTextMapTypeCContextCellCarriesMultigramChain() throws {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t2
+    KEY_COUNT\t2
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    再\t-8.386\t6\t不要
+    樣\t-8.562\t6\t不要|再
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    ㄗㄞˋ\t0\t1
+    ㄧㄤˋ\t1\t1
+    """
+
+    let trie: any VanguardTrieProtocol = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+
+    let bigrams = trie.queryGrams(["ㄗㄞˋ"], filterType: .init(rawValue: 6))
+    #expect(bigrams.map(\.value) == ["再"])
+    #expect(bigrams.first?.previous == "不要")
+    #expect(bigrams.first?.anterior == nil)
+
+    let trigrams = trie.queryGrams(["ㄧㄤˋ"], filterType: .init(rawValue: 6))
+    #expect(trigrams.map(\.value) == ["樣"])
+    #expect(trigrams.first?.previous == "再")
+    #expect(trigrams.first?.anterior == "不要")
   }
 }
