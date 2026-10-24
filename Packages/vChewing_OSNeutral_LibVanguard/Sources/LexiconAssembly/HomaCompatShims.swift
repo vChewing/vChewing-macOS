@@ -34,13 +34,18 @@ extension Homa.Gram {
 extension Array where Element == Homa.Gram {
   /// Given a filter set, deduplicate and filter the gram array in-place.
   /// Ported from legacy `Array<Megrez.Unigram>.consolidate(filter:)`.
+  ///
+  /// 去重身分自 Phase 324 起含「前驗詞鏈」：同一個詞值在前文不同時的 bigram／trigram
+  /// 條目是真實不同的統計資料，若仍以詞值去重，TextMap 內的 multigram 會在進入組句
+  /// 引擎之前被靜默丟棄。
   public mutating func consolidate(filter theFilter: Set<String> = .init()) {
     var inserted: [String: Double] = [:]
     var insertedArray: [Homa.Gram] = []
     for neta in self {
       if theFilter.contains(neta.current) { continue }
-      if inserted.keys.contains(neta.current) { continue }
-      inserted[neta.current] = neta.probability
+      let identity = "\(neta.current)\u{1}\(neta.previous ?? "")\u{1}\(neta.anterior ?? "")"
+      if inserted.keys.contains(identity) { continue }
+      inserted[identity] = neta.probability
       insertedArray.append(neta)
     }
     self = insertedArray

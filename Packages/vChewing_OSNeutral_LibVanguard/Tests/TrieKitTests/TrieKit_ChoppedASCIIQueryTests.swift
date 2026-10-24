@@ -59,7 +59,7 @@ struct TrieKitTextMapChoppedASCIIQueryTests {
 
     var result = ""
     result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
-    result += "VERSION\t1.1\n"
+    result += "VERSION\t2.0\n"
     result += "TYPE\tTYPING\n"
     result += "READING_SEPARATOR\t-\n"
     result += "ENTRY_COUNT\t\(valueLines.count)\n"

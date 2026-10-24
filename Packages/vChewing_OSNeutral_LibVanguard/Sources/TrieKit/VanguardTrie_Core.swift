@@ -61,6 +61,25 @@ public enum VanguardTrie {
     public struct Entry: Hashable, Sendable {
       // MARK: Lifecycle
 
+      /// 組建一筆辭典條目（帶 n-gram 前驗詞鏈）。
+      /// - Parameters:
+      ///   - value: 詞值。
+      ///   - typeID: 條目型別。
+      ///   - probability: 機率（TextMap 內即 log10 權重）。
+      ///   - context: 前驗詞鏈（由舊至新；最後一個元素是緊鄰的前一個詞）。
+      public init(
+        value: String,
+        typeID: EntryType,
+        probability: Double,
+        context: [String] = []
+      ) {
+        self.value = value
+        self.typeID = typeID
+        self.probability = probability
+        self.context = context
+      }
+
+      /// 相容入口：以單層前文（bigram／trigram）組建條目。
       public init(
         value: String,
         typeID: EntryType,
@@ -68,11 +87,10 @@ public enum VanguardTrie {
         previous: String?,
         anterior: String? = nil
       ) {
-        self.value = value
-        self.typeID = typeID
-        self.probability = probability
-        self.previous = previous
-        self.anterior = anterior
+        var context = [String]()
+        if let anterior, !anterior.isEmpty { context.append(anterior) }
+        if let previous, !previous.isEmpty { context.append(previous) }
+        self.init(value: value, typeID: typeID, probability: probability, context: context)
       }
 
       // MARK: Public
@@ -80,8 +98,17 @@ public enum VanguardTrie {
       public let value: String
       public let typeID: EntryType
       public let probability: Double
-      public let previous: String?
-      public let anterior: String?
+      /// 前驗詞鏈（由舊至新）。空陣列代表 unigram。
+      public let context: [String]
+
+      /// 緊鄰的前一個詞（bigram／trigram 敘述用之）。
+      public var previous: String? { context.last }
+
+      /// 前前一個詞（trigram 敘述用之）。
+      public var anterior: String? {
+        guard context.count >= 2 else { return nil }
+        return context[context.count - 2]
+      }
     }
 
     public struct EntryType: OptionSet, Sendable, Codable, Hashable {
@@ -120,14 +147,26 @@ public enum VanguardTrie {
       keyArray: [String],
       value: String,
       probability: Double,
-      previous: String?,
-      anterior: String?
+      context: [String] = []
     ) {
       self.keyArray = keyArray
       self.value = value
       self.probability = probability
-      self.previous = previous
-      self.anterior = anterior
+      self.context = context
+    }
+
+    /// 相容入口：以單層前文組建元圖。
+    public init(
+      keyArray: [String],
+      value: String,
+      probability: Double,
+      previous: String?,
+      anterior: String?
+    ) {
+      var context = [String]()
+      if let anterior, !anterior.isEmpty { context.append(anterior) }
+      if let previous, !previous.isEmpty { context.append(previous) }
+      self.init(keyArray: keyArray, value: value, probability: probability, context: context)
     }
 
     // MARK: Public
@@ -135,8 +174,17 @@ public enum VanguardTrie {
     public let keyArray: [String]
     public let value: String
     public let probability: Double
-    public let previous: String?
-    public let anterior: String?
+    /// 前驗詞鏈（由舊至新）。空陣列代表 unigram。
+    public let context: [String]
+
+    /// 緊鄰的前一個詞（bigram／trigram 敘述用之）。
+    public var previous: String? { context.last }
+
+    /// 前前一個詞（trigram 敘述用之）。
+    public var anterior: String? {
+      guard context.count >= 2 else { return nil }
+      return context[context.count - 2]
+    }
   }
 }
 

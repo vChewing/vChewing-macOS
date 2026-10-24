@@ -140,7 +140,7 @@ struct LXFacadeTextMapTests {
 
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t2
@@ -164,7 +164,7 @@ struct LXFacadeTextMapTests {
     }
 
     let textMap =
-      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t1.1\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nㄏㄜˋ\t0\t1\r\n"
+      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t2.0\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nㄏㄜˋ\t0\t1\r\n"
 
     #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
     #expect(LXAssembly.LXFacade.getFactoryReverseLookupData(with: "和") == ["ㄏㄜˋ"])
@@ -178,7 +178,7 @@ struct LXFacadeTextMapTests {
 
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -206,7 +206,7 @@ struct LXFacadeTextMapTests {
 
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1.1
+    VERSION\t2.0
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -1011,7 +1011,7 @@ struct LXFacadeTextMapTests {
 
     var result = ""
     result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
-    result += "VERSION\t1.1\n"
+    result += "VERSION\t2.0\n"
     result += "TYPE\tTYPING\n"
     result += "READING_SEPARATOR\t-\n"
     result += "ENTRY_COUNT\t\(valueLines.count)\n"
