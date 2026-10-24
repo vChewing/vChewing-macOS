@@ -55,12 +55,16 @@ extension HomaTestsRoot {
     ///
     /// 三元圖 T01「的|這樣,在」把「在」扳回來；此案僅靠負控才具鑑別力
     /// （正斷言在舊演算法下亦成立，因為「在」是左文脈的局部最優）。
+    ///
+    /// 總分反映計分模型（P326）：`的` 節點以單元圖基線 −1.5 起算，T01 的增益
+    /// （原始機率 −0.5，較基線高 1.0）按鏈長 3 計兩次 ⇒ 節點分數 −1.5 + 2.0 = +0.5，
+    /// 總分因而由舊模型的 −19.209 提高 1.0 至 −18.209。
     @Test("[Homa] Incoming Context: Trigram Restores Earlier Same-Sounding Word")
     func testTrigramRestoresEarlierSameSoundingWord() throws {
       let assembler = Self.makeAssembler()
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
       #expect(assembler.assemble().values == ["不", "要", "在", "這樣", "的"])
-      #expect(abs(assembler.mostRecentPathScore - -19.209) < 1e-6)
+      #expect(abs(assembler.mostRecentPathScore - -18.209) < 1e-6)
     }
 
     /// 丙案之負控：拿掉 T01 之後必須退回「再」。
@@ -81,6 +85,34 @@ extension HomaTestsRoot {
       let third = assembler.assemble().values
       #expect(second == first)
       #expect(third == second)
+    }
+
+    /// 計分模型（P326）：`baseline + (chainLength − 1) × (probability − baseline)`。
+    ///
+    /// - 雙元圖的結果恰為原始機率，與舊模型逐位元相同（既有語料的計分不會漂移）。
+    /// - 三元圖把增益算兩次；四階以上再由鏈長自然外推。
+    /// - 鏈長數的是「詞鏈」而非讀音：多音節詞的單元圖仍是 1。
+    @Test("[Homa] Incoming Context: Chain-Length Weighting")
+    func testChainLengthWeighting() throws {
+      let baseline = -1.5
+      func gram(previous: String?, anterior: String?, probability: Double) -> Homa.Gram {
+        .init(
+          keyArray: ["ㄉㄜ˙"],
+          current: "的",
+          previous: previous,
+          anterior: anterior,
+          probability: probability
+        )
+      }
+      let unigram = gram(previous: nil, anterior: nil, probability: -1.5)
+      let bigram = gram(previous: "這樣", anterior: nil, probability: -0.6)
+      let trigram = gram(previous: "這樣", anterior: "在", probability: -0.5)
+      #expect(unigram.chainLength == 1)
+      #expect(bigram.chainLength == 2)
+      #expect(trigram.chainLength == 3)
+      #expect(abs(unigram.weightedScore(against: baseline) - -1.5) < 1e-9)
+      #expect(abs(bigram.weightedScore(against: baseline) - -0.6) < 1e-9)
+      #expect(abs(trigram.weightedScore(against: baseline) - 0.5) < 1e-9)
     }
   }
 }

@@ -203,8 +203,10 @@ extension Homa {
     /// 候選的取捨（皆為精確規則，不是 beam）：
     /// - 每個「會被之後的 n-gram 引用到的詞值」各留一條假設（同詞值取機率最高的那條）。
     /// - 其餘單元圖對未來而言彼此等價（都不會命中任何 n-gram），只留機率最高者。
-    /// - 命中前文的雙元／三元圖只要分數高過該節點的單元圖基底，就是候選
-    ///   （沿用 P324 既有的「加成須高於基底」門檻，避免低分的 junk n-gram 反客為主）。
+    /// - 命中前文的雙元／三元圖只要原始分數高過該節點的單元圖基底，就是候選
+    ///   （沿用 P324 既有的「加成須高於基底」門檻，避免低分的 junk n-gram 反客為主）；
+    ///   其計分則按鏈長計次（`Gram.weightedScore(against:)`，P326 計分模型）：
+    ///   雙元圖的增益算一次（與舊行為相同）、三元圖算兩次。
     /// - 整個節點連一條單元圖都沒有時，退回排序後的第一條元圖，與
     ///   `Homa.Node.evaluate` 的無前文分支一致。
     static func candidates(
@@ -236,7 +238,7 @@ extension Homa {
           guard let previous, !previous.isEmpty, gram.previous == previous else { continue }
           guard gram.anterior == nil || gram.anterior == anterior else { continue }
           guard gram.probability > baseline else { continue }
-          result.append((gram, gram.probability))
+          result.append((gram, gram.weightedScore(against: baseline)))
           continue
         }
         hasUnigram = true
