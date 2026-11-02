@@ -113,7 +113,7 @@ extension UserPhraseInsertable {
       /// 有些使用者的語彙檔案已經過於龐大了（超過一千行），
       /// 每次寫入時都全文整理格式的話，會引發嚴重的效能問題。
       /// 所以這裡不再強制要求整理格式。
-      let theType: LXAssembly.ReplacableUserDataType = toFilter ? .theFilter : .thePhrases
+      let theType: LXAssembly.ReplaceableUserDataType = toFilter ? .theFilter : .thePhrases
       let theURL = LXMgr.userDictDataURL(mode: inputMode, type: theType)
       var fileSize: UInt64?
       do {

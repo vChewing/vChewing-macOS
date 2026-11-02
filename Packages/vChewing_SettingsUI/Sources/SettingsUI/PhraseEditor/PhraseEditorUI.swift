@@ -88,20 +88,20 @@
           }
           .labelsHidden()
           Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
-            Text(LXAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
-              LXAssembly.ReplacableUserDataType.thePhrases
+            Text(LXAssembly.ReplaceableUserDataType.thePhrases.localizedDescription).tag(
+              LXAssembly.ReplaceableUserDataType.thePhrases
             )
-            Text(LXAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
-              LXAssembly.ReplacableUserDataType.theFilter
+            Text(LXAssembly.ReplaceableUserDataType.theFilter.localizedDescription).tag(
+              LXAssembly.ReplaceableUserDataType.theFilter
             )
-            Text(LXAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
-              LXAssembly.ReplacableUserDataType.theReplacements
+            Text(LXAssembly.ReplaceableUserDataType.theReplacements.localizedDescription).tag(
+              LXAssembly.ReplaceableUserDataType.theReplacements
             )
-            Text(LXAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
-              LXAssembly.ReplacableUserDataType.theAssociates
+            Text(LXAssembly.ReplaceableUserDataType.theAssociates.localizedDescription).tag(
+              LXAssembly.ReplaceableUserDataType.theAssociates
             )
-            Text(LXAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
-              LXAssembly.ReplacableUserDataType.theSymbols
+            Text(LXAssembly.ReplaceableUserDataType.theSymbols.localizedDescription).tag(
+              LXAssembly.ReplaceableUserDataType.theSymbols
             )
           }
           .labelsHidden()
@@ -225,7 +225,7 @@
     @State
     private var selInputMode: Shared.InputMode = .imeModeNULL
     @State
-    private var selUserDataType: LXAssembly.ReplacableUserDataType = .thePhrases
+    private var selUserDataType: LXAssembly.ReplaceableUserDataType = .thePhrases
 
     @AppStorage("PhraseEditorAutoReloadExternalModifications")
     private var autoReloadExternalModifications: Bool = true
@@ -405,7 +405,7 @@
 
       public static func sampleDictionaryContent(
         for type: LXAssembly
-          .ReplacableUserDataType
+          .ReplaceableUserDataType
       )
         -> String {
         var result = ""

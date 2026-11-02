@@ -10,7 +10,7 @@ import SwiftExtension
 public enum LXAssembly {
   // MARK: Public
 
-  public enum ReplacableUserDataType: String, CaseIterable, Identifiable {
+  public enum ReplaceableUserDataType: String, CaseIterable, Identifiable {
     case thePhrases
     case theFilter
     case theReplacements

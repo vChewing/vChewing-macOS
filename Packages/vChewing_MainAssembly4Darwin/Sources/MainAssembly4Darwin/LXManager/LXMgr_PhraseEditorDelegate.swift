@@ -24,7 +24,7 @@ extension LXMgr: PhraseEditorDelegate {
 
   public func openPhraseFile(
     mode: Shared.InputMode,
-    type: LXAssembly.ReplacableUserDataType,
+    type: LXAssembly.ReplaceableUserDataType,
     using app: FileOpenMethod
   ) {
     Self.openPhraseFile(fromURL: Self.userDictDataURL(mode: mode, type: type), using: app)
@@ -36,7 +36,7 @@ extension LXMgr: PhraseEditorDelegate {
 
   public func retrieveData(
     mode: Shared.InputMode,
-    type: LXAssembly.ReplacableUserDataType
+    type: LXAssembly.ReplaceableUserDataType
   )
     -> String {
     Self.retrieveData(mode: mode, type: type)
@@ -44,7 +44,7 @@ extension LXMgr: PhraseEditorDelegate {
 
   public static func retrieveData(
     mode: Shared.InputMode,
-    type: LXAssembly.ReplacableUserDataType
+    type: LXAssembly.ReplaceableUserDataType
   )
     -> String {
     vCLog("Retrieving data. Mode: \(mode.localizedDescription), type: \(type.localizedDescription)")
@@ -59,7 +59,7 @@ extension LXMgr: PhraseEditorDelegate {
 
   public func saveData(
     mode: Shared.InputMode,
-    type: LXAssembly.ReplacableUserDataType,
+    type: LXAssembly.ReplaceableUserDataType,
     data: String
   )
     -> String {
@@ -68,7 +68,7 @@ extension LXMgr: PhraseEditorDelegate {
 
   @discardableResult
   public static func saveData(
-    mode: Shared.InputMode, type: LXAssembly.ReplacableUserDataType, data: String
+    mode: Shared.InputMode, type: LXAssembly.ReplaceableUserDataType, data: String
   )
     -> String {
     LXAssembly.withFileHandleQueueSync {

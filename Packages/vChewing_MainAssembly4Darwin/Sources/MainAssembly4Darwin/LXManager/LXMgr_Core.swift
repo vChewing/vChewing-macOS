@@ -135,7 +135,7 @@ public final class LXMgr {
   }
 
   public static func loadUserPhrasesData(
-    type: LXAssembly.ReplacableUserDataType? = nil,
+    type: LXAssembly.ReplaceableUserDataType? = nil,
     async: Bool? = nil
   ) {
     guard let type = type else {

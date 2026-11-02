@@ -45,15 +45,15 @@ public final class SettingsUIHost {
   public var migrateUserDataFrom: (_ oldPath: String, _ newPath: String) -> Int = { _, _ in 0 }
   public var importYahooKeyKeyUserDictionary: (_ url: URL?) throws -> (totalFound: Int, importedCount: Int)
     = { _ in (0, 0) }
-  public var retrieveData: (_ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType) -> String
+  public var retrieveData: (_ mode: Shared.InputMode, _ type: LXAssembly.ReplaceableUserDataType) -> String
     = { _, _ in "" }
   public var saveData: (
-    _ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType, _ data: String
+    _ mode: Shared.InputMode, _ type: LXAssembly.ReplaceableUserDataType, _ data: String
   )
     -> String = { _, _, data in data }
   public var tagOverrides: (_ text: inout String, _ mode: Shared.InputMode) -> () = { _, _ in }
   public var openPhraseFile: (
-    _ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType, _ app: FileOpenMethod
+    _ mode: Shared.InputMode, _ type: LXAssembly.ReplaceableUserDataType, _ app: FileOpenMethod
   )
     -> () = { _, _, _ in }
 

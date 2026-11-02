@@ -672,7 +672,7 @@ extension LXAssembly {
     /// 自當前記憶體取得指定使用者子語言模組內的原始資料體。
     /// - Parameters:
     ///   - targetType: 操作對象。
-    public func retrieveData(from targetType: ReplacableUserDataType) -> String {
+    public func retrieveData(from targetType: ReplaceableUserDataType) -> String {
       switch targetType {
       case .thePhrases: return lxUserPhrases.strData
       case .theFilter: return lxFiltered.strData
@@ -688,7 +688,7 @@ extension LXAssembly {
     ///   - targetType: 操作對象。
     public func replaceData(
       textData rawStrData: String,
-      for targetType: ReplacableUserDataType,
+      for targetType: ReplaceableUserDataType,
       save: Bool = true
     ) {
       var rawText = rawStrData

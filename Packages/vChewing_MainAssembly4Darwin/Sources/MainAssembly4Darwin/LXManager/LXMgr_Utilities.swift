@@ -59,7 +59,7 @@ extension LXMgr {
   /// - Returns: 資料路徑（URL）。
   public static func userDictDataURL(
     mode: Shared.InputMode,
-    type: LXAssembly.ReplacableUserDataType,
+    type: LXAssembly.ReplaceableUserDataType,
     basePath: String? = nil
   )
     -> URL {
@@ -400,7 +400,7 @@ extension LXMgr {
   @discardableResult
   public static func migrateUserDataFrom(oldPath: String, to newPath: String) -> Int {
     var migratedCount = 0
-    for type in LXAssembly.ReplacableUserDataType.allCases {
+    for type in LXAssembly.ReplaceableUserDataType.allCases {
       for mode in Shared.InputMode.validCases {
         let oldURL = userDictDataURL(mode: mode, type: type, basePath: oldPath)
         let newURL = userDictDataURL(mode: mode, type: type, basePath: newPath)
@@ -528,7 +528,7 @@ extension LXMgr {
   }
 
   public static func openUserDictFile(
-    type: LXAssembly.ReplacableUserDataType,
+    type: LXAssembly.ReplaceableUserDataType,
     dual: Bool = false,
     alt: Bool
   ) {
@@ -591,7 +591,7 @@ extension LXMgr {
     /// 前者的話，需要該檔案存在的人自己會建立。
     /// 後者的話，你在敲字時自己就會建立。
     var failed = false
-    caseCheck: for type in LXAssembly.ReplacableUserDataType.allCases {
+    caseCheck: for type in LXAssembly.ReplaceableUserDataType.allCases {
       let templateName = Self.templateName(for: type, mode: mode)
       if !ensureFileExists(userDictDataURL(mode: mode, type: type), deployTemplate: templateName) {
         failed = true
@@ -602,7 +602,7 @@ extension LXMgr {
   }
 
   internal static func templateName(
-    for type: LXAssembly.ReplacableUserDataType,
+    for type: LXAssembly.ReplaceableUserDataType,
     mode: Shared.InputMode
   )
     -> String {

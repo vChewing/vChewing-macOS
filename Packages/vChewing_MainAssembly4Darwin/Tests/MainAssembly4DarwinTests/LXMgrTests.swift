@@ -314,7 +314,7 @@ final class LXMgrTests {
       try? FileManager.default.removeItem(at: newDir)
     }
 
-    let type = LXAssembly.ReplacableUserDataType.theAssociates
+    let type = LXAssembly.ReplaceableUserDataType.theAssociates
     let mode = Shared.InputMode.imeModeCHT
     let oldURL = LXMgr.userDictDataURL(mode: mode, type: type, basePath: oldDir.path)
     let newURL = LXMgr.userDictDataURL(mode: mode, type: type, basePath: newDir.path)
@@ -339,7 +339,7 @@ final class LXMgrTests {
       try? FileManager.default.removeItem(at: newDir)
     }
 
-    let type = LXAssembly.ReplacableUserDataType.theAssociates
+    let type = LXAssembly.ReplaceableUserDataType.theAssociates
     let mode = Shared.InputMode.imeModeCHT
     let oldURL = LXMgr.userDictDataURL(mode: mode, type: type, basePath: oldDir.path)
     let newURL = LXMgr.userDictDataURL(mode: mode, type: type, basePath: newDir.path)

@@ -57,7 +57,7 @@ public final class SessionHost {
     -> Bool =
     { _, _, _ in false }
   /// 取得使用者辭典資料路徑。
-  public var userDictDataURL: (_ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType) -> URL =
+  public var userDictDataURL: (_ mode: Shared.InputMode, _ type: LXAssembly.ReplaceableUserDataType) -> URL =
     { _, _ in URL(fileURLWithPath: "") }
 
   // MARK: - Notifier 動作依賴

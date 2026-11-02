@@ -176,7 +176,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     }
   }
 
-  var selUserDataType: LXAssembly.ReplacableUserDataType {
+  var selUserDataType: LXAssembly.ReplaceableUserDataType {
     switch cmbPEDataTypeMenu.selectedTag() {
     case 0: return .thePhrases
     case 1: return .theFilter
@@ -291,7 +291,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     // 嚴重警告：NSMenu.items 在 macOS 10.13 為止的系統下是唯讀的！！
     // 往這個 property 裡面直接寫東西會導致整個視窗叫不出來！！！
     cmbPEDataTypeMenu.menu?.appendItems {
-      for (tag, neta) in LXAssembly.ReplacableUserDataType.allCases.enumerated() {
+      for (tag, neta) in LXAssembly.ReplaceableUserDataType.allCases.enumerated() {
         NSMenu.Item(verbatim: neta.localizedDescription)?.tag(tag)
       }
     }
@@ -494,7 +494,7 @@ private enum PETerminology {
 
     public static func sampleDictionaryContent(
       for type: LXAssembly
-        .ReplacableUserDataType
+        .ReplaceableUserDataType
     )
       -> String {
       var result = ""
