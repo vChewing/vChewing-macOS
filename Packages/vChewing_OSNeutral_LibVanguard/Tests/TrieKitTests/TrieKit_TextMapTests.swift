@@ -466,6 +466,51 @@ struct TrieKitTextMapTests {
     #expect(trigrams.first?.anterior == "不要")
   }
 
+  @Test("[TrieKit] Type C accepts a wildcard in the previous slot only")
+  func testTextMapTypeCGapRow() throws {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t1
+    KEY_COUNT\t1
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    的\t-8.562\t6\t在|*
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    ㄉㄜ˙\t0\t1
+    """
+
+    let trie: any VanguardTrieProtocol = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+    let grams = trie.queryGrams(["ㄉㄜ˙"], filterType: .init(rawValue: 6))
+    #expect(grams.count == 1)
+    #expect(grams.first?.anterior == "在")
+    #expect(grams.first?.previous == VanguardTrie.Trie.Entry.wildcardContextToken)
+    // 萬用符不得變成 `nil`：那會被當成「沒有前文」，鏈長與計分一併退化。
+    #expect(grams.first?.context.count == 2)
+  }
+
+  @Test("[TrieKit] Type C rejects a wildcard outside the previous slot")
+  func testTextMapTypeCRejectsBadWildcardPlacement() throws {
+    for contextCell in ["*", "*|在"] {
+      let textMap = """
+      #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+      VERSION\t2.0
+      TYPE\tTYPING
+      READING_SEPARATOR\t-
+      ENTRY_COUNT\t1
+      KEY_COUNT\t1
+      #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+      的\t-8.562\t6\t\(contextCell)
+      #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+      ㄉㄜ˙\t0\t1
+      """
+      #expect(throws: (any Error).self) {
+        _ = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+      }
+    }
+  }
+
   @Test("[TrieKit] Type D groups by value and type while preserving expansion order")
   func testTypeDGroupingAndRoundTripOrder() throws {
     let trie = VanguardTrie.Trie(separator: "-")

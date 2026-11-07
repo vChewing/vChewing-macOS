@@ -67,6 +67,13 @@ extension Homa {
 
     // MARK: Public
 
+    /// 前文格之萬用符：該格不指定詞值，其貢獻已聚合進分母。
+    ///
+    /// 只用於「有 anterior、缺 previous」之缺口列（`[x, *]`）。`*` 不得存成 `nil`——
+    /// 存 `nil` 會被當成「沒有這個前文」，鏈長與計分一併退化。格式層只允許它出現在
+    /// 前文鏈之最後一格，且不得單獨成鏈。
+    public static let wildcardContextToken = "*"
+
     /// 元圖識別碼。
     public let id: FIUUID
     public let keyArray: [String]
@@ -78,9 +85,16 @@ extension Homa {
 
     public var isUnigram: Bool { previous == nil && anterior == nil }
 
+    /// 前文鏈之最後一格是否為萬用符（缺口列）。
+    public var hasWildcardPrevious: Bool { previous == Homa.Gram.wildcardContextToken }
+
     /// 該元圖的前文鏈長（1 = 單元圖、2 = 雙元圖、3 = 三元圖）。
     /// - Note: 這是「詞鏈」的長度，不是讀音長度：多音節詞的單元圖仍然是 1。
-    public var chainLength: Int { 1 + (previous == nil ? 0 : 1) + (anterior == nil ? 0 : 1) }
+    /// - Note: 萬用符那一格不算——缺口列 `[x, *]` 只約束一個前文，故鏈長為 2；
+    ///   若把 `*` 也計入，`weightedScore` 會把它當成三元圖而把增益算兩次。
+    public var chainLength: Int {
+      1 + (previous == nil || hasWildcardPrevious ? 0 : 1) + (anterior == nil ? 0 : 1)
+    }
 
     public var description: String {
       describe(keySeparator: "-")

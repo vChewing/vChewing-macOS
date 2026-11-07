@@ -286,6 +286,7 @@ extension VanguardTrie {
           guard (1 ... 2).contains(context.count) else {
             throw makeParseError("TextMap v2.0 supports only one or two context tokens.")
           }
+          try validateContextTokens(context)
           results.append(Trie.Entry(
             value: value,
             typeID: Trie.EntryType(rawValue: typeIDRaw),
@@ -306,6 +307,7 @@ extension VanguardTrie {
         guard context.count <= 2, parts.count == 3 || !context.isEmpty else {
           throw makeParseError("Type-C context must contain one or two tokens when present.")
         }
+        try validateContextTokens(context)
         return [
           Trie.Entry(
             value: value,
@@ -518,6 +520,17 @@ extension VanguardTrie {
     }
 
     /// 只拒絕會破壞文字格式的 Cc／換行；ZWJ 等 Cf 是合法詞值成分。
+    /// 前文鏈之語法：萬用符只准出現在兩格鏈的最後一格。
+    ///
+    /// `[*]`（單元圖已有）與 `[* , y]`（前文在 previous、anterior 不設限）皆屬冗餘或
+    /// 無義之寫法，一律報錯而非靜默接受。
+    private static func validateContextTokens(_ context: [String]) throws {
+      guard context.contains(Trie.Entry.wildcardContextToken) else { return }
+      guard context.count == 2, context[1] == Trie.Entry.wildcardContextToken else {
+        throw makeParseError("Wildcard context token is only allowed as the last of two tokens.")
+      }
+    }
+
     private static func isStructuralControl(_ scalar: UnicodeScalar) -> Bool {
       scalar.properties.generalCategory == .control || CharacterSet.newlines.contains(scalar)
     }

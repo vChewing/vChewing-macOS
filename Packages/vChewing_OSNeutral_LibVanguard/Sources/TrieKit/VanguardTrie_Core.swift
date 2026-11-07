@@ -95,6 +95,12 @@ public enum VanguardTrie {
 
       // MARK: Public
 
+      /// 前文格之萬用符：該格不指定詞值，其貢獻已聚合進分母。
+      ///
+      /// 只用於「有 anterior、缺 previous」之缺口列（`[x, *]`）。格式層只准它出現在
+      /// 兩格前文鏈之最後一格；單獨成鏈或置於 anterior 一格皆屬語法錯誤。
+      public static let wildcardContextToken = "*"
+
       public let value: String
       public let typeID: EntryType
       public let probability: Double

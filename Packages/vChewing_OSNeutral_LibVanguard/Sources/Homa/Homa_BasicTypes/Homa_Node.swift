@@ -238,7 +238,9 @@ extension Homa.Node {
         firstUnigramProbability = gram.probability
         firstUnigramIndex = index
       }
-      guard hasPrevious, gram.previous == previous else { continue }
+      // 缺口列（`[x, *]`）不約束 previous，故不受 hasPrevious 之限；其餘仍須精確匹配。
+      let matchesPrevious = gram.hasWildcardPrevious || (hasPrevious && gram.previous == previous)
+      guard matchesPrevious else { continue }
       // 三元圖：需 exact 匹配前驅二位（anterior 語境存在時才可比對）。
       if let anterior, !anterior.isEmpty, gram.anterior == anterior {
         guard let currentBest = bestTrigram else {
@@ -278,7 +280,9 @@ extension Homa.Node {
       // 無前述內容：語境無從確認，一律以陣列順序的首條單元圖計分（該節點連一條單元圖
       // 都沒有的話，退回首條 gram）。這裡刻意不讀任何殘留選取狀態：右文脈 DP 會對同一
       // 節點以多組前文反覆估值，無前文分數若隨 `currentGramIndex` 漂移，組句就不再可重現。
-      guard hasPrevious else {
+      // 缺口列（`[x, *]`）不需要 previous：只要 anterior 相符即為語境命中，
+      // 故「無 previous」不等於「無語境」。
+      guard hasPrevious || bestBonus != nil else {
         let fallbackProbability = firstUnigramProbability ?? grams[0].probability
         return .init(score: fallbackProbability, targetIndex: firstUnigramIndex ?? 0)
       }

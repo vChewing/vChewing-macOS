@@ -114,6 +114,69 @@ extension HomaTestsRoot {
       #expect(abs(bigram.weightedScore(against: baseline) - -0.6) < 1e-9)
       #expect(abs(trigram.weightedScore(against: baseline) - 0.5) < 1e-9)
     }
+
+    /// 缺口列（`[x, *]`）：previous 不設限、anterior 照常比對。
+    ///
+    /// 此列之存在是為了在 trigram 沒有資料時仍能用到「距離 2」的證據。它必須在
+    /// previous 缺席（DP 正規化成 nil）時照樣命中，否則最需要它的稀疏狀態反而永不觸發。
+    @Test("[Homa] Incoming Context: Gap Row Matches Any Previous")
+    func testGapRowMatchesAnyPrevious() throws {
+      func gram(previous: String?, anterior: String?, probability: Double) -> Homa.Gram {
+        .init(
+          keyArray: ["ㄉㄜ˙"],
+          current: "的",
+          previous: previous,
+          anterior: anterior,
+          probability: probability
+        )
+      }
+      let node = Homa.Node(
+        keyArray: ["ㄉㄜ˙"],
+        grams: [
+          gram(previous: nil, anterior: nil, probability: -1.5),
+          gram(previous: "*", anterior: "在", probability: -0.5),
+        ]
+      )
+      // anterior 相符：無論 previous 是什麼都命中（缺口列在 grams[1]）。
+      #expect(node.evaluate(previous: "隨便", anterior: "在").targetIndex == 1)
+      // previous 缺席（正規化後）仍然命中——這是最需要缺口列的稀疏狀態。
+      #expect(node.evaluate(previous: nil, anterior: "在").targetIndex == 1)
+      // anterior 不符則不命中，退回單元圖。
+      #expect(node.evaluate(previous: "隨便", anterior: "再").targetIndex == 0)
+    }
+
+    /// 缺口列的鏈長只數「受約束」的前文格：`[x, *]` 為 2，不是 3。
+    ///
+    /// 若把萬用符也計入，`weightedScore` 會把增益算兩次，等於讓一條只有單一前文
+    /// 證據的列享有 trigram 的份量。
+    @Test("[Homa] Incoming Context: Gap Row Chain Length")
+    func testGapRowChainLength() throws {
+      let gap = Homa.Gram(
+        keyArray: ["ㄉㄜ˙"], current: "的", previous: "*", anterior: "在", probability: -0.5
+      )
+      #expect(gap.chainLength == 2)
+      #expect(abs(gap.weightedScore(against: -1.5) - -0.5) < 1e-9)
+    }
+
+    /// 端到端：乙案（B01 令「再」勝出）之後，缺口列 `[在, *]` 把「在」扳回來。
+    ///
+    /// 用的正是丙案的右文脈位置，但只約束「距離 2 是『在』」——previous 是「這樣」
+    /// 也好、別的詞也好，都不影響。
+    @Test("[Homa] Incoming Context: Gap Row Restores Earlier Same-Sounding Word")
+    func testGapRowRestoresEarlierSameSoundingWord() throws {
+      let assembler = Self.makeAssembler(withTrigram: false, withGapRow: true)
+      try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
+      #expect(assembler.assemble().values == ["不", "要", "在", "這樣", "的"])
+      #expect(abs(assembler.mostRecentPathScore - -19.209) < 1e-6)
+    }
+
+    /// 同一情境拿掉缺口列之後必須退回「再」，證明翻盤確係該列所致。
+    @Test("[Homa] Incoming Context: Without Gap Row Falls Back")
+    func testWithoutGapRowFallsBack() throws {
+      let assembler = Self.makeAssembler(withTrigram: false)
+      try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
+      #expect(assembler.assemble().values == ["不", "要", "再", "這樣", "的"])
+    }
   }
 }
 
@@ -123,7 +186,8 @@ extension HomaTestsRoot.HomaTests_IncomingContext {
   /// 與 `YukuakiIncomingContextTests` 相同的 mock 辭典（權重皆為示範值、非語料統計）。
   private static func makeAssembler(
     withBigram: Bool = true,
-    withTrigram: Bool = true
+    withTrigram: Bool = true,
+    withGapRow: Bool = false
   )
     -> Homa.Assembler {
     var lines = [
@@ -140,6 +204,8 @@ extension HomaTestsRoot.HomaTests_IncomingContext {
     ]
     if withBigram { lines.append("ㄓㄜˋ-ㄧㄤˋ 這樣 -4.0 再") }
     if withTrigram { lines.append("ㄉㄜ˙ 的 -0.5 這樣 在") }
+    // 缺口列：只約束「距離 2 是『在』」，previous 不設限。
+    if withGapRow { lines.append("ㄉㄜ˙ 的 -0.5 * 在") }
     let mockLX = TestLX(rawData: lines.joined(separator: "\n"))
     return Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
   }
