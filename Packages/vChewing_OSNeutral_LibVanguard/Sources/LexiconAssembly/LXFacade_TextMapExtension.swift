@@ -352,7 +352,18 @@ extension LXAssembly.LXFacade {
         bestByValue[identity] = gram
       }
     }
-    return Array(bestByValue.values)
+    // 以確定序回傳：Dictionary 之迭代序跨行程不保證（Hasher 逐行程加鹽），而
+    // `abbreviatedWordCandidates` 係「先按詞值去重、後排序」——次序一旦不確定，同一份資料
+    // 在兩次啟動之間就會給出不同的名次。按「機率降冪、同分按身分升冪」收斂之後：
+    // ① 輸出可重現；② 先到先得之去重恰好吃到最高分者（與上方「保留最高機率者」同義）。
+    return bestByValue.values.sorted { lhs, rhs in
+      if lhs.probability != rhs.probability { return lhs.probability > rhs.probability }
+      if lhs.current != rhs.current { return lhs.current < rhs.current }
+      if (lhs.previous ?? "") != (rhs.previous ?? "") {
+        return (lhs.previous ?? "") < (rhs.previous ?? "")
+      }
+      return (lhs.anterior ?? "") < (rhs.anterior ?? "")
+    }
   }
 
   func factoryChoppedCoreUnigramsFor(

@@ -1334,6 +1334,10 @@ extension LXAssembly {
       for gram in factoryGrams + userGrams {
         guard gram.keyArray.count <= keysChopped.count else { continue }
         guard !gram.current.isEmpty else { continue }
+        // 本查詢無語境：帶前驗詞鏈之條目（bigram／trigram／缺口列）一律不得進入。
+        // 其分數係條件機率 P(詞｜前文)，在無前文之處無從求值；若放行，等於把條件機率
+        // 當無條件分數用，既會抬高名次、亦可能令「明勝」之自動套用失去語境依據。
+        guard gram.isUnigram else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
         result.append(gram)
       }
