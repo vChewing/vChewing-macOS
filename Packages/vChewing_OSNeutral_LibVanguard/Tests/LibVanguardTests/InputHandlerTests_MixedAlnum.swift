@@ -2666,6 +2666,124 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
+  // MARK: - Shift+/ 之問號寬度（英數閂滯開關）
+
+  /// 閂滯開關啟用、且混打緩衝為空時，Shift+/ 不再刻意敲成半形：
+  /// 該鍵交還既有標點管線，寬度隨「半形標點模式」偏好。
+  @Test(
+    "IH-MixedAlnum-072 Shift slash width follows punctuation pref when latch option is on",
+    arguments: [(halfWidth: false, expected: "？"), (halfWidth: true, expected: "?")]
+  )
+  func test_IH_MixedAlnum_072_ShiftSlashWidthFollowsPunctuationPrefWhenLatchOptionOn(
+    _ scenario: (halfWidth: Bool, expected: String)
+  ) throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    testHandler.prefs.halfWidthPunctuationEnabled = scenario.halfWidth
+    defer {
+      testHandler.prefs.halfWidthPunctuationEnabled = false
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    let shiftQuestion = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "?",
+      charsSansModifiers: "/",
+      keyCode: 44
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftQuestion))
+    #expect(
+      testHandler.mixedAlphanumericalBuffer.isEmpty,
+      "標點管線不得再把 `?` 入混打緩衝，實際得到 `\(testHandler.mixedAlphanumericalBuffer)`"
+    )
+    #expect(
+      testHandler.committableDisplayText(sansReading: true) == scenario.expected,
+      "實際得到 `\(testHandler.committableDisplayText(sansReading: true))`"
+    )
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(
+      testSession.recentCommissions.joined() == scenario.expected,
+      "實際遞交 `\(testSession.recentCommissions.joined())`"
+    )
+  }
+
+  /// 閂滯開關關閉時，Shift+/ 之半形語義**一字不動**——此即既有之刻意操作。
+  @Test("IH-MixedAlnum-073 Shift slash stays half-width when latch option is off")
+  func test_IH_MixedAlnum_073_ShiftSlashStaysHalfWidthWhenLatchOptionOff() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    defer { testHandler.clear() }
+
+    let shiftQuestion = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "?",
+      charsSansModifiers: "/",
+      keyCode: 44
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftQuestion))
+    #expect(testHandler.mixedAlphanumericalBuffer == "?")
+    #expect(testHandler.generateStateOfInputting().displayedText == "?")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "?")
+  }
+
+  /// 閂滯開關啟用、但混打緩衝仍有未判定之英數內容時，Shift+/ 仍維持半形：
+  /// 該段尚未上鎖為英文，不得被中文標點截斷。
+  @Test("IH-MixedAlnum-074 Shift slash stays half-width while mixed buffer is pending")
+  func test_IH_MixedAlnum_074_ShiftSlashStaysHalfWidthWhileMixedBufferPending() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    defer {
+      testHandler.prefs.halfWidthPunctuationEnabled = false
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("ai")
+    #expect(!testHandler.mixedAlnumConfig.isLatchedToAlnum, "前置條件：`ai` 不得觸發上鎖")
+    #expect(testHandler.mixedAlphanumericalBuffer == "ai")
+
+    let shiftQuestion = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "?",
+      charsSansModifiers: "/",
+      keyCode: 44
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftQuestion))
+    #expect(testHandler.mixedAlphanumericalBuffer == "ai?")
+    #expect(testHandler.generateStateOfInputting().displayedText == "ai?")
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "ai?")
+  }
+
+  /// 閂滯於英打時，Shift+/ 仍應即刻遞交半形 `?`：此態與標點寬度偏好無涉。
+  @Test("IH-MixedAlnum-075 Latched alnum still commits half-width Shift slash")
+  func test_IH_MixedAlnum_075_LatchedAlnumStillCommitsHalfWidthShiftSlash() throws {
+    let (testHandler, testSession) = try prepareLatchedMixedModeHandler()
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    defer {
+      testHandler.prefs.halfWidthPunctuationEnabled = false
+      testHandler.prefs.enableLatchedAlnumStateInMixedAlnumMode = false
+      testHandler.clear()
+    }
+
+    typeSentence("ls")
+    #expect(testHandler.mixedAlnumConfig.isLatchedToAlnum)
+    testSession.recentCommissions.removeAll()
+
+    let shiftQuestion = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "?",
+      charsSansModifiers: "/",
+      keyCode: 44
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftQuestion))
+    #expect(
+      testSession.recentCommissions.joined() == "?",
+      "實際遞交 `\(testSession.recentCommissions.joined())`"
+    )
+  }
+
   // MARK: - Test harness
 
   private struct MixedBufferExitScenario: Sendable {

@@ -327,11 +327,17 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若當前鍵（含修飾鍵）在標點詞庫有可用項，
     // 視為 CJK 標點輸入，優先回到既有標點管線處理。
     // 但若目前鍵位本身就是合法注音鍵，則必須讓注音輸入優先。
-    // 僅 Shift+? 需強制保留 ASCII 語義，不回到 CJK 標點管線。
+    // Shift+? 在**未啟用英數閂滯開關**時仍強制保留 ASCII 語義（既有之刻意操作）；
+    // 該開關啟用且混打緩衝為空者，則交還 CJK 標點管線——問號之半形／全形一律由
+    // 「半形標點模式」偏好決定，不另立選項。緩衝非空者仍保留
+    // ASCII 語義，以免尚未上鎖為英文的那一段被中文標點截斷。
     // 其餘 Shift 標點（例如 Shift+` 的 ~）仍需維持既有 CJK 標點查詢能力。
     let punctuationQueryStrings = handler.punctuationQueryStrings(input: input)
     let isShiftQuestionMark = input.isShiftHeld && ["?", "？"].contains(visibleInputText)
-    let matchesCJKPunctuation = !isShiftQuestionMark && isPunctuationChar
+    let routesShiftQuestionMarkToCJKPunctuation =
+      isLatchedAlnumStateEnabled && handler.mixedAlphanumericalBuffer.isEmpty
+    let matchesCJKPunctuation = !(isShiftQuestionMark && !routesShiftQuestionMarkToCJKPunctuation)
+      && isPunctuationChar
       && !isPhoneticKeyRaw && (punctuationQueryStrings?.contains {
         handler.currentLM.lxQuerier.hasUnigrams(for: [$0])
       } ?? false)
