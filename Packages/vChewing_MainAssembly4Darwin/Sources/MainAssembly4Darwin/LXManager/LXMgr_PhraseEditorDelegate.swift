@@ -85,23 +85,54 @@ extension LXMgr: PhraseEditorDelegate {
 
   public func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode) {
     performSyncTaskBypassingCassetteMode {
-      var outputStack: ContiguousArray<String> = .init()
-      for currentLine in strProcessed.split(separator: "\n") {
-        let arr = currentLine.split(separator: " ")
-        guard arr.count >= 2 else { continue }
-        let exists = Self.checkIfPhrasePairExists(
-          userPhrase: arr[0].description, mode: mode,
-          keyArray: arr[1].split(separator: "-").map(\.description),
+      strProcessed = Self.applyOverrideTags(to: strProcessed) { value, keyArray in
+        Self.checkIfPhrasePairExists(
+          userPhrase: value, mode: mode, keyArray: keyArray,
           factoryDictionaryOnly: true,
           cassetteModeAlreadyBypassed: true
         )
-        outputStack.append(currentLine.description)
-        let replace = !currentLine.contains(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") && exists
-        if replace { outputStack.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") }
-        outputStack.append("\n")
       }
-      strProcessed = outputStack.joined()
     }
+  }
+
+  /// 逐列補上 `#𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎` 標記——「整理」路徑之純函式部分，配對查詢以閉包注入。
+  ///
+  /// 三條規矩：① 帶 `#NGRAM` 之列**原樣放行**（不判配對、不追加標記）——該標記之語義是
+  /// 「此（值，讀音）原廠已有」，與 n-gram 列無關；② **兩格以下之列原樣保留**——整理只該
+  /// 正規化格式、不該刪內容（舊制會把這類列連同其斷行一併丟棄）；③ 其餘照舊。
+  static func applyOverrideTags(
+    to text: String,
+    isFactoryPairExisting: (_ value: String, _ keyArray: [String]) -> Bool
+  )
+    -> String {
+    var outputStack: ContiguousArray<String> = .init()
+    for currentLine in text.split(separator: "\n") {
+      let arr = currentLine.split(separator: " ")
+      guard arr.count >= 2, !isNGramRow(currentLine) else {
+        outputStack.append(currentLine.description)
+        outputStack.append("\n")
+        continue
+      }
+      let exists = isFactoryPairExisting(
+        arr[0].description,
+        arr[1].split(separator: "-").map(\.description)
+      )
+      outputStack.append(currentLine.description)
+      let replace = !currentLine.contains(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") && exists
+      if replace { outputStack.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") }
+      outputStack.append("\n")
+    }
+    return outputStack.joined()
+  }
+
+  /// 該列是否為 n-gram 列：任一 `#` 標籤格以 ASCII `NGRAM`（不分大小寫）起首即算。
+  static func isNGramRow(_ line: Substring) -> Bool {
+    for cell in line.split(separator: " ") where cell.hasPrefix("#") {
+      let body = cell.dropFirst()
+      guard body.count >= 5 else { continue }
+      if body.prefix(5).lowercased() == "ngram" { return true }
+    }
+    return false
   }
 
   public func performAsyncTaskBypassingCassetteMode<T>(

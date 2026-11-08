@@ -133,7 +133,11 @@ extension LXAssembly {
       // 載入期暫存：轉換後 key → 行範圍（依檔案行序）。
       let shouldReverse = shouldReverse // 必需，否則下文的 closure 會出錯。
       var protoLineMap: [String: [Range<Int>]] = [:]
+      // 供載入期診斷：資料列之檔案序行號與範圍（診斷於索引建置完成之後另跑，見下）。
+      var diagnosticLines: [(number: Int, range: Range<Int>)] = []
+      var lineNumber = 0
       rawData.parseByteLines { lineRange in
+        lineNumber += 1
         var firstCellRange: Range<Int>?
         var secondCellRange: Range<Int>?
         rawData.parseByteCells(in: lineRange) { currentRange, currentIndex in
@@ -154,6 +158,7 @@ extension LXAssembly {
         var theKey = String(decoding: rawData[keyRange], as: UTF8.self)
         theKey.convertToPhonabets()
         protoLineMap[theKey, default: []].append(lineRange)
+        diagnosticLines.append((lineNumber, lineRange))
       }
       // 依 key bytes 排序建置最終索引；同 key 的行已在暫存階段依檔案行序排列。
       let sortedKeys = protoLineMap.keys.sorted {
@@ -179,6 +184,7 @@ extension LXAssembly {
       entries = newEntries
       // 明確釋放暫存辭典記憶體
       protoLineMap.removeAll(keepingCapacity: false)
+      diagnose(lines: diagnosticLines)
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
@@ -252,25 +258,10 @@ extension LXAssembly {
         for entryIndex in matchedRange {
           let entry = entries[entryIndex]
           let lineRange = Int(entry.lineStart) ..< Int(entry.lineEnd)
-          var firstCellRange: Range<Int>?
-          var secondCellRange: Range<Int>?
-          var thirdCellRange: Range<Int>?
-          rawData.parseByteCells(in: lineRange) { currentRange, currentIndex in
-            switch currentIndex {
-            case 0:
-              firstCellRange = currentRange
-              return true
-            case 1:
-              secondCellRange = currentRange
-              return true
-            case 2:
-              thirdCellRange = currentRange
-              return false
-            default:
-              return false
-            }
-          }
-          guard let firstCellRange, let secondCellRange else { continue }
+          let parsed = parseLine(lineRange)
+          guard let firstCellRange = parsed.firstCell,
+                let secondCellRange = parsed.secondCell
+          else { continue }
           let valueRange = shouldReverse ? firstCellRange : secondCellRange
           let theValue = String(decoding: rawData[valueRange], as: UTF8.self)
           let valueHash = theValue.hashValue
@@ -281,14 +272,31 @@ extension LXAssembly {
             continue
           }
           var theScore: Double
-          if let thirdCellRange, !shouldForceDefaultScore, !rawData[thirdCellRange].contains(0x23) {
-            theScore = .init(String(decoding: rawData[thirdCellRange], as: UTF8.self))
+          if let scoreCell = parsed.scoreCell, !shouldForceDefaultScore,
+             !rawData[scoreCell].contains(0x23) {
+            theScore = .init(String(decoding: rawData[scoreCell], as: UTF8.self))
               ?? defaultScore((keyArray, theValue))
           } else {
             theScore = defaultScore(nil)
           }
           if theScore > 0 {
             theScore *= -1 // 應對可能忘記寫負號的情形
+          }
+          if parsed.gateCount > 0 {
+            // 該列宣告為 n-gram：前文鏈不合格者**整列不生效**——不得落回單元圖，
+            // 否則「宣告了卻寫壞」會靜默地以條件機率充當無條件分數。
+            guard parsed.gateCount == 1, parsed.issue == nil,
+                  let gateCell = parsed.gateCell,
+                  let chain = contextChain(ofGateCell: gateCell)
+            else { continue }
+            grams.append(Homa.Gram(
+              keyArray: keyArray,
+              current: theValue,
+              previous: chain.previous,
+              anterior: chain.anterior,
+              probability: theScore
+            ))
+            continue
           }
           grams.append(Homa.Gram(keyArray: keyArray, value: theValue, score: theScore))
         }
@@ -472,6 +480,21 @@ extension LXAssembly {
 
     // MARK: Private
 
+    // MARK: - n-gram 列（`#NGRAM:前文鏈`）
+
+    /// 一列之標籤區分類結果。
+    private struct LineParse {
+      var firstCell: Range<Int>?
+      var secondCell: Range<Int>?
+      /// 第 2 格若非以 `#` 起首之標籤，即為分數格。
+      var scoreCell: Range<Int>?
+      /// `#NGRAM` 閘門格（重複時取最後一個）。
+      var gateCell: Range<Int>?
+      var gateCount = 0
+      /// 診斷訊息（nil＝本列無問題）。
+      var issue: String?
+    }
+
     /// 轉換後注音 keys 的 UTF-8 位元組 blob（key 經 `convertToPhonabets` 轉換，非原文子字串）。
     private var keyData: [UInt8] = []
     /// 按 key bytes 排序的行索引；同 key 的行依檔案行序排列。
@@ -552,6 +575,125 @@ extension LXAssembly {
         cursor += 1
       }
       return segIndex == cellBytes.count
+    }
+
+    /// `#` 之後是否以 ASCII `NGRAM`（不分大小寫）起首；是則回傳含 `#` 之前綴長度（6）。
+    private func ngramPrefixLength(in cell: Range<Int>) -> Int? {
+      guard cell.count >= 6 else { return nil }
+      let expected: [UInt8] = Array("ngram".utf8)
+      for offset in 0 ..< 5 {
+        var byte = rawData[cell.lowerBound + 1 + offset]
+        if byte >= 0x41, byte <= 0x5A { byte += 0x20 } // ASCII 大寫 → 小寫
+        guard byte == expected[offset] else { return nil }
+      }
+      return 6
+    }
+
+    /// 逐格掃描一列、分類標籤區並辨識 `#NGRAM` 閘門；同時產生載入期診斷。
+    private func parseLine(_ lineRange: Range<Int>) -> LineParse {
+      var result = LineParse()
+      var sawChainLikeCellWithoutGate = false
+      var numericCellAfterTag: Int?
+      rawData.parseByteCells(in: lineRange) { cell, index in
+        switch index {
+        case 0:
+          result.firstCell = cell
+        case 1:
+          result.secondCell = cell
+        default:
+          if rawData[cell.lowerBound] == 0x23 {
+            guard let prefixLength = ngramPrefixLength(in: cell) else { return true }
+            result.gateCount += 1
+            result.gateCell = cell
+            let payloadStart = cell.lowerBound + prefixLength
+            if payloadStart >= cell.upperBound {
+              result.issue = "`#NGRAM` 之後缺 `:前文鏈`"
+            } else if rawData[payloadStart] != 0x3A { // ':'
+              result.issue = "`#NGRAM` 之後須為 `:`（未知變體）"
+            }
+          } else if index == 2 {
+            result.scoreCell = cell
+          } else if rawData[cell].contains(0x7C) { // '|'
+            sawChainLikeCellWithoutGate = true
+          } else if numericCellAfterTag == nil,
+                    Double(String(decoding: rawData[cell], as: UTF8.self)) != nil {
+            numericCellAfterTag = cell.lowerBound
+          }
+        }
+        return true
+      }
+      if result.gateCount > 1 {
+        result.issue = "一列出現 \(result.gateCount) 個 `#NGRAM` 閘門（取最後一個）"
+      } else if result.gateCount == 0, sawChainLikeCellWithoutGate {
+        result.issue = "疑似前文鏈之內容卻無 `#NGRAM` 閘門（將按單元圖讀取）"
+      } else if result.issue == nil, let numericCellAfterTag {
+        result.issue = "分數只能寫在第 2 格（第 \(numericCellAfterTag + 1) 位元組處另有數字）"
+      }
+      if result.issue == nil, let second = result.secondCell {
+        if rawData[second.lowerBound] == 0x23 {
+          result.issue = "讀音格以 `#` 起首（疑似把標籤寫進了讀音格）"
+        } else if Double(String(decoding: rawData[second], as: UTF8.self)) != nil {
+          result.issue = "讀音格是數字（疑似把分數寫進了讀音格）"
+        }
+      }
+      return result
+    }
+
+    /// 取閘門格所載之前文鏈；nil＝不合格。
+    ///
+    /// 鏈由舊至新、以 `|` 分隔；末詞為 `previous`、倒數第二詞為 `anterior`。
+    /// `*` 只准居兩詞鏈之末（缺口列），不得單獨成鏈、亦不得居非末位。
+    private func contextChain(ofGateCell cell: Range<Int>) -> (previous: String, anterior: String?)? {
+      guard let prefixLength = ngramPrefixLength(in: cell) else { return nil }
+      let payloadStart = cell.lowerBound + prefixLength
+      guard payloadStart < cell.upperBound, rawData[payloadStart] == 0x3A else { return nil }
+      let start = payloadStart + 1
+      guard start < cell.upperBound else { return nil }
+      let payload = String(decoding: rawData[start ..< cell.upperBound], as: UTF8.self)
+      let tokens = payload.split(separator: "|", omittingEmptySubsequences: false).map(String.init)
+      guard !tokens.isEmpty, tokens.allSatisfy({ !$0.isEmpty }) else { return nil }
+      let wildcard = Homa.Gram.wildcardContextToken
+      switch tokens.count {
+      case 1:
+        guard tokens[0] != wildcard else { return nil }
+        return (tokens[0], nil)
+      case 2:
+        if tokens[1] == wildcard {
+          guard tokens[0] != wildcard else { return nil }
+          return (wildcard, tokens[0])
+        }
+        guard !tokens.contains(wildcard) else { return nil }
+        return (tokens[1], tokens[0])
+      default:
+        return nil
+      }
+    }
+
+    /// 載入期診斷：僅記錄，不阻斷載入（使用者資料之解析一律「絕不整體失敗」）。
+    private func diagnose(lines: [(number: Int, range: Range<Int>)]) {
+      var seen: [String: Double] = [:]
+      for line in lines {
+        let parsed = parseLine(line.range)
+        if let issue = parsed.issue {
+          let raw = String(decoding: rawData[line.range], as: UTF8.self)
+          vCLMLog("lxCoreEX: 第 \(line.number) 列：\(issue)。原列：\(raw)")
+        }
+        guard let first = parsed.firstCell, let second = parsed.secondCell else { continue }
+        let valueCell = shouldReverse ? first : second
+        let readingCell = shouldReverse ? second : first
+        let value = String(decoding: rawData[valueCell], as: UTF8.self)
+        var reading = String(decoding: rawData[readingCell], as: UTF8.self)
+        reading.convertToPhonabets()
+        let chain = parsed.gateCell.flatMap { contextChain(ofGateCell: $0) }
+        let chainKey = chain.map { [$0.anterior ?? "", $0.previous].joined(separator: "|") } ?? ""
+        let identity = "\(reading)\u{1}\(value)\u{1}\(chainKey)"
+        let score = parsed.scoreCell.flatMap { Double(String(decoding: rawData[$0], as: UTF8.self)) } ?? 0
+        if let existing = seen[identity], existing != score {
+          vCLMLog("lxCoreEX: 第 \(line.number) 列：同一（讀音、詞值、前文鏈）重複且分數不同（先出現者生效）。")
+        } else {
+          seen[identity] = score
+        }
+      }
     }
 
     /// 二分搜尋 key，回傳對應 entries 的範圍（同 key 的行連續排列）。

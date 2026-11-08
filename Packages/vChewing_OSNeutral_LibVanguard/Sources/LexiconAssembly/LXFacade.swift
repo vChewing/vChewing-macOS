@@ -427,7 +427,9 @@ extension LXAssembly {
         keyArray: pair.keyArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: false
       )
-      guard userGrams.contains(where: { $0.current == pair.value }) else { return false }
+      // 只認單元圖：一條純 n-gram 列係「語境偏好」，不是「頻率已釘」——若算作控頻，
+      // 該字之狂拼 α 自動套用會被無故關掉（P266 之閘門語義見 `autoApplyFurious…`）。
+      guard userGrams.contains(where: { $0.isUnigram && $0.current == pair.value }) else { return false }
       let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
       let factoryGrams = factoryChoppedUnigramsFor(
         keyArray: pair.keyArray, entryType: entryType, partiallyMatch: false
@@ -1095,7 +1097,11 @@ extension LXAssembly {
         }
         if flatKeyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.probability).max() {
           userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
-            guard currentUnigram.keyArray.count == 1 else { return currentUnigram }
+            // 加冕只及於單元圖：n-gram 列之分數係作者所寫之條件機率，改寫它會令
+            // 「p > 單元圖基線」那道閘門失效（該列於是變成「有語境即必勝」）。
+            guard currentUnigram.keyArray.count == 1, currentUnigram.isUnigram else {
+              return currentUnigram
+            }
             return Homa.Gram(
               keyArray: currentUnigram.keyArray,
               value: currentUnigram.current,
