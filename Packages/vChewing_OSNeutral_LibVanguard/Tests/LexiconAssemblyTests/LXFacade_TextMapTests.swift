@@ -266,6 +266,48 @@ struct LXFacadeTextMapTests {
   }
 
   @Test
+  func testFactoryDictionaryHonorsTrustedLoadFlag() async throws {
+    let tempDir = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+    defer {
+      try? FileManager.default.removeItem(at: tempDir)
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let malformed = makeTextMap([
+      ("A", [("和", -9.9, 5)]),
+    ]).replacingOccurrences(of: "-9.9", with: "nan")
+    let textMapPath = tempDir.appendingPathComponent("VanguardFactoryDict4Typing.txtMap")
+    try malformed.write(to: textMapPath, atomically: true, encoding: .utf8)
+
+    let originalAsyncLoading = LXAssembly.LXFacade.asyncLoadingUserData
+    LXAssembly.LXFacade.asyncLoadingUserData = false
+    defer {
+      LXAssembly.LXFacade.asyncLoadingUserData = originalAsyncLoading
+    }
+
+    let instance = LXAssembly.LXFacade(isCHS: false)
+    let strictResult: Bool = await withCheckedContinuation { continuation in
+      LXAssembly.LXFacade.connectFactoryDictionary(textMapPath: textMapPath.path) {
+        continuation.resume(returning: $0)
+      }
+    }
+    #expect(!strictResult)
+
+    let trustedResult: Bool = await withCheckedContinuation { continuation in
+      LXAssembly.LXFacade.connectFactoryDictionary(
+        textMapPath: textMapPath.path,
+        validateValues: false
+      ) {
+        continuation.resume(returning: $0)
+      }
+    }
+    #expect(trustedResult)
+    #expect(!instance.hasFactoryCoreUnigramsFor(keyArray: ["A"]))
+  }
+
+  @Test
   func testFactoryDictionaryRejectsBundledExternalRevLookupFixture() throws {
     defer {
       LXAssembly.LXFacade.disconnectFactoryDictionary()

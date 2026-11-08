@@ -19,7 +19,10 @@ extension VanguardTrie {
   public final class TextMapTrie {
     // MARK: Lifecycle
 
-    public init(data: Data) throws {
+    /// - Parameter validateValues: 是否逐行驗證 VALUES 區段。預設 `true`。
+    ///   受信任、且已由 app 簽章保護的 bundled TextMap 可傳 `false` 以省下整段
+    ///   驗證成本；外部匯入的 TextMap 仍應維持 `true`。
+    public init(data: Data, validateValues: Bool = true) throws {
       self.rawData = data
 
       let bounds = try Self.locatePragmaBounds(in: data)
@@ -40,13 +43,15 @@ extension VanguardTrie {
         from: bounds.valuesContentStart,
         to: bounds.keyMapLineStart
       )
-      try Self.validateValueLines(
-        in: data,
-        offsets: valuesLineOffsets,
-        valuesEndOffset: bounds.keyMapLineStart,
-        isTyping: header.isTyping,
-        defaultProbs: header.defaultProbs
-      )
+      if validateValues {
+        try Self.validateValueLines(
+          in: data,
+          offsets: valuesLineOffsets,
+          valuesEndOffset: bounds.keyMapLineStart,
+          isTyping: header.isTyping,
+          defaultProbs: header.defaultProbs
+        )
+      }
       self.valuesLineOffsets = valuesLineOffsets
       self.valuesEndOffset = bounds.keyMapLineStart
 
@@ -367,6 +372,27 @@ extension VanguardTrie.TextMapTrie {
     return offsets
   }
 
+  /// 解析非負十進位 `UInt32`；不接受正負號、空白或非 ASCII 數字。
+  private static func parseDecimalUInt32(
+    _ buffer: UnsafeBufferPointer<UInt8>,
+    from start: Int,
+    to end: Int
+  )
+    -> UInt32? {
+    guard end > start else { return nil }
+    var result: UInt32 = 0
+    for index in start ..< end {
+      let byte = buffer[index]
+      guard byte >= 0x30, byte <= 0x39 else { return nil }
+      let (multiplied, multiplyOverflow) = result.multipliedReportingOverflow(by: 10)
+      guard !multiplyOverflow else { return nil }
+      let (added, addOverflow) = multiplied.addingReportingOverflow(UInt32(byte - 0x30))
+      guard !addOverflow else { return nil }
+      result = added
+    }
+    return result
+  }
+
   private static func parseKeyLineMapContent(
     in data: Data,
     from start: Int,
@@ -408,16 +434,17 @@ extension VanguardTrie.TextMapTrie {
         }
 
         guard let firstTab, let secondTab, firstTab > lowerBound else { return }
-        let startLineRaw = extractString(from: data, start: firstTab + 1, end: secondTab)
-        let countRaw = extractString(from: data, start: secondTab + 1, end: upperBound)
-        guard let startLine = Int(startLineRaw), let count = Int(countRaw) else { return }
+        // 以 byte 直接解析行號與筆數，免去每行兩次 `String` 配置。
+        guard let startLine = parseDecimalUInt32(buffer, from: firstTab + 1, to: secondTab),
+              let count = parseDecimalUInt32(buffer, from: secondTab + 1, to: upperBound)
+        else { return }
 
         entries.append(
           .init(
             keyStart: UInt32(lowerBound),
             keyEnd: UInt32(firstTab),
-            startLine: UInt32(startLine),
-            count: UInt32(count),
+            startLine: startLine,
+            count: count,
             segmentCount: 0 // filled below
           )
         )
@@ -452,7 +479,8 @@ extension VanguardTrie.TextMapTrie {
     }
 
     // Byte-level key initials extraction avoids String/split allocations.
-    var tempGroups: [String: [UInt32]] = [:]
+    // 以 `[UInt8]` 直接作鍵：免去 `String(decoding:)` 的 UTF-8 驗證與物件配置。
+    var tempGroups: [[UInt8]: [UInt32]] = [:]
     let sepByte = separator.asciiValue!
     data.withUnsafeBytes { rawBuffer in
       let initBuf = rawBuffer.bindMemory(to: UInt8.self)
@@ -479,8 +507,7 @@ extension VanguardTrie.TextMapTrie {
             }
           }
         }
-        let initials = String(decoding: initialsBytes, as: UTF8.self)
-        tempGroups[initials, default: []].append(UInt32(nodeID))
+        tempGroups[initialsBytes, default: []].append(UInt32(nodeID))
         entries[idx] = .init(
           keyStart: UInt32(ks),
           keyEnd: UInt32(ke),
@@ -491,8 +518,8 @@ extension VanguardTrie.TextMapTrie {
       }
     }
 
-    let buckets = tempGroups.map { initials, nodeIDs in
-      InitialsBucket(initialsUTF8: ContiguousArray(initials.utf8), nodeIDs: nodeIDs)
+    let buckets = tempGroups.map { initialsBytes, nodeIDs in
+      InitialsBucket(initialsUTF8: ContiguousArray(initialsBytes), nodeIDs: nodeIDs)
     }.sorted { lhs, rhs in
       lhs.initialsUTF8.withUnsafeBufferPointer { lhsBuffer in
         rhs.initialsUTF8.withUnsafeBufferPointer { rhsBuffer in

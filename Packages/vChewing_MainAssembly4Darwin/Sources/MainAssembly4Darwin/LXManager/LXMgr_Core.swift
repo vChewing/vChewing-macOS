@@ -91,8 +91,16 @@ public final class LXMgr {
     Notifier.notify(
       message: "i18n:LXMgr.notification.FactoryLexiconLoadingStarted".i18n
     )
+    // bundled TextMap 住在 app bundle 內、受簽章保護；其逐行 VALUES 驗證可略過，
+    // 以縮短載入時間。外部匯入的工廠辭典（住 App Support）仍維持逐行嚴格驗證。
+    let bundledPath = Self.getBundleDataPath(
+      "VanguardFactoryDict4Typing",
+      factory: true,
+      ext: "txtMap"
+    )
     LXAssembly.LXFacade.connectFactoryDictionary(
-      textMapPath: path
+      textMapPath: path,
+      validateValues: path != bundledPath
     ) { resultBool in
       precondition(resultBool, "vChewing factory TextMap loading failed.")
       #if compiler(>=6.2)

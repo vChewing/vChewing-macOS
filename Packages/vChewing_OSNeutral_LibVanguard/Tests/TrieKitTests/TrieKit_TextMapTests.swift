@@ -685,6 +685,35 @@ struct TrieKitTextMapTests {
     }
   }
 
+  @Test("[TrieKit] Trusted load skips VALUES validation but keeps structural validation")
+  func testTrustedLoadSkipsValueValidation() throws {
+    let malformedValues = makeTextMap(values: ["A\tnan\t6"], keyMap: ["foo\t0\t1"])
+    #expect(throws: (any Error).self) {
+      _ = try VanguardTrie.TextMapTrie(data: Data(malformedValues.utf8))
+    }
+
+    let trusted = try VanguardTrie.TextMapTrie(
+      data: Data(malformedValues.utf8),
+      validateValues: false
+    )
+    // 未驗證的壞列留待惰性解析；解析失敗即視為無詞條，而非讓整個載入失敗。
+    #expect(trusted.queryGrams(["foo"], filterType: .init(rawValue: 6)).isEmpty)
+
+    let missingKeyMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t1
+    KEY_COUNT\t0
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    A\t-1\t6
+    """
+    #expect(throws: (any Error).self) {
+      _ = try VanguardTrie.TextMapTrie(data: Data(missingKeyMap.utf8), validateValues: false)
+    }
+  }
+
   @Test("[TrieKit] Version gate requires explicit 2.0 and empty B sides stay valid")
   func testVersionGateAndEmptyTypingCells() throws {
     for version in [nil, "VERSION\t2.1", "VERSION\t2.0.1"] {

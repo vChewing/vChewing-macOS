@@ -35,6 +35,7 @@ extension LXAssembly.LXFacade {
   public static func connectFactoryDictionary(
     textMapPath: String,
     dropPreviousConnection: Bool = true,
+    validateValues: Bool = true,
     completionHandler: (@Sendable (Bool) -> ())? = nil
   ) {
     if dropPreviousConnection {
@@ -50,7 +51,7 @@ extension LXAssembly.LXFacade {
     if !asyncLoadingUserData {
       do {
         let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
-        factoryTrie = try VanguardTrie.TextMapTrie(data: textMapData)
+        factoryTrie = try VanguardTrie.TextMapTrie(data: textMapData, validateValues: validateValues)
         vCLMLog("Factory TextMap loading complete: \(resolvedTextMapPath)")
         completionHandler?(true)
         return
@@ -65,7 +66,7 @@ extension LXAssembly.LXFacade {
         mainSync {
           do {
             let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
-            let newTrie = try VanguardTrie.TextMapTrie(data: textMapData)
+            let newTrie = try VanguardTrie.TextMapTrie(data: textMapData, validateValues: validateValues)
             factoryTrie = newTrie
             vCLMLog("Factory TextMap async loading complete: \(resolvedTextMapPath)")
             completionHandler?(true)
