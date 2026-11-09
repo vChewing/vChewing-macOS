@@ -188,7 +188,7 @@ extension Homa.Node {
   ///
   /// 這是 `getScore(previous:anterior:)` 的純函式版本：**完全不改動節點狀態**，
   /// 只回報「該得多少分」與「該把選取移到哪一條元圖」。組句的動態規劃需要對同一個
-  /// 節點以多組前文反覆估值（右文脈 DP），若估值帶副作用，則結果會取決於估值順序。
+  /// 節點以多組前文反覆估值（正向文脈 DP），若估值帶副作用，則結果會取決於估值順序。
   internal struct Evaluation {
     /// 此次估值得出的分數。
     internal let score: Double
@@ -202,7 +202,7 @@ extension Homa.Node {
   /// 一旦有比對到相符的雙元／三元圖資料，就會比較其權重與當前節點的權重，並選擇
   /// 權重較高的那個、然後**據此視情況移動這個節點的選取**。
   /// - Important: 這是「估值＋寫回」的合體版，只適合**單一路徑**的場合。需要同時評估
-  ///   多條假設時（右文脈 DP），請改用 `evaluate(previous:anterior:)` 取得純量結果，
+  ///   多條假設時（正向文脈 DP），請改用 `evaluate(previous:anterior:)` 取得純量結果，
   ///   再於確定勝出路徑之後呼叫 `adopt(gram:)`；否則節點狀態會被「最後一次估值」污染。
   /// - Parameters:
   ///   - previous: 前述節點內容，用以查詢可能的雙元圖資料。
@@ -216,8 +216,8 @@ extension Homa.Node {
 
   /// 以給定前文估值，但不改動任何狀態（`getScore(previous:anterior:)` 的純函式版本）。
   ///
-  /// 右文脈 DP 需要對同一個節點以多組前文反覆估值（「在」與「再」兩條假設都得活到
-  /// 右邊的詞進來），若估值本身帶副作用，結果就會取決於估值順序、無法重現。
+  /// 正向文脈 DP 需要對同一個節點以多組前文反覆估值（「在」與「再」兩條假設都得活到
+  /// 後續的詞進來），若估值本身帶副作用，結果就會取決於估值順序、無法重現。
   /// - Parameters:
   ///   - previous: 前述節點內容。
   ///   - anterior: 前述節點再往前一格的內容（可選）。
@@ -278,7 +278,7 @@ extension Homa.Node {
       return .init(score: unigramBaseline, targetIndex: nil)
     default:
       // 無前述內容：語境無從確認，一律以陣列順序的首條單元圖計分（該節點連一條單元圖
-      // 都沒有的話，退回首條 gram）。這裡刻意不讀任何殘留選取狀態：右文脈 DP 會對同一
+      // 都沒有的話，退回首條 gram）。這裡刻意不讀任何殘留選取狀態：正向文脈 DP 會對同一
       // 節點以多組前文反覆估值，無前文分數若隨 `currentGramIndex` 漂移，組句就不再可重現。
       // 缺口列（`[x, *]`）不需要 previous：只要 anterior 相符即為語境命中，
       // 故「無 previous」不等於「無語境」。
@@ -302,7 +302,7 @@ extension Homa.Node {
   }
 
   /// 把 `currentGramIndex` 移到指定元圖上；只移動選取、不動覆寫狀態。
-  /// - Remark: 右文脈 DP 只在**確定的勝出路徑**上呼叫此函式，且時機在整個動態規劃
+  /// - Remark: 正向文脈 DP 只在**確定的勝出路徑**上呼叫此函式，且時機在整個動態規劃
   ///   結束之後——同一節點在推導期間會被多組前文估值，不得被任一組污染。
   internal mutating func adopt(gram: Homa.Gram) {
     guard let index = grams.firstIndex(of: gram) else { return }

@@ -13,7 +13,7 @@ import Testing
 extension HomaTestsRoot {
   /// 節點覆寫型別在組句期間的語義。
   ///
-  /// 與 `Yukuaki` 側的 `YukuakiNodeOverrideTests` 逐條對應：右文脈 DP 會對同一個節點以
+  /// 與 `Yukuaki` 側的 `YukuakiNodeOverrideTests` 逐條對應：正向文脈 DP 會對同一個節點以
   /// 多組前文反覆估值，故「得多少分」與「該選哪一條元圖」必須分開說清楚。兩引擎在這一層
   /// 若有分歧，Lexicon 倉庫組得出來的句子在輸入法裡就打不出來。
   struct HomaTests_NodeOverrideEvaluation: HomaTestSuite {

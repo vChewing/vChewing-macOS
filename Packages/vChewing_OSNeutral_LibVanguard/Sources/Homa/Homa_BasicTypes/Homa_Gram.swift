@@ -147,7 +147,7 @@ extension Homa {
     ///
     /// 之所以要按鏈長計次：在「總分 = 各節點分數之和」的模型裡，若高階 n-gram 的增益
     /// 只算一次，兩條假設的勝負就只取決於各自增益之比（PMI 之比），與詞鏈長度無關。
-    /// 如此一來，長鏈證據與短鏈證據等權，右文脈即使成立也扳不動左文脈。
+    /// 如此一來，長鏈證據與短鏈證據等權，正向文脈即使成立也扳不動負向文脈。
     /// - Parameter baseline: 同名節點之單元圖基線分數（通常是該節點最高分的單元圖）。
     public func weightedScore(against baseline: Double) -> Double {
       baseline + Double(chainLength - 1) * (probability - baseline)

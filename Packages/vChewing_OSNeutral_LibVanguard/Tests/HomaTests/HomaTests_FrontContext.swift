@@ -8,22 +8,22 @@ import Testing
 
 @testable import Homa
 
-// MARK: - HomaTestsRoot.HomaTests_IncomingContext
+// MARK: - HomaTestsRoot.HomaTests_FrontContext
 
 extension HomaTestsRoot {
-  /// 右文脈（incoming context）對組句的影響。
+  /// 正向文脈（front context）對組句的影響。
   ///
-  /// 「右文脈」＝組句當下的左文脈還不足以定案，必須等**右邊**的詞進來才知道該選哪個
-  /// 同音詞。本 suite 與 `Yukuaki` 側的 `YukuakiIncomingContextTests` 逐條對應
+  /// 「正向文脈」＝組句當下的負向文脈還不足以定案，必須等**右邊**的詞進來才知道該選哪個
+  /// 同音詞。本 suite 與 `Yukuaki` 側的 `YukuakiFrontContextTests` 逐條對應
   /// （同一組魔術數字、同一組鍵、同一組斷言），兩個引擎的組句結果必須逐字相同。
   ///
   /// 這三支測試若改回「只以位置為 DP 狀態」的舊演算法，第二支會失敗：「再」在「要」
   /// 後面就先輸給「在」而被砍掉，之後「這樣」帶來的雙元圖加成永遠沒機會生效。
-  struct HomaTests_IncomingContext: HomaTestSuite {
+  struct HomaTests_FrontContext: HomaTestSuite {
     /// 甲案：`curr = [這*] // expecting prev = 在 by default`。
     ///
     /// 沒有任何 n-gram 資料時，「在」以單元圖機率勝出（−5.009 優於 −5.5）。
-    @Test("[Homa] Incoming Context: Default Selection Without N-Grams")
+    @Test("[Homa] Front Context: Default Selection Without N-Grams")
     func testDefaultSelectionWithoutNGrams() throws {
       let assembler = Self.makeAssembler(withBigram: false, withTrigram: false)
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄌㄧˇ"].forEach { try assembler.insertKey($0) }
@@ -35,7 +35,7 @@ extension HomaTestsRoot {
     ///
     /// B01 的可選窗口為 `(−4.709, −3.209)`：低於 −4.709 則扳不過「在」，高於 −3.209
     /// 則丙案的三元圖 T01 再怎麼加分也扳不回來（T01 亦不得為正）。
-    @Test("[Homa] Incoming Context: Bigram Flips Earlier Same-Sounding Word")
+    @Test("[Homa] Front Context: Bigram Flips Earlier Same-Sounding Word")
     func testBigramFlipsEarlierSameSoundingWord() throws {
       let assembler = Self.makeAssembler(withTrigram: false)
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ"].forEach { try assembler.insertKey($0) }
@@ -44,7 +44,7 @@ extension HomaTestsRoot {
     }
 
     /// 乙案之負控：拿掉 B01 之後必須退回「在」，證明翻盤確係 B01 所致。
-    @Test("[Homa] Incoming Context: Without Bigram Falls Back")
+    @Test("[Homa] Front Context: Without Bigram Falls Back")
     func testWithoutBigramFallsBack() throws {
       let assembler = Self.makeAssembler(withBigram: false, withTrigram: false)
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ"].forEach { try assembler.insertKey($0) }
@@ -54,12 +54,12 @@ extension HomaTestsRoot {
     /// 丙案：`curr = 的 while prev = 這樣 // expecting anterior = 在`。
     ///
     /// 三元圖 T01「的|這樣,在」把「在」扳回來；此案僅靠負控才具鑑別力
-    /// （正斷言在舊演算法下亦成立，因為「在」是左文脈的局部最優）。
+    /// （正斷言在舊演算法下亦成立，因為「在」是負向文脈的局部最優）。
     ///
     /// 總分反映計分模型（P326）：`的` 節點以單元圖基線 −1.5 起算，T01 的增益
     /// （原始機率 −0.5，較基線高 1.0）按鏈長 3 計兩次 ⇒ 節點分數 −1.5 + 2.0 = +0.5，
     /// 總分因而由舊模型的 −19.209 提高 1.0 至 −18.209。
-    @Test("[Homa] Incoming Context: Trigram Restores Earlier Same-Sounding Word")
+    @Test("[Homa] Front Context: Trigram Restores Earlier Same-Sounding Word")
     func testTrigramRestoresEarlierSameSoundingWord() throws {
       let assembler = Self.makeAssembler()
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
@@ -68,7 +68,7 @@ extension HomaTestsRoot {
     }
 
     /// 丙案之負控：拿掉 T01 之後必須退回「再」。
-    @Test("[Homa] Incoming Context: Without Trigram Falls Back")
+    @Test("[Homa] Front Context: Without Trigram Falls Back")
     func testWithoutTrigramFallsBack() throws {
       let assembler = Self.makeAssembler(withTrigram: false)
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
@@ -76,7 +76,7 @@ extension HomaTestsRoot {
     }
 
     /// 重複組句不得漂移：語境加分只移動選取、不記成覆寫狀態。
-    @Test("[Homa] Incoming Context: Assembly Is Idempotent")
+    @Test("[Homa] Front Context: Assembly Is Idempotent")
     func testAssemblyIsIdempotent() throws {
       let assembler = Self.makeAssembler()
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
@@ -92,7 +92,7 @@ extension HomaTestsRoot {
     /// - 雙元圖的結果恰為原始機率，與舊模型逐位元相同（既有語料的計分不會漂移）。
     /// - 三元圖把增益算兩次；四階以上再由鏈長自然外推。
     /// - 鏈長數的是「詞鏈」而非讀音：多音節詞的單元圖仍是 1。
-    @Test("[Homa] Incoming Context: Chain-Length Weighting")
+    @Test("[Homa] Front Context: Chain-Length Weighting")
     func testChainLengthWeighting() throws {
       let baseline = -1.5
       func gram(previous: String?, anterior: String?, probability: Double) -> Homa.Gram {
@@ -119,7 +119,7 @@ extension HomaTestsRoot {
     ///
     /// 此列之存在是為了在 trigram 沒有資料時仍能用到「距離 2」的證據。它必須在
     /// previous 缺席（DP 正規化成 nil）時照樣命中，否則最需要它的稀疏狀態反而永不觸發。
-    @Test("[Homa] Incoming Context: Gap Row Matches Any Previous")
+    @Test("[Homa] Front Context: Gap Row Matches Any Previous")
     func testGapRowMatchesAnyPrevious() throws {
       func gram(previous: String?, anterior: String?, probability: Double) -> Homa.Gram {
         .init(
@@ -149,7 +149,7 @@ extension HomaTestsRoot {
     ///
     /// 若把萬用符也計入，`weightedScore` 會把增益算兩次，等於讓一條只有單一前文
     /// 證據的列享有 trigram 的份量。
-    @Test("[Homa] Incoming Context: Gap Row Chain Length")
+    @Test("[Homa] Front Context: Gap Row Chain Length")
     func testGapRowChainLength() throws {
       let gap = Homa.Gram(
         keyArray: ["ㄉㄜ˙"], current: "的", previous: "*", anterior: "在", probability: -0.5
@@ -160,9 +160,9 @@ extension HomaTestsRoot {
 
     /// 端到端：乙案（B01 令「再」勝出）之後，缺口列 `[在, *]` 把「在」扳回來。
     ///
-    /// 用的正是丙案的右文脈位置，但只約束「距離 2 是『在』」——previous 是「這樣」
+    /// 用的正是丙案的正向文脈位置，但只約束「距離 2 是『在』」——previous 是「這樣」
     /// 也好、別的詞也好，都不影響。
-    @Test("[Homa] Incoming Context: Gap Row Restores Earlier Same-Sounding Word")
+    @Test("[Homa] Front Context: Gap Row Restores Earlier Same-Sounding Word")
     func testGapRowRestoresEarlierSameSoundingWord() throws {
       let assembler = Self.makeAssembler(withTrigram: false, withGapRow: true)
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
@@ -171,7 +171,7 @@ extension HomaTestsRoot {
     }
 
     /// 同一情境拿掉缺口列之後必須退回「再」，證明翻盤確係該列所致。
-    @Test("[Homa] Incoming Context: Without Gap Row Falls Back")
+    @Test("[Homa] Front Context: Without Gap Row Falls Back")
     func testWithoutGapRowFallsBack() throws {
       let assembler = Self.makeAssembler(withTrigram: false)
       try ["ㄅㄨˋ", "ㄧㄠˋ", "ㄗㄞˋ", "ㄓㄜˋ", "ㄧㄤˋ", "ㄉㄜ˙"].forEach { try assembler.insertKey($0) }
@@ -180,10 +180,10 @@ extension HomaTestsRoot {
   }
 }
 
-// MARK: - HomaTests_IncomingContext.MockLexicon
+// MARK: - HomaTests_FrontContext.MockLexicon
 
-extension HomaTestsRoot.HomaTests_IncomingContext {
-  /// 與 `YukuakiIncomingContextTests` 相同的 mock 辭典（權重皆為示範值、非語料統計）。
+extension HomaTestsRoot.HomaTests_FrontContext {
+  /// 與 `YukuakiFrontContextTests` 相同的 mock 辭典（權重皆為示範值、非語料統計）。
   private static func makeAssembler(
     withBigram: Bool = true,
     withTrigram: Bool = true,
