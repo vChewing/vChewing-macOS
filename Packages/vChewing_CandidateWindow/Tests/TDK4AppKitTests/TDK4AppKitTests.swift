@@ -378,6 +378,179 @@ struct TDK4AppKitTests {
 
   /// 迴歸鎖定：標籤之**墨跡**應光學居中於其正方形區域（兩側留白相等）。
   /// 舊制以 `ceil` 取整居中、位移恆偏正向，肉眼可見「偏 center-trailing」（實測留白差可達 1.8 點）。
+
+  // MARK: - 候選字 cell 之面積
+
+  /// 迴歸鎖定：任一 cell 之矩形寬度，皆不得小於該格實際繪製所佔之寬度
+  /// （前端內距 ＋ 標籤盒 ＋ 候選字詞），亦不得小於 `requiredCellWidth(padding:)` 所定之
+  /// 面積下限（前者再加尾端內距 4 × padding）。橫排矩陣之「倍數化」只准加寬，不准反過來
+  /// 把字詞截掉——舊制只取倍數化之值，而倍數化之基數（`textDimension`）比實際佔寬小，
+  /// 故當該基數恰為最小格寬之整數倍時，`ceil` 不帶來任何餘裕，字詞遂越出該格之矩形。
+  @Test
+  func testCandidateCellAreaCoversItsContent() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    let candidates: [CandidateInState] = [
+      (keyArray: [""], value: "今天日期"),
+      (keyArray: [""], value: "2026年11月9日"),
+      (keyArray: [""], value: "2026年11月09日"),
+      (keyArray: [""], value: "二〇二六年十一月九日"),
+      (keyArray: [""], value: "26-11-09"),
+      (keyArray: [""], value: "26年11月9日"),
+      (keyArray: [""], value: "26年11月09日"),
+      (keyArray: [""], value: "我"),
+      (keyArray: [""], value: "淺草"),
+      (keyArray: [""], value: "hello"),
+      (keyArray: [""], value: "二十四歲是學生"),
+    ]
+
+    for size in [12, 16, 24, 40] {
+      PrefMgr.shared.candidateListTextSize = size
+      // 最小格寬隨字級浮動，故須逐字級取值（不得在迴圈外取一次）。
+      let minCellWidth = TDK4AppKit.CandidatePool4AppKit.blankCell.cellLength()
+      for layout in [UILayoutOrientation.horizontal, .vertical] {
+        for lines in [1, 4] {
+          let pool = TDK4AppKit.CandidatePool4AppKit(
+            candidates: candidates, lines: lines, isExpanded: true,
+            selectionKeys: "123456789", layout: layout
+          )
+          pool.updateMetrics()
+          // 只有當前頁之 cell 會被排版（其餘之 `visualDimension` 仍為零），故僅就前者斷言。
+          let laidOutCells = pool.candidateLines.flatMap { $0 }
+            .filter { $0.visualDimension.width > 0 }
+          #expect(!laidOutCells.isEmpty, "字級 \(size)／\(layout)／\(lines) 列：應有 cell 完成排版")
+          for cell in laidOutCells {
+            let context = "字級 \(size)／\(layout)／\(lines) 列／「\(cell.displayedText)」"
+            // 繪製佔寬由繪製面之資料獨立算出（不經 `keyAndPhraseWidth`），以資對帳。
+            let footprint = 2 * pool.padding + cell.phraseDrawXOffset
+              + cell.measuredPhraseWidth(isMatrix: false)
+            let required = cell.requiredCellWidth(padding: pool.padding)
+            #expect(
+              cell.visualDimension.width >= footprint,
+              "\(context)：格寬 \(cell.visualDimension.width) 小於繪製佔寬 \(footprint)"
+            )
+            if layout == .horizontal, pool.isMatrix {
+              // 矩陣：格寬恆為最小格寬之整數倍，且該倍數須容得下繪製佔寬。
+              let units = cell.visualDimension.width / minCellWidth
+              #expect(
+                abs(units - units.rounded()) < 0.001,
+                "\(context)：矩陣格寬 \(cell.visualDimension.width) 不是最小格寬 \(minCellWidth) 之整數倍"
+              )
+              // 兩側須先對齊型別：Swift Testing 之 `#expect` 對混型別（`CGFloat` vs `Double`）
+              // 之比較會誤報失敗——實測兩側皆為 90.0 卻報 `false`。
+              #expect(
+                cell.visualDimension.width
+                  == CGFloat(cell.cellWidthMultiplied(minCellWidth: minCellWidth, padding: pool.padding)),
+                "\(context)：矩陣格寬應為繪製佔寬向上取整至最小格寬之整數倍"
+              )
+            } else {
+              // 非矩陣：硬約束須另含尾端內距 4 × padding。
+              #expect(
+                cell.visualDimension.width >= required,
+                "\(context)：格寬 \(cell.visualDimension.width) 小於面積下限 \(required)"
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// 迴歸鎖定（實機病灶）：同一行內「26年11月9日」與「26年11月09日」僅差一個半形 `0`，
+  /// 二者之面積下限並不相同；後者不得沿用前者所分配到之寬度——舊制之下兩者同為 112 點，
+  /// 而「26年11月09日」實需約 126 點，於是其高亮矩形短於字詞、字詞溢入右鄰格。
+  @Test
+  func testDateCandidateCellAreaIsNotBorrowedFromShorterSibling() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    // 該對候選置於首位，以確保單行模式之下二者同落在首頁（未被排版者之寬度為零）。
+    let candidates: [CandidateInState] = [
+      (keyArray: ["ㄐㄧㄣ"], value: "26年11月9日"),
+      (keyArray: ["ㄐㄧㄣ"], value: "26年11月09日"),
+      (keyArray: ["ㄐㄧㄣ"], value: "今天日期"),
+      (keyArray: ["ㄐㄧㄣ"], value: "2026年11月9日"),
+      (keyArray: ["ㄐㄧㄣ"], value: "2026年11月09日"),
+      (keyArray: ["ㄐㄧㄣ"], value: "26-11-09"),
+    ]
+    for size in [16, 24] {
+      PrefMgr.shared.candidateListTextSize = size
+      for lines in [1, 4] {
+        let pool = TDK4AppKit.CandidatePool4AppKit(
+          candidates: candidates, lines: lines, isExpanded: true,
+          selectionKeys: "123456789", layout: .horizontal
+        )
+        pool.updateMetrics()
+        let cells = pool.candidateLines.flatMap { $0 }
+        guard let short = cells.first(where: { $0.displayedText == "26年11月9日" }),
+              let long = cells.first(where: { $0.displayedText == "26年11月09日" })
+        else {
+          Issue.record("字級 \(size)／\(lines) 列：找不到日期候選之 cell")
+          continue
+        }
+        // 佔寬由繪製面之資料獨立算出（不經 `drawFootprintWidth`），以免斷言隨受測函式連動。
+        let shortDrawWidth = 2 * pool.padding + short.phraseDrawXOffset
+          + short.measuredPhraseWidth(isMatrix: false)
+        let longDrawWidth = 2 * pool.padding + long.phraseDrawXOffset
+          + long.measuredPhraseWidth(isMatrix: false)
+        #expect(
+          longDrawWidth > shortDrawWidth,
+          "字級 \(size)／\(lines) 列：「26年11月09日」之繪製佔寬應大於「26年11月9日」"
+        )
+        #expect(
+          long.visualDimension.width >= longDrawWidth,
+          "字級 \(size)／\(lines) 列：「26年11月09日」不得沿用「26年11月9日」之面積"
+        )
+        #expect(
+          short.visualDimension.width >= shortDrawWidth,
+          "字級 \(size)／\(lines) 列：「26年11月9日」之面積亦不得短於其佔寬"
+        )
+        if pool.isMatrix {
+          let minCellWidth = TDK4AppKit.CandidatePool4AppKit.blankCell.cellLength()
+          for cell in [short, long] {
+            let units = cell.visualDimension.width / minCellWidth
+            #expect(
+              abs(units - units.rounded()) < 0.001,
+              "字級 \(size)／\(lines) 列／「\(cell.displayedText)」：矩陣格寬應為最小格寬之整數倍"
+            )
+          }
+        }
+      }
+    }
+  }
+
+  /// 迴歸鎖定：區域編碼以 16 位元（2 bytes）之 LCID 儲存，不得退回 `String`
+  /// （候選字 cell 在極端情形可達千個以上，逐格存 `String` 即逐格多佔 16 bytes、
+  /// 且每次建立字型都要橋接一次 `CFString`）。四個標籤之對位亦一併鎖住。
+  @Test
+  func testCandidateLocaleIsCompactAndMapped() throws {
+    // 實測為 1 byte（編譯器按 case 數縮小儲存）；上限釘在 2 bytes，即 LCID 之 16 位元。
+    #expect(
+      MemoryLayout<TDK4AppKit.CandidateLocale>.size <= 2,
+      "區域編碼每格不得超過 2 bytes（退回 \(String.self) 即 16 bytes）"
+    )
+
+    let cases: [(tag: String, locale: TDK4AppKit.CandidateLocale, lcid: UInt16)] = [
+      ("zh-Hans", .zhHans, 0x0804),
+      ("zh-Hant", .zhHant, 0x0404),
+      ("ja", .ja, 0x0411),
+      ("", .none, 0x0000),
+      ("ko", .none, 0x0000),
+    ]
+    for item in cases {
+      #expect(
+        TDK4AppKit.CandidateLocale(languageTag: item.tag) == item.locale,
+        "「\(item.tag)」應解析為 \(item.locale)"
+      )
+      #expect(item.locale.rawValue == item.lcid, "\(item.locale) 之 LCID 應為 \(item.lcid)")
+    }
+    #expect(TDK4AppKit.CandidateLocale.zhHant.languageTag == "zh-Hant")
+    #expect(TDK4AppKit.CandidateLocale.none.languageTag == nil)
+    #expect(TDK4AppKit.CandidateLocale.none.cfLanguage == nil)
+    #expect(TDK4AppKit.CandidateLocale.ja.cfLanguage == "ja" as CFString)
+  }
+
   @Test
   func testCandidateKeyLabelInkIsCenteredInItsBox() throws {
     let baselineSize = PrefMgr.shared.candidateListTextSize

@@ -11,12 +11,15 @@ import SwiftExtension
 extension TDK4AppKit {
   /// reloadData 去重用的顯示組態快照：任一項變動都必須重建資料池，
   /// 否則會沿用前次建池時的版面、選字鍵、展頁狀態或字型區域設定。
+  /// `textSize` 亦為其中一項：cell 之 `textDimension` 與 `keyAndPhraseWidth`（面積下限）
+  /// 皆於建池時以當下字級定影，字級變更而不重建即令兩者停在舊值。
   struct CandidateDisplayConfig: Equatable {
     var maxLinesPerPage: Int
     var isExpanded: Bool
     var selectionKeys: String
     var layout: UILayoutOrientation
     var locale: String
+    var textSize: Double
   }
 
   // MARK: - CandidatePool
@@ -435,12 +438,16 @@ extension TDK4AppKit {
       layout: UILayoutOrientation = .vertical, locale: String = ""
     ) {
       self.layout = layout
-      Self.blankCell.locale = locale
+      let cellLocale = CandidateLocale(languageTag: locale)
+      Self.blankCell.locale = cellLocale
       self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
       cleanDataOnMain()
       isExpanded = expanded
       var allCandidates = candidates.map {
-        CandidateCellData4AppKit(key: " ", displayedText: $0.value, keyArray: $0.keyArray, segLength: $0.keyArray.count)
+        CandidateCellData4AppKit(
+          key: " ", displayedText: $0.value, keyArray: $0.keyArray,
+          segLength: $0.keyArray.count, locale: cellLocale
+        )
       }
       if allCandidates.isEmpty { allCandidates.append(Self.blankCell) }
       candidateDataAll = allCandidates
@@ -454,11 +461,11 @@ extension TDK4AppKit {
         candidate.whichLine = candidateLines.count
         var isOverflown: Bool = (currentColumn.count == maxLineCapacity) && !currentColumn.isEmpty
         if shouldCalculateRowWidth {
-          // 使用倍數化寬度來計算行容量。
+          // 使用倍數化寬度來計算行容量（與排版時同取 `matrixCellWidth`，兩者不得各算一套）。
           let accumulatedWidth: Double = currentColumn.map {
-            $0.cellWidthMultiplied(minCellWidth: minCellWidth)
+            matrixCellWidth($0, minCellWidth: minCellWidth)
           }.reduce(0, +)
-          let candidateWidth = candidate.cellWidthMultiplied(minCellWidth: minCellWidth)
+          let candidateWidth = matrixCellWidth(candidate, minCellWidth: minCellWidth)
           let remainingSpaceWidth: Double = maxRowWidth - candidateWidth
           isOverflown = isOverflown || accumulatedWidth > remainingSpaceWidth
         }
@@ -468,7 +475,6 @@ extension TDK4AppKit {
           candidate.whichLine += 1
         }
         candidate.subIndex = currentColumn.count
-        candidate.locale = locale
         currentColumn.append(candidate)
         // 寫回資料池（struct 值語義：candidateDataAll 與 candidateLines 各自持有副本）。
         candidateDataAll[i] = candidate
@@ -653,6 +659,17 @@ extension TDK4AppKit.CandidatePool4AppKit {
     return (min, nil)
   }
 
+  /// 橫排矩陣模式中，該格實際分配到之寬度：**恆為最小格寬之整數倍**，
+  /// 且該倍數以該格之繪製佔寬（`drawFootprintWidth(padding:)`）為基、必容得下它。
+  ///
+  /// 舊制以 `textDimension`（「選字鍵 ＋ 一個空白 ＋ 候選字詞」之實測寬）為基——與實際繪製
+  /// 之佔寬不同源，且當該值恰為最小格寬之整數倍時，`ceil` 不帶來任何餘裕，於是
+  /// 「標籤盒 ＋ 候選字詞」遂越出該格之矩形：高亮底色短於字詞、字詞溢入右鄰格。
+  /// 行容量之推算、實際排版與上下鍵之最近格推算三處皆須經此一途，不得各算一套。
+  func matrixCellWidth(_ cell: CandidateCellData4AppKit, minCellWidth: Double) -> Double {
+    cell.cellWidthMultiplied(minCellWidth: minCellWidth, padding: padding)
+  }
+
   func isFilterable(target index: Int) -> Bool {
     let segLength = candidateDataAll[index].segLength
     guard segLength == 1 else { return true }
@@ -765,7 +782,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
       // Horizontal matrix 模式：基於 X 軸位置找最接近的 cell。
       if _maxLinesPerPage > 1 {
         let currentRow = candidateLines[currentLineNumber]
-        result = Self.findClosestSubIndex(
+        result = findClosestSubIndex(
           from: (currentRow, currentSubIndex),
           to: targetRow, minCellWidth: minCellWidth
         )
@@ -786,7 +803,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
       // Horizontal matrix 模式：基於 X 軸位置找最接近的 cell。
       if _maxLinesPerPage > 1 {
         let currentRow = candidateLines[currentLineNumber]
-        result = Self.findClosestSubIndex(
+        result = findClosestSubIndex(
           from: (currentRow, currentSubIndex),
           to: targetRow, minCellWidth: minCellWidth
         )
@@ -832,7 +849,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
 
 extension TDK4AppKit.CandidatePool4AppKit {
   /// 計算從一行移動到另一行時，基於 X 軸位置找到最接近的 cell 的 subIndex。
-  fileprivate static func findClosestSubIndex(
+  fileprivate func findClosestSubIndex(
     from sourceIntel: (row: [CandidateCellData4AppKit], subIndex: Int),
     to targetRow: [CandidateCellData4AppKit], minCellWidth: Double
   )
@@ -842,7 +859,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
     // 計算當前 cell 的 X 軸中心位置。
     var currentCellCenterX: Double = 0
     for (i, cell) in sourceRow.enumerated() {
-      let cellWidth = cell.cellWidthMultiplied(minCellWidth: minCellWidth)
+      let cellWidth = matrixCellWidth(cell, minCellWidth: minCellWidth)
       if i < sourceSubIndex {
         currentCellCenterX += cellWidth
       } else if i == sourceSubIndex {
@@ -855,7 +872,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
     var bestDistance = Double.greatestFiniteMagnitude
     var accumulatedX: Double = 0
     for (i, cell) in targetRow.enumerated() {
-      let cellWidth = cell.cellWidthMultiplied(minCellWidth: minCellWidth)
+      let cellWidth = matrixCellWidth(cell, minCellWidth: minCellWidth)
       let cellCenterX = accumulatedX + cellWidth / 2
       let distance = abs(cellCenterX - currentCellCenterX)
       if distance < bestDistance {
@@ -990,7 +1007,8 @@ extension TDK4AppKit.CandidatePool4AppKit {
         var cellDimension = updatedCell.visualDimension
 
         if layout == .horizontal, isMatrix {
-          cellDimension.width = updatedCell.cellWidthMultiplied(minCellWidth: minCellWidth)
+          // 倍數化只用來對齊欄位；面積下限由 `matrixCellWidth` 一併把關（不得只取倍數化之值）。
+          cellDimension.width = matrixCellWidth(updatedCell, minCellWidth: minCellWidth)
         } else if layout == .vertical || updatedCell.displayedText.count <= 2 {
           cellDimension.width = max(minimumCellDimension.width, cellDimension.width)
         }

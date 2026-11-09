@@ -153,7 +153,8 @@ extension TDK4AppKit {
         isExpanded: delegate.shouldAutoExpandCandidates,
         selectionKeys: delegate.selectionKeys,
         layout: currentLayout,
-        locale: delegate.localeForFontFallbacks
+        locale: delegate.localeForFontFallbacks,
+        textSize: TDK4AppKit.CandidateCellData4AppKit.unifiedSize
       )
       if candidates.isEmpty || !candidatesEqual(candidates, lastCandidates)
         || displayConfig != lastDisplayConfig {

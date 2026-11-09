@@ -59,3 +59,65 @@ extension TDK4AppKit {
     }
   }
 }
+
+// MARK: TDK4AppKit.CandidateLocale
+
+extension TDK4AppKit {
+  /// 選字窗之區域編碼（候選字詞之字型回退用）。
+  ///
+  /// **何以不以 `String` 儲存**：候選字 cell 之數量在極端情形可達千個以上，而區域編碼是
+  /// **每一格都一樣**的東西。逐格存一個 `String` 即逐格多佔 16 bytes（兩個 machine word），
+  /// 且每次建立字型（`CTFontCreateUIFontForLanguage`）都得把它橋接成 `CFString`——那是逐格、
+  /// 逐次排版各一次之橋接開銷。此型別每格只佔 2 bytes，橋接結果則按 case 快取一次。
+  ///
+  /// 原始值取 Windows LCID 之常見值（與同模組之 `CandidateAppearance: Int` 同制）：
+  /// `zh-Hans` ＝ `0x0804`、`zh-Hant` ＝ `0x0404`、`ja` ＝ `0x0411`、不指定 ＝ `0x0000`。
+  /// 值域即 `delegate.localeForFontFallbacks` 之封閉集（`zh-Hans`／`zh-Hant`／`ja`／空字串）；
+  /// 未知之標籤一律歸 `.none`（＝不指定語言、走系統預設回退）。
+  enum CandidateLocale: UInt16, CaseIterable, Sendable {
+    case none = 0x0000
+    case zhHans = 0x0804
+    case zhHant = 0x0404
+    case ja = 0x0411
+
+    // MARK: Lifecycle
+
+    /// 由語言標籤解析。未知之標籤一律歸 `.none`。
+    init(languageTag: String) {
+      switch languageTag {
+      case "zh-Hans": self = .zhHans
+      case "zh-Hant": self = .zhHant
+      case "ja": self = .ja
+      default: self = .none
+      }
+    }
+
+    // MARK: Internal
+
+    /// 該區域之語言標籤；`.none` 為 nil（不指定）。
+    var languageTag: String? {
+      switch self {
+      case .none: return nil
+      case .zhHans: return "zh-Hans"
+      case .zhHant: return "zh-Hant"
+      case .ja: return "ja"
+      }
+    }
+
+    /// 供 `CTFontCreateUIFontForLanguage` 用之語言；橋接後之 `CFString` 每 case 只造一次。
+    var cfLanguage: CFString? {
+      switch self {
+      case .none: return nil
+      case .zhHans: return Self.cfLanguageZHans
+      case .zhHant: return Self.cfLanguageZHant
+      case .ja: return Self.cfLanguageJA
+      }
+    }
+
+    // MARK: Private
+
+    private static let cfLanguageZHans: CFString = "zh-Hans" as CFString
+    private static let cfLanguageZHant: CFString = "zh-Hant" as CFString
+    private static let cfLanguageJA: CFString = "ja" as CFString
+  }
+}

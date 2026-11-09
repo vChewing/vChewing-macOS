@@ -18,20 +18,26 @@ extension TDK4AppKit {
     init(
       key: String, displayedText: String,
       keyArray: [String] = [], segLength: Int? = nil,
-      isSelected: Bool = false
+      isSelected: Bool = false, locale: CandidateLocale = .none
     ) {
       self.selectionKey = key
       self.displayedText = displayedText
       self.keyArray = keyArray
       self.segLength = max(segLength ?? keyArray.count, 1)
       self.isHighlighted = isSelected
+      self.locale = locale
       self.textDimension = .init(
         width: ceil(Self.unifiedCharDimension * 1.4),
         height: Self.unifiedTextHeight
       )
+      self.keyAndPhraseWidth = 0
       if displayedText.count > 1 {
         textDimension.width = makeAttributedString().getBoundingDimension().width
       }
+      // 該格之面積下限只在此處與「繪製所用之字型」同源算出（locale 已就位）：
+      // 候選字詞之字型隨 locale 而異（實測 ja 與 zh-Hant 之同字串寬度不同），
+      // 若日後改以繪製當下才量測，必須一併保證與此處同源。
+      self.keyAndPhraseWidth = keyLabelBoxSide + measuredPhraseWidth(isMatrix: false)
     }
 
     // MARK: Internal
@@ -83,10 +89,15 @@ extension TDK4AppKit {
     var headerDrawXOffset: CGFloat = 0
     var phraseDrawXOffset: CGFloat = 0
 
-    var locale = ""
+    /// 該格之區域編碼（字型回退用）。以 16 位元之 LCID 儲存，理由見 `CandidateLocale`。
+    var locale: CandidateLocale = .none
     var selectionKey: String
     let displayedText: String
     private(set) var textDimension: CGSize
+    /// 該格之內容寬度（不含內距）：選字鍵標籤之正方形區域 ＋ 候選字詞之實測寬度。
+    /// 此即「面積」之唯一真源——`requiredCellWidth(padding:)` 只在其上加計內距。
+    /// 於初期化時以當下之字級與 locale 定影（與 `textDimension` 同制）。
+    private(set) var keyAndPhraseWidth: CGFloat
     var segLength: Int
     /// 該候選字詞的原始讀音鍵陣列，用於讀音 disambiguation 顯示。
     let keyArray: [String]
@@ -144,10 +155,9 @@ extension TDK4AppKit {
 
     var themeColorCocoa: NSColor {
       switch locale {
-      case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: 0.85)
-      case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
-      case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: 0.85)
-      default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+      case .zhHans: return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: 0.85)
+      case .none, .zhHant: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+      case .ja: return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: 0.85)
       }
     }
 
@@ -214,16 +224,45 @@ extension TDK4AppKit {
       return textDimension.width
     }
 
-    /// 計算倍數化後的 cell 寬度。用於 horizontal matrix 模式，確保每個 cell 寬度是最低寬度的倍數。
-    /// - Parameter minCellWidth: 最小 cell 寬度（通常是 blankCell.cellLength()）。
-    /// - Returns: 倍數化後的寬度。
-    func cellWidthMultiplied(minCellWidth: Double) -> Double {
-      guard minCellWidth > 0 else { return textDimension.width }
-      // 對於短文字（≤1 字），使用最小寬度。
-      if displayedText.count <= 1 { return minCellWidth }
-      // 對於長文字，計算需要多少個最小寬度單位。
-      let multiplier = ceil(textDimension.width / minCellWidth)
-      return multiplier * minCellWidth
+    /// 該格之面積下限：前端內距 2 × padding ＋ 標籤盒 ＋ 候選字詞 ＋ 尾端內距 4 × padding。
+    ///
+    /// 此值**不得**再由「前端內距只算一份」之舊式推得（該式會吃掉尾端內距），亦不得
+    /// 以 `textDimension`（＝「選字鍵字串 ＋ 一個空白 ＋ 候選字詞」之實測寬）替代：
+    /// 兩者在繪製面上不是同一個東西——標籤盒係正方形（邊長＝標籤行高）、候選字詞自其右緣
+    /// 起排，故實際佔寬為「標籤盒 ＋ 候選字詞」，與 `textDimension` 之差可達數點。
+    /// 凡計算該格面積者（非矩陣之硬約束、矩陣之倍數化下限）一律經此一途。
+    func requiredCellWidth(padding: CGFloat) -> CGFloat {
+      keyAndPhraseWidth + 6 * padding
+    }
+
+    /// 候選字詞之實測寬度（單行）。`locale` 已就位時，此值與繪製所用之字型同源。
+    func measuredPhraseWidth(isMatrix: Bool = false) -> CGFloat {
+      makeAttributedStringPhrase(isMatrix: isMatrix).getBoundingDimension().width
+    }
+
+    /// 該格之**繪製佔寬**：前端內距 2 × padding ＋ 標籤盒 ＋ 候選字詞（不含尾端內距）。
+    /// 此即「不得截字」之硬下限——矩陣之倍數化以此為基，非矩陣之硬約束另加尾端內距。
+    func drawFootprintWidth(padding: CGFloat) -> CGFloat {
+      2 * padding + keyAndPhraseWidth
+    }
+
+    /// 計算橫排矩陣之 cell 寬度：**恆為最小格寬之整數倍**，且該倍數須容得下該格之繪製佔寬。
+    ///
+    /// 倍數化之基**不得**取 `textDimension`（＝「選字鍵 ＋ 一個空白 ＋ 候選字詞」之實測寬）：
+    /// 繪製面上標籤盒係正方形（邊長＝標籤行高）、候選字詞自其右緣起排，實際佔寬是
+    /// 「標籤盒 ＋ 候選字詞」，兩者相差數點；而 `ceil` 對「恰為整數倍」之基數不帶來任何餘裕，
+    /// 字詞遂越出該格。改以 `drawFootprintWidth(padding:)` 為基之後，倍數化只會加寬、不會截字。
+    /// 尾端內距不在本路徑之約束內（矩陣之尾端內距即該倍數之餘裕，沿既有裁定）。
+    /// - Parameters:
+    ///   - minCellWidth: 最小 cell 寬度（通常是 `blankCell.cellLength()`）。
+    ///   - padding: 該池之內距（前端算 2 份）。
+    /// - Returns: 不小於繪製佔寬、且為 `minCellWidth` 整數倍之寬度。
+    func cellWidthMultiplied(minCellWidth: Double, padding: CGFloat) -> Double {
+      let footprint = drawFootprintWidth(padding: padding)
+      guard minCellWidth > 0 else { return ceil(footprint) }
+      // 單字候選（含全形空白、範本 cell）之佔寬本就小於一個單位，故取一個單位為下限。
+      let units = ceil(max(footprint, minCellWidth) / minCellWidth)
+      return units * minCellWidth
     }
 
     /// 生成組合後的屬性字串（選字鍵 + 候選字詞）。不帶快取；快取統一由資料池管理。
@@ -248,8 +287,8 @@ extension TDK4AppKit {
         .paragraphStyle: Self.sharedParagraphStyle,
         .foregroundColor: fontColorCandidate,
       ]
-      if #available(macOS 12, *) {
-        attrCandidate[.languageIdentifier] = locale as AnyObject
+      if #available(macOS 12, *), let languageTag = locale.languageTag {
+        attrCandidate[.languageIdentifier] = languageTag as AnyObject
       }
       let delta: String = (isMatrix && displayedText.count < 2) ? "  　" : ""
       return NSAttributedString(
@@ -286,10 +325,8 @@ extension TDK4AppKit {
       cellDimension.width += keyLabelBoxSide - fontSizeKey
       // 選字鍵標籤之正方形區域與候選字詞必須同時放得進該格，且尾端一側亦得留足內距：
       // 內容自 2 × padding 起算、依序為標籤盒與候選字詞，尾端另留 4 × padding（經實機目視定案）。
-      // （既有算式在極大字級下本就容不下「標籤 ＋ 字詞」，此處一併收緊。）
-      let keyAndPhraseWidth = keyLabelBoxSide
-        + makeAttributedStringPhrase(isMatrix: false).size().width
-      cellDimension.width = max(cellDimension.width, keyAndPhraseWidth + 6 * padding)
+      // 面積下限之算式住 `requiredCellWidth(padding:)`；此處不得另行就地複寫一份。
+      cellDimension.width = max(cellDimension.width, requiredCellWidth(padding: padding))
       visualDimension = cellDimension
       visualOrigin = currentOrigin
       headerDrawYOffset = ceil(cellDimension.height * 0.2)
@@ -349,14 +386,18 @@ extension TDK4AppKit {
       //      guard result == nil else { break compatibility }
       //    }
       //  }
-      let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
+      let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(
+        .system, size, locale.cfLanguage
+      )
       return defaultResult ?? NSFont.systemFont(ofSize: size)
     }
 
     func phraseFontEmphasized(size: CGFloat? = nil) -> NSFont {
       // 該 Font 不自訂。
       let size: CGFloat = size ?? fontSizeCandidate
-      let result: CTFont? = CTFontCreateUIFontForLanguage(.emphasizedSystem, size, locale as CFString)
+      let result: CTFont? = CTFontCreateUIFontForLanguage(
+        .emphasizedSystem, size, locale.cfLanguage
+      )
       return result ?? NSFont.systemFont(ofSize: size)
     }
   }
