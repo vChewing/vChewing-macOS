@@ -807,26 +807,41 @@ extension InputHandlerProtocol {
 
     if currentTypingMethod == .vChewingFactory,
        let eTenCandidates = segregateCandidatesForETenDOS(from: arrCandidates) {
-      eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode {
-        let seq4ETen = currentLM.lxQuerier.supplementalValues(
-          for: eTenCandidates.reading,
-          strategy: .configuredLookup
-        )
-        guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
-        let arrSeq4ETen: [Homa.CandidatePair] = seq4ETen.map {
-          .init(key: eTenCandidates.reading, value: $0)
-        }
-        arrCandidates = eTenCandidates.longerSegments + deduplicateCandidatesPreservingOrder(
-          arrSeq4ETen + eTenCandidates.singleSegments
-        )
+      // 使用者自訂候選序：其優先權高於倚天中文 DOS 之候選序。
+      // 逐字選字（SCPC）與磁帶模式下不生效：前者之倚天序即其肌肉記憶本體，
+      // 後者之候選由磁帶供給，皆不容使用者序介入。
+      let userSequence: [String] = {
+        guard !prefs.useSCPCTypingMode, typingMode != .cassette else { return [] }
+        return currentLM.lxQuerier.candidateSequenceValues(for: eTenCandidates.reading)
+      }()
+      if !userSequence.isEmpty {
+        // 先求得「若無使用者序時、倚天管線會陳列的單讀音候選」，再以使用者序重排之。
+        let eTenSingles = eTenSequencedSingleSegments(for: eTenCandidates)
+          ?? eTenCandidates.singleSegments
+        arrCandidates = eTenCandidates.longerSegments
+          + applyingCandidateSequence(userSequence, to: eTenSingles)
       } else {
-        let supplementalCandidates = supplementalETenSingleKanjiCandidates(
-          reading: eTenCandidates.reading,
-          existingSingleSegments: eTenCandidates.singleSegments
-        )
-        // 關閉強制排序時，保留既有候選順序，只把倚天獨有的單漢字候選補到尾端。
-        if !supplementalCandidates.isEmpty {
-          arrCandidates.append(contentsOf: supplementalCandidates)
+        eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode {
+          let seq4ETen = currentLM.lxQuerier.supplementalValues(
+            for: eTenCandidates.reading,
+            strategy: .configuredLookup
+          )
+          guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
+          let arrSeq4ETen: [Homa.CandidatePair] = seq4ETen.map {
+            .init(key: eTenCandidates.reading, value: $0)
+          }
+          arrCandidates = eTenCandidates.longerSegments + deduplicateCandidatesPreservingOrder(
+            arrSeq4ETen + eTenCandidates.singleSegments
+          )
+        } else {
+          let supplementalCandidates = supplementalETenSingleKanjiCandidates(
+            reading: eTenCandidates.reading,
+            existingSingleSegments: eTenCandidates.singleSegments
+          )
+          // 關閉強制排序時，保留既有候選順序，只把倚天獨有的單漢字候選補到尾端。
+          if !supplementalCandidates.isEmpty {
+            arrCandidates.append(contentsOf: supplementalCandidates)
+          }
         }
       }
     }
@@ -867,6 +882,55 @@ extension InputHandlerProtocol {
     }
     guard singleReadings.count == 1, let reading = singleReadings.first else { return nil }
     return (singleSegments, longerSegments, reading)
+  }
+
+  /// 倚天中文 DOS 管線下、單讀音候選之最終陳列序。
+  ///
+  /// 使用者自訂候選序須以此為基底：其序只重排、不新增，故須先知道「若無自訂序時
+  /// 倚天管線會陳列哪些候選」。強制排序開啟而倚天表無此讀音時回傳 `nil`，
+  /// 表示「無須更動」（沿用呼叫端既有之候選序）。
+  private func eTenSequencedSingleSegments(
+    for candidates: (
+      singleSegments: [Homa.CandidatePair],
+      longerSegments: [Homa.CandidatePair],
+      reading: String
+    )
+  )
+    -> [Homa.CandidatePair]? {
+    if prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode {
+      let seq4ETen = currentLM.lxQuerier.supplementalValues(
+        for: candidates.reading,
+        strategy: .configuredLookup
+      )
+      guard !seq4ETen.isEmpty else { return nil }
+      let arrSeq4ETen: [Homa.CandidatePair] = seq4ETen.map {
+        .init(key: candidates.reading, value: $0)
+      }
+      return deduplicateCandidatesPreservingOrder(arrSeq4ETen + candidates.singleSegments)
+    }
+    return deduplicateCandidatesPreservingOrder(
+      candidates.singleSegments + supplementalETenSingleKanjiCandidates(
+        reading: candidates.reading,
+        existingSingleSegments: candidates.singleSegments
+      )
+    )
+  }
+
+  /// 以使用者自訂候選序重排單讀音候選：列出的候選依序前置，其餘維持原本之相對順序。
+  /// 序列中查無於候選者一律略過——本表只調次序，不新增辭典內查無的候選。
+  private func applyingCandidateSequence(
+    _ sequence: [String],
+    to candidates: [Homa.CandidatePair]
+  )
+    -> [Homa.CandidatePair] {
+    guard !sequence.isEmpty, !candidates.isEmpty else { return candidates }
+    var remaining = candidates
+    var head: [Homa.CandidatePair] = []
+    sequence.forEach { value in
+      guard let index = remaining.firstIndex(where: { $0.value == value }) else { return }
+      head.append(remaining.remove(at: index))
+    }
+    return head + remaining
   }
 
   private func supplementalETenSingleKanjiCandidates(

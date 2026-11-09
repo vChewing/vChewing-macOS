@@ -395,4 +395,226 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.composer.getInlineCompositionForDisplay(isHanyuPinyin: true) == "z")
     #expect(!testHandler.currentLM.config.partialMatchEnabled)
   }
+
+  @Test("IH-CandidateOrder-009 User sequence reorders single-reading candidates")
+  func test_IH_CandidateOrder_009_UserSequenceReordersSingleReadingCandidates() throws {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let reading = "ㄅㄛ"
+    let eTenSequence = uniqueSingleIdeographicValues(
+      testHandler.currentLM.lxQuerier.supplementalValues(for: reading, strategy: .configuredLookup)
+    )
+    guard eTenSequence.count >= 4 else {
+      Issue.record("倚天中文 DOS 序列表測試資料不足：\(reading)")
+      return
+    }
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    // 辭典權重之降冪為「播、玻」；自訂序反之。另列一個辭典內不存在的「測」以鎖住「不新增候選」。
+    let factoryValues = ["玻", "播"]
+    let textMap = makeTypingTextMap([
+      (
+        reading,
+        [
+          (value: "玻", probability: -5, typeID: factoryTypeID),
+          (value: "播", probability: -4.5, typeID: factoryTypeID),
+        ]
+      ),
+    ])
+
+    defer {
+      testHandler.currentLM.replaceCandidateSequenceData(textData: "")
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
+      testHandler.clear()
+    }
+
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
+    testHandler.clear()
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+    testHandler.currentLM.replaceCandidateSequenceData(
+      textData: "\(reading) 玻 播 測\n"
+    )
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
+
+    let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
+    let eTenExtras = eTenSequence.filter { !factoryValues.contains($0) }
+    #expect(candidateValues == ["玻", "播"] + eTenExtras)
+    #expect(!candidateValues.contains("測"))
+  }
+
+  @Test("IH-CandidateOrder-010 User sequence outranks the ETen sequence")
+  func test_IH_CandidateOrder_010_UserSequenceOutranksETenSequence() throws {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let reading = "ㄅㄛ"
+    let eTenSequence = uniqueSingleIdeographicValues(
+      testHandler.currentLM.lxQuerier.supplementalValues(for: reading, strategy: .configuredLookup)
+    )
+    guard eTenSequence.count >= 4 else {
+      Issue.record("倚天中文 DOS 序列表測試資料不足：\(reading)")
+      return
+    }
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let factoryValues = [eTenSequence[1], eTenSequence[0]]
+    let textMap = makeTypingTextMap([
+      (
+        reading,
+        factoryValues.enumerated().map {
+          (value: $0.element, probability: -5 - Double($0.offset), typeID: factoryTypeID)
+        }
+      ),
+    ])
+
+    defer {
+      testHandler.currentLM.replaceCandidateSequenceData(textData: "")
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
+      testHandler.clear()
+    }
+
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
+    testHandler.clear()
+    testHandler.prefs.enforceETenDOSCandidateSequence = true
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+    let userSequence = [eTenSequence[2], eTenSequence[1]]
+    testHandler.currentLM.replaceCandidateSequenceData(
+      textData: "\(reading) \(userSequence.joined(separator: " "))\n"
+    )
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
+
+    let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
+    let expected = userSequence + eTenSequence.filter { !userSequence.contains($0) }
+    #expect(candidateValues == expected)
+  }
+
+  @Test("IH-CandidateOrder-011 User sequence is inert under SCPC mode")
+  func test_IH_CandidateOrder_011_UserSequenceInertUnderSCPC() throws {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let reading = "ㄅㄛ"
+    let eTenSequence = uniqueSingleIdeographicValues(
+      testHandler.currentLM.lxQuerier.supplementalValues(for: reading, strategy: .configuredLookup)
+    )
+    guard eTenSequence.count >= 4 else {
+      Issue.record("倚天中文 DOS 序列表測試資料不足：\(reading)")
+      return
+    }
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let factoryValues = [eTenSequence[1], eTenSequence[0]]
+    let textMap = makeTypingTextMap([
+      (
+        reading,
+        factoryValues.enumerated().map {
+          (value: $0.element, probability: -5 - Double($0.offset), typeID: factoryTypeID)
+        }
+      ),
+    ])
+
+    defer {
+      testHandler.currentLM.replaceCandidateSequenceData(textData: "")
+      testHandler.prefs.useSCPCTypingMode = false
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
+      testHandler.clear()
+    }
+
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
+    testHandler.clear()
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+    testHandler.currentLM.replaceCandidateSequenceData(
+      textData: "\(reading) \(eTenSequence[2]) \(eTenSequence[3])\n"
+    )
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
+
+    // SCPC 下使用者序不生效：單讀音候選仍為倚天序（SCPC 恆強制倚天序）。
+    let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
+    #expect(candidateValues == eTenSequence)
+  }
+
+  @Test("IH-CandidateOrder-012 User sequence is inert under cassette mode")
+  func test_IH_CandidateOrder_012_UserSequenceInertUnderCassette() throws {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let reading = "ㄅㄛ"
+    let eTenSequence = uniqueSingleIdeographicValues(
+      testHandler.currentLM.lxQuerier.supplementalValues(for: reading, strategy: .configuredLookup)
+    )
+    guard eTenSequence.count >= 4 else {
+      Issue.record("倚天中文 DOS 序列表測試資料不足：\(reading)")
+      return
+    }
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let factoryValues = ["玻", "播"]
+    let textMap = makeTypingTextMap([
+      (
+        reading,
+        [
+          (value: "玻", probability: -5, typeID: factoryTypeID),
+          (value: "播", probability: -4.5, typeID: factoryTypeID),
+        ]
+      ),
+    ])
+
+    defer {
+      testHandler.currentLM.replaceCandidateSequenceData(textData: "")
+      testHandler.prefs.cassetteEnabled = false
+      testHandler.currentLM.syncPrefs()
+      testLX?.disconnectFactoryDictionary()
+      #expect(testLX?.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData) == true)
+      testHandler.clear()
+    }
+
+    testLX?.disconnectFactoryDictionary()
+    #expect(testLX?.connectToTestFactoryDictionary(textMapData: textMap) == true)
+    testHandler.clear()
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+    testHandler.currentLM.replaceCandidateSequenceData(
+      textData: "\(reading) 玻 播\n"
+    )
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
+
+    // 磁帶模式下辭典查詢繞過原廠核心辭典，故先於非磁帶態備妥組字器、再切換模式驗證候選窗之閘門。
+    let beforeSwitch = testHandler.generateArrayOfCandidates().map(\.value)
+    #expect(Array(beforeSwitch.prefix(2)) == ["玻", "播"])
+
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.currentLM.syncPrefs()
+    let cassetteValues = testHandler.generateArrayOfCandidates().map(\.value)
+    let eTenExtras = eTenSequence.filter { !factoryValues.contains($0) }
+    #expect(cassetteValues == ["播", "玻"] + eTenExtras)
+  }
 }

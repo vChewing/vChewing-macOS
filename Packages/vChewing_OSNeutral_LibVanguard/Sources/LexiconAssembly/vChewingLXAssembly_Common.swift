@@ -16,6 +16,9 @@ public enum LXAssembly {
     case theReplacements
     case theAssociates
     case theSymbols
+    /// 使用者自訂候選字詞排序表。格式與語彙表不同（每列「讀音 候選…」），故其編輯界面
+    /// 之插入欄位語義亦不同；但仍屬「可整份置換」之使用者資料，故列入本枚舉。
+    case theCandidateSequence
 
     // MARK: Public
 
@@ -28,6 +31,7 @@ public enum LXAssembly {
       case .theReplacements: return "i18n:PhraseEditor.TabReplacements".i18n
       case .theAssociates: return "i18n:PhraseEditor.TabAssociates".i18n
       case .theSymbols: return "i18n:PhraseEditor.TabSymbols".i18n
+      case .theCandidateSequence: return "i18n:PhraseEditor.TabCandidateSequence".i18n
       }
     }
   }

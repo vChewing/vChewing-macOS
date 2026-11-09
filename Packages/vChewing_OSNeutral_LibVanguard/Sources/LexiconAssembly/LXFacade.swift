@@ -77,6 +77,7 @@ extension LXAssembly {
       lxUserSymbols.locator = locator
       lxAssociates.locator = locator
       lxReplacements.locator = locator
+      lxCandidateSequence.locator = locator
     }
 
     // MARK: Public
@@ -168,6 +169,14 @@ extension LXAssembly {
           value = value.dropFirst().description
         }
         return associatedCandidates(forPairs: pairs)
+      }
+
+      /// 給定讀音之使用者自訂候選序；無此讀音之自訂序時回傳空陣列。
+      ///
+      /// 語義為「該讀音下、使用者想要優先陳列之候選字詞（依序）」。此表不新增候選，
+      /// 只調整辭典既有候選之次序；其優先權高於倚天中文 DOS 候選序。
+      public func candidateSequenceValues(for reading: String) -> [String] {
+        lxFacade.candidateSequenceValues(for: reading)
       }
 
       public func supplementalValues(
@@ -452,6 +461,7 @@ extension LXAssembly {
       lxUserSymbols.clear()
       lxAssociates.clear()
       lxReplacements.clear()
+      lxCandidateSequence.clear()
       unigramLRUCache.removeAll(keepingCapacity: true)
       inputTokenHashesArray.removeAll(keepingCapacity: true)
     }
@@ -580,6 +590,30 @@ extension LXAssembly {
       }
     }
 
+    /// 載入使用者自訂候選字詞排序表。
+    ///
+    /// 與其他使用者資料不同，本表只影響候選窗之陳列次序、不參與組句，故一律同步讀入
+    /// （檔案甚小、且必須在下一拍按鍵之前就緒）。舊資料一律先清除：檔案不存在時即為空表。
+    public func loadCandidateSequenceData(path: String) {
+      lxCandidateSequence.clear()
+      if locator.exists(at: URL(fileURLWithPath: path)) {
+        lxCandidateSequence.open(path)
+        vCLMLog("lxCandidateSequence: \(lxCandidateSequence.count) entries of data loaded from: \(path)")
+      } else {
+        vCLMLog("lxCandidateSequence: File access failure: \(path)")
+      }
+    }
+
+    /// 熱置換候選字詞排序表（不落盤）：供單元測試與宿主就地注入。
+    public func replaceCandidateSequenceData(textData: String) {
+      lxCandidateSequence.replaceData(textData: textData)
+    }
+
+    /// 給定讀音之使用者自訂候選序；無此讀音之自訂序時回傳空陣列。
+    public func candidateSequenceValues(for reading: String) -> [String] {
+      lxCandidateSequence.values(for: reading)
+    }
+
     public func loadUserAssociatesData(path: String) {
       // 無論新檔案是否可讀，都必須先清除舊資料。
       lxAssociates.clear()
@@ -681,6 +715,7 @@ extension LXAssembly {
       case .theReplacements: return lxReplacements.strData
       case .theAssociates: return lxAssociates.strData
       case .theSymbols: return lxUserSymbols.strData
+      case .theCandidateSequence: return lxCandidateSequence.rawText
       }
     }
 
@@ -711,9 +746,12 @@ extension LXAssembly {
       case .theSymbols:
         lxUserSymbols.replaceData(textData: rawText)
         if save { lxUserSymbols.saveData() }
+      case .theCandidateSequence:
+        lxCandidateSequence.replaceData(textData: rawText)
+        if save { lxCandidateSequence.saveData() }
       }
       // LRU cache 必須在熱置換之後失效，否則後續查詢會返回置換前的結果。
-      // 逕行全量失效：五個目標之中僅 `.thePhrases` 與 `.theSymbols` 會餵入 `unigramsFor`，
+      // 逕行全量失效：各目標之中僅 `.thePhrases` 與 `.theSymbols` 會餵入 `unigramsFor`，
       // 但逐項列舉一旦日後新增目標即會漏掉，且熱置換屬人肉操作頻率、全量作廢的代價可忽略。
       unigramLRUCache.removeAll(keepingCapacity: true)
     }
@@ -782,6 +820,8 @@ extension LXAssembly {
     )
     var lxReplacements = LXReplacements()
     var lxAssociates = LXAssociates()
+    /// 使用者自訂候選字詞排序表（只影響候選窗之陳列次序、不參與組句）。
+    var lxCandidateSequence = LXCandidateSequence()
 
     /// 額外掛載的語言模組來源中樞（多來源掛載）。
     /// 預設為空，故對既有行為零影響；宿主可經由 `mountGramSupplier(_:)` 追加來源。
