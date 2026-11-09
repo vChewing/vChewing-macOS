@@ -12,6 +12,7 @@ private let kTemplateNameUserFilterList = "template-exclusions"
 private let kTemplateNameUserSymbolPhrases = "template-usersymbolphrases"
 private let kTemplateNameUserAssociatesCHS = "template-associatedPhrases-chs"
 private let kTemplateNameUserAssociatesCHT = "template-associatedPhrases-cht"
+private let kTemplateNameCandidateSequence = "template-candidate-sequence"
 
 extension LXMgr {
   // MARK: - 獲取原廠核心語彙檔案資料所在路徑（優先獲取 Containers 下的資料檔案）。
@@ -70,6 +71,7 @@ extension LXMgr {
       case .theReplacements: return "phrases-replacement"
       case .theAssociates: return "associatedPhrases"
       case .theSymbols: return "usersymbolphrases"
+      case .theCandidateSequence: return "candidate-sequence"
       }
     }()
     fileName.append((mode == .imeModeCHT) ? "-cht.txt" : "-chs.txt")
@@ -402,27 +404,38 @@ extension LXMgr {
     var migratedCount = 0
     for type in LXAssembly.ReplaceableUserDataType.allCases {
       for mode in Shared.InputMode.validCases {
-        let oldURL = userDictDataURL(mode: mode, type: type, basePath: oldPath)
-        let newURL = userDictDataURL(mode: mode, type: type, basePath: newPath)
-        guard FileManager.default.isReadableFile(atPath: oldURL.path),
-              FileManager.default.isReadableFile(atPath: newURL.path) else { continue }
-        do {
-          // 直接以位元組讀取與拼接：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
-          let oldBytes = [UInt8](try Data(contentsOf: oldURL))
-          let newBytes = [UInt8](try Data(contentsOf: newURL))
-          // 跳過空檔案（byte 層級：全為空白／斷行字元即視為空）。
-          guard !isOnlyWhitespaceAndNewlines(oldBytes) else { continue }
-          var merged = newBytes
-          merged.append(0x0A)
-          merged.append(contentsOf: oldBytes)
-          try Data(merged).write(to: newURL, options: .atomic)
+        if mergeUserDataFile(
+          oldURL: userDictDataURL(mode: mode, type: type, basePath: oldPath),
+          newURL: userDictDataURL(mode: mode, type: type, basePath: newPath),
+          label: "\(type) for \(mode)"
+        ) {
           migratedCount += 1
-        } catch {
-          vCLog("Failed to migrate \(type) for \(mode): \(error)")
         }
       }
     }
     return migratedCount
+  }
+
+  /// 將舊目錄某一份使用者資料併入新目錄之同名檔（新檔內容在前、舊檔內容追加在後）。
+  /// - Returns: 是否實際併入（舊檔不存在、新檔不存在、或舊檔全為空白／斷行時皆為假）。
+  private static func mergeUserDataFile(oldURL: URL, newURL: URL, label: String) -> Bool {
+    guard FileManager.default.isReadableFile(atPath: oldURL.path),
+          FileManager.default.isReadableFile(atPath: newURL.path) else { return false }
+    do {
+      // 直接以位元組讀取與拼接：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+      let oldBytes = [UInt8](try Data(contentsOf: oldURL))
+      let newBytes = [UInt8](try Data(contentsOf: newURL))
+      // 跳過空檔案（byte 層級：全為空白／斷行字元即視為空）。
+      guard !isOnlyWhitespaceAndNewlines(oldBytes) else { return false }
+      var merged = newBytes
+      merged.append(0x0A)
+      merged.append(contentsOf: oldBytes)
+      try Data(merged).write(to: newURL, options: .atomic)
+      return true
+    } catch {
+      vCLog("Failed to migrate \(label): \(error)")
+      return false
+    }
   }
 
   /// 判斷給定位元組是否全為空白／斷行字元（對齊 `CharacterSet.whitespacesAndNewlines` 的 UTF-8 位元組集合）。
@@ -611,6 +624,7 @@ extension LXMgr {
     case .theFilter: return kTemplateNameUserFilterList
     case .theReplacements: return kTemplateNameUserReplacements
     case .theSymbols: return kTemplateNameUserSymbolPhrases
+    case .theCandidateSequence: return kTemplateNameCandidateSequence
     case .theAssociates:
       return mode == .imeModeCHS ? kTemplateNameUserAssociatesCHS : kTemplateNameUserAssociatesCHT
     }

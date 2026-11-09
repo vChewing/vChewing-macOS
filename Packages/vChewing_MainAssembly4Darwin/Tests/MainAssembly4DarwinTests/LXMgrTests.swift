@@ -355,6 +355,56 @@ final class LXMgrTests {
     #expect(Array(merged) == newBytes) // 舊檔未合併，新檔原樣。
   }
 
+  @Test
+  func testMigrateIncludesCandidateSequenceTable() throws {
+    // 候選字詞排序表不屬於可熱置換語彙型別，故其遷移另列一條；合併序與其他使用者資料相同。
+    let (oldDir, newDir) = try Self.makeDirs()
+    defer {
+      try? FileManager.default.removeItem(at: oldDir)
+      try? FileManager.default.removeItem(at: newDir)
+    }
+
+    let mode = Shared.InputMode.imeModeCHT
+    let oldURL = LXMgr.userDictDataURL(mode: mode, type: .theCandidateSequence, basePath: oldDir.path)
+    let newURL = LXMgr.userDictDataURL(mode: mode, type: .theCandidateSequence, basePath: newDir.path)
+    let newBytes = Array("ㄅㄚ 八 巴\n".utf8)
+    let oldBytes = Array("ㄅㄚ 巴 八\n".utf8)
+    try Data(newBytes).write(to: newURL)
+    try Data(oldBytes).write(to: oldURL)
+
+    let migrated = LXMgr.migrateUserDataFrom(oldPath: oldDir.path, to: newDir.path)
+    #expect(migrated == 1)
+    let merged = try Data(contentsOf: newURL)
+    #expect(Array(merged) == newBytes + [0x0A] + oldBytes)
+  }
+
+  @Test
+  func testCandidateSequenceDataURLNamesFollowInputMode() {
+    let base = "/tmp/vChewingTest-candidate-sequence"
+    #expect(
+      LXMgr.userDictDataURL(mode: .imeModeCHT, type: .theCandidateSequence, basePath: base).lastPathComponent
+        == "candidate-sequence-cht.txt"
+    )
+    #expect(
+      LXMgr.userDictDataURL(mode: .imeModeCHS, type: .theCandidateSequence, basePath: base).lastPathComponent
+        == "candidate-sequence-chs.txt"
+    )
+    #expect(
+      LXMgr.userDictDataURL(mode: .imeModeNULL, type: .theCandidateSequence, basePath: base).lastPathComponent
+        == "candidate-sequence-chs.txt"
+    )
+  }
+
+  @Test
+  func testCandidateSequenceTemplateFileIsCreated() throws {
+    // `chkUserLMFilesExist` 亦須確保候選字詞排序表存在（範本在測試宿主內缺席時可為空檔）。
+    let mode = Shared.InputMode.imeModeCHT
+    let url = LXMgr.userDictDataURL(mode: mode, type: .theCandidateSequence)
+    try? FileManager.default.removeItem(at: url)
+    #expect(LXMgr.chkUserLMFilesExist(mode))
+    #expect(FileManager.default.fileExists(atPath: url.path))
+  }
+
   // MARK: Private
 
   private static func makeDirs() throws -> (old: URL, new: URL) {

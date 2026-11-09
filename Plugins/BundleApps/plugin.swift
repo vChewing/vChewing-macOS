@@ -259,8 +259,9 @@ extension BundleAppsPlugin {
 
     // ── Template files ──
     for file in [
-      "template-exclusions.txt", "template-replacements.txt",
-      "template-userphrases.txt", "template-usersymbolphrases.txt",
+      "template-candidate-sequence.txt", "template-exclusions.txt",
+      "template-replacements.txt", "template-userphrases.txt",
+      "template-usersymbolphrases.txt",
     ] {
       try fm.copyItem(at: srcRes.appending(path: file), to: resources.appending(path: file))
     }

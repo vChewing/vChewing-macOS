@@ -183,6 +183,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     case 2: return .theReplacements
     case 3: return .theAssociates
     case 4: return .theSymbols
+    case 5: return .theCandidateSequence
     default: return .thePhrases
     }
   }
@@ -215,7 +216,8 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     txtPEField2.isEnabled = selInputMode != .imeModeNULL && !isLoading
     txtPEField3.isEnabled = selInputMode != .imeModeNULL && !isLoading
     txtPEField3.isHidden = selUserDataType != .thePhrases || isLoading
-    txtPECommentField.isEnabled = selUserDataType != .theAssociates && !isLoading
+    txtPECommentField.isEnabled =
+      ![.theAssociates, .theCandidateSequence].contains(selUserDataType) && !isLoading
   }
 
   func updateLabels() {
@@ -264,6 +266,13 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
       (txtPEField3.cell as? NSTextFieldCell)?.placeholderString = ""
       (txtPECommentField.cell as? NSTextFieldCell)?.placeholderString = PETerminology.AddPhrases
         .locComment.localized.0
+    case .theCandidateSequence:
+      (txtPEField1.cell as? NSTextFieldCell)?.placeholderString = "i18n:Common.Reading".i18n
+      (txtPEField2.cell as? NSTextFieldCell)?.placeholderString = PETerminology.AddPhrases
+        .locCandidateSequenceCandidates.localized.0
+      (txtPEField3.cell as? NSTextFieldCell)?.placeholderString = ""
+      (txtPECommentField.cell as? NSTextFieldCell)?
+        .placeholderString = "i18n:PhraseEditor.InlineCommentsNotSupported".i18n
     }
   }
 
@@ -434,25 +443,39 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
   func addPEButtonClicked(_: NSButton) {
     asyncOnMain { [weak self] in
       guard let this = self else { return }
+      let isCandidateSequence = this.selUserDataType == .theCandidateSequence
       this.txtPEField1.stringValue.removeAll { "　 \t\n\r".contains($0) }
-      if this.selUserDataType != .theAssociates {
+      if this.selUserDataType != .theAssociates, !isCandidateSequence {
         this.txtPEField2.stringValue.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
       }
+      if isCandidateSequence {
+        // 本表以空白分欄：收斂連續空白並去首尾，其餘原樣。
+        this.txtPEField2.stringValue = this.txtPEField2.stringValue
+          .split(whereSeparator: { $0.isWhitespace })
+          .joined(separator: " ")
+      }
       this.txtPEField2.stringValue.removeAll {
-        this.selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
+        if this.selUserDataType == .theAssociates || isCandidateSequence {
+          return "\n\r".contains($0)
+        }
+        return "　 \t\n\r".contains($0)
       }
       this.txtPEField3.stringValue.removeAll { !"0123456789.-".contains($0) }
       this.txtPECommentField.stringValue.removeAll { "\n\r".contains($0) }
       guard !this.txtPEField1.stringValue.isEmpty,
             !this.txtPEField2.stringValue.isEmpty else { return }
       var arrResult: [String] = [this.txtPEField1.stringValue, this.txtPEField2.stringValue]
-      if let weightVal = Double(this.txtPEField3.stringValue), weightVal < 0 {
-        arrResult.append(weightVal.description)
+      if !isCandidateSequence {
+        if let weightVal = Double(this.txtPEField3.stringValue), weightVal < 0 {
+          arrResult.append(weightVal.description)
+        }
+        if !this.txtPECommentField.stringValue
+          .isEmpty { arrResult.append("#" + this.txtPECommentField.stringValue) }
       }
-      if !this.txtPECommentField.stringValue
-        .isEmpty { arrResult.append("#" + this.txtPECommentField.stringValue) }
       var resultTaggable = arrResult.joined(separator: " ")
-      SettingsUIHost.shared.tagOverrides(&resultTaggable, this.selInputMode)
+      if !isCandidateSequence {
+        SettingsUIHost.shared.tagOverrides(&resultTaggable, this.selInputMode)
+      }
       if let lastChar = this.tfdPETextEditor.string.last, !"\n".contains(lastChar) {
         resultTaggable.insert("\n", at: resultTaggable.startIndex)
       }
@@ -473,6 +496,7 @@ private enum PETerminology {
     case locReplaceTo = "i18n:Common.ReplaceTo"
     case locAdd = "i18n:Common.Add"
     case locInitial = "i18n:Common.Initial"
+    case locCandidateSequenceCandidates = "i18n:PhraseEditor.CandidatesInOrder"
 
     // MARK: Public
 
@@ -508,6 +532,8 @@ private enum PETerminology {
       case .theAssociates:
         result = "i18n:PhraseEditor.ExampleAssociates".i18n
       case .theSymbols: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+      case .theCandidateSequence:
+        result = "i18n:PhraseEditor.ExampleCandidateSequence".i18n
       }
       return result
     }

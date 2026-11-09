@@ -153,6 +153,9 @@ public final class LXMgr {
           filterPath: userDictDataURL(mode: mode, type: .theFilter).path,
           async: async
         )
+        mode.lexicon.loadCandidateSequenceData(
+          path: userDictDataURL(mode: mode, type: .theCandidateSequence).path
+        )
         mode.lexicon.loadUserSymbolData(path: userDictDataURL(mode: mode, type: .theSymbols).path)
         mode.lexicon.pomReducedLifetime = PrefMgr.shared.reducePOMLifetimeToNoMoreThan12Hours
         mode.lexicon.loadPOMData()
@@ -188,6 +191,10 @@ public final class LXMgr {
       case .theSymbols:
         mode.lexicon.loadUserSymbolData(
           path: Self.userDictDataURL(mode: mode, type: .theSymbols).path
+        )
+      case .theCandidateSequence:
+        mode.lexicon.loadCandidateSequenceData(
+          path: Self.userDictDataURL(mode: mode, type: .theCandidateSequence).path
         )
       }
     }

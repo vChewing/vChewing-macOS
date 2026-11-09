@@ -542,8 +542,9 @@ extension BundleAppsLegacyPlugin {
 
     // ── Template files ──
     for file in [
-      "template-exclusions.txt", "template-replacements.txt",
-      "template-userphrases.txt", "template-usersymbolphrases.txt",
+      "template-candidate-sequence.txt", "template-exclusions.txt",
+      "template-replacements.txt", "template-userphrases.txt",
+      "template-usersymbolphrases.txt",
     ] {
       try fm.copyItem(
         at: srcRes.appendingPathComponent(file),

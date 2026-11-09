@@ -3842,19 +3842,19 @@
       "key" : "kEnforceETenDOSCandidateSequence",
       "labels" : {
         "en" : {
-          "description" : "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting.",
+          "description" : "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting. That order can still be overridden by per-reading definitions under \"Phrase Editor → Candidate Order\".",
           "shortTitle" : "Enforce Eten DOS Sequence on all single-kanji candidates"
         },
         "ja" : {
-          "description" : "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。",
+          "description" : "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。ただし、この順序は「辞書編集 → 候補順序」の読みごとの定義で上書きできます。",
           "shortTitle" : "単漢字候補の陳列順番を倚天中国語DOS順に強制する"
         },
         "zh-Hans" : {
-          "description" : "对敝输入法的候选字的顺序有着强烈的手动调整之需求的使用者们往往都是从倚天中文 DOS 开始积累了对候选字的直觉记忆、希望能使用这种候选字排序，故提供该选项。逐字选字模式会始终遵循该排序特性，不受该开关所影响。",
+          "description" : "对敝输入法的候选字的顺序有着强烈的手动调整之需求的使用者们往往都是从倚天中文 DOS 开始积累了对候选字的直觉记忆、希望能使用这种候选字排序，故提供该选项。逐字选字模式会始终遵循该排序特性，不受该开关所影响。惟此顺序仍可被「语汇编辑器 → 候选顺序」内针对个别读音之定义覆写。",
           "shortTitle" : "对所有单汉字候选字强制施加倚天中文DOS系统排序"
         },
         "zh-Hant" : {
-          "description" : "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。",
+          "description" : "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。惟此順序仍可被「語彙編輯器 → 候選順序」內針對個別讀音之定義覆寫。",
           "shortTitle" : "對所有單漢字候選字強制施加倚天中文DOS系統排序"
         }
       },

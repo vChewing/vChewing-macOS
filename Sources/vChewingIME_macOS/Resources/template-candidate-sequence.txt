@@ -1,0 +1,23 @@
+# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍
+# 本檔案可自訂「單一讀音」下之候選字詞順序。每行一個讀音：先寫讀音（後置聲調註記之注音讀音），再依序寫候選字詞，彼此以半形空白分隔。
+# 本文件可自订「单一读音」下的候选字词顺序。每行一个读音：先写读音（后置声调注记之注音读音），再依序写候选字词，彼此以半角空白分隔。
+# このファイルでは「単一の読み」における候補の順序をカスタマイズできます。一行につき一つの読み：まず読み（後置声調記号付きの注音読み）を書き、次に候補を並べます（半角空白区切り）。
+# This file customizes the candidate order under a single reading. One reading per line: write the reading (Zhuyin with trailing intonation mark), then the candidates in order, separated by ASCII spaces.
+#
+#    ㄅㄚ 八 巴 吧
+#    ㄗㄞˋ 在 再
+#
+# 列出的候選會依序排到最前面；其餘候選維持原本的相對順序接在其後。本表只調整既有候選之順序、不新增辭典內查無的候選。
+# 列出的候选会依序排到最前面；其余候选维持原本的相对顺序接在其后。本表只调整既有候选的顺序、不新增辞典内查无的候选。
+# 列挙した候補はその順に先頭へ並びます。残りの候補は元の相対順序のままその後に続きます。本表は既存候補の順序だけを調整し、辞書に無い候補は追加しません。
+# Listed candidates are moved to the front in the given order; the rest keep their original relative order after them. This table only reorders existing candidates and never adds candidates absent from the dictionaries.
+#
+# 本表之優先權高於倚天中文 DOS 候選序；逐字選字模式與磁帶模式下不套用本表。同一讀音出現多行時，以最後一行為準。
+# 本表之优先权高于倚天中文 DOS 候选序；逐字选字模式与磁带模式下不套用本表。同一读音出现多行时，以最后一行为准。
+# 本表は倚天中文 DOS の候補順より優先されます。逐字選字モードとカセットモードでは本表を適用しません。同じ読みが複数行にある場合は最後の行が有効です。
+# This table outranks the ETen DOS candidate sequence. It is not applied in the per-character selection (SCPC) mode or the cassette mode. If a reading appears on more than one line, the last line wins.
+#
+# 如果任何一行以半形英數「#」開頭，則該行將被忽略。
+# 如果任何一行以半角英数「#」开头，则该行将被忽略。
+# 頭文字が半角英数「#」の行は効けません。
+# Lines beginning with an ASCII sharp symbol are omitted.

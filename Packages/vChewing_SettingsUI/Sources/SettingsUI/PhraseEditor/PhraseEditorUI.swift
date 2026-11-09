@@ -103,6 +103,9 @@
             Text(LXAssembly.ReplaceableUserDataType.theSymbols.localizedDescription).tag(
               LXAssembly.ReplaceableUserDataType.theSymbols
             )
+            Text(LXAssembly.ReplaceableUserDataType.theCandidateSequence.localizedDescription).tag(
+              LXAssembly.ReplaceableUserDataType.theCandidateSequence
+            )
           }
           .labelsHidden()
           Spacer()
@@ -136,7 +139,7 @@
         }
 
         VStack(spacing: 4) {
-          if selUserDataType != .theAssociates {
+          if ![.theAssociates, .theCandidateSequence].contains(selUserDataType) {
             HStack {
               TextField(lblAddPhraseTag4, text: $txtAddPhraseField4)
                 .autocorrectionDisabled(true)
@@ -297,27 +300,46 @@
         lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
         lblAddPhraseTag3 = ""
         lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+      case .theCandidateSequence:
+        lblAddPhraseTag1 = "i18n:Common.Reading".i18n
+        lblAddPhraseTag2 = PETerms.AddPhrases.locCandidateSequenceCandidates.localized.0
+        lblAddPhraseTag3 = ""
+        lblAddPhraseTag4 = ""
       }
     }
 
     private func insertEntry() {
+      let isCandidateSequence = selUserDataType == .theCandidateSequence
       txtAddPhraseField1.removeAll { "　 \t\n\r".contains($0) }
-      if selUserDataType != .theAssociates {
+      if selUserDataType != .theAssociates, !isCandidateSequence {
         txtAddPhraseField2.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
       }
+      if isCandidateSequence {
+        // 本表以空白分欄：收斂連續空白並去首尾，其餘原樣。
+        txtAddPhraseField2 = txtAddPhraseField2
+          .split(whereSeparator: { $0.isWhitespace })
+          .joined(separator: " ")
+      }
       txtAddPhraseField2.removeAll {
-        selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
+        if selUserDataType == .theAssociates || isCandidateSequence {
+          return "\n\r".contains($0)
+        }
+        return "　 \t\n\r".contains($0)
       }
       txtAddPhraseField3.removeAll { !"0123456789.-".contains($0) }
       txtAddPhraseField4.removeAll { "\n\r".contains($0) }
       guard !txtAddPhraseField1.isEmpty, !txtAddPhraseField2.isEmpty else { return }
       var arrResult: [String] = [txtAddPhraseField1, txtAddPhraseField2]
-      if let weightVal = Double(txtAddPhraseField3), weightVal < 0 {
-        arrResult.append(weightVal.description)
+      if !isCandidateSequence {
+        if let weightVal = Double(txtAddPhraseField3), weightVal < 0 {
+          arrResult.append(weightVal.description)
+        }
+        if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
       }
-      if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
       var resultTaggable = arrResult.joined(separator: " ")
-      delegate?.tagOverrides(in: &resultTaggable, mode: selInputMode)
+      if !isCandidateSequence {
+        delegate?.tagOverrides(in: &resultTaggable, mode: selInputMode)
+      }
       if let lastChar = txtContent.last, !"\n".contains(lastChar) {
         resultTaggable.insert("\n", at: resultTaggable.startIndex)
       }
@@ -384,6 +406,7 @@
       case locReplaceTo = "i18n:Common.ReplaceTo"
       case locAdd = "i18n:Common.Add"
       case locInitial = "i18n:Common.Initial"
+      case locCandidateSequenceCandidates = "i18n:PhraseEditor.CandidatesInOrder"
 
       // MARK: Public
 
@@ -419,6 +442,8 @@
         case .theAssociates:
           result = "i18n:PhraseEditor.ExampleAssociates".i18n
         case .theSymbols: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+        case .theCandidateSequence:
+          result = "i18n:PhraseEditor.ExampleCandidateSequence".i18n
         }
         return result
       }
