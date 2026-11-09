@@ -1771,16 +1771,16 @@
       "key" : "kCNS11643Enabled",
       "labels" : {
         "en" : {
-          "shortTitle" : "Enable CNS+GBEX Mode Support (2026-08-10)"
+          "shortTitle" : "Enable CNS+GBEX Mode Support (2026-10-05)"
         },
         "ja" : {
-          "shortTitle" : "CNS+GBEXモード支援を有効にする (2026-08-10)"
+          "shortTitle" : "CNS+GBEXモード支援を有効にする (2026-10-05)"
         },
         "zh-Hans" : {
-          "shortTitle" : "启用 CNS+GBEX 模式支援 (2026-08-10)"
+          "shortTitle" : "启用 CNS+GBEX 模式支援 (2026-10-05)"
         },
         "zh-Hant" : {
-          "shortTitle" : "啟用 CNS+GBEX 模式支援 (2026-08-10)"
+          "shortTitle" : "啟用 CNS+GBEX 模式支援 (2026-10-05)"
         }
       },
       "metadataPending" : false,
