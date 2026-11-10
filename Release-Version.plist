@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleShortVersionString</key>
-	<string>5.0.0</string>
+	<string>5.0.1</string>
 	<key>CFBundleVersion</key>
-	<string>5000</string>
+	<string>5010</string>
 </dict>
 </plist>
