@@ -236,6 +236,7 @@
 "i18n:PhraseOperation.NerfUserPhraseSucceeded" = "- この文節の（候補としての）優先順位を下げました。";
 "i18n:PhraseOperation.PhraseReplacementInterfering" = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "i18n:PhraseOperation.UnfilterPhraseSucceeded" = "- この文節は排除リストから外しました。";
+"i18n:PhraseOperation.UserDataWriteFailed" = "⚠︎ ユーザー語彙データの書き込みに失敗したため、今回の操作は反映されていません。";
 "i18n:PinyinZhuyinTypingMode.Pinyin" = "弁音モード";
 "i18n:PinyinZhuyinTypingMode.Zhuyin" = "注音モード";
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、唯音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで唯音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで唯音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで唯音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。\n\nホ）一部のユーザーから、関連する実行中のアプリやサービス（特にパスワードマネージャー、macCatalyst ベースのパスワードログイン作業、またはシェル経由のパスワードログイン作業）を終了し、その後に画面／現在のユーザーセッションをロックして再度解除すると、今回の問題が緩和されたとの報告があります。";

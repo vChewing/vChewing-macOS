@@ -473,6 +473,63 @@ final class LXMgrTests {
     #expect(FileManager.default.fileExists(atPath: url.path))
   }
 
+  // MARK: - 增量套用與寫入失敗之通報（P346）
+
+  /// 增量套用：只把該列收進記憶體索引，不必整檔重載。
+  @Test
+  func test026_LXMgr_UserPhraseRowAppliesIncrementally() {
+    let mode = Shared.InputMode.imeModeCHT
+    let keyArray = ["ㄑㄩㄝˋ", "ㄕˊ"]
+    let value = "乂乂乂乂"
+    let row = "\(value) \(keyArray.joined(separator: "-"))"
+    defer { _ = mode.lexicon.removeFilteredUserDataRow(row) }
+
+    let applied = LXMgr.applyUserPhraseRowIncrementally(
+      row: (primary: row, converted: row),
+      inputMode: mode,
+      kind: .append,
+      isFiltering: true
+    )
+    #expect(applied)
+    #expect(LXMgr.checkIfPhrasePairIsFiltered(userPhrase: value, mode: mode, keyArray: keyArray))
+  }
+
+  /// 寫入失敗須經可指派之 lambda 通報（宿主於啟動時指派為 Notifier）。
+  @Test
+  func test027_LXMgr_UserDataWriteFailureIsReported() async throws {
+    let mode = Shared.InputMode.imeModeCHT
+    let phrasesURL = LXMgr.userDictDataURL(mode: mode, type: .thePhrases)
+    // 讓目標路徑成為目錄：寫入必然失敗。
+    try? FileManager.default.removeItem(at: phrasesURL)
+    try FileManager.default.createDirectory(at: phrasesURL, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: phrasesURL) }
+
+    var capturedReasons: [String] = []
+    var reporterRanOnMainThread = false
+    let previousReporter = LXMgr.userDataWriteFailureReporter
+    LXMgr.userDataWriteFailureReporter = { reason in
+      capturedReasons.append(reason)
+      reporterRanOnMainThread = isOnMainQueue()
+    }
+    defer { LXMgr.userDataWriteFailureReporter = previousReporter }
+
+    let phrase = UserPhraseInsertable(
+      keyArray: ["ㄐㄧㄚ", "ㄓㄨ"],
+      value: "家主",
+      inputMode: mode
+    )
+    let accepted = LXMgr.writeUserPhrasesAtOnce(phrase, areWeFiltering: false)
+    #expect(accepted, "受理與落盤成敗脫鉤：受理即返回。")
+    LXAssembly.drainUserDataWriteQueue()
+    for _ in 0 ..< 200 where capturedReasons.isEmpty {
+      await Task.yield()
+      try? await Task.sleep(nanoseconds: 5_000_000)
+    }
+    #expect(capturedReasons.count == 1, "失敗須通報一次。")
+    #expect(capturedReasons.first?.isEmpty == false)
+    #expect(reporterRanOnMainThread, "通報須在主執行緒上為之（Notifier 需主執行緒）。")
+  }
+
   // MARK: Private
 
   private static func makeDirs() throws -> (old: URL, new: URL) {

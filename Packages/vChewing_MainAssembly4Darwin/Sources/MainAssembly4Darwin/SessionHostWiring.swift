@@ -24,6 +24,13 @@ extension SessionHost {
     host.isStateDataFilterableForMarked = { LXMgr.isStateDataFilterableForMarked($0) }
     host.savePerceptionOverrideModelData = { LXMgr.savePerceptionOverrideModelData(false) }
     host.writeUserPhrasesAtOnce = { LXMgr.writeUserPhrasesAtOnce($0, areWeFiltering: $1) }
+    // 使用者資料寫入失敗之通報（P346）：落盤已在寫入巷上非同步完成，其成敗不可能再回傳給
+    // 當初那次按鍵——故經此可指派之 lambda 轉給 Notifier。未指派時只記日誌。
+    LXMgr.userDataWriteFailureReporter = { reason in
+      // 使用者可見之文案一律 i18n（不得夾帶英文診斷字串）；診斷只進日誌。
+      vCLog("UserDataWrite: \(reason)")
+      Notifier.notify(message: "i18n:PhraseOperation.UserDataWriteFailed".i18n)
+    }
     host.bleachSpecifiedSuggestions = { targets, headReadings, mode in
       if let headReadings, !headReadings.isEmpty {
         LXMgr.bleachSpecifiedSuggestions(headReadings: headReadings, mode: mode)

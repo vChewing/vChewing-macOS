@@ -732,6 +732,37 @@ extension LXAssembly {
       unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
+    /// 就地在記憶體索引內追加一列使用者資料：**不重讀整檔、不重解析既有列**。
+    ///
+    /// 供「就地加詞／濾除」之落盤成功後即時套用：落盤端已把同一列寫進檔案，此處把同一列收進
+    /// 記憶體索引，故不必再整檔重載。整檔重載原本會在主執行緒上重解析上萬列——那正是使用者
+    /// 資料一大就卡頓的原因；增量收列只解析新的一列。
+    /// - Parameters:
+    ///   - row: 該列之內容（`值 讀音 [權重] …`，與檔案內者相同）。
+    ///   - isFiltering: 該列是否屬濾除清單。
+    /// - Returns: 是否已套用。不合格時回傳假，呼叫端應退回整檔重載。
+    @discardableResult
+    public func insertUserDataRow(_ row: String, isFiltering: Bool) -> Bool {
+      let didInsert = isFiltering ? lxFiltered.insertRow(row) : lxUserPhrases.insertRow(row)
+      guard didInsert else { return false }
+      // 該列已成為正式資料：把先前為「即時生效」而插入之同值臨時記錄移出，免得查詢結果重複
+      // （整檔重載本會一併清空臨時記錄，增量收列須自行補做）。
+      removeTemporaryDuplicate(ofRow: row, isFiltering: isFiltering)
+      unigramLRUCache.removeAll(keepingCapacity: true)
+      return true
+    }
+
+    /// 就地在記憶體索引內移除一列濾除清單資料：與落盤端之 NUL 覆寫同語義。
+    /// - Parameter row: 該列之前兩格（`值 讀音`），以空白分隔。
+    /// - Returns: 是否確有一列被移除。
+    @discardableResult
+    public func removeFilteredUserDataRow(_ row: String) -> Bool {
+      let cells = row.split(separator: " ").prefix(2).map(String.init)
+      guard cells.count == 2, lxFiltered.removeRow(matching: cells) else { return false }
+      unigramLRUCache.removeAll(keepingCapacity: true)
+      return true
+    }
+
     /// 該函式主要供單元測試所用。
     public func clearTemporaryData(isFiltering: Bool) {
       _ = isFiltering ? lxFiltered.clear() : lxUserPhrases.clear()
@@ -1536,6 +1567,23 @@ extension LXAssembly {
         result = newResult
       }
       return result
+    }
+
+    /// 移出與該列同值之臨時記錄（整檔重載本會清空整個臨時表，增量路徑只清這一筆）。
+    private func removeTemporaryDuplicate(ofRow row: String, isFiltering: Bool) {
+      let cells = row.split(separator: " ").prefix(2).map(String.init)
+      guard cells.count == 2 else { return }
+      let keyChain = cells[1]
+      let value = cells[0]
+      var tempMap = isFiltering ? lxFiltered.temporaryMap : lxUserPhrases.temporaryMap
+      guard var grams = tempMap[keyChain] else { return }
+      grams.removeAll { $0.current == value }
+      tempMap[keyChain] = grams.isEmpty ? nil : grams
+      if isFiltering {
+        lxFiltered.temporaryMap = tempMap
+      } else {
+        lxUserPhrases.temporaryMap = tempMap
+      }
     }
 
     /// 把 POM 的 contextual 記憶接成 gram（S2）。

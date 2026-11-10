@@ -33,6 +33,16 @@ public final class LXMgr {
   /// Non-isolated so it can be written from KVO observer callbacks.
   public nonisolated(unsafe) static var recordedPathInvalidityAlerts = [PathInvalidityAlert]()
 
+  /// 使用者資料寫入失敗之通報通道（可指派 lambda）。
+  ///
+  /// 就地加詞／濾除之落盤自 P345 起於使用者資料寫入巷上非同步執行，其成敗已不可能再回報給
+  /// 當初那次按鍵（那條鏈路不得再等磁碟）——故失敗一律經此 lambda 通報。宿主於啟動時指派為
+  /// Notifier（`SessionHostWiring`）；未指派時退回僅記日誌。
+  /// - Note: 本回呼恆於主執行緒上被呼叫。參數為技術性之失敗緣由（英文診斷字串），
+  ///   **只供日誌與診斷**——使用者可見之文案一律 i18n（`i18n:PhraseOperation.UserDataWriteFailed`），
+  ///   不得把該字串直接併入通報文案。
+  public static var userDataWriteFailureReporter: ((String) -> ())?
+
   public static var isCoreDBConnected: Bool { LXAssembly.LXFacade.isFactoryDictionaryLoaded }
 
   /// Clear the accumulated invalidity-alert buffer (call in test `init` / `deinit`).

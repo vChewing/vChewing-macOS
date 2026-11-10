@@ -197,6 +197,107 @@ extension LXAssembly {
       temporaryMap.removeAll(keepingCapacity: false)
     }
 
+    // MARK: - 增量更新
+
+    /// 就地在記憶體索引內追加一列：**只解析該列**，不重讀整檔、亦不重解析既有列。
+    ///
+    /// 內容語義與檔案內之列相同（`值 讀音 [權重] [#NGRAM:前文鏈]`）：key 取第二格
+    /// （`shouldReverse` 為真時；本類型之三份使用者資料皆如此），`#` 起首之註解列一律不收。
+    /// 既有內容若未以斷行收尾，先補一個斷行——與 `UserPhraseFileWriter` 之追加語義一致，
+    /// 否則記憶體內之 `rawData` 會與磁碟上之內容分歧。
+    ///
+    /// - Important: 本函式只動**索引**與 `rawData`；`#NGRAM:` 閘門之判定仍在查詢時逐列為之，
+    ///   故增量收列與整檔重載之查詢結果一致。
+    /// - Parameter row: 該列之內容（可含結尾斷行）。
+    /// - Returns: 是否已建入索引；輸入不合格時回傳假、記憶體狀態不變。
+    @discardableResult
+    mutating func insertRow(_ row: String) -> Bool {
+      var rowBytes = Array(row.utf8)
+      guard !rowBytes.isEmpty else { return false }
+      if rowBytes.last != 0x0A { rowBytes.append(0x0A) }
+      // 既有內容缺斷行時先補一個（與落盤端之補行語義一致）。
+      let needsLeadingNewline = rawData.last.map { $0 != 0x0A } ?? false
+      let rollbackStart = rawData.count
+      let lineStart = rawData.count + (needsLeadingNewline ? 1 : 0)
+      if needsLeadingNewline { rawData.append(0x0A) }
+      rawData.append(contentsOf: rowBytes)
+      // 與 `parseByteLines` 之語義一致：entry 之範圍**不含**結尾斷行。
+      let lineRange = lineStart ..< (rawData.count - 1)
+
+      // 只解析這一列的前兩格。
+      var firstCellRange: Range<Int>?
+      var secondCellRange: Range<Int>?
+      rawData.parseByteCells(in: lineRange) { currentRange, currentIndex in
+        switch currentIndex {
+        case 0:
+          firstCellRange = currentRange
+          return true
+        case 1:
+          secondCellRange = currentRange
+          return false
+        default:
+          return false
+        }
+      }
+      guard let firstCellRange, let secondCellRange,
+            rawData[firstCellRange.lowerBound] != 0x23
+      else {
+        // 註解列、或格數不足：回滾這一列之追加。
+        rawData.removeSubrange(rollbackStart ..< rawData.count)
+        return false
+      }
+      let keyRange = shouldReverse ? secondCellRange : firstCellRange
+      var theKey = String(decoding: rawData[keyRange], as: UTF8.self)
+      theKey.convertToPhonabets()
+      insertIndexEntry(keyBytes: Array(theKey.utf8), lineRange: lineRange)
+      return true
+    }
+
+    /// 就地在記憶體索引內移除一列：命中之列於 `rawData` 內以 NUL 覆寫前兩格
+    /// （與 `UserPhraseFileWriter` 之落盤語義一致），並自索引內除名。
+    ///
+    /// - Parameter cells: 該列之前兩格（`[值, 讀音]`）。
+    /// - Returns: 是否確有一列被移除。
+    @discardableResult
+    mutating func removeRow(matching cells: [String]) -> Bool {
+      guard cells.count >= 2 else { return false }
+      let keyChain = shouldReverse ? cells[1] : cells[0]
+      guard let keyRange = entryRange(forKey: keyChain) else { return false }
+      let spacePrefixed = Array("\(cells[0]) \(cells[1])".utf8)
+      let tabPrefixed = Array("\(cells[0])\t\(cells[1])".utf8)
+      let prefixLength = spacePrefixed.count // 兩者等長
+      var didRemove = false
+      var survivors: [CoreEXEntry] = []
+      survivors.reserveCapacity(entries.count)
+      for (offset, entry) in entries.enumerated() {
+        guard keyRange.contains(offset) else {
+          survivors.append(entry)
+          continue
+        }
+        let headStart = Int(entry.lineStart)
+        guard headStart + prefixLength <= rawData.count,
+              Array(rawData[headStart ..< headStart + prefixLength]) == spacePrefixed
+              || Array(rawData[headStart ..< headStart + prefixLength]) == tabPrefixed
+        else {
+          survivors.append(entry)
+          continue
+        }
+        for offsetInLine in 0 ..< prefixLength {
+          rawData[headStart + offsetInLine] = 0
+        }
+        didRemove = true
+        continue
+      }
+      guard didRemove else { return false }
+      let keyBytes = Array(keyChain.utf8)
+      let stillHasKey = survivors.contains { entry in
+        keyData.compareByteRange(Int(entry.keyStart) ..< Int(entry.keyEnd), with: keyBytes) == 0
+      }
+      if !stillHasKey { uniqueKeyCount = Swift.max(0, uniqueKeyCount - 1) }
+      entries = survivors
+      return true
+    }
+
     // MARK: - Advanced features
 
     func saveData() {
@@ -575,6 +676,39 @@ extension LXAssembly {
         cursor += 1
       }
       return segIndex == cellBytes.count
+    }
+
+    /// 於索引內插入一筆 entry：`keyData` 之新鍵一律附加於尾端（既有 entry 之位移因此不動），
+    /// `entries` 則插在「第一筆鍵大於該鍵」之處——與 `entryRange(forKey:)` 之二分搜尋假設一致。
+    private mutating func insertIndexEntry(keyBytes: [UInt8], lineRange: Range<Int>) {
+      var lo = 0
+      var hi = entries.count
+      while lo < hi {
+        let mid = lo + (hi - lo) / 2
+        let entry = entries[mid]
+        let comparison = keyData.compareByteRange(
+          Int(entry.keyStart) ..< Int(entry.keyEnd), with: keyBytes
+        )
+        if comparison <= 0 { lo = mid + 1 } else { hi = mid }
+      }
+      let hasSameKey = lo > 0 && keyData.compareByteRange(
+        Int(entries[lo - 1].keyStart) ..< Int(entries[lo - 1].keyEnd), with: keyBytes
+      ) == 0
+      let keyStart: Int
+      if hasSameKey {
+        keyStart = Int(entries[lo - 1].keyStart)
+      } else {
+        keyStart = keyData.count
+        keyData.append(contentsOf: keyBytes)
+        uniqueKeyCount += 1
+      }
+      let newEntry = CoreEXEntry(
+        keyStart: UInt32(keyStart),
+        keyEnd: UInt32(keyStart + keyBytes.count),
+        lineStart: UInt32(lineRange.lowerBound),
+        lineEnd: UInt32(lineRange.upperBound)
+      )
+      entries.insert(newEntry, at: lo)
     }
 
     /// `#` 之後是否以 ASCII `NGRAM`（不分大小寫）起首；是則回傳含 `#` 之前綴長度（6）。

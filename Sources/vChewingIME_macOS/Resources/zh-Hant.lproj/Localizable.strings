@@ -236,6 +236,7 @@
 "i18n:PhraseOperation.NerfUserPhraseSucceeded" = "- 成功將該詞音配對降權處理。";
 "i18n:PhraseOperation.PhraseReplacementInterfering" = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "i18n:PhraseOperation.UnfilterPhraseSucceeded" = "- 成功將該詞音配對從濾除清單移出。";
+"i18n:PhraseOperation.UserDataWriteFailed" = "⚠︎ 使用者語彙資料未能寫入磁碟，該次操作未生效。";
 "i18n:PinyinZhuyinTypingMode.Pinyin" = "拼音模式";
 "i18n:PinyinZhuyinTypingMode.Zhuyin" = "注音模式";
 "i18n:securityAgentHelper.warningMessage.footer" = "當這則訊息呈現出來的時候，唯音已經嘗試呼叫 `DisableSecureEventInput()` 來試圖解除這個狀態。以下是唯音建議您採取的行動：\n\n0. 將這則訊息視窗留一份螢幕擷圖、以備接下來的需要。\n\n1. 如果輸入法選單內的唯音仍舊處於無法選取的狀態（下文簡稱「灰色不可用狀態」），則請考慮結束上述執行緒、以迫使其釋放各自的 SecureEventInput 狀態。這將立刻解除唯音的灰色不可用狀態。\n\n2. 如果該執行緒所屬的 App 來自於 Mac App Store 的話，請向 Apple 檢舉其對 SecureEventInput 的濫用。Apple 會在必要的情況下對這類 App 採取措施，比如：臨時下架，直至軟體研發方解決相關故障。\n\n3. 無論該執行緒是否來自於 Mac App Store，也都請您向相關的研發方/提供方提報該故障。您可以將這則訊息的螢幕擷圖給他們看，因為裡面已經包含了用以偵測該故障的必要資訊。\n\n4. 有使用者回報，先關閉相關的執行中應用與服務（尤其是密碼管理工具、基於 macCatalyst 的密碼登入作業、或任何以 Shell 執行的密碼登入作業），再鎖定並解鎖螢幕／目前使用者的桌面工作階段，能夠在一定程度上舒緩目前的狀況。";

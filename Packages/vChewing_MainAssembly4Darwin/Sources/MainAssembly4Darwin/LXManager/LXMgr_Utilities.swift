@@ -521,26 +521,69 @@ extension LXMgr {
       case .unfilter: .theFilter
       case .append: areWeFiltering ? .theFilter : .thePhrases
       }
+    let primaryRow = primaryPlan.cells.joined(separator: " ")
+    let convertedRow = convertedPlan.cells.joined(separator: " ")
+    let writeKind = primaryPlan.kind
+    let theInputMode = userPhrase.inputMode
     LXAssembly.withUserDataWriteQueueAsync {
       let primaryOutcome = LXAssembly.UserPhraseFileWriter.perform(primaryPlan)
       let convertedOutcome = LXAssembly.UserPhraseFileWriter.perform(convertedPlan)
       asyncOnMain {
         guard primaryOutcome.isSucceeded, convertedOutcome.isSucceeded else {
-          vCLog(
-            "UserPhrasesAtOnce: Failed to write phrase data. "
-              + "\(primaryOutcome), \(convertedOutcome)"
-          )
+          let reason = "\(primaryOutcome) \(convertedOutcome)"
+          vCLog("UserPhrasesAtOnce: Failed to write phrase data. \(reason)")
+          // 該次按鍵早已回報 IMK，成敗只得另行通報。
+          Self.userDataWriteFailureReporter?(reason)
           return
         }
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
           Broadcaster.shared.postEventForReloadingPhraseEditor()
         }
-        // 重載本身亦為非同步：讀檔與格式整理在寫入巷上（排在本筆寫入之後），
-        // 僅「把解析結果套進語言模組」回到主執行緒。
+        // 增量套用：只把剛才那一列收進記憶體索引（不重讀整檔、不重解析既有列）。
+        // 任一環節不合格即退回整檔重載——重載本身亦為非同步，讀檔與整理都在寫入巷上。
+        let incrementalApplied = Self.applyUserPhraseRowIncrementally(
+          row: (primaryRow, convertedRow),
+          inputMode: theInputMode,
+          kind: writeKind,
+          isFiltering: areWeFiltering
+        )
+        guard !incrementalApplied else { return }
         Self.loadUserPhrasesData(type: reloadType, async: true)
       }
     }
     return true
+  }
+
+  /// 把剛才落盤的那一列就地收進兩個語言模組（正體與跨簡繁各一），不重讀整檔。
+  ///
+  /// - Parameters:
+  ///   - row: 正體與跨簡繁之兩列內容。
+  ///   - inputMode: 該次操作之輸入模式（跨簡繁者取其 `reversed`）。
+  ///   - kind: 追加或移出。
+  ///   - isFiltering: 追加者是否進濾除清單。
+  /// - Returns: 兩邊皆成功才回傳真；否則呼叫端應退回整檔重載。
+  @discardableResult
+  static func applyUserPhraseRowIncrementally(
+    row: (primary: String, converted: String),
+    inputMode: Shared.InputMode,
+    kind: LXAssembly.UserPhraseFileWriter.Kind,
+    isFiltering: Bool
+  )
+    -> Bool {
+    let primaryLexicon = inputMode.lexicon
+    let convertedLexicon = inputMode.reversed.lexicon
+    switch kind {
+    case .append:
+      let primaryApplied = primaryLexicon.insertUserDataRow(row.primary, isFiltering: isFiltering)
+      let convertedApplied = convertedLexicon.insertUserDataRow(
+        row.converted, isFiltering: isFiltering
+      )
+      return primaryApplied && convertedApplied
+    case .unfilter:
+      let primaryApplied = primaryLexicon.removeFilteredUserDataRow(row.primary)
+      let convertedApplied = convertedLexicon.removeFilteredUserDataRow(row.converted)
+      return primaryApplied && convertedApplied
+    }
   }
 
   // MARK: - 藉由語彙編輯器開啟使用者檔案
