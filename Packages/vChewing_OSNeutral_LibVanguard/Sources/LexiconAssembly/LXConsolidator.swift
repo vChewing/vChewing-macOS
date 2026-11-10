@@ -11,7 +11,7 @@ extension LXAssembly {
   public enum LXConsolidator {
     // MARK: Public
 
-    public static let kPragmaHeader =
+    nonisolated public static let kPragmaHeader =
       "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍"
 
     /// 檢查給定檔案的標頭是否正常。
@@ -19,24 +19,22 @@ extension LXAssembly {
     ///   - path: 給定檔案路徑。
     ///   - locator: 資料通道；預設為行程級之 `LXAssembly.userDataLocator`。
     /// - Returns: 結果正常則為真，其餘為假。
-    public static func checkPragma(
+    nonisolated public static func checkPragma(
       path: String,
       using locator: any UserDataLocator = LXAssembly.userDataLocator
     )
       -> Bool {
-      LXAssembly.withFileHandleQueueSync {
-        guard let data = try? locator.read(at: URL(fileURLWithPath: path)) else {
-          vCLMLog("Header Verification Failed: File Missing.")
-          return false
-        }
-        // 純前綴判定：檔頭須與 pragma 的 UTF-8 位元組完全一致，且其後須為斷行或 EOF。
-        guard hasIntactPragmaHeader(bytes: data) else {
-          vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
-          return false
-        }
-        vCLMLog("Header Verification Succeeded: \(kPragmaHeader).")
-        return true
+      guard let data = try? locator.read(at: URL(fileURLWithPath: path)) else {
+        vCLMLog("Header Verification Failed: File Missing.")
+        return false
       }
+      // 純前綴判定：檔頭須與 pragma 的 UTF-8 位元組完全一致，且其後須為斷行或 EOF。
+      guard hasIntactPragmaHeader(bytes: data) else {
+        vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
+        return false
+      }
+      vCLMLog("Header Verification Succeeded: \(kPragmaHeader).")
+      return true
     }
 
     /// 檢查檔案是否以空行結尾，如果缺失則補充之。
@@ -45,38 +43,36 @@ extension LXAssembly {
     ///   - locator: 資料通道；預設為行程級之 `LXAssembly.userDataLocator`。
     /// - Returns: 結果正常或修復順利則為真，其餘為假。
     @discardableResult
-    public static func fixEOF(
+    nonisolated public static func fixEOF(
       path: String,
       using locator: any UserDataLocator = LXAssembly.userDataLocator
     )
       -> Bool {
-      LXAssembly.withFileHandleQueueSync {
-        let url = URL(fileURLWithPath: path)
-        guard let data = try? locator.read(at: url) else {
-          vCLMLog("EOF Fix Failed: File Missing at \(path).")
+      let url = URL(fileURLWithPath: path)
+      guard let data = try? locator.read(at: url) else {
+        vCLMLog("EOF Fix Failed: File Missing at \(path).")
+        return false
+      }
+      /// 注意：Swift 版 LXConsolidator 並未在此安排對 EOF 的去重複工序。
+      /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
+      if data.last != 0x0A {
+        vCLMLog("EOF Missing Confirmed, Start Fixing.")
+        do {
+          try locator.append(Data([0x0A]), to: url)
+        } catch {
+          vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
           return false
         }
-        /// 注意：Swift 版 LXConsolidator 並未在此安排對 EOF 的去重複工序。
-        /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
-        if data.last != 0x0A {
-          vCLMLog("EOF Missing Confirmed, Start Fixing.")
-          do {
-            try locator.append(Data([0x0A]), to: url)
-          } catch {
-            vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
-            return false
-          }
-          vCLMLog("EOF Successfully Assured.")
-        }
-        return true
+        vCLMLog("EOF Successfully Assured.")
       }
+      return true
     }
 
     /// 統整給定的字串。
     /// - Parameters:
     ///   - text: 操作對象。
     ///   - shouldCheckPragma: 是否在檔案標頭完好無損的情況下略過對格式的整理。
-    public static func consolidate(
+    nonisolated public static func consolidate(
       text strProcessed: inout String,
       pragma shouldCheckPragma: Bool
     ) {
@@ -96,42 +92,40 @@ extension LXAssembly {
     ///   - path: 給定檔案路徑。
     ///   - shouldCheckPragma: 是否在檔案標頭完好無損的情況下略過對格式的整理。
     ///   - locator: 資料通道；預設為行程級之 `LXAssembly.userDataLocator`。
-    public static func consolidate(
+    nonisolated public static func consolidate(
       path: String,
       pragma shouldCheckPragma: Bool,
       using locator: any UserDataLocator = LXAssembly.userDataLocator
     )
       -> Bool {
-      LXAssembly.withFileHandleQueueSync {
-        let pragmaResult = checkPragma(path: path, using: locator)
-        if shouldCheckPragma {
-          if pragmaResult {
-            return true
-          }
+      let pragmaResult = checkPragma(path: path, using: locator)
+      if shouldCheckPragma {
+        if pragmaResult {
+          return true
         }
-
-        let urlPath = URL(fileURLWithPath: path)
-        do {
-          var buffer = [UInt8](try locator.read(at: urlPath))
-          buffer = Self.consolidateNormalize(bytes: buffer)
-          // 以原始位元組寫回：非法 UTF-8 內容原樣保留（不再經 String 解碼轉成 U+FFFD）。
-          try locator.write(Data(buffer), to: urlPath)
-        } catch {
-          vCLMLog("Consolidation Failed w/ File: \(path), error: \(error)")
-          return false
-        }
-        vCLMLog("Either Consolidation Successful Or No-Need-To-Consolidate.")
-        return true
       }
+
+      let urlPath = URL(fileURLWithPath: path)
+      do {
+        var buffer = [UInt8](try locator.read(at: urlPath))
+        buffer = Self.consolidateNormalize(bytes: buffer)
+        // 以原始位元組寫回：非法 UTF-8 內容原樣保留（不再經 String 解碼轉成 U+FFFD）。
+        try locator.write(Data(buffer), to: urlPath)
+      } catch {
+        vCLMLog("Consolidation Failed w/ File: \(path), error: \(error)")
+        return false
+      }
+      vCLMLog("Either Consolidation Successful Or No-Need-To-Consolidate.")
+      return true
     }
 
     // MARK: Internal
 
-    static let kPragmaHeaderBytes = [UInt8](kPragmaHeader.utf8)
+    nonisolated static let kPragmaHeaderBytes = [UInt8](kPragmaHeader.utf8)
 
     /// 純記憶體版標頭判定：給定內容是否以 pragma 標頭的 UTF-8 位元組開頭、其後為斷行或 EOF。
     /// 與 `checkPragma(path:)` 的語義一致，供 `consolidate(text:pragma:)` 在零配置下短路。
-    static func hasIntactPragmaHeader<C: Collection>(bytes: C) -> Bool where C.Element == UInt8 {
+    nonisolated static func hasIntactPragmaHeader<C: Collection>(bytes: C) -> Bool where C.Element == UInt8 {
       guard bytes.starts(with: kPragmaHeaderBytes) else { return false }
       guard let next = bytes.dropFirst(kPragmaHeaderBytes.count).first else { return true } // EOF 視為通過
       return next == 0x0A || next == 0x0D
@@ -139,7 +133,7 @@ extension LXAssembly {
 
     /// 判斷位元組緩衝於指定位置是否為一個完整空白序列（ASCII 空白字元／Tab／NBSP／全形空白字元）。
     /// 是則回傳其長度（1–3），否則為 0。
-    static func whitespaceSequenceLength(_ bytes: [UInt8], at index: Int) -> Int {
+    nonisolated static func whitespaceSequenceLength(_ bytes: [UInt8], at index: Int) -> Int {
       let b = bytes[index]
       if b == 0x20 || b == 0x09 { return 1 }
       if b == 0xC2, index + 1 < bytes.count, bytes[index + 1] == 0xA0 { return 2 } // NBSP
@@ -150,7 +144,7 @@ extension LXAssembly {
     /// 判斷位元組緩衝於指定位置是否為一個 ICU 斷行序列（`^`／`$` 行錨依據）。
     /// 是則回傳其長度（1–3），否則為 0。CRLF 視為單一斷行。
     /// - Remark: ICU 行錨集合含 LF／CR／VT／FF／CRLF／NEL／LS／PS（等同 CharacterSet.newlines）。
-    static func lineTerminatorLength(_ bytes: [UInt8], at index: Int) -> Int {
+    nonisolated static func lineTerminatorLength(_ bytes: [UInt8], at index: Int) -> Int {
       switch bytes[index] {
       case 0x0A, 0x0B, 0x0C:
         return 1
@@ -168,7 +162,7 @@ extension LXAssembly {
     }
 
     /// Step 1: 將連續空白序列（ASCII 空白字元／Tab／NBSP／全形空白字元）收斂為單一 ASCII 空白字元。
-    static func collapseWhitespaceRuns(_ source: [UInt8]) -> [UInt8] {
+    nonisolated static func collapseWhitespaceRuns(_ source: [UInt8]) -> [UInt8] {
       var out = [UInt8]()
       out.reserveCapacity(source.count)
       var index = 0
@@ -188,7 +182,7 @@ extension LXAssembly {
     }
 
     /// Step 2: 剝除各行之行首行尾空白字元（行錨依據 ICU 斷行集合，含檔案首尾）。
-    static func stripLineEdgeSpaces(_ source: [UInt8]) -> [UInt8] {
+    nonisolated static func stripLineEdgeSpaces(_ source: [UInt8]) -> [UInt8] {
       var out = [UInt8]()
       out.reserveCapacity(source.count)
       var atLineStart = true
@@ -221,7 +215,7 @@ extension LXAssembly {
     }
 
     /// Step 3: 將 LF／CR／FF 斷行連續收斂為單一 LF。
-    static func collapseNewlineRuns(_ source: [UInt8]) -> [UInt8] {
+    nonisolated static func collapseNewlineRuns(_ source: [UInt8]) -> [UInt8] {
       var out = [UInt8]()
       out.reserveCapacity(source.count)
       var index = 0
@@ -243,7 +237,7 @@ extension LXAssembly {
     /// 以位元組層級統整內容格式：空白收斂 → 行邊空白字元剝除 → 斷行收斂 → 移除標頭列 →
     /// 依「保留最後一次出現」去重複 → 補回 pragma 標頭。
     /// - Remark: 全程僅觸及完整 UTF-8 序列，不會切斷多位元組字元。
-    static func consolidateNormalize(bytes source: [UInt8]) -> [UInt8] {
+    nonisolated static func consolidateNormalize(bytes source: [UInt8]) -> [UInt8] {
       let pass1 = collapseWhitespaceRuns(source)
       let pass2 = stripLineEdgeSpaces(pass1)
       let pass3 = collapseNewlineRuns(pass2)

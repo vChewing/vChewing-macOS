@@ -176,13 +176,15 @@ public final class LXMgr {
           async: async
         )
       case .theFilter:
-        // We have to enforce the toggle of async loading here for this case:
+        // 濾除清單之重載一律走非同步路徑：讀檔與格式整理在使用者資料寫入巷上，
+        // 只有「把解析結果套進語言模組」回到主執行緒（P345）。
+        // 單元測試則維持同步語義——測試需要「呼叫返回時資料已就位」。
         if OSUtils.isRunningUnitTests {
           Self.reloadUserFilterDirectly(mode: mode)
         } else {
-          asyncOnMain {
-            Self.reloadUserFilterDirectly(mode: mode)
-          }
+          mode.lexicon.reloadUserFilterData(
+            path: Self.userDictDataURL(mode: mode, type: .theFilter).path
+          )
         }
       case .theReplacements:
         if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
@@ -303,12 +305,19 @@ public final class LXMgr {
     pomSavingCoordinator.savePerceptionOverrideModelData(saveAllModes: saveAllModes)
   }
 
+  /// 清詞時之落盤交由 POM 之 debounce 協調器負責：本函式只改記憶體狀態並**登記**一次存檔，
+  /// 不於呼叫端之執行緒上做 JSON 編碼與磁碟寫入。清詞係打字過程中之操作（P345，#625），
+  /// 不得在 IMK 之事件鏈路上直接落盤。
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
-    mode.lexicon.bleachSpecifiedPOMSuggestions(targets: targets)
+    mode.lexicon.bleachSpecifiedPOMSuggestions(
+      targets: targets, saveCallback: { Self.savePerceptionOverrideModelData(false) }
+    )
   }
 
   public static func bleachSpecifiedSuggestions(headReadings: [String], mode: Shared.InputMode) {
-    mode.lexicon.bleachSpecifiedPOMSuggestions(headReadings: headReadings)
+    mode.lexicon.bleachSpecifiedPOMSuggestions(
+      headReadings: headReadings, saveCallback: { Self.savePerceptionOverrideModelData(false) }
+    )
   }
 
   public static func removeUnigramsFromPerceptionOverrideModel(_ mode: Shared.InputMode) {

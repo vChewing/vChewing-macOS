@@ -72,41 +72,47 @@ public final class DiskUserDataLocator: UserDataLocator, @unchecked Sendable {
   nonisolated public var isBackedByFileSystem: Bool { true }
 
   nonisolated public func exists(at url: URL) -> Bool {
-    FileManager.default.fileExists(atPath: url.path)
+    LXAssembly.withUserDataFileLock { FileManager.default.fileExists(atPath: url.path) }
   }
 
   nonisolated public func read(at url: URL) throws -> Data {
-    try Data(contentsOf: url)
+    try LXAssembly.withUserDataFileLock { try Data(contentsOf: url) }
   }
 
   nonisolated public func write(_ data: Data, to url: URL) throws {
-    try data.write(to: url, options: .atomic)
+    try LXAssembly.withUserDataFileLock { try data.write(to: url, options: .atomic) }
   }
 
   /// - Note: 一律走 `SwiftExtension` 為 macOS 10.9 鋪的 `FileHandle` 相容層
   ///   （`seekToEOF()`／`writeData(_:)`／`closeTheFile()`）——拋錯之新式 API 起自 macOS 10.15.4，
   ///   於 legacy 側之建置目標會直接以 availability 錯誤擋下。
   nonisolated public func append(_ data: Data, to url: URL) throws {
-    if !FileManager.default.fileExists(atPath: url.path) {
-      _ = FileManager.default.createFile(atPath: url.path, contents: nil)
+    try LXAssembly.withUserDataFileLock {
+      if !FileManager.default.fileExists(atPath: url.path) {
+        _ = FileManager.default.createFile(atPath: url.path, contents: nil)
+      }
+      let fileHandle = try FileHandle(forWritingTo: url)
+      defer { try? fileHandle.closeTheFile() }
+      _ = try fileHandle.seekToEOF()
+      try fileHandle.writeData(data)
     }
-    let fileHandle = try FileHandle(forWritingTo: url)
-    defer { try? fileHandle.closeTheFile() }
-    _ = try fileHandle.seekToEOF()
-    try fileHandle.writeData(data)
   }
 
   nonisolated public func remove(at url: URL) throws {
-    if FileManager.default.fileExists(atPath: url.path) {
-      try FileManager.default.removeItem(at: url)
+    try LXAssembly.withUserDataFileLock {
+      if FileManager.default.fileExists(atPath: url.path) {
+        try FileManager.default.removeItem(at: url)
+      }
     }
   }
 
   nonisolated public func byteSize(at url: URL) -> UInt64? {
-    guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) else {
-      return nil
+    LXAssembly.withUserDataFileLock {
+      guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) else {
+        return nil
+      }
+      return (attributes[.size] as? NSNumber)?.uint64Value
     }
-    return (attributes[.size] as? NSNumber)?.uint64Value
   }
 }
 

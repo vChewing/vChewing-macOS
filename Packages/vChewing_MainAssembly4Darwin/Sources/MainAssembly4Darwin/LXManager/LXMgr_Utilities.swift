@@ -495,27 +495,52 @@ extension LXMgr {
 
   // MARK: - 寫入使用者檔案
 
+  /// 就地加詞／降權／升權／濾除之落盤。
+  ///
+  /// **本函式不在呼叫端之執行緒上碰磁碟**（P345）：決策——語言模組查詢、目標路徑、跨簡繁轉換
+  /// ——於此（主執行緒）完成，落盤與其後續之資料重載則整批派至
+  /// ``LXAssembly/userDataWriteQueue``。故其回傳值之語義由「已寫入成功」改為「已受理」：
+  /// IMK 之鍵盤事件鏈路只認受理與否，磁碟之成敗於寫入巷上記錄。
+  ///
+  /// 之所以要這樣切：就地加詞／濾除是**打字過程中**的操作，而它一次會觸發兩支檔案之追加與
+  /// 一次整檔重載（含格式整理）；使用者資料若落在極慢或已失效的卷上，這串工作便足以讓整個
+  /// 輸入法行程失去回應（GH Issue #625）。寫入巷是序列的，故同一批操作之先後次序不變。
   @discardableResult
   public static func writeUserPhrasesAtOnce(
     _ userPhrase: UserPhraseInsertable, areWeFiltering: Bool
   )
     -> Bool {
-    LXAssembly.withFileHandleQueueSync {
-      let resultA = userPhrase.write(toFilter: areWeFiltering)
-      let resultB = userPhrase.crossConverted.write(toFilter: areWeFiltering)
-      guard resultA, resultB else {
-        vCLog("UserPhrasesAtOnce: Failed to write phrase data.")
-        return false
+    guard let primaryPlan = userPhrase.makeWritePlan(toFilter: areWeFiltering) else { return false }
+    guard let convertedPlan = userPhrase.crossConverted.makeWritePlan(toFilter: areWeFiltering)
+    else { return false }
+    // 重載對象取決於「剛才動的是哪一支檔」：移出濾除清單者動的是濾除清單，加入濾除者亦然，
+    // 升權／降權動的才是片語表。此處不得以 `areWeFiltering` 一概而論——移出濾除清單之呼叫端
+    // 傳的是 `false`，但動到的仍是濾除清單（P345；舊制由 `removeFromFilter` 內之同步重載兜住）。
+    let reloadType: LXAssembly.ReplaceableUserDataType =
+      switch primaryPlan.kind {
+      case .unfilter: .theFilter
+      case .append: areWeFiltering ? .theFilter : .thePhrases
       }
-      if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-        Broadcaster.shared.postEventForReloadingPhraseEditor()
+    LXAssembly.withUserDataWriteQueueAsync {
+      let primaryOutcome = LXAssembly.UserPhraseFileWriter.perform(primaryPlan)
+      let convertedOutcome = LXAssembly.UserPhraseFileWriter.perform(convertedPlan)
+      asyncOnMain {
+        guard primaryOutcome.isSucceeded, convertedOutcome.isSucceeded else {
+          vCLog(
+            "UserPhrasesAtOnce: Failed to write phrase data. "
+              + "\(primaryOutcome), \(convertedOutcome)"
+          )
+          return
+        }
+        if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
+          Broadcaster.shared.postEventForReloadingPhraseEditor()
+        }
+        // 重載本身亦為非同步：讀檔與格式整理在寫入巷上（排在本筆寫入之後），
+        // 僅「把解析結果套進語言模組」回到主執行緒。
+        Self.loadUserPhrasesData(type: reloadType, async: true)
       }
-      // Use async: true — the reload's readFileContentAsync will be enqueued
-      // on fileHandleQueue, executed after this sync block returns. This way
-      // MainActor only blocks briefly during replaceData (asynchronously later).
-      Self.loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases, async: true)
-      return true
     }
+    return true
   }
 
   // MARK: - 藉由語彙編輯器開啟使用者檔案
@@ -612,6 +637,20 @@ extension LXMgr {
       }
     }
     return !failed
+  }
+
+  /// 該型別之使用者資料檔的範本資源位置（不存在者為 `nil`）。
+  ///
+  /// 供使用者資料寫入巷於「目標檔不存在」時鋪底——該巷不得回頭詢問語言模組，
+  /// 故範本位置須隨落盤計畫一併備妥。
+  public static func templateURL(
+    for type: LXAssembly.ReplaceableUserDataType,
+    mode: Shared.InputMode
+  )
+    -> URL? {
+    let basename = templateName(for: type, mode: mode)
+    guard !basename.isEmpty else { return nil }
+    return Bundle.main.url(forResource: basename, withExtension: "txt")
   }
 
   internal static func templateName(

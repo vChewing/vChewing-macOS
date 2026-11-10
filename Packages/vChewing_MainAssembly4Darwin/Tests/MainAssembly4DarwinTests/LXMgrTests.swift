@@ -395,6 +395,74 @@ final class LXMgrTests {
     )
   }
 
+  // MARK: - 使用者資料寫入巷（P345）
+
+  /// 就地加詞／濾除之落盤不得卡住呼叫端（P345，GH Issue #625）。
+  ///
+  /// IMK 之鍵盤事件鏈路（Session 收到 `KBEvent` → 回報 IMK）本該非阻塞；而「就地加詞」係打字
+  /// 過程中觸發之操作，一次會牽動兩支使用者資料檔之追加與一次整檔重載。本組測試以「先把寫入巷
+  /// 佔住、再量呼叫端耗時」直接證明該鏈路已不再等磁碟。
+  @Test
+  func test024_LXMgr_UserPhraseWriteDoesNotBlockTheCallingThread() throws {
+    let mode = Shared.InputMode.imeModeCHT
+    let phrasesURL = LXMgr.userDictDataURL(mode: mode, type: .thePhrases)
+    try Data("".utf8).write(to: phrasesURL)
+
+    // 佔住寫入巷：若就地加詞仍在呼叫端之執行緒上等磁碟，本呼叫就會被卡在這裡。
+    let releaseGate = DispatchSemaphore(value: 0)
+    LXAssembly.withUserDataWriteQueueAsync {
+      _ = releaseGate.wait(timeout: .now() + 10)
+    }
+
+    let phrase = UserPhraseInsertable(
+      keyArray: ["ㄐㄧㄚ", "ㄓㄨ"],
+      value: "家主",
+      inputMode: mode
+    )
+    let startingTime = Date()
+    let accepted = LXMgr.writeUserPhrasesAtOnce(phrase, areWeFiltering: false)
+    let elapsed = Date().timeIntervalSince(startingTime)
+    releaseGate.signal()
+
+    #expect(accepted, "落盤計畫於主執行緒備妥後應即受理。")
+    #expect(elapsed < 0.1, "就地加詞不得在呼叫端之執行緒上等候磁碟（實測 \(elapsed) 秒）。")
+
+    // 受理之後，寫入巷仍會把資料寫進檔案。
+    LXAssembly.drainUserDataWriteQueue()
+    let phrasesContent = try String(contentsOf: phrasesURL, encoding: .utf8)
+    #expect(phrasesContent.contains("家主 ㄐㄧㄚ-ㄓㄨ"))
+  }
+
+  /// 加入濾除清單亦然：受理即返回，落盤於寫入巷上完成。
+  @Test
+  func test025_LXMgr_PhraseFilteringDoesNotBlockTheCallingThread() throws {
+    let mode = Shared.InputMode.imeModeCHT
+    let filterURL = LXMgr.userDictDataURL(mode: mode, type: .theFilter)
+    try Data("".utf8).write(to: filterURL)
+
+    let releaseGate = DispatchSemaphore(value: 0)
+    LXAssembly.withUserDataWriteQueueAsync {
+      _ = releaseGate.wait(timeout: .now() + 10)
+    }
+
+    let phrase = UserPhraseInsertable(
+      keyArray: ["ㄏㄨㄛˋ", "ㄗㄨㄟˋ"],
+      value: "獲罪",
+      inputMode: mode
+    )
+    let startingTime = Date()
+    let accepted = LXMgr.writeUserPhrasesAtOnce(phrase, areWeFiltering: true)
+    let elapsed = Date().timeIntervalSince(startingTime)
+    releaseGate.signal()
+
+    #expect(accepted)
+    #expect(elapsed < 0.1, "濾除不得在呼叫端之執行緒上等候磁碟（實測 \(elapsed) 秒）。")
+
+    LXAssembly.drainUserDataWriteQueue()
+    let filterContent = try String(contentsOf: filterURL, encoding: .utf8)
+    #expect(filterContent.contains("獲罪 ㄏㄨㄛˋ-ㄗㄨㄟˋ"))
+  }
+
   @Test
   func testCandidateSequenceTemplateFileIsCreated() throws {
     // `chkUserLMFilesExist` 亦須確保候選字詞排序表存在（範本在測試宿主內缺席時可為空檔）。

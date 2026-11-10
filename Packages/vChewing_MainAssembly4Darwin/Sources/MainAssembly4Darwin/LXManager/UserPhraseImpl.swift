@@ -89,153 +89,37 @@ extension UserPhraseInsertable {
     inputMode.lexicon.lxQuerier.isPairFiltered(pair: .init(keyArray: keyArray, value: value))
   }
 
-  public func write(toFilter: Bool) -> Bool {
-    LXAssembly.withFileHandleQueueSync {
-      guard isValid else {
-        vCLog("UserPhrase.write(toFilter: \(toFilter.description)) Error: UserPhrase invalid.")
-        return false
-      }
-      guard LXMgr.chkUserLMFilesExist(inputMode) else {
-        vCLog("UserPhrase.write(toFilter: \(toFilter.description)) Error: UserLMFiles not exist.")
-        return false
-      }
-      if !toFilter, isAlreadyFiltered {
-        vCLog("START REMOVING THIS PHRASE FROM FILTER.")
-        removeFromFilter()
-        // 在整理過一遍之後，如果還是被排除的狀態的話，則證明語彙濾除清單檔案有格式問題、需要整理。
-        // 這種情況下，先強制整理，再排除。
-        if isAlreadyFiltered {
-          removeFromFilter(forceConsolidate: true)
-        }
-        return !isAlreadyFiltered
-      }
-      /// 施工筆記：
-      /// 有些使用者的語彙檔案已經過於龐大了（超過一千行），
-      /// 每次寫入時都全文整理格式的話，會引發嚴重的效能問題。
-      /// 所以這裡不再強制要求整理格式。
-      let theType: LXAssembly.ReplaceableUserDataType = toFilter ? .theFilter : .thePhrases
-      let theURL = LXMgr.userDictDataURL(mode: inputMode, type: theType)
-      var fileSize: UInt64?
-      do {
-        let dict = try FileManager.default.attributesOfItem(atPath: theURL.path)
-        if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
-      } catch {
-        vCLog(
-          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Target file size is null."
-        )
-        return false
-      }
-      guard let fileSize = fileSize else {
-        vCLog(
-          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Target file size is null."
-        )
-        return false
-      }
-      guard var dataToInsert = "\(description)\n".data(using: .utf8) else {
-        vCLog(
-          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Failed from preparing insertion data."
-        )
-        return false
-      }
-      guard let writeFile = FileHandle(forUpdatingAtPath: theURL.path) else {
-        vCLog(
-          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Failed from initiating file handle."
-        )
-        return false
-      }
-      defer { try? writeFile.close() }
-      if fileSize > 0 {
-        try? writeFile.seek(toOffset: fileSize - 1)
-        if (try? writeFile.readToEnd())?.first != 0x0A {
-          dataToInsert.insert(0x0A, at: 0)
-        }
-      }
-      _ = try? writeFile.seekToEnd()
-      try? writeFile.write(contentsOf: dataToInsert)
-      return true
-    }
-  }
-
-  /// 嘗試將該筆記錄從語彙濾除清單檔案內移除，但可能會因為語彙濾除清單檔案尚未整理的格式而失敗。
+  /// 於主執行緒備妥一份落盤計畫。
   ///
-  /// 原理：發現該當條目時，直接全部置換為 NULL（0x0）。這樣可以最小化磁碟寫入次數。
-  /// （不然還得將當前位置後面的內容整個重新寫入。）
-  /// - Parameter confirm: 再檢查一遍是否符合執行條件。不符合的話，就啥也不做。
-  @discardableResult
-  public func removeFromFilter(
-    confirm: Bool = false,
-    forceConsolidate: Bool = false
-  )
-    -> Bool {
-    LXAssembly.withFileHandleQueueSync {
-      var debugOutput = ContiguousArray<String>()
-      defer {
-        if !debugOutput.isEmpty { vCLog(debugOutput.joined(separator: "\n")) }
-      }
-      if confirm {
-        guard isValid else {
-          debugOutput
-            .append(
-              "removeFromFilter(): This user phrase pair is invalid. \(descriptionCells.prefix(2).joined(separator: " "))"
-            )
-          return false
-        }
-        guard isAlreadyFiltered else {
-          debugOutput
-            .append("removeFromFilter(): This user phrase pair is not in the filtered list.")
-          return false
-        }
-      }
-      let theURL = LXMgr.userDictDataURL(mode: inputMode, type: .theFilter)
-      if forceConsolidate,
-         !LXAssembly.LXConsolidator.consolidate(path: theURL.path, pragma: false) { return false }
-      // Get FileSize.
-      var fileSize: UInt64?
-      do {
-        let dict = try FileManager.default.attributesOfItem(atPath: theURL.path)
-        if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
-      } catch {
-        debugOutput
-          .append("removeFromFilter(): Failed from getting the file size of the filter list file.")
-        return false
-      }
-      guard let fileSize = fileSize else { return false }
-      // Prepare FileHandle.
-      guard let fileHandle = FileHandle(forUpdatingAtPath: theURL.path) else {
-        debugOutput.append("removeFromFilter(): Failed from handling the filter list file.")
-        return false
-      }
-      defer { try? fileHandle.close() }
-      // Get bytes for matching.
-      let usefulCells = descriptionCells.prefix(2)
-      guard usefulCells.count == 2 else { return false }
-      guard let data1 = usefulCells.joined(separator: " ").data(using: .utf8) else { return false }
-      guard let data2 = usefulCells.joined(separator: "\t").data(using: .utf8) else { return false }
-      let bufferLength = data1.count // data1 與 data2 長度相等
-      guard fileSize >= bufferLength else { return true }
-      let blankData = Data([UInt8](repeating: 0x0, count: bufferLength)) // 用來搞填充的垃圾資料
-      let sharpData = Data([0x23]) // Sharp Sign (#)
-      let lfData = Data([0x0A]) // Line Feed '\n'
-      try? fileHandle.seek(toOffset: 0) // 從頭開始讀取處理。
-      for currentWorkingOffset in 0 ... (Int(fileSize) - bufferLength) {
-        /// !! 注意：FileHandle 的 seek 位置會在每次 readData() / write() 之後都有變動。
-        // 只在「行首或換行（LF）之後」嘗試匹配；此外，若前一位元組是 # 則略過。
-        if currentWorkingOffset > 0 {
-          try? fileHandle.seek(toOffset: UInt64(currentWorkingOffset - 1))
-          let previousByte = (try? fileHandle.read(upToCount: 1)) ?? Data()
-          if previousByte == sharpData { continue }
-          guard previousByte == lfData else { continue }
-        }
-        // 開始手術
-        try? fileHandle.seek(toOffset: UInt64(currentWorkingOffset))
-        let dataScoped = (try? fileHandle.read(upToCount: bufferLength)) ?? Data()
-        guard [data1, data2].contains(dataScoped) else { continue }
-        try? fileHandle.seek(toOffset: UInt64(currentWorkingOffset))
-        try? fileHandle.write(contentsOf: blankData)
-      }
-      LXMgr.reloadUserFilterDirectly(mode: inputMode)
-      return true
+  /// 所有語言模組之查詢（該配對是否已在濾除清單內、該列是否與既存條目重複、權重幾何）皆在此
+  /// 完成——那些狀態由主執行緒單獨持有。耗時的檔案 I/O 則交給
+  /// ``LXAssembly/UserPhraseFileWriter`` 於使用者資料寫入巷上執行（P345）。
+  ///
+  /// - Parameter toFilter: 是否要加入濾除清單。
+  /// - Returns: 落盤計畫；輸入資料不合規時為 `nil`。
+  public func makeWritePlan(toFilter: Bool) -> LXAssembly.UserPhraseFileWriter.WritePlan? {
+    guard isValid else {
+      vCLog("UserPhrase.makeWritePlan(toFilter: \(toFilter.description)) Error: UserPhrase invalid.")
+      return nil
     }
+    let cells = descriptionCells
+    // 已在濾除清單內者，本次「不加濾除」實為「自濾除清單移出」。
+    if !toFilter, isAlreadyFiltered {
+      let type: LXAssembly.ReplaceableUserDataType = .theFilter
+      return .init(
+        kind: .unfilter,
+        targetURL: LXMgr.userDictDataURL(mode: inputMode, type: type),
+        cells: cells,
+        templateURL: LXMgr.templateURL(for: type, mode: inputMode)
+      )
+    }
+    let type: LXAssembly.ReplaceableUserDataType = toFilter ? .theFilter : .thePhrases
+    return .init(
+      kind: .append,
+      targetURL: LXMgr.userDictDataURL(mode: inputMode, type: type),
+      cells: cells,
+      templateURL: LXMgr.templateURL(for: type, mode: inputMode)
+    )
   }
 }
 

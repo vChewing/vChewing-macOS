@@ -546,6 +546,9 @@ extension LXAssembly {
     }
 
     /// 這個函式不用 GCD。
+    /// - Important: 本函式於**呼叫端所在執行緒**上讀檔（通常是主執行緒）。凡因輸入事件而起之
+    ///   濾除清單重載，一律改用 ``reloadUserFilterData(path:)``——那條路徑把讀檔丟到使用者資料
+    ///   寫入巷、只把「套用結果」帶回主執行緒（P345，GH Issue #625）。
     public func reloadUserFilterDirectly(path: String) {
       // 無論新檔案是否可讀，都必須先清除舊資料。
       lxFiltered.clear()
@@ -557,6 +560,37 @@ extension LXAssembly {
       } else {
         vCLMLog("lxFiltered: File access failure: \(path)")
       }
+    }
+
+    /// 非同步重載濾除清單：讀檔與格式整理在使用者資料寫入巷上完成，
+    /// 解析結果（`replaceData`）才回到主執行緒套用。
+    ///
+    /// 與 ``reloadUserFilterDirectly(path:)`` 的語義差別僅在「讀檔在何處執行」：兩者最終都令
+    /// `lxFiltered` 之內容等於該檔之當下內容（讀檔失敗則清空）。之所有必要另立此路徑，是因為
+    /// 濾除清單可能很大、且所在之卷可能極慢——在主執行緒上讀它即等於卡住整個輸入法。
+    public func reloadUserFilterData(path: String) {
+      // 舊資料不先清：非同步路徑之「空窗期」由 `replaceData` 之全量取代收口（與 P315 對
+      // `loadUserPhrasesData` 之處理同一理由）。
+      unigramLRUCache.removeAll(keepingCapacity: true)
+      LXAssembly.readFileContentAsync(
+        path: path,
+        shouldConsolidate: lxFiltered.allowConsolidation,
+        using: locator,
+        completion: { [weak self] content in
+          guard let self else { return }
+          LXAssembly.withFileHandleQueueSync {
+            self.lxFiltered.replaceData(textData: content)
+          }
+          self.lxFiltered.filePath = path
+          // 新資料已就位：即時令查詢快取失效，避免空窗期內產生的條目殘留。
+          self.unigramLRUCache.removeAll(keepingCapacity: true)
+          vCLMLog("lxFiltered: \(self.lxFiltered.count) entries of data loaded from: \(path)")
+        },
+        onFailure: { [weak self] in
+          self?.lxFiltered.clear()
+          self?.unigramLRUCache.removeAll(keepingCapacity: true)
+        }
+      )
     }
 
     public func loadUserSymbolData(path: String) {

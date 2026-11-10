@@ -376,14 +376,18 @@ extension InputHandlerProtocol {
               .map { (ngramKey: $0.contextualizedGramKey, candidate: $0.candidate) },
           ].compactMap { $0 }
           if !contextualTargets.isEmpty {
-            currentLM.bleachSpecifiedPOMSuggestions(targets: contextualTargets)
+            currentLM.bleachSpecifiedPOMSuggestions(
+              targets: contextualTargets, saveCallback: pomSaveCallback
+            )
           }
           let candidateTargets = [
             pomObservationPrimary?.candidate,
             pomObservation2ndary?.candidate,
           ].compactMap { $0 }
           if !candidateTargets.isEmpty {
-            currentLM.bleachSpecifiedPOMSuggestions(targets: Array(Set(candidateTargets)))
+            currentLM.bleachSpecifiedPOMSuggestions(
+              targets: Array(Set(candidateTargets)), saveCallback: pomSaveCallback
+            )
           }
           pomObservationPrimary = nil
           pomObservation2ndary = nil
