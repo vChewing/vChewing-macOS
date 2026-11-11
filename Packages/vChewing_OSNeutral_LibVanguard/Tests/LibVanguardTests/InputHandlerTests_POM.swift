@@ -326,7 +326,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     #expect(obsCaptured?.contextualizedGramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
     guard let obsCaptured else {
-      preconditionFailure("Should have a capture.")
+      fatalError("Should have a capture.")
     }
     let assembledFollowingOverride = assembler.assembledSentence
       .map(\.value)
@@ -340,7 +340,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let currentmemory = pom.getSavableData()
     let firstObservationKey = currentmemory.first?.key
     guard let firstObservationKey else {
-      preconditionFailure("POM memorized nothing, or something wrong happen.")
+      fatalError("POM memorized nothing, or something wrong happen.")
     }
     #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
     // 然後是記憶效力測試：
@@ -460,7 +460,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(overrideSucceeded)
     #expect(obsCaptured?.contextualizedGramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
     guard let obsCaptured else {
-      preconditionFailure("Should have a capture.")
+      fatalError("Should have a capture.")
     }
 
     let assembledAfter = assembler.assembledSentence.map(\.value).joined(separator: " ")
@@ -473,7 +473,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let currentmemory = pom.getSavableData()
     let firstObservationKey = currentmemory.first?.key
     guard let firstObservationKey else {
-      preconditionFailure("POM memorized nothing, or something wrong happen.")
+      fatalError("POM memorized nothing, or something wrong happen.")
     }
     #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
 
@@ -493,7 +493,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
     #expect(!suggestion.isEmpty)
     guard let firstSuggestionRAW = suggestion.candidates.first else {
-      preconditionFailure("POM suggested nothing, or something wrong happen.")
+      fatalError("POM suggested nothing, or something wrong happen.")
     }
 
     let candidateSuggested = Homa.CandidatePair(

@@ -65,7 +65,7 @@ extension POMTestSuite {
       }
       #expect(obsCaptured?.contextualizedGramKey == "(zai4,再)&(chuang4,創)&(shi4,世)")
       guard let obsCaptured else {
-        preconditionFailure("Should have a capture.")
+        fatalError("Should have a capture.")
       }
       // compositor.assemble() <- 已經組句了。
       let assembledFollowingOverride = compositor.assembledSentence.values.joined(separator: " ")
@@ -78,7 +78,7 @@ extension POMTestSuite {
       let currentmemory = pom.getSavableData()
       let firstObservationKey = currentmemory.first?.key
       guard let firstObservationKey else {
-        preconditionFailure("POM memorized nothing, or something wrong happen.")
+        fatalError("POM memorized nothing, or something wrong happen.")
       }
       #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
       // 然後是記憶效力測試：
@@ -101,7 +101,7 @@ extension POMTestSuite {
       )
       #expect(!suggestion.isEmpty)
       guard let firstSuggestionRAW = suggestion.candidates.first else {
-        preconditionFailure("POM suggested nothing, or something wrong happen.")
+        fatalError("POM suggested nothing, or something wrong happen.")
       }
       let candidateSuggested = Homa.CandidatePair(
         keyArray: firstSuggestionRAW.keyArray,
@@ -154,7 +154,7 @@ extension POMTestSuite {
       }
       #expect(obsCaptured?.contextualizedGramKey == "(zai4,再)&(chuang4,創)&(shi4,世)")
       guard let obsCaptured else {
-        preconditionFailure("Should have a capture.")
+        fatalError("Should have a capture.")
       }
 
       let assembledFollowingOverride = compositor.assembledSentence.values.joined(separator: " ")
@@ -167,7 +167,7 @@ extension POMTestSuite {
       let currentmemory = pom.getSavableData()
       let firstObservationKey = currentmemory.first?.key
       guard let firstObservationKey else {
-        preconditionFailure("POM memorized nothing, or something wrong happen.")
+        fatalError("POM memorized nothing, or something wrong happen.")
       }
       #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
 
@@ -186,7 +186,7 @@ extension POMTestSuite {
       )
       #expect(!suggestion.isEmpty)
       guard let firstSuggestionRAW = suggestion.candidates.first else {
-        preconditionFailure("POM suggested nothing, or something wrong happen.")
+        fatalError("POM suggested nothing, or something wrong happen.")
       }
 
       let candidateSuggested = Homa.CandidatePair(
@@ -249,7 +249,7 @@ extension POMTestSuite {
       }
       #expect(obsCaptured?.contextualizedGramKey == "(shang1-wu4,商務)&(ying1-yu3,英語)&(hui4-hua4,會話)")
       guard let obsCaptured else {
-        preconditionFailure("Should have a capture.")
+        fatalError("Should have a capture.")
       }
       // compositor.assemble() <- 已經組句了。
       let assembledFollowingOverride = compositor.assembledSentence.values.joined(separator: " ")
@@ -262,7 +262,7 @@ extension POMTestSuite {
       let currentmemory = pom.getSavableData()
       let firstObservationKey = currentmemory.first?.key
       guard let firstObservationKey else {
-        preconditionFailure("POM memorized nothing, or something wrong happen.")
+        fatalError("POM memorized nothing, or something wrong happen.")
       }
       #expect(firstObservationKey == obsCaptured.contextualizedGramKey) // 然後是記憶效力測試：
       let validationLX = TestLX(rawData: HomaTests.strLXSampleData_BusinessEnglishSession)
@@ -284,7 +284,7 @@ extension POMTestSuite {
       )
       #expect(!suggestion.isEmpty)
       guard let firstSuggestionRAW = suggestion.candidates.first else {
-        preconditionFailure("POM suggested nothing, or something wrong happen.")
+        fatalError("POM suggested nothing, or something wrong happen.")
       }
       let candidateSuggested = Homa.CandidatePair(
         keyArray: firstSuggestionRAW.keyArray,
@@ -349,7 +349,7 @@ extension POMTestSuite {
         obsCaptured = $0
       }
       guard let obsCaptured else {
-        preconditionFailure("Should have a capture.")
+        fatalError("Should have a capture.")
       }
       #expect(obsCaptured.candidate == "遞交")
       #expect(obsCaptured.contextualizedGramKey == "()&(di4,第)&(di4-jiao1,遞交)")
@@ -395,7 +395,7 @@ extension POMTestSuite {
       )
       #expect(!suggestion.isEmpty)
       guard let firstSuggestionRAW = suggestion.candidates.first else {
-        preconditionFailure("POM suggested nothing, or something wrong happen.")
+        fatalError("POM suggested nothing, or something wrong happen.")
       }
       #expect(firstSuggestionRAW.value == "遞交")
       #expect(firstSuggestionRAW.keyArray == ["di4", "jiao1"])
@@ -473,7 +473,7 @@ extension POMTestSuite {
       #expect(assembledAfterOverride == "多 奇")
 
       guard let obsCaptured else {
-        preconditionFailure("Should have captured the perception intel.")
+        fatalError("Should have captured the perception intel.")
       }
       // sameLenSwap 場景，key 反映覆寫後的結果。
       #expect(obsCaptured.contextualizedGramKey == "()&(ㄉㄨㄛ,多)&(ㄑㄧˊ,奇)")
@@ -489,7 +489,7 @@ extension POMTestSuite {
       let currentMemory = pom.getSavableData()
       let firstObservationKey = currentMemory.first?.key
       guard let firstObservationKey else {
-        preconditionFailure("POM memorized nothing.")
+        fatalError("POM memorized nothing.")
       }
       #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
 
@@ -511,7 +511,7 @@ extension POMTestSuite {
       )
       #expect(!suggestion.isEmpty, "POM should suggest the memorized override.")
       guard let firstSuggestionRAW = suggestion.candidates.first else {
-        preconditionFailure("POM suggested nothing.")
+        fatalError("POM suggested nothing.")
       }
 
       let candidateSuggested = Homa.CandidatePair(

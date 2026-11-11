@@ -96,7 +96,7 @@ public final class LXMgr {
   // (InputSession_HandleEvent shows "Factory dictionary not loaded yet." tooltip).
   public static func connectCoreDB(dbPath: String? = nil) {
     guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
-      preconditionFailure("vChewing factory TextMap data not found.")
+      fatalError("vChewing factory TextMap data not found.")
     }
     Notifier.notify(
       message: "i18n:LXMgr.notification.FactoryLexiconLoadingStarted".i18n

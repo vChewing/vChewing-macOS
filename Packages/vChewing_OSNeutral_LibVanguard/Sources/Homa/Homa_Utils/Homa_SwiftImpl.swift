@@ -296,7 +296,7 @@ public struct FIUUID: Hashable, Codable, Sendable {
     /// 以 `UUID` 表示的識別值，僅在可匯入 Foundation 時提供。
     public var uuid: UUID {
       guard let result = UUID(uuidString: uuidString()) else {
-        preconditionFailure("Invalid FIUUID state: unable to produce UUID string.")
+        fatalError("Invalid FIUUID state: unable to produce UUID string.")
       }
       return result
     }
@@ -304,7 +304,7 @@ public struct FIUUID: Hashable, Codable, Sendable {
     /// 透過 Foundation 的 `UUID` 初期化。
     public init(uuid: UUID) {
       guard let value = FIUUID(uuidString: uuid.uuidString) else {
-        preconditionFailure("Unable to convert UUID to FIUUID.")
+        fatalError("Unable to convert UUID to FIUUID.")
       }
       self = value
     }

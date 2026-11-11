@@ -725,7 +725,7 @@ extension DualpinParser {
     do {
       return try JSONDecoder().decode(DualpinParser.self, from: Data(json.utf8))
     } catch {
-      preconditionFailure("Arimitsu：內建方案「\(name)」之 JSON 原文無法解碼：\(error)")
+      fatalError("Arimitsu：內建方案「\(name)」之 JSON 原文無法解碼：\(error)")
     }
   }
 
