@@ -46,6 +46,18 @@ struct InputTokenTests {
   }
 
   @Test
+  func testTranslatingTokens_6_LunarDateMonthDaySuffix() throws {
+    // 農曆日期之尾綴「日」不是 `MMMd` 的一部分，須由格式字串自帶。
+    for isCHS in [false, true] {
+      let results = "MACRO@DATE_LUNA".parseAsInputToken(isCHS: isCHS)
+      #expect(results.count == 2)
+      #expect(results.allSatisfy { $0.contains("年") && $0.contains("月") && $0.hasSuffix("日") })
+      let monthDayParts = results.compactMap { $0.split(separator: "年", maxSplits: 1).last }
+      #expect(Set(monthDayParts.map(\.description)).count == 1)
+    }
+  }
+
+  @Test
   func testTranslatingTokens_4_Week() throws {
     print("測試今天星期幾：" + "MACRO@WEEK".parseAsInputToken(isCHS: false).description)
     print("測試今天週幾：" + "MACRO@WEEK_SHORTENED".parseAsInputToken(isCHS: false).description)

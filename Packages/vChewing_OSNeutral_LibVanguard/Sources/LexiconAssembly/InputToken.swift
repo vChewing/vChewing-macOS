@@ -133,7 +133,8 @@ extension LXAssembly.InputToken {
       guard !hasLuna else {
         formatter.calendar = .init(identifier: .chinese)
         formatter.dateStyle = .medium
-        formatter.dateFormat = "MMMd"
+        // 「日」不是 `MMMd` 的一部分，須由格式字串自帶。
+        formatter.dateFormat = "MMMd日"
         let dateString = formatter.string(from: dateToDescribe)
         formatter.dateFormat = "U"
         let yearGanzhi = formatter.string(from: dateToDescribe)
