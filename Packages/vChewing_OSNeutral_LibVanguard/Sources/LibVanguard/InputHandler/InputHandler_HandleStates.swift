@@ -446,6 +446,7 @@ extension InputHandlerProtocol {
     var pomObservation: Homa.PerceptionIntel?
     let outcome = applyFuriousFrontCandidate(
       candidate, to: assembler, bucket: bucket,
+      appendsPendingAbbreviation: abbreviatedCells != nil,
       perceptionHandler: memorizePOM ? { pomObservation = $0 } : nil
     )
     switch outcome {

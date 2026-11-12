@@ -2067,6 +2067,80 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testSession.state.type == .ofInputting)
   }
 
+  /// 狂拼整詞簡拼（R2-α）之就地選字，不得被「組字器已有內容」時之段數上限誤攔。
+  ///
+  /// 症狀（生產環境）：先敲「ta」再敲「sll」，組字區顯示「他sll」、候選窗列出「酸溜溜」
+  /// 「溼漉漉」「溼淋淋」，此時 Shift+2／Shift+3 皆無反應。根因：
+  /// `applyFuriousFrontCandidate` 之 P169 承接上限以「組字器鍵數 ＋ 1」計，其「1」係
+  /// 單一前方音節之語義；簡拼整詞之待確認素材本即多音節（此例 3 格），三音節候選遂被
+  /// 誤判為「與既有鍵重疊」而靜默退回。
+  @Test("IH-FuriousPinyin-058 Furious abbreviation selection after committed syllables")
+  func test_IH_FuriousPinyin_058_FuriousAbbreviationSelectionAfterCommittedSyllables() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled4Pinyin = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.mockCandidateController = nil
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 三音節簡拼候選（分數相近，故不觸發 R3-a 自動套用）＋單音節 gram（供讀音存在性驗證）。
+    [
+      .init(keyArray: ["ㄊㄚˇ"], value: "他", score: 9),
+      .init(keyArray: ["ㄙㄨㄢ", "ㄌㄧㄡ", "ㄌㄧㄡ"], value: "酸溜溜", score: 9),
+      .init(keyArray: ["ㄕ", "ㄌㄨˋ", "ㄌㄨˋ"], value: "溼漉漉", score: 8.5),
+      .init(keyArray: ["ㄕ", "ㄌㄧㄣ", "ㄌㄧㄣ"], value: "溼淋淋", score: 8),
+      .init(keyArray: ["ㄙㄨㄢ"], value: "酸", score: 0),
+      .init(keyArray: ["ㄌㄧㄡ"], value: "溜", score: 0),
+      .init(keyArray: ["ㄕ"], value: "溼", score: 0),
+      .init(keyArray: ["ㄌㄨˋ"], value: "漉", score: 0),
+      .init(keyArray: ["ㄌㄧㄣ"], value: "淋", score: 0),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled4Pinyin = true
+    testHandler.currentLM.syncPrefs()
+
+    // 先敲一音節「ta」：此刻尚留在注拼槽，下一鍵輸入時方自動切音節、固化進組字器。
+    typeSentence("ta")
+    #expect(testHandler.composer.romajiBuffer == "ta")
+    #expect(testHandler.assembler.isEmpty)
+
+    // 再敲「sll」：鍵入「s」時「ta」自動切音節固化為「他」；其後三格簡拼候選成立。
+    typeSentence("sll")
+    #expect(testHandler.assembler.keys.count == 1, "「ta」應在鍵入下一音節首鍵時固化為一個鍵。")
+    #expect(testHandler.composer.romajiBuffer == "sll")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.candidates.first?.value == "酸溜溜")
+    #expect(testSession.state.candidates.contains { $0.value == "溼漉漉" })
+
+    // 模擬候選窗已顯示（handleCandidate 需要 ctlCandidate.visible）。
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+
+    // Shift+2：就地選中第二候選「溼漉漉」。
+    let shift2 = KBEvent.KeyEventData(
+      flags: .shift, chars: "@", charsSansModifiers: "2", keyCode: 19
+    ).asEvent
+    #expect(testHandler.triageInput(event: shift2))
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty, "選中後注拼槽應清空。")
+    #expect(testHandler.assembler.keys.count == 4, "組字器應為「他」＋三個候選讀音。")
+    #expect(generateDisplayedText().contains("溼漉漉"), "組字區應顯示所選之整詞候選。")
+    #expect(testSession.state.type == .ofInputting)
+  }
+
   /// 狂拼整詞簡拼（R2-α）空白鍵固化：注拼槽整段無法展開成單一音節桶（如「xqr」→
   /// 「星期日」）時，空白鍵把整詞簡拼候選之首的實際讀音以單鍵插入組字器
   /// （不覆寫、保留 LM 重切分自由度）、清空注拼槽、trail 失效——不丟失前方上下文。

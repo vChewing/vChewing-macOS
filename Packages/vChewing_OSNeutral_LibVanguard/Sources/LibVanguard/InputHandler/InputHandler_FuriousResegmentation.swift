@@ -525,16 +525,41 @@ extension InputHandlerProtocol {
   /// （只插聲調桶、不覆寫，保留重切分自由度）。
   /// - Parameter preservingFuzzyKeys: 為 true 時一律插入整組聲調桶（保留 tone-fuzzy
   ///   候選窗），僅以覆寫釘住顯示——用於空白鍵固化的「模擬選字窗選字」路徑。
+  /// - Parameter appendsPendingAbbreviation: 為 true 時，候選之讀音**整段**代表注拼槽內
+  ///   待確認之多音節簡拼素材（`furiousContext == nil` 之 R2-α 路徑）⇒ 一律接在組字器
+  ///   尾端、覆寫該段，**不**參與跨邊界／首段重合之判定。此二判定係為「候選橫跨已提交鍵」
+  ///   而設；簡拼素材仍全程住注拼槽、尚未進入組字器，故對它作該判定即可能把候選首段
+  ///   誤併入上一個已提交之鍵，亦會觸發 P169 之段數上限（其「1」係單一前方音節之語義）
+  ///   而靜默退回（實測：`tasll` 之 Shift+2／Shift+3 無反應）。
   @discardableResult
   func applyFuriousFrontCandidate(
     _ candidate: CandidateInState,
     to targetAssembler: Homa.Assembler,
     bucket: [String],
     preservingFuzzyKeys: Bool = false,
+    appendsPendingAbbreviation: Bool = false,
     perceptionHandler: ((Homa.PerceptionIntel) -> ())? = nil
   )
     -> FuriousFrontApplyOutcome {
     guard !candidate.value.isEmpty else { return .failed }
+    // R2-α 簡拼整詞：待確認素材（注拼槽之多音節字母流）尚未進入組字器，故候選之讀音
+    // 全部都是新位置 ⇒ 逐讀音接在游標後、再覆寫該 span。此路徑必須先於跨邊界與 P169
+    // 之段數上限——後兩者以「前方只有一個音節」為前提。
+    if appendsPendingAbbreviation {
+      let anchor = targetAssembler.cursor
+      let keysToInsert = candidate.keyArray.map { Homa.PossibleKey.singleKey($0) }
+      guard !keysToInsert.isEmpty,
+            (try? targetAssembler.insertKeys(keysToInsert)) != nil else { return .failed }
+      let success = (try? targetAssembler.overrideCandidate(
+        .init(keyArray: candidate.keyArray, value: candidate.value),
+        at: anchor,
+        type: .withSpecified,
+        isExplicitlyOverridden: true,
+        enforceRetokenization: true,
+        perceptionHandler: perceptionHandler
+      )) != nil
+      return success ? .overridden : .inserted
+    }
     let isBucketPinned = candidate.keyArray == bucket
     var isCrossBoundary = false
     var crossBoundarySpan = 0
@@ -670,22 +695,20 @@ extension InputHandlerProtocol {
   public func previewFuriousHighlightedCandidate(_ candidate: CandidateInState) {
     guard let session = session else { return }
     // α 路徑（R2-α）：前方無法形成單一音節桶（如「ysxb」）時，以空桶試算簡拼整詞候選。
+    let fetchedContext = furiousFrontContext
+    let abbreviatedCells = fetchedContext == nil ? furiousAbbreviatedCells : nil
+    guard fetchedContext != nil || abbreviatedCells != nil else { return }
     let furiousContext: (
       bucket: [String],
       preview: String,
       crossingPair: CandidateInState?,
       assembledMainValues: [String],
       tailReading: String?
-    )
-    if let context = furiousFrontContext {
-      furiousContext = context
-    } else {
-      guard furiousAbbreviatedCells != nil else { return }
-      furiousContext = ([], "", nil, [], nil)
-    }
+    ) = fetchedContext ?? ([], "", nil, [], nil)
     let scratch = assembler.copy
     let outcome = applyFuriousFrontCandidate(
-      candidate, to: scratch, bucket: furiousContext.bucket
+      candidate, to: scratch, bucket: furiousContext.bucket,
+      appendsPendingAbbreviation: abbreviatedCells != nil
     )
     switch outcome {
     case .failed: return // 插入失敗：不更新預覽。
