@@ -443,6 +443,44 @@ pkg-signed: archive
 	@echo "Building signed and notarized PKG installer..."
 	./BuildPKG.sh --sign
 
+# ── notarizeAppInstallers／assemblePublish ──────────────────────────
+#
+# `pkg-signed` 自己就會把 pkg 送審（`BuildPKG.sh --sign` 收尾跑 notarytool 並 staple），
+# 但兩顆 `.app` 版安裝包從前只能在 Xcode Organizer 裡手動 Distribute：重簽 → 送審 →
+# 把回條 staple 回 bundle。這一步現由 `Scripts/notarize-app-installers.sh` 代勞，
+# 兩份 zip 落 `Build/Notarized/`。
+#
+# `assemblePublish` 再把三份產物與 `shasum.txt` 湊進發佈目錄（預設 `../../Publish/
+# Published-v<版號>`，即 `_vChewing/Publish/` 底下那一層），檔名與 shasum 順序沿用
+# 4.9.2 以來既有的習慣。
+NOTARY_PROFILE ?= AC_PASSWORD
+NOTARIZED_DIR ?= Build/Notarized
+PUBLISH_ROOT ?= $(CURDIR)/../../Publish
+
+.PHONY: notarizeAppInstallers assemblePublish
+
+notarizeAppInstallers:
+	./Scripts/notarize-app-installers.sh --out "$(NOTARIZED_DIR)" --profile "$(NOTARY_PROFILE)"
+
+assemblePublish: notarizeAppInstallers
+	@set -e; \
+	ver=$$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Release-Version.plist); \
+	pkg="Build/vChewing-macOS-$$ver-signed.pkg"; \
+	if [ ! -f "$$pkg" ]; then echo "缺少 $$pkg；請先跑 make pkg-signed。" >&2; exit 1; fi; \
+	alt="vChewing-macOS-$$ver-signed-alternative.zip"; \
+	aqua="vChewingAqua-$$ver-signed.zip"; \
+	dst="$(PUBLISH_ROOT)/Published-v$$ver"; \
+	mkdir -p "$$dst"; \
+	cp "$$pkg" "$$dst/"; \
+	cp "$(NOTARIZED_DIR)/$$alt" "$$dst/"; \
+	cp "$(NOTARIZED_DIR)/$$aqua" "$$dst/"; \
+	cd "$$dst"; \
+	rm -f .DS_Store; \
+	shasum -a 256 "$$alt" "vChewing-macOS-$$ver-signed.pkg" "$$aqua" > shasum.txt; \
+	ls -lh; \
+	echo; \
+	cat shasum.txt
+
 archive: universal-build
 	@echo "Assembling and archiving app bundles..."
 	swift package --allow-writing-to-package-directory bundle-apps -- --build-dir $(UNIVERSAL_DIR) --archive
