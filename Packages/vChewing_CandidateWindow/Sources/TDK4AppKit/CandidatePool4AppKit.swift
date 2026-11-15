@@ -130,6 +130,15 @@ extension TDK4AppKit {
 
     let padding: CGFloat = 2
 
+    /// 該池之「佔寬邊距」：`繪製佔寬 − textDimension.width`。
+    ///
+    /// `textDimension` 量「選字鍵 ＋ 一個空白 ＋ 候選字詞」，繪製面則是「前端內距 ＋ 標籤盒
+    /// ＋ 候選字詞」⇒ 兩者之差是一個與內容無關、只隨（字級, locale）而變的常數：
+    /// `2 × padding ＋ 標籤盒 − 標籤字串 advance − 空白 advance`。
+    /// 由池層一次算得（每個池 2 次量測，O(1)），逐格只做加法；
+    /// **建池路徑不得逐格量測**——狂打時候選清單可逾千格（見 P349）。
+    private(set) var footprintMargin: CGFloat = 0
+
     let originDelta: CGFloat = {
       if #unavailable(macOS 26.0) { return 3 }
       return 2
@@ -397,6 +406,10 @@ extension TDK4AppKit {
 
     // MARK: Private
 
+    /// 範本 cell 之戳記：`"<字級>#<locale>"`。戳記一變即重建範本，
+    /// 免其烘焙值（`textDimension`／`visualDimension`）停在初次存取時之字級（P231 之定影）。
+    private static var templateStamp = ""
+
     /// 選字鍵屬性字串快取（keyed by cell.index），僅存活於一次排版→繪製循環內。
     private var headerCache: [Int: NSAttributedString] = [:]
     /// 候選字詞屬性字串快取（keyed by cell.index，再依 isMatrix 分層）。
@@ -409,6 +422,38 @@ extension TDK4AppKit {
     /// 觀察者令牌。`deinit` 為 nonisolated，故以 `nonisolated(unsafe)` 標記
     /// （僅用來解除註册，不侜他用）。
     nonisolated(unsafe) private var systemAppearanceObserver: NSObjectProtocol?
+
+    /// 依（字級, locale）戳記重建兩個行程級範本 cell；戳記未變則不動。
+    private static func refreshTemplateCellsIfNeeded(locale: CandidateLocale) {
+      let stamp = "\(CandidateCellData4AppKit.unifiedSize)#\(locale.rawValue)"
+      guard stamp != templateStamp else { return }
+      templateStamp = stamp
+      shitCell = CandidateCellData4AppKit(
+        key: " ", displayedText: "💩", isSelected: false, locale: locale
+      )
+      blankCell = CandidateCellData4AppKit(
+        key: " ", displayedText: "　", isSelected: false, locale: locale
+      )
+    }
+
+    /// 算該池之佔寬邊距（每個池 2 次量測；逐格不再量測）。
+    ///
+    /// 兩次量測皆取**未取整**之 `size()`：`textDimension` 本身已 `ceil`，
+    /// 其差值取未取整值才不會把誤差累積成「少算」。
+    private static func footprintMargin(padding: CGFloat, locale: CandidateLocale) -> CGFloat {
+      let probe = CandidateCellData4AppKit(
+        key: "0", displayedText: "我", isSelected: false, locale: locale
+      )
+      let headerAdvance = NSAttributedString(
+        string: "0",
+        attributes: [.kern: 0, .font: probe.selectionKeyFont()]
+      ).size().width
+      let spaceAdvance = NSAttributedString(
+        string: " ",
+        attributes: [.kern: 0, .font: probe.phraseFont()]
+      ).size().width
+      return 2 * padding + probe.keyLabelBoxSide - headerAdvance - spaceAdvance
+    }
 
     private func startObservingSystemAppearance() {
       guard systemAppearanceObserver == nil else { return }
@@ -439,7 +484,8 @@ extension TDK4AppKit {
     ) {
       self.layout = layout
       let cellLocale = CandidateLocale(languageTag: locale)
-      Self.blankCell.locale = cellLocale
+      Self.refreshTemplateCellsIfNeeded(locale: cellLocale)
+      footprintMargin = Self.footprintMargin(padding: padding, locale: cellLocale)
       self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
       cleanDataOnMain()
       isExpanded = expanded
@@ -667,7 +713,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
   /// 「標籤盒 ＋ 候選字詞」遂越出該格之矩形：高亮底色短於字詞、字詞溢入右鄰格。
   /// 行容量之推算、實際排版與上下鍵之最近格推算三處皆須經此一途，不得各算一套。
   func matrixCellWidth(_ cell: CandidateCellData4AppKit, minCellWidth: Double) -> Double {
-    cell.cellWidthMultiplied(minCellWidth: minCellWidth, padding: padding)
+    cell.cellWidthMultiplied(minCellWidth: minCellWidth, margin: footprintMargin)
   }
 
   func isFilterable(target index: Int) -> Bool {

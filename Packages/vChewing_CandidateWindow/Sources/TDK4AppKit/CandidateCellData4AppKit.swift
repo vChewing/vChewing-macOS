@@ -30,14 +30,9 @@ extension TDK4AppKit {
         width: ceil(Self.unifiedCharDimension * 1.4),
         height: Self.unifiedTextHeight
       )
-      self.keyAndPhraseWidth = 0
       if displayedText.count > 1 {
         textDimension.width = makeAttributedString().getBoundingDimension().width
       }
-      // 該格之面積下限只在此處與「繪製所用之字型」同源算出（locale 已就位）：
-      // 候選字詞之字型隨 locale 而異（實測 ja 與 zh-Hant 之同字串寬度不同），
-      // 若日後改以繪製當下才量測，必須一併保證與此處同源。
-      self.keyAndPhraseWidth = keyLabelBoxSide + measuredPhraseWidth(isMatrix: false)
     }
 
     // MARK: Internal
@@ -94,10 +89,6 @@ extension TDK4AppKit {
     var selectionKey: String
     let displayedText: String
     private(set) var textDimension: CGSize
-    /// 該格之內容寬度（不含內距）：選字鍵標籤之正方形區域 ＋ 候選字詞之實測寬度。
-    /// 此即「面積」之唯一真源——`requiredCellWidth(padding:)` 只在其上加計內距。
-    /// 於初期化時以當下之字級與 locale 定影（與 `textDimension` 同制）。
-    private(set) var keyAndPhraseWidth: CGFloat
     var segLength: Int
     /// 該候選字詞的原始讀音鍵陣列，用於讀音 disambiguation 顯示。
     let keyArray: [String]
@@ -224,41 +215,32 @@ extension TDK4AppKit {
       return textDimension.width
     }
 
-    /// 該格之面積下限：前端內距 2 × padding ＋ 標籤盒 ＋ 候選字詞 ＋ 尾端內距 4 × padding。
-    ///
-    /// 此值**不得**再由「前端內距只算一份」之舊式推得（該式會吃掉尾端內距），亦不得
-    /// 以 `textDimension`（＝「選字鍵字串 ＋ 一個空白 ＋ 候選字詞」之實測寬）替代：
-    /// 兩者在繪製面上不是同一個東西——標籤盒係正方形（邊長＝標籤行高）、候選字詞自其右緣
-    /// 起排，故實際佔寬為「標籤盒 ＋ 候選字詞」，與 `textDimension` 之差可達數點。
-    /// 凡計算該格面積者（非矩陣之硬約束、矩陣之倍數化下限）一律經此一途。
-    func requiredCellWidth(padding: CGFloat) -> CGFloat {
-      keyAndPhraseWidth + 6 * padding
-    }
-
-    /// 候選字詞之實測寬度（單行）。`locale` 已就位時，此值與繪製所用之字型同源。
-    func measuredPhraseWidth(isMatrix: Bool = false) -> CGFloat {
-      makeAttributedStringPhrase(isMatrix: isMatrix).getBoundingDimension().width
-    }
-
     /// 該格之**繪製佔寬**：前端內距 2 × padding ＋ 標籤盒 ＋ 候選字詞（不含尾端內距）。
-    /// 此即「不得截字」之硬下限——矩陣之倍數化以此為基，非矩陣之硬約束另加尾端內距。
-    func drawFootprintWidth(padding: CGFloat) -> CGFloat {
-      2 * padding + keyAndPhraseWidth
+    ///
+    /// `textDimension` 量的是「選字鍵 ＋ 一個空白 ＋ 候選字詞」之組合字串，而繪製面上
+    /// 標籤盒係正方形（邊長＝標籤行高）、候選字詞自其右緣起排 ⇒ 兩者之差是一個
+    /// **與內容無關、只隨（字級, locale）而變**的常數。該常數由資料池一次算得
+    /// （`CandidatePool4AppKit.footprintMargin`），逐格只做一次加法——
+    /// 建池路徑**不得**再逐格量測（成本為 O(N)，狂打時 N 可逾千）。
+    /// 單字候選之 `textDimension` 係合成值（不量測），其面積由最小格寬／emoji 地板決定。
+    func drawFootprintWidth(margin: CGFloat) -> CGFloat {
+      textDimension.width + margin
+    }
+
+    /// 該格之面積下限：繪製佔寬 ＋ 尾端內距 4 × padding。非矩陣路徑之硬約束。
+    func requiredCellWidth(padding: CGFloat, margin: CGFloat) -> CGFloat {
+      drawFootprintWidth(margin: margin) + 4 * padding
     }
 
     /// 計算橫排矩陣之 cell 寬度：**恆為最小格寬之整數倍**，且該倍數須容得下該格之繪製佔寬。
     ///
-    /// 倍數化之基**不得**取 `textDimension`（＝「選字鍵 ＋ 一個空白 ＋ 候選字詞」之實測寬）：
-    /// 繪製面上標籤盒係正方形（邊長＝標籤行高）、候選字詞自其右緣起排，實際佔寬是
-    /// 「標籤盒 ＋ 候選字詞」，兩者相差數點；而 `ceil` 對「恰為整數倍」之基數不帶來任何餘裕，
-    /// 字詞遂越出該格。改以 `drawFootprintWidth(padding:)` 為基之後，倍數化只會加寬、不會截字。
     /// 尾端內距不在本路徑之約束內（矩陣之尾端內距即該倍數之餘裕，沿既有裁定）。
     /// - Parameters:
     ///   - minCellWidth: 最小 cell 寬度（通常是 `blankCell.cellLength()`）。
-    ///   - padding: 該池之內距（前端算 2 份）。
+    ///   - margin: 該池之佔寬邊距（`CandidatePool4AppKit.footprintMargin`）。
     /// - Returns: 不小於繪製佔寬、且為 `minCellWidth` 整數倍之寬度。
-    func cellWidthMultiplied(minCellWidth: Double, padding: CGFloat) -> Double {
-      let footprint = drawFootprintWidth(padding: padding)
+    func cellWidthMultiplied(minCellWidth: Double, margin: CGFloat) -> Double {
+      let footprint = drawFootprintWidth(margin: margin)
       guard minCellWidth > 0 else { return ceil(footprint) }
       // 單字候選（含全形空白、範本 cell）之佔寬本就小於一個單位，故取一個單位為下限。
       let units = ceil(max(footprint, minCellWidth) / minCellWidth)
@@ -326,7 +308,19 @@ extension TDK4AppKit {
       // 選字鍵標籤之正方形區域與候選字詞必須同時放得進該格，且尾端一側亦得留足內距：
       // 內容自 2 × padding 起算、依序為標籤盒與候選字詞，尾端另留 4 × padding（經實機目視定案）。
       // 面積下限之算式住 `requiredCellWidth(padding:)`；此處不得另行就地複寫一份。
-      cellDimension.width = max(cellDimension.width, requiredCellWidth(padding: padding))
+      if thePool.isHorizontal, thePool.isMatrix {
+        // 矩陣：格寬稍後由 `matrixCellWidth` 覆寫（以池層 margin 推得，逐格不量測）。
+        cellDimension.width = max(
+          cellDimension.width,
+          requiredCellWidth(padding: padding, margin: thePool.footprintMargin)
+        )
+      } else {
+        // 非矩陣：此處只排「當前頁」（≤ 4 列 × 9 格），故量測不構成建池成本；
+        // 單字候選之 `textDimension` 係合成值、非繪製佔寬，故硬約束必須逐格實測。
+        let keyAndPhraseWidth = keyLabelBoxSide
+          + makeAttributedStringPhrase(isMatrix: false).getBoundingDimension().width
+        cellDimension.width = max(cellDimension.width, keyAndPhraseWidth + 6 * padding)
+      }
       visualDimension = cellDimension
       visualOrigin = currentOrigin
       headerDrawYOffset = ceil(cellDimension.height * 0.2)

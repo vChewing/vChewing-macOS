@@ -422,14 +422,24 @@ struct TDK4AppKitTests {
           #expect(!laidOutCells.isEmpty, "字級 \(size)／\(layout)／\(lines) 列：應有 cell 完成排版")
           for cell in laidOutCells {
             let context = "字級 \(size)／\(layout)／\(lines) 列／「\(cell.displayedText)」"
-            // 繪製佔寬由繪製面之資料獨立算出（不經 `keyAndPhraseWidth`），以資對帳。
+            // 繪製佔寬由繪製面之資料獨立算出（不經池層 margin），以資對帳。
             let footprint = 2 * pool.padding + cell.phraseDrawXOffset
-              + cell.measuredPhraseWidth(isMatrix: false)
-            let required = cell.requiredCellWidth(padding: pool.padding)
+              + cell.makeAttributedStringPhrase(isMatrix: false).getBoundingDimension().width
             #expect(
               cell.visualDimension.width >= footprint,
               "\(context)：格寬 \(cell.visualDimension.width) 小於繪製佔寬 \(footprint)"
             )
+            // 池層 margin 口徑與實測面積須一致（多字格：`textDimension` 為組合字串之實測值；
+            // 單字格之 `textDimension` 係合成值，不在此列）。容差 1.5 點＝兩次 ceil 之累積。
+            if cell.displayedText.count > 1 {
+              let derived = cell.requiredCellWidth(
+                padding: pool.padding, margin: pool.footprintMargin
+              )
+              #expect(
+                abs(derived - (footprint + 4 * pool.padding)) <= 1.5,
+                "\(context)：margin 口徑 \(derived) 與實測面積 \(footprint + 4 * pool.padding) 之差應 ≤ 1.5 點"
+              )
+            }
             if layout == .horizontal, pool.isMatrix {
               // 矩陣：格寬恆為最小格寬之整數倍，且該倍數須容得下繪製佔寬。
               let units = cell.visualDimension.width / minCellWidth
@@ -441,14 +451,16 @@ struct TDK4AppKitTests {
               // 之比較會誤報失敗——實測兩側皆為 90.0 卻報 `false`。
               #expect(
                 cell.visualDimension.width
-                  == CGFloat(cell.cellWidthMultiplied(minCellWidth: minCellWidth, padding: pool.padding)),
+                  == CGFloat(cell.cellWidthMultiplied(
+                    minCellWidth: minCellWidth, margin: pool.footprintMargin
+                  )),
                 "\(context)：矩陣格寬應為繪製佔寬向上取整至最小格寬之整數倍"
               )
             } else {
-              // 非矩陣：硬約束須另含尾端內距 4 × padding。
+              // 非矩陣：硬約束須另含尾端內距 4 × padding（以繪製面獨立算出者為準）。
               #expect(
-                cell.visualDimension.width >= required,
-                "\(context)：格寬 \(cell.visualDimension.width) 小於面積下限 \(required)"
+                cell.visualDimension.width >= footprint + 4 * pool.padding,
+                "\(context)：格寬 \(cell.visualDimension.width) 小於實測面積下限 \(footprint + 4 * pool.padding)"
               )
             }
           }
@@ -491,9 +503,9 @@ struct TDK4AppKitTests {
         }
         // 佔寬由繪製面之資料獨立算出（不經 `drawFootprintWidth`），以免斷言隨受測函式連動。
         let shortDrawWidth = 2 * pool.padding + short.phraseDrawXOffset
-          + short.measuredPhraseWidth(isMatrix: false)
+          + short.makeAttributedStringPhrase(isMatrix: false).getBoundingDimension().width
         let longDrawWidth = 2 * pool.padding + long.phraseDrawXOffset
-          + long.measuredPhraseWidth(isMatrix: false)
+          + long.makeAttributedStringPhrase(isMatrix: false).getBoundingDimension().width
         #expect(
           longDrawWidth > shortDrawWidth,
           "字級 \(size)／\(lines) 列：「26年11月09日」之繪製佔寬應大於「26年11月9日」"
@@ -518,6 +530,98 @@ struct TDK4AppKitTests {
         }
       }
     }
+  }
+
+  // MARK: - 建池成本與範本 cell 之戳記
+
+  /// 迴歸鎖定：建池成本不得隨候選格數疊加「逐格量測」。
+  ///
+  /// 單字候選之 `textDimension` 係合成值（零量測），多字候選各量一次；故 1000 格單字之建池
+  /// 應只為 1000 格多字之小半。先前把「標籤盒 ＋ 候選字詞」量測塞進 cell init 時，單字格
+  /// 由 0 條 CTLine 變成 2 條，該比值由約 0.1 升至約 0.6（實測 5.19 → 39.95 ms）。
+  /// 以「比值」為判準（機器無關），另不設絕對毫秒門檻以免 CI 抖動誤殺。
+  @Test
+  func testPoolBuildCostDoesNotMeasureEverySingleCharacterCell() throws {
+    // 每一趟用**互不重複**之候選字串：量測結果有行程級快取（以字串＋屬性為鍵），
+    // 重複建同一份清單會把逐格量測之成本藏掉，而生產環境每鍵之候選清單本即不同。
+    func han(_ round: Int) -> [CandidateInState] {
+      (0 ..< 1_000).map { i in
+        let scalar = UnicodeScalar(0x4E00 + ((round * 1_000 + i) % 0x5000))!
+        return (keyArray: ["ㄐㄧ"], value: String(Character(scalar)))
+      }
+    }
+    func words(_ round: Int) -> [CandidateInState] {
+      (0 ..< 1_000).map { i in
+        (keyArray: ["a", "b"], value: "詞\(round)-\(i)組")
+      }
+    }
+
+    func elapsed(_ make: (Int) -> [CandidateInState]) -> TimeInterval {
+      // 暖機一次（首次會付字型解析之成本），其後三趟各用不同字串。
+      _ = TDK4AppKit.CandidatePool4AppKit(
+        candidates: make(0), lines: 4, isExpanded: true,
+        selectionKeys: "123456789", layout: .horizontal
+      )
+      let start = Date()
+      for round in 1 ... 3 {
+        _ = TDK4AppKit.CandidatePool4AppKit(
+          candidates: make(round), lines: 4, isExpanded: true,
+          selectionKeys: "123456789", layout: .horizontal
+        )
+      }
+      return Date().timeIntervalSince(start) / 3
+    }
+
+    // 計數判準（機器無關）：建 1000 格單字候選之池，不得逐格量測。
+    let before = AttributedStringMeasurementCounter.callCount
+    _ = TDK4AppKit.CandidatePool4AppKit(
+      candidates: han(9), lines: 4, isExpanded: true,
+      selectionKeys: "123456789", layout: .horizontal
+    )
+    let measurements = AttributedStringMeasurementCounter.callCount - before
+    let singleChar = elapsed(han)
+    let multiChar = elapsed(words)
+    print(
+      String(
+        format: "POOL-BUILD 1000 cells: single=%.2f ms, multi=%.2f ms, measurements=%d",
+        singleChar * 1_000, multiChar * 1_000, measurements
+      )
+    )
+    #expect(
+      measurements < 50,
+      "1000 格單字候選之建池觸發了 \(measurements) 次量測——建池不得逐格量測（單字格應為零量測）"
+    )
+  }
+
+  /// 迴歸鎖定：行程級範本 cell（`shitCell`／`blankCell`）之烘焙量測須隨（字級, locale）戳記
+  /// 重建，不得停在初次存取之字級（P231 之「初次存取即定影」）。
+  @Test
+  func testTemplateCellsFollowCandidateFontSize() throws {
+    let baselineSize = PrefMgr.shared.candidateListTextSize
+    defer { PrefMgr.shared.candidateListTextSize = baselineSize }
+
+    func seedTemplates(at size: Int) {
+      PrefMgr.shared.candidateListTextSize = size
+      _ = TDK4AppKit.CandidatePool4AppKit(
+        candidates: [(keyArray: [""], value: "我")], lines: 4, isExpanded: true,
+        selectionKeys: "12", layout: .horizontal
+      )
+    }
+
+    seedTemplates(at: 12)
+    let smallHeight = TDK4AppKit.CandidatePool4AppKit.shitCell.textDimension.height
+    let smallWidth = TDK4AppKit.CandidatePool4AppKit.shitCell.textDimension.width
+    seedTemplates(at: 40)
+    let largeHeight = TDK4AppKit.CandidatePool4AppKit.shitCell.textDimension.height
+    let largeWidth = TDK4AppKit.CandidatePool4AppKit.shitCell.textDimension.width
+    #expect(
+      largeHeight > smallHeight,
+      "範本 cell 之文字高度應隨字級重建（12 → \(smallHeight)、40 → \(largeHeight)）"
+    )
+    #expect(
+      largeWidth > smallWidth,
+      "範本 cell 之文字寬度應隨字級重建（12 → \(smallWidth)、40 → \(largeWidth)）"
+    )
   }
 
   /// 迴歸鎖定：區域編碼以 16 位元（2 bytes）之 LCID 儲存，不得退回 `String`

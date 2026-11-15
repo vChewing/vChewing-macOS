@@ -111,6 +111,18 @@
     }
   }
 
+  // MARK: - AttributedStringMeasurementCounter
+
+  /// 屬性字串量測之呼叫次數（**僅供測試**）。
+  ///
+  /// 用途是斷言「候選窗建池路徑不得逐格量測」：建池對整個候選清單建 cell（狂打可逾千格），
+  /// 而排版只涉當前頁；逐格量測會令建池成本隨 N 線性疊加。計數置於量測入口，
+  /// 方能涵蓋所有呼叫路徑（含 `getBoundingDimension(forceFallback:)`）。
+  public enum AttributedStringMeasurementCounter {
+    /// 累計呼叫次數。測試可比對建池前後之差。
+    public static var callCount: Int = 0
+  }
+
   // MARK: - AttributedStringMeasurementCache
 
   /// Isolated cache for NSAttributedString dimension measurements.
@@ -165,6 +177,7 @@
     /// 回傳該 NSAttributedString 的邊界尺寸。單行、無附件文本會走 CoreText 快路徑。
     @objc
     public func getBoundingDimension(forceFallback: Bool = false) -> CGSize {
+      AttributedStringMeasurementCounter.callCount += 1
       guard length > 0 else { return .zero }
       let shouldFallback = forceFallback || containsLineBreaks || containsAttachments
       let path: AttributedStringMeasurementCache.MeasurementPath = shouldFallback ? .textKitFallback : .fastSingleLine
