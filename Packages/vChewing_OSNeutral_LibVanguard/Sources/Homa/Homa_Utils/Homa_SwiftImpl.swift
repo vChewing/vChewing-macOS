@@ -310,3 +310,21 @@ public struct FIUUID: Hashable, Codable, Sendable {
     }
   }
 #endif
+
+extension Array {
+  /// 穩定排序：`areInIncreasingOrder` 判為等價者，一律維持原次序。
+  ///
+  /// 純 Swift 實作（本 target 不依賴 `SwiftExtension`）：以 `enumerated()` 之位移充當
+  /// 決勝鍵，故結果與元素型別是否 `Comparable` 無涉。用於「次序本身即語義」之處
+  /// ——同分元圖之先後決定候選名次與同身份去重之取捨。
+  func stableSorted(
+    by areInIncreasingOrder: (Element, Element) -> Bool
+  )
+    -> [Element] {
+    enumerated().sorted { lhs, rhs in
+      if areInIncreasingOrder(lhs.element, rhs.element) { return true }
+      if areInIncreasingOrder(rhs.element, lhs.element) { return false }
+      return lhs.offset < rhs.offset
+    }.map(\.element)
+  }
+}

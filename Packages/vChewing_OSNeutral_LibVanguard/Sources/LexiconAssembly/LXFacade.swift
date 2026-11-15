@@ -1292,7 +1292,12 @@ extension LXAssembly {
           lxFiltered.unigramsFor(key: keyChain, keyArray: flatKeyArray).lazy.map(\.current)
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
-      rawAllUnigrams.sort { $0.probability > $1.probability }
+      // 同分者一律維持既有次序——**不得**改用不保證穩定之 `Array.sort`。
+      // 此處次序即語義：使用者片語先於原廠（見上方 `allUserPhraseUnigrams + rawAllUnigrams`），
+      // 而使用者片語本身已反轉為「新列在前」。故同分時「最近一次寫入者」勝出——升權／降權
+      // 之列因此恆能壓過同一讀音底下既有的 `#Override` 列；若此處排序不穩定，同分競品之
+      // 先後即隨實作而異（控頻查核以此序為判準）。
+      rawAllUnigrams = rawAllUnigrams.stableSort { $0.probability > $1.probability }
       // POM 記憶作為 n-gram 統計來源（S2）：附加於 unigram 之後、不經 consolidate
       // （避免與同名 unigram 去重互擾）。僅餵「帶前後文」的 contextual 記憶——bare unigram
       // 記憶對 DP 無貢獻（節點 unigramScore 取陣列首筆、不選中尾端注入）且會污染選字窗
@@ -1824,7 +1829,12 @@ extension LXAssembly {
           }.map(\.current)
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
-      rawAllUnigrams.sort { $0.probability > $1.probability }
+      // 同分者一律維持既有次序——**不得**改用不保證穩定之 `Array.sort`。
+      // 此處次序即語義：使用者片語先於原廠（見上方 `allUserPhraseUnigrams + rawAllUnigrams`），
+      // 而使用者片語本身已反轉為「新列在前」。故同分時「最近一次寫入者」勝出——升權／降權
+      // 之列因此恆能壓過同一讀音底下既有的 `#Override` 列；若此處排序不穩定，同分競品之
+      // 先後即隨實作而異（控頻查核以此序為判準）。
+      rawAllUnigrams = rawAllUnigrams.stableSort { $0.probability > $1.probability }
       // POM 記憶作為 n-gram 統計來源——同 fast path：僅餵「帶前後文」的 contextual 記憶。
       // 此為聲調桶（[PossibleKey] alternatives）路徑，keyChain 為各位置代表鍵（無調字形），
       // 故 POM head 比對**顯式**以 `.toneInsensitivePrefix`（去聲調等值）進行——桶查詢本就不能

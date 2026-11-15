@@ -287,7 +287,7 @@ extension CandidateKey {
 
 public enum Shared {
   // The type of input modes.
-  public enum InputMode: String, CaseIterable, Identifiable {
+  public enum InputMode: String, CaseIterable, Identifiable, Sendable {
     case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
     case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
     case imeModeNULL = ""

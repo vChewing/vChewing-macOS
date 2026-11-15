@@ -66,7 +66,7 @@ public protocol CtlCandidateProtocol: AnyObject {
 
 // MARK: - CandidateContextMenuAction
 
-public enum CandidateContextMenuAction {
+public enum CandidateContextMenuAction: Sendable {
   case toBoost
   case toNerf
   case toFilter

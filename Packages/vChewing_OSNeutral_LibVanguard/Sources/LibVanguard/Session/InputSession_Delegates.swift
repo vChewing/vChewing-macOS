@@ -38,6 +38,8 @@ extension SessionProtocol {
     if addToFilter { action = .toFilter }
     userPhrase = host.updateUserPhraseWeight(userPhrase, action)
     guard host.writeUserPhrasesAtOnce(userPhrase, action == .toFilter) else { return false }
+    // 控頻之成效不在這條回呼鏈路上驗（落盤已非同步），故另排一次延後查核。
+    schedulePhraseOperationPostCheck(for: userPhrase, action: action)
 
     // 後續操作。
     let valueCurrent = userPhrase.value
@@ -404,6 +406,7 @@ extension SessionProtocol {
     userPhrase = host.updateUserPhraseWeight(userPhrase, action)
 
     let succeeded = host.writeUserPhrasesAtOnce(userPhrase, action == .toFilter)
+    if succeeded { schedulePhraseOperationPostCheck(for: userPhrase, action: action) }
 
     // 直接同步重載目前使用中的語言模組，以避免單元測試時不同 LM 實例之間資料不同步。
     if OSUtils.isRunningUnitTests {

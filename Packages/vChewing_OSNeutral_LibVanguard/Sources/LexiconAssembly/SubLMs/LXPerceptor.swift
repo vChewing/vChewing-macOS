@@ -43,6 +43,20 @@ extension LXAssembly {
     case exact
     case toneInsensitivePrefix
   }
+
+  /// 一筆漸退記憶的唯讀快照（供診斷與測試消費）。
+  ///
+  /// 語義：當組句器對 `headReading` 之既定選字為 `headValue` 時，使用者曾改選 `candidate`。
+  /// 故「`headValue` 恰為本次升權之詞、而 `candidate` 另有其詞」者，即為升權之後仍會
+  /// 被該記憶綁架的既存記錄；降權亦然（`candidate` 恰為本次降權之詞者）。
+  public struct POMMemory: Sendable, Equatable {
+    public let headReading: String
+    public let headValue: String
+    public let previous: String?
+    public let anterior: String?
+    public let candidate: String
+    public let probability: Double
+  }
 }
 
 // MARK: - LXAssembly.LXPerceptor
@@ -623,14 +637,25 @@ extension LXAssembly.LXPerceptor {
   /// 容錯：注音第一聲讀音在字串上本就不帶聲調記號（生＝`ㄕㄥ`），卻屬真實聲調；
   /// 真正的聲調桶／partial 容錯由呼叫端**顯式**以 `.toneInsensitivePrefix` 要求
   /// （引擎 alternatives 路徑、狂拼 LibVanguard 建議查詢）。
-  /// 回傳每筆記憶的 previous 值（若有）與候選、權重。不做「只留最高分」篩選——n-gram 餵入
-  /// 需要全量記憶，各記憶的前後文（previous）即是 bigram 的條件鍵。
+  /// 回傳每筆記憶的 head 詞值、previous 值（若有）與候選、權重。不做「只留最高分」篩選——
+  /// n-gram 餵入需要全量記憶，各記憶的前後文（previous）即是 bigram 的條件鍵。
+  ///
+  /// `headValue` 係記憶鍵之 head 格所載的詞值＝記憶成形當下、組句器對該 head 讀音的**既定
+  /// 選字**；`candidate` 才是使用者當時改選的結果。控頻查核需要兩者：只有「head 詞值恰為
+  /// 本次升權之詞、而候選另有其詞」的記憶，才會在升權之後回過頭綁架選字。
   func perceptionsFor(
     headReading: String,
     timestamp: Double,
     matchMode: LXAssembly.POMQueryMode = .exact
   )
-    -> [(headReading: String, previous: String?, anterior: String?, candidate: String, probability: Double)] {
+    -> [(
+      headReading: String,
+      headValue: String,
+      previous: String?,
+      anterior: String?,
+      candidate: String,
+      probability: Double
+    )] {
     guard !headReading.isEmpty else { return [] }
     let separatorString = Homa.Assembler.theSeparator
     func segments(of reading: String) -> [String] {
@@ -639,8 +664,14 @@ extension LXAssembly.LXPerceptor {
     }
     let querySegments = segments(of: headReading)
     guard !querySegments.isEmpty else { return [] }
-    var results: [(headReading: String, previous: String?, anterior: String?, candidate: String, probability: Double)] =
-      []
+    var results: [(
+      headReading: String,
+      headValue: String,
+      previous: String?,
+      anterior: String?,
+      candidate: String,
+      probability: Double
+    )] = []
     lock.withLock {
       // 以 head 讀音索引直接取回候選桶：`.exact` 走原文索引、`.toneInsensitivePrefix` 走去聲調索引，
       // 免除逐鍵 `parsePerceptionKey` 的全表掃描（原本的成本與記憶總量成正比）。
@@ -689,6 +720,7 @@ extension LXAssembly.LXPerceptor {
           guard overrideScore > threshold else { continue }
           results.append((
             headReading: parts.headReading,
+            headValue: parts.headValue,
             previous: parts.previous?.value,
             anterior: parts.anterior?.value,
             candidate: candidate,

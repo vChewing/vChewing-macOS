@@ -540,7 +540,14 @@ extension Homa {
         return cached
       }
       var newResult = gramQuerier(Array(keyArraySlice))
-      newResult.sort(by: Self.sortGram)
+      // 穩定排序：同分（且同長、同鍵、同前文）者維持供給端之次序。
+      //
+      // 此處不得改用 `Array.sort`：其不保證穩定，同分元圖之先後會隨元素數與實作而異。
+      // 供給端之次序本身即語義——使用者片語先於原廠、且新寫入之列先於舊列（見
+      // `LXAssembly.LXFacade` 之單元圖查詢）——故同分時「最近一次控頻」者勝出；
+      // 若此處打亂，同一讀音下同分的兩個詞就會隨機翻盤。去重緊接其後，故穩定性
+      // 同時決定「同身份者保留哪一筆」。
+      newResult = newResult.stableSorted(by: Self.sortGram)
       // 就地去重（依身份雜湊），與舊版「sorted + compactMap」的語義完全一致：
       // 依排序後的順序保留每個身份的第一個出現，且不額外建立一次性陣列。
       var insertedIntel = Set<Int>()
