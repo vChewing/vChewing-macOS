@@ -80,8 +80,11 @@ extension SessionProtocol {
   /// 排定一次控頻查核：於使用者資料寫入巷上排隊，故必然在其落盤工作之後執行；
   /// 巷上只做「排到主執行緒」這一件小事，查核本身一律回主執行緒（語言模組之持有者）。
   ///
-  /// - Note: 本函式只認升權與降權；加詞與濾除另有其語義（前者本就以「出現與否」自證、
-  ///   後者之成效由「該詞是否消失」自證），不在此列。
+  /// - Note: 本函式只認升權與降權——**就地加詞走的也是 `.toBoost`**，故一併涵蓋；
+  ///   濾除（`.toFilter`）不在此列：其成敗由「該詞是否仍出現」當場自證，且既有之清詞
+  ///   路徑已按候選名清掉會把它拉回來的漸退記憶。
+  /// - Note: 呼叫端有二：標記態（`performUserPhraseOperation`：Enter／Shift+Cmd+Enter）
+  ///   與選字窗（`candidatePairManipulated`：右鍵選單、Opt+Cmd+加減號）。
   func schedulePhraseOperationPostCheck(
     for phrase: UserPhraseInsertable,
     action: CandidateContextMenuAction,
