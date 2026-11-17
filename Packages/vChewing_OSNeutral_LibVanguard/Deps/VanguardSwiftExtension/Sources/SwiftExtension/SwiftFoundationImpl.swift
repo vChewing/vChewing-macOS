@@ -80,10 +80,39 @@ public enum OSUtils {
     set { _isRunningUnitTests.value = newValue }
   }
 
-  /// 將訊息寫進當前行程之系統記錄：Apple 平台自 macOS／iOS 26 起走 OSLog（`Logger`），
-  /// 更舊的系統與其餘平台走 `NSLog`／`print`。
+  /// 將訊息排進系統記錄之寫入巷（``LogWriteLane``）。本呼叫不等待寫出。
+  ///
+  /// 寫出端不在呼叫端之執行緒上：`os_log`／`NSLog` 之同步寫入在有人串流讀取記錄時會遭記錄守護
+  /// 行程回壓，若就地寫出，輸入法之 IMK 事件鏈路即隨之阻塞（打字遲鈍之真因）。故延遲至專屬之
+  /// 序列佇列上寫出——寫什麼由呼叫端決定、何時寫出則不必等。
+  ///
+  /// 強制日誌（相隔數日才發作之故障證據）另以 ``flushConsoleLog()`` 立即排空。
   nonisolated public static func consoleLog<S: StringProtocol>(_ msg: S) {
-    let msgStr = msg.description
+    consoleLogLane.enqueue(msg.description)
+  }
+
+  /// 同步排空系統記錄之寫入巷；返回時先前入列之訊息皆已寫出。
+  ///
+  /// 只給「不能等」的場合用：`vCLog(forced:)` 之診斷訊息、以及行程正常終結之前。
+  nonisolated public static func flushConsoleLog() {
+    consoleLogLane.flush()
+  }
+
+  // MARK: Private
+
+  nonisolated private static let _defaultsStore: NSMutex<any DefaultsStore> = .init(
+    UserDefaultsStore(.standard)
+  )
+  nonisolated private static let _isRunningUnitTests = NSMutex(false)
+  nonisolated private static let consoleLogLane = LogWriteLane(
+    label: "org.vChewing.OSUtils.consoleLog"
+  ) { msgStr in
+    writeToSystemLog(msgStr)
+  }
+
+  /// 實際之寫出：Apple 平台自 macOS／iOS 26 起走 OSLog（`Logger`），
+  /// 更舊的系統與其餘平台走 `NSLog`／`print`。
+  nonisolated private static func writeToSystemLog(_ msgStr: String) {
     #if canImport(Darwin)
       if #available(iOS 26.0, macOS 26.0, *) {
         #if canImport(OSLog)
@@ -99,13 +128,6 @@ public enum OSUtils {
       print(msgStr)
     #endif
   }
-
-  // MARK: Private
-
-  nonisolated private static let _defaultsStore: NSMutex<any DefaultsStore> = .init(
-    UserDefaultsStore(.standard)
-  )
-  nonisolated private static let _isRunningUnitTests = NSMutex(false)
 }
 
 // MARK: - Real Home Dir for Sandboxed Apps
