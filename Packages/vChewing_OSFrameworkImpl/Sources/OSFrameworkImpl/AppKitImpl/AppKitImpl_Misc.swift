@@ -575,18 +575,24 @@
       case none = 0
     }
 
+    /// 液態玻璃（`NSGlassEffectView`）之啟用判準——全域單一真源。
+    ///
+    /// **macOS 26 全代排除**：該代之玻璃於終末版本品質不穩，且本工作區之機器已於 27、
+    /// 無從複驗 26 之實機行為。凡消費 `uxLevel` 之可見浮窗（TDK／GSI 選字窗、PCB）一律退回
+    /// `NSVisualEffectView` 之材質路徑（`.material`）；27 起方用玻璃。
     public static var uxLevel: UXLevel {
       switch (OSUtils.isAppleSilicon, OSUtils.totalMemoryGiB) {
       case (true, 16...):
-        if #available(macOS 26, *) {
+        if #available(macOS 27, *) {
+          // 以 `DTPlatformVersion` 判「本建置是否以新設計之 SDK 建出」：
+          // 以 26 之前之 SDK 建出者（如 5.10 之 legacy 支線）一律退回材質。
           if let infoDict = Bundle.main.infoDictionary {
             let verStr = (infoDict["DTPlatformVersion"] as? String)?.prefix(4) ?? "_"
-            if let verDouble = Double(verStr) {
-              if verDouble < 26 { return .material }
-              let uiCompat = infoDict["UIDesignRequiresCompatibility"] as? Bool
-              if uiCompat == true { return .material }
-            }
+            if let verDouble = Double(verStr), verDouble < 26 { return .material }
           }
+          // 此處**不讀** `UIDesignRequiresCompatibility`：本倉之兩份 app plist 自 Phase 352 起
+          // 一律填 `true`（求 macOS 26 之渲染與 15 看齊），而 macOS 27 起系統無視該鍵
+          // ——若此處照讀，27 之玻璃會被我方自己關掉。
           return .liquidGlass
         } else {
           return .material

@@ -69,21 +69,28 @@ extension IMEMenuSputnik {
     }
     // -------------
     let currentInputMode = IMEApp.currentInputMode
+
+    /// 設定視窗之 AppKit 項：`alternated` 為真時作為 SwiftUI 項之 Option 替代項。
+    func cocoaSettingsMenuItem(alternated: Bool) -> NSMenuItem? {
+      guard !silentMode else { return nil }
+      let item = NSMenu.Item("i18n:Menu.vChewingSettings")?
+        .act(
+          register {
+            CtlSettingsCocoa.show()
+            NSApp.popup()
+          }
+        )
+      if alternated { item?.alternated() }
+      return item
+    }
+
     return NSMenu().appendItems {
       // `CtlSettingsUI`（SwiftUI 版設定視窗）整檔圈於 `#if compiler(>=6.2)` 之內（§5.1(f)／§5.3 鐵律五：
       // SwiftUI 之任何內容不得裸露於 5.10 可編的路徑上，<6.2 分支不提供替代實作）。
       // 故 5.10 側祇剩 AppKit 版一項、別無可選——這與 `vChewing-OSX-Legacy` 的選單形態一致。
+      // 供應範圍一律問 `SettingsUIWindowPolicy`（macOS 26 全代排除），不在此處另立判準。
       #if compiler(>=6.2)
-        if #unavailable(macOS 14) {
-          NSMenu.Item("i18n:Menu.vChewingSettings")?
-            .act(
-              register {
-                CtlSettingsCocoa.show()
-                NSApp.popup()
-              }
-            )
-            .nulled(silentMode)
-        } else {
+        if #available(macOS 14, *), SettingsUIWindowPolicy.isSwiftUIWindowAvailable {
           NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (SwiftUI)")?
             .act(
               register {
@@ -92,24 +99,12 @@ extension IMEMenuSputnik {
               }
             )
             .nulled(silentMode)
-          NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (AppKit)")?
-            .act(
-              register {
-                CtlSettingsCocoa.show()
-                NSApp.popup()
-              }
-            )
-            .alternated().nulled(silentMode)
+          cocoaSettingsMenuItem(alternated: true)
+        } else {
+          cocoaSettingsMenuItem(alternated: false)
         }
       #else
-        NSMenu.Item("i18n:Menu.vChewingSettings")?
-          .act(
-            register {
-              CtlSettingsCocoa.show()
-              NSApp.popup()
-            }
-          )
-          .nulled(silentMode)
+        cocoaSettingsMenuItem(alternated: false)
       #endif
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item("i18n:Menu.SponsorTheDevelopment")?

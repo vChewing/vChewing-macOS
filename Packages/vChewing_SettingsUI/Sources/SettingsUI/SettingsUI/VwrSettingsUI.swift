@@ -23,7 +23,13 @@
       var viewModel = viewModel
       NavigationSplitView(columnVisibility: $columnVisibility) {
         sidebar
-          .navigationSplitViewColumnWidth(173)
+          // 欄寬三值同取 `sidebarWidth`：本視窗為固定尺寸，若容許拖動側欄，
+          // 詳情欄即可能窄於表單最小寬、重演「內容被裁切」之故障。
+          .navigationSplitViewColumnWidth(
+            min: CGFloat(CtlSettingsUI.sidebarWidth),
+            ideal: CGFloat(CtlSettingsUI.sidebarWidth),
+            max: CGFloat(CtlSettingsUI.sidebarWidth)
+          )
       } detail: {
         detailView
           .frame(maxHeight: .infinity)

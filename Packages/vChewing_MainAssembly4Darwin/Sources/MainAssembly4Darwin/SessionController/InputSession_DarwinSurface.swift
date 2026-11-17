@@ -103,8 +103,9 @@ extension InputSession {
     // `CtlSettingsUI`（SwiftUI 版設定視窗，macOS 14+）整檔圈於 `#if compiler(>=6.2)` 之內
     // （§5.1(f)／§5.3 鐵律五）。故 5.10 側一律走 AppKit 版，且無 `osCheck` 之分流
     // ——這與 `vChewing-OSX-Legacy` 的同名實作一致（該倉即 `CtlSettingsCocoa.show()` 單路）。
+    // 供應範圍（含 macOS 26 全代之排除）一律問 `SettingsUIWindowPolicy`，不在此處另立判準。
     #if compiler(>=6.2)
-      osCheck: if #available(macOS 14, *) {
+      osCheck: if #available(macOS 14, *), SettingsUIWindowPolicy.isSwiftUIWindowAvailable {
         switch NSEvent.keyModifierFlags {
         case .option: break osCheck
         default: CtlSettingsUI.show()

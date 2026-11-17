@@ -25,7 +25,10 @@
     public init() {
       super.init(
         window: .init(
-          contentRect: CGRect(x: 401, y: 295, width: 758, height: Self.contentMaxHeight),
+          // 寬度取「側欄欄位 ＋ 表單最小寬」之實需總和，不取任意種子值：
+          // 種子值較窄時，SwiftUI 之 `NavigationSplitView` 仍以其兩欄實需寬排版，
+          // 而其是否上報為視窗之 `contentMinSize` 隨 macOS 版本而異（見 `windowWidth`）。
+          contentRect: CGRect(x: 401, y: 295, width: Self.windowWidth, height: Self.contentMaxHeight),
           styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
           backing: .buffered,
           defer: true
@@ -50,6 +53,10 @@
           .environment(viewModel)
           .ignoresSafeArea()
       )
+      // `NSHostingView` 是否把內容之最小寬回報為視窗之 `contentMinSize` 隨 macOS 版本而異
+      // （macOS 26 之終末版本即不再回報，遂見內容左右裁切）。故於內容安裝之後顯式釘住，
+      // 使視窗之最小寬恆為兩欄之實需總和。
+      window?.contentMinSize = NSSize(width: Self.windowWidth, height: 0)
       var preferencesTitleName = "i18n:Menu.vChewingSettings".i18n
       preferencesTitleName.removeLast()
       window?.title = preferencesTitleName
@@ -138,7 +145,22 @@
 
     public static let contentMaxHeight: Double = 650
 
+    /// 側欄之理想欄寬（`NavigationSplitView` 之 `.navigationSplitViewColumnWidth`）。
+    public static let sidebarWidth: Double = 173
+
+    /// 側欄欄位之實測外溢量：宣告 173 時欄位實得 175（另有 1 點分隔線）。
+    public static let sidebarGutterWidth: Double = 3
+
+    /// 表單（詳情欄）之最小寬；各 pane 之 `Form` 皆以之為 `.frame(minWidth:)`。
     public static let formWidth: Double = 614
+
+    /// 視窗內容之總寬＝側欄欄位（含分隔線）＋表單最小寬。
+    ///
+    /// SwiftUI 之 `NavigationSplitView` 以兩欄之 ideal／min 寬定其 fitting 寬（本設定下為
+    /// 175 ＋ 1 ＋ 614 ＝ 790），而 `NSHostingView` 是否把該值回報成視窗之 `contentMinSize`
+    /// 隨 macOS 版本而異。故視窗之寬於此處**顯式**宣告，不依賴該回報；
+    /// `CtlSettingsUITests` 會以 `NSSplitView` 之 fitting 寬複驗此值不短於實需。
+    public static var windowWidth: Double { sidebarWidth + sidebarGutterWidth + formWidth }
 
     public static var isCJKInterface: Bool {
       let lang = PrefMgr.shared.effectiveAppleLanguage

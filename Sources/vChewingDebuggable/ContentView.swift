@@ -119,6 +119,8 @@ final class DiagnosticsViewModel {
     [
       "SettingsUI (SwiftUI): \(isSettingsUIVisible ? "open" : "closed")",
       "SettingsCocoa (AppKit): \(isSettingsCocoaVisible ? "open" : "closed")",
+      // 生產路徑之供應範圍（macOS 26 全代退守 AppKit）；本宿主仍可手動開任一視窗。
+      "SettingsUI policy: \(SettingsUIWindowPolicy.isSwiftUIWindowAvailable ? "supplied" : "suspended")",
       "Environment: \(Self.isBootstrapped ? "ready" : "not ready")",
       "pendingUnitTests: \(OSUtils.isRunningUnitTests ? "on" : "off")",
     ].joined(separator: "   |   ")
