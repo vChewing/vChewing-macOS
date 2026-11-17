@@ -110,7 +110,8 @@ extension AppDelegate {
     // 將不需要阻塞啟動流程的初期化工作延後至下一個 RunLoop 迭代。
     asyncOnMain {
       // 安全代理檢查（行程掃描）與語音引擎預熱無需在啟動瞬間完成。
-      SecurityAgentHelper.shared.timer?.fire()
+      // 掃描計時器之部署本身即含首輪掃描，故此處不得再另行 fire——否則每輪起動會掃兩趟。
+      SecurityAgentHelper.shared.deployTimer()
       SpeechSputnik.shared.refreshStatus() // 根據現狀條件決定是否初期化語音引擎。
     }
 
@@ -162,6 +163,8 @@ extension AppDelegate {
   public func applicationWillTerminate(_: Notification) {
     // 確保應用終止時停止所有已啟動的 security-scoped 資源
     BookmarkManager.shared.stopAllSecurityScopedAccesses()
+    // 留下「乾淨結束」之墓碑：否則下一輪起動無從分辨本輪係正常終結抑或死於非命。
+    SecurityAgentHelper.shared.recordCleanExit()
   }
 
   public func updateDirectoryMonitorPath() {

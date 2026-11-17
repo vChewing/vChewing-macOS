@@ -13,12 +13,11 @@ import Testing
 
 /// 心跳／墓碑帳本之判定：死亡只能由下一輪起動反推，故每一種「上一輪怎麼結束」皆須有定論。
 struct SecurityAgentSessionLedgerTests {
-  // MARK: Internal
-
   /// 固定時基：本套房不碰真實時鐘。
   static let base = Date(timeIntervalSince1970: 1_800_000_000)
 
-  @Test func testFreshInstallIsNeitherAbnormalNorSafeMode() {
+  @Test
+  func testFreshInstallIsNeitherAbnormalNorSafeMode() {
     let fresh = SecurityAgentSessionLedger()
     #expect(!fresh.previousSessionEndedAbnormally)
     #expect(fresh.previousSessionLifespan == 0)
@@ -29,7 +28,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(started.ledger.cleanExitAt == .distantPast)
   }
 
-  @Test func testCleanExitResetsTheStreak() {
+  @Test
+  func testCleanExitResetsTheStreak() {
     let previous = SecurityAgentSessionLedger(
       bootedAt: Self.base,
       heartbeatAt: Self.base.addingTimeInterval(60),
@@ -42,7 +42,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(started.ledger.abnormalDeathStreak == 0)
   }
 
-  @Test func testQuickAbnormalDeathIncrementsTheStreak() {
+  @Test
+  func testQuickAbnormalDeathIncrementsTheStreak() {
     let previous = SecurityAgentSessionLedger(
       bootedAt: Self.base,
       heartbeatAt: Self.base.addingTimeInterval(120),
@@ -58,7 +59,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(started.ledger.cleanExitAt == .distantPast)
   }
 
-  @Test func testMatureSessionEndingIsTreatedAsNormalAgeing() {
+  @Test
+  func testMatureSessionEndingIsTreatedAsNormalAgeing() {
     let previous = SecurityAgentSessionLedger(
       bootedAt: Self.base,
       heartbeatAt: Self.base.addingTimeInterval(SecurityAgentSessionLedger.maturityInterval),
@@ -66,12 +68,13 @@ struct SecurityAgentSessionLedgerTests {
       abnormalDeathStreak: 2
     )
     #expect(previous.previousSessionEndedAbnormally)
-    let started = previous.startingNewSession(at: Self.base.addingTimeInterval(4000))
+    let started = previous.startingNewSession(at: Self.base.addingTimeInterval(4_000))
     #expect(started.isSafeMode == false)
     #expect(started.ledger.abnormalDeathStreak == 0)
   }
 
-  @Test func testReachingTheLimitEntersSafeModeAndResetsTheStreak() {
+  @Test
+  func testReachingTheLimitEntersSafeModeAndResetsTheStreak() {
     let previous = SecurityAgentSessionLedger(
       bootedAt: Self.base,
       heartbeatAt: Self.base,
@@ -84,7 +87,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(started.ledger.abnormalDeathStreak == 0)
   }
 
-  @Test func testHeartbeatIsThrottled() {
+  @Test
+  func testHeartbeatIsThrottled() {
     let ledger = SecurityAgentSessionLedger(bootedAt: Self.base, heartbeatAt: Self.base)
     #expect(ledger.beatingHeart(at: Self.base.addingTimeInterval(100)) == ledger)
     let beaten = ledger.beatingHeart(at: Self.base.addingTimeInterval(300))
@@ -92,7 +96,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(beaten.bootedAt == ledger.bootedAt)
   }
 
-  @Test func testRecordingCleanExitClearsEverything() {
+  @Test
+  func testRecordingCleanExitClearsEverything() {
     let ledger = SecurityAgentSessionLedger(
       bootedAt: Self.base,
       heartbeatAt: Self.base,
@@ -105,7 +110,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(!exited.previousSessionEndedAbnormally)
   }
 
-  @Test func testLedgerRoundTripsThroughInjectedStore() {
+  @Test
+  func testLedgerRoundTripsThroughInjectedStore() {
     let prefs = PrefMgr(store: InMemoryDefaultsStore())
     let ledger = SecurityAgentSessionLedger(
       bootedAt: Self.base,
@@ -117,7 +123,8 @@ struct SecurityAgentSessionLedgerTests {
     #expect(SecurityAgentSessionLedger(prefs: prefs) == ledger)
   }
 
-  @Test func testEmptyStoreReadsAsAFreshLedger() {
+  @Test
+  func testEmptyStoreReadsAsAFreshLedger() {
     let prefs = PrefMgr(store: InMemoryDefaultsStore())
     let restored = SecurityAgentSessionLedger(prefs: prefs)
     #expect(restored == SecurityAgentSessionLedger())
