@@ -971,7 +971,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    // Shift + Left
+    // Shift + BackwardArrow
     if input.isCursorBackward, input.isShiftHeld {
       let moved: Bool = {
         if input.isHoldingAny([.command, .option]) {
@@ -1001,7 +1001,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    // Shift + Right
+    // Shift + ForwardArrow
     if input.isCursorForward, input.isShiftHeld {
       let moved: Bool = {
         if input.isHoldingAny([.command, .option]) {
@@ -1571,7 +1571,7 @@ extension InputHandlerProtocol {
     }
 
     if input.isShiftHeld {
-      // Shift + Right
+      // Shift + ForwardArrow
       if assembler.cursor < assembler.length {
         assembler.marker = assembler.cursor
         if input.isHoldingAny([.command, .option]) {
@@ -1641,7 +1641,7 @@ extension InputHandlerProtocol {
     }
 
     if input.isShiftHeld {
-      // Shift + left
+      // Shift + BackwardArrow
       if assembler.cursor > 0 {
         assembler.marker = assembler.cursor
         let moved: Bool = {
@@ -1850,37 +1850,33 @@ extension InputHandlerProtocol {
 
   // MARK: - 處理 Caps Lock 與英數輸入模式（Caps Lock and Alphanumerical mode）
 
-  /// 處理 CapsLock 與英數輸入模式。
-  /// - Remark: 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
+  /// 處理 Caps Lock 與英數模式：Caps Lock 亮燈時，字母鍵改以 ASCII 遞交。
   /// 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
   /// - Parameter input: 輸入訊號。
-  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  /// - Returns: 已攔截者回 `true`／`false`；`nil` 表示本函式不處理、交回呼叫端分診。
   func handleCapsLockAndAlphanumericalMode(input: InputSignalProtocol) -> Bool? {
     guard let session = session else { return nil }
     let handleCapsLock = !prefs.bypassNonAppleCapsLockHandling && input.isCapsLockOn
     guard handleCapsLock || session.isASCIIMode else { return nil }
 
-    // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，
-    // 所以這裡一律強制重置狀態為 .ofEmpty()。
+    // macOS 12 以前取不到可靠的 Caps Lock 狀態，先歸零，
+    // 以免沿用上一個客體留下的殘留狀態。
     session.switchState(State.ofEmpty())
 
-    // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
+    // Shift 已由系統處理大寫；此處不再攔截，讓按鍵直接落到客體。
     var shiftCapsLockHandling = input.isUpperCaseASCIILetterKey && session.isASCIIMode
     shiftCapsLockHandling = shiftCapsLockHandling || handleCapsLock && input.isShiftHeld
     guard !shiftCapsLockHandling else { return false }
 
-    // 不再讓唯音處理由 Shift 切換到的英文模式的按鍵輸入。
+    // 由 Shift 切換而來的英數模式，其按鍵不再由本函式接手。
     if session.isASCIIMode, !handleCapsLock { return false }
 
-    /// 如果是 ASCII 當中的不可列印的字元的話，
-    /// 不使用「insertText:replacementRange:」。
-    /// 某些應用無法正常處理非 ASCII 字符的輸入。
+    // ASCII 控制字元不經 insertText:replacementRange: 遞交：
+    // 部分客體會拒絕非列印字元，故直接放行。
     if input.isASCII, !input.charCode.isPrintableASCII { return false }
 
-    // 將整個組字區的內容遞交給客體應用。
-    // 此處 `lowercased()` 是刻意的行為：
-    // 使用者關掉系統的 CpLk 中英輸入法切換之後，想在 CpLk 亮燈時直接打英數的話，
-    // 會希望在尚未摁 Shift 的時候預設敲小寫英數。
+    // 其餘內容一律以小寫遞交：Caps Lock 亮燈但未按 Shift 時，
+    // 使用者期待的是小寫英數，而非系統預設的大寫。
     session.switchState(State.ofCommitting(textToCommit: input.text.lowercased()))
 
     return true

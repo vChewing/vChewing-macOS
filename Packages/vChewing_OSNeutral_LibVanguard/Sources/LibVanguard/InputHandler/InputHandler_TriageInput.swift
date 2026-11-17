@@ -320,12 +320,11 @@ extension InputHandlerProtocol {
       // 提前放行一些用不到的特殊按鍵輸入情形。
       guard !(input.isInvalid && state.type == .ofEmpty) else { return false }
 
-      // 如果當前組字器為空的話，就不再攔截 Cmd / 非筆電功能鍵，
-      // 畢竟這些鍵可能會用來觸發系統功能。
+      // 無組字內容時，Command 與功能鍵屬系統熱鍵，直接放行。
       if !state.hasComposition,
          input.isCommandHeld || input.isNonLaptopFunctionKey { return false }
 
-      // 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
+      // Caps Lock／英數模式由 handleCapsLockAndAlphanumericalMode 統一處理；
       // 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
       if let capsHandleResult = handleCapsLockAndAlphanumericalMode(input: input) {
         return capsHandleResult

@@ -6,7 +6,7 @@ import Tekkon
 
 // MARK: - BPMFFullMatchTypewriter
 
-/// 注音按鍵輸入處理 (Handle BPMF Keys)
+/// 注音按鍵輸入處理。
 @frozen
 public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: TypewriterProtocol {
   // MARK: Lifecycle

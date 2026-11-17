@@ -46,31 +46,26 @@ public enum TooltipColorState {
 
 /// 用以讓每個狀態自描述的 enum。
 public enum StateType: String {
-  /// **失活狀態 .ofDeactivated**: 使用者沒在使用輸入法、或者使用者已經切換到另一個客體應用來敲字。
+  /// 未啟用：目前沒有客體在收字，或使用者已切換到別的輸入法。
   case ofDeactivated = "Deactivated"
-  /// **空狀態 .ofEmpty**: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
-  /// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
-  /// 唯音輸入法在「組字區與組音區/組筆區同時為空」、
-  /// 且客體軟體正在準備接收使用者文字輸入行為的時候，會處於空狀態。
-  /// 有時，唯音會利用呼叫空狀態的方式，讓組字區內已經顯示出來的內容遞交出去。
+  /// 無未遞交內容：剛切換到唯音，或上一輪已遞交完畢。
+  /// 亦用以清空組字區——`switchState` 會在此結算殘留內容。
   case ofEmpty = "Empty"
-  /// **中絕狀態 .ofAbortion**: 與 .ofEmpty() 類似，但會扔掉上一個狀態的內容、
-  /// 不將這些內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。
+  /// 中絕：回到無內容狀態，但**不遞交**上一輪的組字內容；常用於取消輸入。
+  /// 此狀態僅為過渡：`switchState` 會立刻將其正規化為 `.ofEmpty`。
   case ofAbortion = "Abortion"
-  /// **遞交狀態 .ofCommitting**: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
-  /// 該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。如果直接呼叫處理該狀態的話，
-  /// 在呼叫處理之前的組字區的內容會消失，除非你事先呼叫處理過 .ofEmpty()。
+  /// 遞交：承載要送給客體的文字。通常緊接 `.ofEmpty`；
+  /// 若先前的組字內容尚未結算，須先經 `.ofEmpty`，否則會被丟棄。
   case ofCommitting = "Committing"
-  /// **關聯詞語狀態 .ofAssociates**: 逐字選字模式內的關聯詞語輸入狀態。
+  /// 關聯詞：在逐字選字或關聯詞模式下，挑選接在前一個字後面的詞。
   case ofAssociates = "Associates"
-  /// **輸入狀態 .ofInputting**: 使用者輸入了內容。此時會出現組字區（Compositor）。
+  /// 組字中：組字區有未遞交的內容，游標與標記皆在此語境內。
   case ofInputting = "Inputting"
-  /// **標記狀態 .ofMarking**: 使用者在組字區內標記某段範圍，
-  /// 可以決定是添入新詞、還是將這個範圍的詞音組合放入語彙濾除清單。
+  /// 標記中：在組字區內選定一段範圍，準備加詞、降頻或濾除。
   case ofMarking = "Marking"
-  /// **選字狀態 .ofCandidates**: 叫出選字窗、允許使用者選字。
+  /// 選字中：候選窗已展開，等待使用者選擇。
   case ofCandidates = "Candidates"
-  /// **分類分層符號表狀態 .ofSymbolTable**: 分類分層符號表選單專用的狀態，有自身的特殊處理。
+  /// 符號表：分類分層符號選單展開；沿用候選窗的導覽機制，但資料源不同。
   case ofSymbolTable = "SymbolTable"
 }
 

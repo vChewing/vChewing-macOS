@@ -15,7 +15,7 @@ import Testing
 ///
 /// - Important: 本檔之測試分兩類。第一類（兩支既有測試用例）以 `setOptions` **直接驅動 config**，
 ///   驗的是「旗標為真即抑制」這條下游語義；第二類（四態與熱鍵）**必須經 `syncPrefs()`**，
-///   因為它們驗的正是「偏好 → 旗標」這條上游推導——直接寫 config 會使它們恆真而失去意義。
+///   因為它們驗的正是「偏好 → 旗標」這條推導——直接寫 config 會使它們恆真而失去意義。
 @Suite(.serialized)
 struct LXFacadeFuriousZhuyinwenTests {
   // MARK: Internal

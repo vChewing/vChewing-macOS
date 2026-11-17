@@ -199,22 +199,16 @@ extension IMEStateProtocol {
 
 // MARK: - IMEState
 
-/// 用以呈現輸入法控制器（IMKInputSessionController）的各種狀態。
+/// 輸入會話當下的狀態快照。
 ///
-/// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
-/// 等輸入裝置接收輸入訊號，據此切換至對應的狀態，再根據狀態更新使用者介面內容，
-/// 最終生成文字輸出、遞交給接收文字輸入行為的客體應用。此乃單向資訊流序，且使用
-/// 者介面內容與文字輸出均無條件地遵循某一個指定的資料來源。
+/// `type` 標明語境（見 `StateType`），`data` 承載顯示文字、游標、候選清單與提示
+/// 等資料，`node` 則指向符號表／候選樹的節點。狀態一經生成即不再就地改寫；
+/// `switchState(_:)` 以新副本取代舊副本，既有副本可留存供測試或比較。
 ///
-/// IMEState 型別用以呈現輸入法控制器正在做的事情，且分狀態儲存各種狀態限定的
-/// 常數與變數。
-///
-/// 對 IMEState 型別下的諸多狀態的切換，應以生成新副本來取代舊有副本的形式來完
-/// 成。唯一例外是 IMEState.ofMarking、擁有可以將自身轉變為 IMEState.ofInputting
-/// 的成員函式，但也只是生成副本、來交給輸入法控制器來處理而已。每個狀態都有
-/// 各自的構造器 (Constructor)。
-///
-/// 輸入法控制器持下述狀態請洽 StateType Enum 的 Documentation。
+/// 各語境的建構器（`ofEmpty`、`ofInputting`、`ofMarking`、`ofCommitting` 等）
+/// 集中處理該語境必備的欄位；`IMEStateData` 只存資料，顯示樣式與 UTF-16 投影
+/// 由其擴充方法導出。`CandidateNode` 仍為參考型別，與會話層共用，不隨狀態副本
+/// 複製。
 public struct IMEState: IMEStateProtocol {
   // MARK: Lifecycle
 

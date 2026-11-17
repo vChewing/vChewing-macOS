@@ -2579,7 +2579,8 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
-    // 真實 factory 詞庫（mcbopomofo-cht 4.7.0）相關詞條的 grams（含分數）。
+    // 真實 factory 詞庫相關詞條的 grams（含分數）。
+    // 取自 Vanguard lexicon 4.7.0 (compiled as key-value-score tsv format)。
     [
       .init(keyArray: ["ㄊㄚ"], value: "他", score: -5.024),
       .init(keyArray: ["ㄊㄚ"], value: "她", score: -5.045),

@@ -399,7 +399,7 @@ struct LXFacadeTextMapTests {
 
     let instance = LXAssembly.LXFacade(isCHS: false)
     // 模擬真實辭典中「我」同時以「無調墊底」（ㄨㄛ、低權重）與「聲調專屬」
-    // （ㄨㄛˇ、高權重）兩種讀音鍵存在（實際 mcbopomofo 資料即有此結構）；
+    // （ㄨㄛˇ、高權重）兩種讀音鍵存在（實際 factory 詞庫即有此結構）；
     // 「喔」僅有無調（ㄨㄛ、中權重）。
     let textMap = makeTextMap([
       ("ㄨㄛ", [("喔", -5.183, 6), ("我", -9.465, 6)]),
