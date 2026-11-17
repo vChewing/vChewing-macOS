@@ -15,6 +15,10 @@ public protocol PrefMgrProtocol {
   var alwaysUsePCBWithElectronBasedClients: Bool { get set }
   var securityHardenedCompositionBuffer: Bool { get set }
   var checkAbusersOfSecureEventInputAPI: Bool { get set }
+  var securityAgentSessionBootedAt: Double { get set }
+  var securityAgentSessionHeartbeatAt: Double { get set }
+  var securityAgentSessionCleanExitAt: Double { get set }
+  var securityAgentAbnormalDeathStreak: Int { get set }
   var disableIMKSwiftServerControllerPruning: Bool { get set }
   var disableIMKSwiftEvictedClientInvalidation: Bool { get set }
   var disableIMKSwiftClientWrapperTermination: Bool { get set }

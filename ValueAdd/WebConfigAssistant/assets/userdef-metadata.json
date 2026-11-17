@@ -1,5 +1,5 @@
 {
-  "count" : 126,
+  "count" : 130,
   "entries" : [
     {
       "default" : false,
@@ -297,6 +297,118 @@
       "range" : null,
       "rawValue" : "CheckAbusersOfSecureEventInputAPI",
       "type" : "bool"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "float",
+      "exchangeBlacklisted" : true,
+      "key" : "kSecurityAgentSessionBootedAt",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_SecurityAgent_SessionBootedAt",
+      "type" : "double"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "float",
+      "exchangeBlacklisted" : true,
+      "key" : "kSecurityAgentSessionHeartbeatAt",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_SecurityAgent_SessionHeartbeatAt",
+      "type" : "double"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "float",
+      "exchangeBlacklisted" : true,
+      "key" : "kSecurityAgentSessionCleanExitAt",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_SecurityAgent_SessionCleanExitAt",
+      "type" : "double"
+    },
+    {
+      "default" : 0,
+      "defaultsType" : "integer",
+      "exchangeBlacklisted" : true,
+      "key" : "kSecurityAgentAbnormalDeathStreak",
+      "labels" : {
+        "en" : {
+
+        },
+        "ja" : {
+
+        },
+        "zh-Hans" : {
+
+        },
+        "zh-Hant" : {
+
+        }
+      },
+      "metadataPending" : false,
+      "metadataPendingReason" : "none",
+      "minimumOS" : 10.9,
+      "options" : null,
+      "optionsKind" : null,
+      "range" : null,
+      "rawValue" : "_SecurityAgent_AbnormalDeathStreak",
+      "type" : "integer"
     },
     {
       "default" : -2000,

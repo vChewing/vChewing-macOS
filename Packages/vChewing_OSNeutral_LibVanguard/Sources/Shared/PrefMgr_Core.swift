@@ -33,6 +33,10 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
     _alwaysUsePCBWithElectronBasedClients.store = store
     _securityHardenedCompositionBuffer.store = store
     _checkAbusersOfSecureEventInputAPI.store = store
+    _securityAgentSessionBootedAt.store = store
+    _securityAgentSessionHeartbeatAt.store = store
+    _securityAgentSessionCleanExitAt.store = store
+    _securityAgentAbnormalDeathStreak.store = store
     _disableIMKSwiftServerControllerPruning.store = store
     _disableIMKSwiftEvictedClientInvalidation.store = store
     _disableIMKSwiftClientWrapperTermination.store = store
@@ -200,6 +204,18 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
 
   @AppProperty(userDef: .kCheckAbusersOfSecureEventInputAPI)
   public var checkAbusersOfSecureEventInputAPI: Bool
+
+  @AppProperty(userDef: .kSecurityAgentSessionBootedAt)
+  public var securityAgentSessionBootedAt: Double
+
+  @AppProperty(userDef: .kSecurityAgentSessionHeartbeatAt)
+  public var securityAgentSessionHeartbeatAt: Double
+
+  @AppProperty(userDef: .kSecurityAgentSessionCleanExitAt)
+  public var securityAgentSessionCleanExitAt: Double
+
+  @AppProperty(userDef: .kSecurityAgentAbnormalDeathStreak)
+  public var securityAgentAbnormalDeathStreak: Int
 
   @AppProperty(userDef: .kDisableIMKSwiftServerControllerPruning)
   public var disableIMKSwiftServerControllerPruning: Bool

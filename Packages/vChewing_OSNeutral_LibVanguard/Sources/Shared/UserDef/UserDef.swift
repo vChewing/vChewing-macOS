@@ -24,6 +24,14 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kAlwaysUsePCBWithElectronBasedClients = "AlwaysUsePCBWithElectronBasedClients"
   case kSecurityHardenedCompositionBuffer = "SecurityHardenedCompositionBuffer"
   case kCheckAbusersOfSecureEventInputAPI = "CheckAbusersOfSecureEventInputAPI"
+  /// 安全代理掃描器上一輪之起動時刻（`timeIntervalSince1970`；0 即無紀錄）。
+  case kSecurityAgentSessionBootedAt = "_SecurityAgent_SessionBootedAt"
+  /// 安全代理掃描器上一輪之最後心跳時刻（`timeIntervalSince1970`；0 即無紀錄）。
+  case kSecurityAgentSessionHeartbeatAt = "_SecurityAgent_SessionHeartbeatAt"
+  /// 安全代理掃描器上一輪之乾淨結束時刻（`timeIntervalSince1970`；不早於起動時刻即算乾淨結束）。
+  case kSecurityAgentSessionCleanExitAt = "_SecurityAgent_SessionCleanExitAt"
+  /// 安全代理掃描器之連續非正常結束次數。
+  case kSecurityAgentAbnormalDeathStreak = "_SecurityAgent_AbnormalDeathStreak"
   case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
   case kMostRecentInputMode = "MostRecentInputMode"
   case kCassettePath = "CassettePath"
@@ -258,6 +266,10 @@ public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     .kFailureFlagForPOMObservation,
     .kMostRecentInputMode,
     .kCandidateServiceMenuContents,
+    .kSecurityAgentSessionBootedAt,
+    .kSecurityAgentSessionHeartbeatAt,
+    .kSecurityAgentSessionCleanExitAt,
+    .kSecurityAgentAbnormalDeathStreak,
   ]
 
   public var id: String { rawValue }
@@ -690,6 +702,10 @@ extension UserDef {
     case .kAlwaysUsePCBWithElectronBasedClients: return .bool(true)
     case .kSecurityHardenedCompositionBuffer: return .bool(false)
     case .kCheckAbusersOfSecureEventInputAPI: return .bool(true)
+    case .kSecurityAgentSessionBootedAt: return .double(0)
+    case .kSecurityAgentSessionHeartbeatAt: return .double(0)
+    case .kSecurityAgentSessionCleanExitAt: return .double(0)
+    case .kSecurityAgentAbnormalDeathStreak: return .integer(0)
     case .kDisableIMKSwiftServerControllerPruning: return .bool(false)
     case .kDisableIMKSwiftEvictedClientInvalidation: return .bool(false)
     case .kDisableIMKSwiftClientWrapperTermination: return .bool(false)
@@ -845,6 +861,10 @@ extension UserDef {
         userDef: self, shortTitle: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle",
         description: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description"
       )
+    case .kSecurityAgentSessionBootedAt: return nil
+    case .kSecurityAgentSessionHeartbeatAt: return nil
+    case .kSecurityAgentSessionCleanExitAt: return nil
+    case .kSecurityAgentAbnormalDeathStreak: return nil
     case .kDisableIMKSwiftServerControllerPruning: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kDisableIMKSwiftServerControllerPruning.shortTitle",
         description: "i18n:UserDef.kDisableIMKSwiftServerControllerPruning.description"
