@@ -12,6 +12,15 @@ import Foundation
   import OSLog
 #endif
 
+/// 寫一則偵錯日誌。
+///
+/// 寫出發生在系統記錄之寫入巷上（``OSUtils/consoleLog(_:)``），故本呼叫不等待記錄守護行程——
+/// 以免在 IMK 事件鏈路上製造打字遲鈍。
+///
+/// - Parameters:
+///   - forced: 是否無視 `_DebugMode` 而強制寫出。此類訊息係「相隔數日才發作」之故障的唯一
+///     取證途徑，故**當場排空寫入巷**：非同步之遺失風險不落在這一批訊息上。
+///   - strPrint: 訊息本文。
 public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
   // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
   // 以免 mixedAlnum 等大量觸發偵錯路徑的案例在完整測試時刷屏。
@@ -20,6 +29,9 @@ public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
   }
   guard forced || OSUtils.defaultsStore.bool(forKey: "_DebugMode") else { return }
   OSUtils.consoleLog("vChewingDebug: \(strPrint)")
+  if forced {
+    OSUtils.flushConsoleLog()
+  }
 }
 
 /// 偵測目前程序是否帶有測試過濾參數（例如 `swift test --filter ...`、`--skip ...` 或 XCTest 的 `-XCTest ...`）。

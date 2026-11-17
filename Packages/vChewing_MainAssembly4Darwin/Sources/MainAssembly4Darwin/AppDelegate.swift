@@ -165,6 +165,9 @@ extension AppDelegate {
     BookmarkManager.shared.stopAllSecurityScopedAccesses()
     // 留下「乾淨結束」之墓碑：否則下一輪起動無從分辨本輪係正常終結抑或死於非命。
     SecurityAgentHelper.shared.recordCleanExit()
+    // 系統記錄之寫入係非同步（見 `OSUtils.consoleLog`）：正常終結前端明排空，免得上輪之尾段
+    // 診斷無聲消失。此步不倚賴上面那則強制日誌之副作用。
+    OSUtils.flushConsoleLog()
   }
 
   public func updateDirectoryMonitorPath() {

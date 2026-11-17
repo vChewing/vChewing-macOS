@@ -189,7 +189,13 @@ public enum ResourceLocator {
     #if canImport(Darwin)
       var info = Dl_info()
       guard dladdr(#dsohandle, &info) != 0, let imagePath = info.dli_fname else { return nil }
-      return URL(fileURLWithPath: String(cString: imagePath)).deletingLastPathComponent()
+      // 不比 `String(cString:)`：該初始化器已棄用；此處自行界定長度即可。
+      let bytes = UnsafeRawPointer(imagePath).assumingMemoryBound(to: UInt8.self)
+      let path = String(
+        decoding: UnsafeBufferPointer(start: bytes, count: strlen(imagePath)),
+        as: UTF8.self
+      )
+      return URL(fileURLWithPath: path).deletingLastPathComponent()
     #else
       // Linux／Windows 沒有等價且可編譯的 API；改取宿主執行檔所在目錄。
       return Bundle.main.executableURL?.deletingLastPathComponent()

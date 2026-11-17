@@ -136,8 +136,19 @@ extension FileManager {
   nonisolated public static let realHomeDir: URL = {
     // Avoid relativeTo: parameter (10.11+) to stay compatible with 10.9.
     #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
-      let url = URL(fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir))
-      return url.standardizedFileURL
+      // 不比 `String(cString:)`：該初始化器已棄用；`getpwuid` 亦有失敗之可能，故補退路。
+      if let passwd = getpwuid(getuid()), let home = passwd.pointee.pw_dir {
+        let bytes = UnsafeRawPointer(home).assumingMemoryBound(to: UInt8.self)
+        let path = String(
+          decoding: UnsafeBufferPointer(start: bytes, count: strlen(home)),
+          as: UTF8.self
+        )
+        return URL(fileURLWithPath: path).standardizedFileURL
+      }
+      if let home = ProcessInfo.processInfo.environment["HOME"] {
+        return URL(fileURLWithPath: home).standardizedFileURL
+      }
+      return URL(fileURLWithPath: NSHomeDirectory()).standardizedFileURL
     #else
       // Windows (or other non-POSIX platforms): try environment vars then fall back to Foundation API
       if let userProfile = ProcessInfo.processInfo.environment["USERPROFILE"] {
