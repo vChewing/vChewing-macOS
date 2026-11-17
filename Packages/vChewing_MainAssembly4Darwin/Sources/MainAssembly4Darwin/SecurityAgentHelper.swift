@@ -3,7 +3,6 @@
 // This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 import AppKit
-import Carbon
 
 // MARK: - SecurityAgentHelper
 
@@ -75,41 +74,21 @@ public final class SecurityAgentHelper {
     let results = SecureEventInputSputnik.getRunningSecureInputApps(abusersOnly: true)
     vCLog("SecurityAgentHelper scanned SecureEventInput abusers. \(results.count) targets found.")
     guard !results.isEmpty else { return }
-    _ = DisableSecureEventInput()
-    // WARNING: It is not necessary, but extremely troublesome,
-    // to call EnableSecureEventInput manually here
-    // (whether deferred or not).
+    // 唯音**不**代為呼叫 `DisableSecureEventInput()`。
     //
-    // EnableSecureEventInput is automatically invoked by the system
-    // whenever a password field regains focus. The SecureEventInput
-    // API is only designed for protecting password fields. When
-    // vChewing issues a warning about abuse of the SecureEventInput
-    // API, all password fields in other applications lose focus.
+    // 舊制在此處呼叫它、並在警告文案裡宣稱「已經嘗試解除」；實測（macOS 27.2.1）證明那是一個
+    // 靜默的 no-op：`SecureEventInput` 之計數係按行程各自持有，全域狀態只是各行程的或，故任何
+    // App 都只能放掉自己那一份。SDK 頭檔之措辭亦然——「if no other application has enabled it」。
+    // 也就是說，這段呼叫從未解除過他人的鎖，卻每分鐘宣告一次「我試過了」：它既誤導使用者，也
+    // 讓「唯音自己把鎖解掉」這條線索在事後被當成嫌疑犯。
     //
-    // Modern AI-powered security vulnerability scanners apparently
-    // are never aware that leaving SecureEventInput enabled
-    // (i.e., failing to restore the previous state) completely
-    // prevents users from switching to any 3rd-party input method
-    // — regardless of whether the current app has text input focus.
-    //
-    // This long-standing issue has severely degraded the UX for all
-    // 3rd-party input method users ever since SecureEventInput (or
-    // InputMethodKit, whichever came later) was introduced.
-    //
-    // The built-in Zhuyin input method on macOS is quite poor,
-    // yet Apple's Chinese Input Method Team (as of May 2026)
-    // refuses to improve it. They are even unwilling to provide
-    // a Zhuyin IME for typing Simplified Chinese. Apple's bug report
-    // and feedback channels have remained largely unresponsive for
-    // decades unless the issue is a critical security vulnerability.
-    // This is why users "vote with their feet" and choose
-    // third-party solutions.
+    // 另一重理由：若哪天 Apple 把計數改回全域，重複呼叫 `DisableSecureEventInput()` 就會變成
+    // 破壞他人密碼欄保護的行為。不做，就不會有這一類風險。
     var pending = results
     Self.reportedPIDs.forEach { pending[$0] = nil }
     guard !pending.isEmpty else { return }
     pending.keys.forEach { Self.reportedPIDs.append($0) }
-    // 上一則警示仍在畫面上時不再疊加。`DisableSecureEventInput()` 已於上方每輪照常執行，
-    // 故此處只略過呈現、不略過緩解。
+    // 上一則警示仍在畫面上時不再疊加。
     guard warningWindow == nil else { return }
     presentWarning(for: pending)
   }
