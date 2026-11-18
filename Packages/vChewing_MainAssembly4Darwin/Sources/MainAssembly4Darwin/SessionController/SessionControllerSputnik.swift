@@ -133,7 +133,7 @@ extension SessionControllerSputnik {
         return 0
       }
       let mask = session.recognizedEvents()
-      if PrefMgr.shared.isDebugModeEnabled {
+      if vCLogIsEnabled() {
         vCLog("RecognizedEvents: addr=\(ctlAddr) mask=\(mask)")
       }
       return mask
@@ -156,10 +156,12 @@ extension SessionControllerSputnik {
       }
       session.adoptClientAddr(ctlAddr)
       let result = session.handleNSEvent(event)
-      if !result, PrefMgr.shared.isDebugModeEnabled {
-        let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
-        if let newEvent = event?.copyAsKBEvent { vCLog("OmitNSEvent: \(newEvent);\nstack: \(stack)") }
-        else { vCLog("OmitNSEvent: [RAW]\(event.debugDescription);\nstack: \(stack)") }
+      // 不附堆疊：`Thread.callStackSymbols` 逐幀掃描已載入映像之符號表（真行程實測每次
+      // 1–5 ms），而放行係常態（每個非輸入法按鍵都會走到這裡）。要不要留日誌只看
+      // `vCLogIsEnabled()`（P354）。
+      if !result, vCLogIsEnabled() {
+        if let newEvent = event?.copyAsKBEvent { vCLog("OmitNSEvent: \(newEvent)") }
+        else { vCLog("OmitNSEvent: [RAW]\(event.debugDescription)") }
       }
       return result
     }
@@ -262,7 +264,7 @@ extension SessionControllerSputnik {
   ///   - ctlAddr: 觸發該回呼的 controller 記憶體位址。
   ///   - callSite: 回呼名稱，用以辨識是哪一條 IMK 派發路徑。
   private static func logUnresolvableController(_ ctlAddr: UInt, at callSite: String) {
-    guard PrefMgr.shared.isDebugModeEnabled else { return }
+    guard vCLogIsEnabled() else { return }
     let tracker = IMKControllerLifetimeTracker.shared()
     vCLog(
       "UnresolvableController: callSite=\(callSite) addr=\(ctlAddr) "
@@ -284,7 +286,7 @@ extension SessionControllerSputnik {
   ///   - ctlAddr: 觸發該回呼的 controller 記憶體位址。
   ///   - session: 解析所得之 session；nil 表示該位址已不可解析。
   private static func logEventEntry(event: NSEvent?, controllerAddr ctlAddr: UInt, session: InputSession?) {
-    guard PrefMgr.shared.isDebugModeEnabled else { return }
+    guard vCLogIsEnabled() else { return }
     var eventDescription = "[NOEVENT]"
     if let event {
       eventDescription = event.copyAsKBEvent.map { "\($0)" } ?? "[RAW]\(event.debugDescription)"

@@ -81,11 +81,16 @@ extension SessionCoreProtocol {
   ///   - caller: 呼叫來源（自動推導為 #function）。
   ///   - line: 呼叫行號（自動推導為 #line）。
   public func switchState(_ newState: IMEState, caller: StaticString = #function, line: Int = #line) {
-    if debugLogCondition || OSUtils.isRunningUnitTests {
+    // 是否留日誌只看 `vCLogIsEnabled()`：那是「這則訊息真的會寫出去」的唯一判準。
+    // 舊制把 `OSUtils.isRunningUnitTests` 也算作「要留日誌」，於是「測試模式靜音」之行程
+    // （例如以該旗標繞過設定窗層級的診斷宿主）每次狀態切換都白白捕獲並符號化一次堆疊，
+    // 而訊息隨即被丟棄。
+    if vCLogIsEnabled() {
+      // 只報 `caller`／`line`，不附堆疊。`Thread.callStackSymbols` 會逐幀掃描已載入映像的
+      // 符號表（本機實測：真行程中每次 1–5 ms，隨堆疊深度增長），而狀態切換每次按鍵要發生
+      // 數次——這筆錢正是打字遲鈍之主因，且 `caller`＋`line` 已足以交代呼叫來源。
       let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
-      let callerTag = "\(caller)@[L\(line)]"
-      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
-      vCLog("StateChanging: \(stateStr), tag: \(callerTag);\nstack: \(stack)")
+      vCLog("StateChanging: \(stateStr), tag: \(caller)@[L\(line)]")
     }
     // 正式處理。
     let previous = state

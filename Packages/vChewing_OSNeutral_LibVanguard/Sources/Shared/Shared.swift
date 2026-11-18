@@ -21,13 +21,17 @@ import Foundation
 ///   - forced: 是否無視 `_DebugMode` 而強制寫出。此類訊息係「相隔數日才發作」之故障的唯一
 ///     取證途徑，故**當場排空寫入巷**：非同步之遺失風險不落在這一批訊息上。
 ///   - strPrint: 訊息本文。
-public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
+public func vCLogIsEnabled(forced: Bool = false) -> Bool {
   // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
   // 以免 mixedAlnum 等大量觸發偵錯路徑的案例在完整測試時刷屏。
   if OSUtils.isRunningUnitTests, !hasTestFilterArguments() {
-    return
+    return false
   }
-  guard forced || OSUtils.defaultsStore.bool(forKey: "_DebugMode") else { return }
+  return forced || OSUtils.defaultsStore.bool(forKey: "_DebugMode")
+}
+
+public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
+  guard vCLogIsEnabled(forced: forced) else { return }
   OSUtils.consoleLog("vChewingDebug: \(strPrint)")
   if forced {
     OSUtils.flushConsoleLog()
