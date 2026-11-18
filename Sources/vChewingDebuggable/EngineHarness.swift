@@ -135,6 +135,55 @@ final class HarnessCapsLockToggler: CapsLockTogglerProtocol {
   var isOn = false
 }
 
+// MARK: - MemoizingDefaultsStore
+
+/// 讀穿快取之偏好容器：量「把每鍵數十次偏好讀取收斂」能省多少。
+///
+/// 只為量測而存在，不進生產碼：外部改動（cfprefsd 通知）不會令其失效。
+final class MemoizingDefaultsStore: DefaultsStore, @unchecked Sendable {
+  // MARK: Lifecycle
+
+  init(wrapping wrapped: any DefaultsStore) {
+    self.wrapped = wrapped
+  }
+
+  // MARK: Internal
+
+  nonisolated func object(forKey key: String) -> Any? {
+    lock.lock()
+    if let hit = cache[key] {
+      lock.unlock()
+      return hit.value
+    }
+    lock.unlock()
+    let value = wrapped.object(forKey: key)
+    lock.lock()
+    cache[key] = (value, true)
+    lock.unlock()
+    return value
+  }
+
+  nonisolated func set(_ value: Any?, forKey key: String) {
+    wrapped.set(value, forKey: key)
+    lock.lock()
+    cache[key] = (value, true)
+    lock.unlock()
+  }
+
+  nonisolated func removeObject(forKey key: String) {
+    wrapped.removeObject(forKey: key)
+    lock.lock()
+    cache.removeValue(forKey: key)
+    lock.unlock()
+  }
+
+  // MARK: Private
+
+  nonisolated private let wrapped: any DefaultsStore
+  nonisolated private let lock = NSLock()
+  nonisolated(unsafe) private var cache: [String: (value: Any?, present: Bool)] = [:]
+}
+
 // MARK: - CountingDefaultsStore
 
 /// 包一層 `DefaultsStore`，只計 `object(forKey:)` 之次數——用來量「每顆按鍵讀了幾次偏好」。
@@ -304,7 +353,9 @@ enum EngineHarness {
     keys: String,
     repeats: Int,
     emulateRealLogging: Bool = false,
-    resetEachRound: Bool = false
+    resetEachRound: Bool = false,
+    skipWarmup: Bool = false,
+    memoizeStore: Bool = false
   )
     -> (report: String, stats: Stats)? {
     if let failure = prepareSession() {
@@ -317,7 +368,9 @@ enum EngineHarness {
     if emulateRealLogging { OSUtils.isRunningUnitTests = false }
     // 量測期間把偏好容器包上一層計數器：每顆按鍵讀幾次偏好，是這輪要盯的數字之一。
     let originalStore = OSUtils.defaultsStore
-    let countingStore = CountingDefaultsStore(wrapping: originalStore)
+    let countingStore = CountingDefaultsStore(
+      wrapping: memoizeStore ? MemoizingDefaultsStore(wrapping: originalStore) : originalStore
+    )
     OSUtils.defaultsStore = countingStore
     defer {
       OSUtils.isRunningUnitTests = previousUnitTestFlag
@@ -325,8 +378,10 @@ enum EngineHarness {
     }
     clientProxy.resetRecording()
 
+    var sourceChars: [Character] = []
     let sequence: [KBEvent] = keys.compactMap { character in
       guard let entry = keyCodeMap[character] else { return nil }
+      sourceChars.append(character)
       return KBEvent(
         with: .keyDown,
         modifierFlags: entry.flags,
@@ -343,8 +398,11 @@ enum EngineHarness {
     }
 
     // 暖機：讓辭典查詢快取、鍵盤解析器與會話狀態先落定，免得第一輪污染分佈。
-    for _ in 0 ..< 10 {
-      for event in sequence { _ = session.handleEvent(event) }
+    // `skipWarmup` 則是相反之用：量「剛開始打字」那幾鍵的冷啟動成本。
+    if !skipWarmup {
+      for _ in 0 ..< 10 {
+        for event in sequence { _ = session.handleEvent(event) }
+      }
     }
     clientProxy.resetRecording()
 
@@ -391,6 +449,19 @@ enum EngineHarness {
     let bucketText = buckets.map { String(format: "%.0f", $0) }.joined(separator: "/")
     let committedSample = String(clientProxy.committedText.prefix(12))
     let perKeyReads = Double(prefReads) / Double(Swift.max(1, stats.count))
+    // 逐字統計：同一顆字鍵在「句長不同」時的成本差，就是聲調鍵隨句長上漂之量。
+    var byChar: [Character: [Double]] = [:]
+    if !sourceChars.isEmpty {
+      for (index, sample) in samples.enumerated() {
+        byChar[sourceChars[index % sourceChars.count], default: []].append(sample)
+      }
+    }
+    let charText = byChar
+      .map { ($0.key, Stats(samples: $0.value)) }
+      .sorted { $0.1.p50 > $1.1.p50 }
+      .prefix(6)
+      .map { String(format: "%@:%.0f/%.0f", String($0.0), $0.1.p50, $0.1.p99) }
+      .joined(separator: " ")
     // 以字串插值組報告：`String(format:)` 之占位符與引數一旦對不上（此處曾在擴充欄位時漏改
     // 格式字串），就會以錯誤型別解讀引數而 SIGSEGV——掛具不該有這種地雷。
     let report = "[BENCH] pid=\(ProcessInfo.processInfo.processIdentifier)"
@@ -407,6 +478,7 @@ enum EngineHarness {
       + " prefReads=\(prefReads)(\(String(format: "%.1f", perKeyReads))/key)"
       +
       " setMarked=\(clientProxy.markedTextSetupCount)(\(String(format: "%.2f", Double(clientProxy.markedTextSetupCount) / Double(Swift.max(1, stats.count))))/key)"
+      + " perChar=[\(charText)] memo=\(memoizeStore ? "on" : "off")"
       + " sample=\"\(committedSample)\""
     return (report, stats)
   }
@@ -418,6 +490,8 @@ enum EngineHarness {
     delay: TimeInterval,
     emulateRealLogging: Bool = false,
     resetEachRound: Bool = false,
+    skipWarmup: Bool = false,
+    memoizeStore: Bool = false,
     log: @escaping (String) -> ()
   ) {
     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -426,7 +500,9 @@ enum EngineHarness {
           keys: keys,
           repeats: repeats,
           emulateRealLogging: emulateRealLogging,
-          resetEachRound: resetEachRound
+          resetEachRound: resetEachRound,
+          skipWarmup: skipWarmup,
+          memoizeStore: memoizeStore
         ) {
           log(result.report)
         }
@@ -486,6 +562,8 @@ enum EngineHarness {
     let resetEachRound = (value("--reset") ?? "0") == "1"
     let emulateRealLogging = (value("--logging") ?? "0") == "1"
     let delay = Double(value("--delay") ?? "2") ?? 2
+    let skipWarmup = (value("--cold") ?? "0") == "1"
+    let memoizeStore = (value("--memo") ?? "0") == "1"
     log(
       "[BENCH] cli pid=\(ProcessInfo.processInfo.processIdentifier) keys=\(keys) "
         + "count=\(repeats) reset=\(resetEachRound) logging=\(emulateRealLogging)"
@@ -496,6 +574,8 @@ enum EngineHarness {
       delay: delay,
       emulateRealLogging: emulateRealLogging,
       resetEachRound: resetEachRound,
+      skipWarmup: skipWarmup,
+      memoizeStore: memoizeStore,
       log: log
     )
   }
