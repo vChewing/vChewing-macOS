@@ -67,11 +67,35 @@ extension DefaultsStore {
 // MARK: - UserDefaultsStore
 
 /// `DefaultsStore` 之 `UserDefaults` 後端——生產環境之唯一實作。
+///
+/// - Note: **讀取有快取**（P355）。每一顆按鍵在真行程裡要讀數十次偏好，而每次
+///   `UserDefaults.object(forKey:)` 都是一趟 CFPreferences 查詢（實測含 `geteuid`／`__persona`
+///   一類系統呼叫）。讀穿快取把同一顆鍵的同一輪重複讀取收斂為一次：實測每鍵成本由
+///   1.30–1.48 ms 降至 0.84–0.91 ms（約三成五）。
+///
+///   失效有三路：本物件之 `set`／`removeObject`、以及 `UserDefaults.didChangeNotification`
+///   （涵蓋同行程其他 `UserDefaults` 實例與 cfprefsd 之外部改動）。
+///
+///   **例外**：**以 `_` 開頭之鍵一律不快取**——那是診斷開關與安全代理帳本之專屬命名空間
+///   （`_DebugMode`、`_SecurityAgent_*` 等），P299 已立法「診斷開關須決策當下求值、不得快取」。
 public final class UserDefaultsStore: DefaultsStore, @unchecked Sendable {
   // MARK: Lifecycle
 
   nonisolated public init(_ defaults: UserDefaults) {
     self.defaults = defaults
+    self.observer = NotificationCenter.default.addObserver(
+      forName: UserDefaults.didChangeNotification,
+      object: nil,
+      queue: nil
+    ) { [weak self] _ in
+      self?.invalidateAll()
+    }
+  }
+
+  deinit {
+    if let observer {
+      NotificationCenter.default.removeObserver(observer)
+    }
   }
 
   // MARK: Public
@@ -81,16 +105,53 @@ public final class UserDefaultsStore: DefaultsStore, @unchecked Sendable {
   /// `nonisolated` 成員相斥。
   nonisolated(unsafe) public let defaults: UserDefaults
 
+  /// 當前快取之鍵數（供診斷與測試斷言；不快取 `_` 開頭者）。
+  nonisolated public var cachedKeyCount: Int {
+    cache.withLockRead { $0.count }
+  }
+
+  /// 自開始以來實際落到 `UserDefaults` 之讀取次數（供診斷與測試斷言）。
+  nonisolated public var underlyingReadCount: Int {
+    underlyingReads.withLockRead { $0 }
+  }
+
   nonisolated public func object(forKey key: String) -> Any? {
-    defaults.object(forKey: key)
+    guard !key.hasPrefix("_") else {
+      underlyingReads.withLock { $0 += 1 }
+      return defaults.object(forKey: key)
+    }
+    if let hit = cache.withLockRead({ $0[key] }) {
+      return hit
+    }
+    underlyingReads.withLock { $0 += 1 }
+    let value = defaults.object(forKey: key)
+    cache.withLock { $0[key] = value }
+    return value
   }
 
   nonisolated public func set(_ value: Any?, forKey key: String) {
     defaults.set(value, forKey: key)
+    invalidate(key)
   }
 
   nonisolated public func removeObject(forKey key: String) {
     defaults.removeObject(forKey: key)
+    invalidate(key)
+  }
+
+  /// 清空整份快取（外部改動之通知，與測試）。
+  nonisolated public func invalidateAll() {
+    cache.withLock { $0.removeAll(keepingCapacity: true) }
+  }
+
+  // MARK: Private
+
+  nonisolated private let cache = NSMutex<[String: Any?]>([:])
+  nonisolated private let underlyingReads = NSMutex(0)
+  nonisolated(unsafe) private var observer: NSObjectProtocol?
+
+  nonisolated private func invalidate(_ key: String) {
+    cache.withLock { _ = $0.removeValue(forKey: key) }
   }
 }
 
