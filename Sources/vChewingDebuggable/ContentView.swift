@@ -188,6 +188,39 @@ final class DiagnosticsViewModel {
       snapshotHeap(tag: Self.queryItem(url, "tag") ?? "external heap snapshot")
     case "mh":
       snapshotMallocHistory(tag: Self.queryItem(url, "tag") ?? "external malloc_history snapshot")
+    case "bench":
+      // 引擎測試掛具：以合成之 KBEvent 驅動，量每次按鍵之主執行緒耗時。
+      let benchKeys = Self.queryItem(url, "keys") ?? "su3 "
+      let repeats = Int(Self.queryItem(url, "count") ?? "200") ?? 200
+      let realLogging = Self.queryItem(url, "logging") == "1"
+      let resetEachRound = Self.queryItem(url, "reset") == "1"
+      if let result = EngineHarness.runBench(
+        keys: benchKeys,
+        repeats: repeats,
+        emulateRealLogging: realLogging,
+        resetEachRound: resetEachRound
+      ) {
+        log(result.report)
+      }
+    case "benchdelay":
+      // 延後 bench：讓外部先把取樣器掛上。
+      let delay = Double(Self.queryItem(url, "delay") ?? "5") ?? 5
+      EngineHarness.scheduleBench(
+        keys: Self.queryItem(url, "keys") ?? "su3 ",
+        repeats: Int(Self.queryItem(url, "count") ?? "200") ?? 200,
+        delay: delay,
+        emulateRealLogging: Self.queryItem(url, "logging") == "1",
+        resetEachRound: Self.queryItem(url, "reset") == "1",
+        log: { [weak self] in self?.log($0) }
+      )
+    case "type":
+      // 逐鍵診斷：送一組按鍵並回報每一步之狀態。
+      log(EngineHarness.typeKeys(Self.queryItem(url, "keys") ?? "su3 "))
+    case "state":
+      log(EngineHarness.stateSnapshot())
+    case "resetengine":
+      EngineHarness.resetSession()
+      log("Engine harness session reset.")
     case "refresh": refreshState()
     case "reset": resetLogs()
     case "clear": clearLogs()
@@ -412,6 +445,8 @@ final class DiagnosticsViewModel {
         )
         log("Remote page flip: vchewingdbg://page/<CocoaTab>; telemetry auto-samples on every open/close/page.")
         sampleMemory(tag: "baseline (after env ready)")
+        // 命令列 bench（繞開 LaunchServices；見 `EngineHarness.handleCommandLineIfPresent`）。
+        EngineHarness.handleCommandLineIfPresent { [weak self] in self?.log($0) }
       } catch {
         log("Bootstrap failed: \(error.localizedDescription)")
       }
