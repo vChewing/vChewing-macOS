@@ -71,6 +71,13 @@ let package = Package(
         "vChewingSharedCLI"
       }
     )
+    /// 以外部辭典驅動真 `InputSession` 之量測工具（P356）。不收進 5.10 支線（同 CLI 之理由）。
+    Product.executable(
+      name: "VanguardBench",
+      targets: buildStrings {
+        "VanguardBench"
+      }
+    )
   },
   dependencies: buildPackageDependencies {
     .package(path: "Deps/VanguardSwiftExtension")
@@ -196,6 +203,18 @@ let package = Package(
     )
 
     // MARK: - Executable Target
+
+    Target.executableTarget(
+      name: "VanguardBench",
+      dependencies: buildTargetDependencies {
+        "LibVanguard"
+        "LexiconAssembly"
+        "Shared"
+      },
+      swiftSettings: buildSwiftSettings {
+        .defaultIsolation(MainActor.self) // set Default Actor Isolation
+      }
+    )
 
     Target.executableTarget(
       name: "vChewingSharedCLI",
