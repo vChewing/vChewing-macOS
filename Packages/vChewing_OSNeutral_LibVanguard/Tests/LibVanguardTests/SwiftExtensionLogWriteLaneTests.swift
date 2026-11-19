@@ -113,13 +113,18 @@ extension LibVanguardTestsRoot {
       let perWorker = 200
       let group = DispatchGroup()
       for worker in 0 ..< workers {
-        DispatchQueue.global().async(group: group) {
+        // 以專屬執行緒而非全域佇列：CI 之全域執行緒池會被同批並行之其他套房佔滿，
+        // 生產者因此餓死（實測 macOS runner 20 秒逾時、91 秒才收工）。本用例要驗的是
+        // 「車道不丟不重」，不是「全域佇列排得到執行緒」。
+        group.enter()
+        Thread.detachNewThread {
+          defer { group.leave() }
           for index in 0 ..< perWorker {
             lane.enqueue("w\(worker)-\(index)")
           }
         }
       }
-      let groupDone = group.wait(timeout: .now() + 20)
+      let groupDone = group.wait(timeout: .now() + 60)
       #expect(groupDone == .success)
       lane.flush()
       #expect(lane.droppedLineCount == 0)
