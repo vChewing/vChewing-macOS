@@ -15,7 +15,8 @@ struct FactoryPunctuationTests {
     #expect(!punctuation.isEmpty)
     #expect(punctuation.keyCount == 223)
     #expect(punctuation.hasUnigramsFor(keyArray: ["_punct_["]))
-    #expect(punctuation.unigramsFor(keyArray: ["_punct_["]).count == 12)
+    #expect(punctuation.unigramsFor(keyArray: ["_punct_["]).count == 13)
+    #expect(punctuation.unigramsFor(keyArray: ["_punct_["]).contains { $0.current == "[" })
     #expect(punctuation.unigramsFor(keyArray: ["_punct_["]).contains { $0.current == "【" })
     #expect(!punctuation.hasUnigramsFor(keyArray: ["_half_punct_"]))
   }
@@ -23,7 +24,7 @@ struct FactoryPunctuationTests {
   @Test("原廠辭典無標點時由子模組補上")
   func facadeFallback() {
     let facade = LXAssembly.LXFacade(isCHS: false, factory: FactoryDictionary())
-    #expect(facade.unigramsFor(keyArray: ["_punct_["]).count == 12)
+    #expect(facade.unigramsFor(keyArray: ["_punct_["]).count == 13)
     #expect(facade.lxQuerier.hasGrams(for: ["_punct_["]))
     #expect(facade.unigramsFor(keyArray: ["_punct_["]).contains { $0.current == "【" })
   }

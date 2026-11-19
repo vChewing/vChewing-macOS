@@ -174,13 +174,17 @@ extension LXAssembly.LXFacade {
       longerSegment: false
     )
     let entries = nodes.flatMap(\.entries)
-    return makeFactoryUnigrams(
+    let factoryGrams = makeFactoryUnigrams(
       entries: entries,
       keyArray: ["_punct_list"],
       sourceKey: "_punct_list",
       entryType: .letterPunctuations,
       includeHalfWidthVariants: false
     )
+    // P359：標點已移出原廠辭典；辭典無此鍵時由子模組供應。
+    return factoryGrams.isEmpty
+      ? lxFactoryPunctuation.baseUnigramsFor(keyArray: ["_punct_list"])
+      : factoryGrams
   }
 
   public func factoryCoreUnigramsFor(

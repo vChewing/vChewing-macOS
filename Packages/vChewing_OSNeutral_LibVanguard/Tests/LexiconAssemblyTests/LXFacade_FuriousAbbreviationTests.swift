@@ -18,7 +18,7 @@ import Testing
 /// 跨行程不保證，而本查詢係「先按詞值去重、後排序」，故次序不確定即令名次不可重現。
 @Suite(.serialized)
 struct LXFacadeFuriousAbbreviationTests {
-  /// 「館」在測試樣本裡只有帶前文之條目（型別 C／D，型別碼 6），故它只會經由
+  /// 「改到」在測試樣本裡只有帶前文之條目（型別 C／D，型別碼 6），故它只會經由
   /// `factoryChoppedUnigramsFor` 以帶 `previous` 的形式出現；過濾之後應為空。
   @Test
   func abbreviatedLookupRejectsContextualGrams() throws {
@@ -35,7 +35,7 @@ struct LXFacadeFuriousAbbreviationTests {
     }
 
     // 前提：樣本必須真的含帶前文之條目，否則本用例測不到東西。
-    let probeKey = ["ㄍㄨㄢˇ"]
+    let probeKey = ["ㄍㄞˇ", "ㄉㄠˋ"]
     let rawFactory = instance.factoryChoppedUnigramsFor(
       keyArray: probeKey,
       entryType: .cht,
@@ -43,12 +43,12 @@ struct LXFacadeFuriousAbbreviationTests {
     )
     #expect(
       rawFactory.contains { !$0.isUnigram },
-      "測試樣本之「館」必須含帶前文之條目，否則本用例失去前提。"
+      "測試樣本之「改到」必須含帶前文之條目，否則本用例失去前提。"
     )
 
     let chopped = instance.abbreviatedWordCandidates(keysChopped: probeKey)
     #expect(chopped.allSatisfy { $0.isUnigram })
-    #expect(chopped.isEmpty, "「館」在樣本裡只有帶前文之條目，過濾後應為空。")
+    #expect(chopped.isEmpty, "「改到」在樣本裡只有帶前文之條目，過濾後應為空。")
 
     // 正控：確有單元圖之讀音仍照常出列，且同樣不含帶前文者。
     let zaiCandidates = instance.abbreviatedWordCandidates(keysChopped: ["ㄗㄞˋ"])

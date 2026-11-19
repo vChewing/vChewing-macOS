@@ -17,17 +17,29 @@ extension LXAssembly {
     // MARK: Lifecycle
 
     public init(records: [PunctuationData.Record] = PunctuationData.records) {
-      var result = [String: [Homa.Gram]]()
+      var base = [String: [Homa.Gram]]()
+      var all = [String: [Homa.Gram]]()
       records.forEach { record in
-        result[record.key, default: []].append(
+        let baseGram = Homa.Gram(
+          keyArray: [record.key],
+          current: record.value,
+          probability: record.score
+        )
+        base[record.key, default: []].append(baseGram)
+        all[record.key, default: []].append(baseGram)
+        // 與原廠 TextMap 管線一致：全形標點另補半形變體，分數略低於本體。
+        let halfWidthValue = record.value.applyingTransformFW2HW(reverse: false)
+        guard halfWidthValue != record.value else { return }
+        all[record.key, default: []].append(
           Homa.Gram(
             keyArray: [record.key],
-            current: record.value,
-            probability: record.score
+            current: halfWidthValue,
+            probability: record.score - 0.0001
           )
         )
       }
-      self.gramsByKey = result
+      self.baseGramsByKey = base
+      self.gramsByKey = all
     }
 
     // MARK: Public
@@ -48,8 +60,15 @@ extension LXAssembly {
       return gramsByKey[key] ?? []
     }
 
+    /// 僅回傳資料檔原值，不含自動補出的半形變體。
+    public func baseUnigramsFor(keyArray: [String]) -> [Homa.Gram] {
+      guard keyArray.count == 1, let key = keyArray.first else { return [] }
+      return baseGramsByKey[key] ?? []
+    }
+
     // MARK: Private
 
+    private let baseGramsByKey: [String: [Homa.Gram]]
     private let gramsByKey: [String: [Homa.Gram]]
   }
 }

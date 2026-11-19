@@ -28,7 +28,7 @@ import Testing
 @Suite(.serialized)
 struct LXFacadeMultigramTests {
   @Test
-  func testTextMapMultigramReachesHomaGrams() throws {
+  func testTextMapContextualGramsReachHomaGrams() throws {
     defer {
       LXAssembly.LXFacade.disconnectFactoryDictionary()
     }
@@ -39,7 +39,7 @@ struct LXFacadeMultigramTests {
         .connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
     )
 
-    // 本用例只驗「原廠 TextMap 的 multigram 能否穿過 LXFacade」。POM 同樣會供應帶前驗詞的
+    // 本用例只驗「原廠 TextMap 的帶前文條目能否穿過 LXFacade」。POM 同樣會供應帶前驗詞的
     // gram，故必須顯式關掉：否則測到的可能是使用者習慣記憶而非詞庫，且會隨執行順序漂移。
     instance.setOptions { config in
       config.isCNSEnabled = false
@@ -48,50 +48,50 @@ struct LXFacadeMultigramTests {
       config.bypassUserPhrasesData = true
     }
 
-    let grams = instance.unigramsFor(keyArray: ["ㄍㄨㄢˇ"])
-    let bigram = grams.first { $0.current == "館" && $0.previous == "書" && $0.anterior == nil }
-    #expect(bigram != nil, "TextMap 的 bigram 條目必須以帶 previous 的 Gram 形式抵達 LXFacade。")
-    #expect(bigram?.anterior == nil)
-
-    let trigram = grams.first { $0.current == "館" && $0.previous == "書" && $0.anterior == "圖" }
-    #expect(trigram != nil, "TextMap 的 trigram 條目必須保留 previous 與 anterior。")
-    #expect(trigram?.anterior == "圖")
+    let grams = instance.unigramsFor(keyArray: ["ㄍㄞˇ", "ㄉㄠˋ"])
+    let contextual = grams.filter { $0.current == "改到" && $0.previous != nil }
+    #expect(contextual.count == 2, "測試樣本之「改到」應有兩筆帶前文的條目。")
+    #expect(
+      Set(contextual.compactMap(\.previous)) == ["會議", "活動"],
+      "帶前文條目之前文應為「會議」與「活動」。"
+    )
+    #expect(contextual.allSatisfy { $0.anterior == nil })
   }
 
-  /// 繁簡兩軌不得串軌：同一個「繁簡共用漢字」在兩軌各有一筆 n-gram 條目時，
+  /// 繁簡兩軌不得串軌：同一個「繁簡共用詞」在兩軌各有一筆帶前文條目時，
   /// 各軌只能取到自己那一筆，且分數必須是自己那一筆的分數。
-  ///
-  /// 出貨語料裡的 `碳` 剛好兩軌同值、同前文、同分母、同分數（只差型別欄的 5／6），
-  /// 故任何一軌被換掉都看不出來。本用例於記憶體中改寫樣本，讓兩軌分數不同
-  /// （繁體軌 −1.25、簡體軌 −0.36），再分別以 `isCHS = false`／`true` 查同一個讀音。
-  /// 只要載入端或取用端拿錯型別，這裡必然失敗。
   @Test
   func testSharedHanziStaysInItsOwnLane() {
     defer {
       LXAssembly.LXFacade.disconnectFactoryDictionary()
     }
 
-    // Windows 的 checkout 會把資源檔換成 CRLF（該倉無 `.gitattributes` 時尤然）。
-    // 這裡先正規化成 LF，否則下面的「整行相等」比對會因為行尾多一個 `\r` 而落空。
     let normalizedSample = LXATestsData.textMapTestCoreLXData
       .replacingOccurrences(of: "\r\n", with: "\n")
       .replacingOccurrences(of: "\r", with: "\n")
     var lines = normalizedSample.components(separatedBy: "\n")
 
-    let traditionalRow = "碳\t-0.36\t6\t氧|化"
-    let simplifiedRow = "碳\t-0.36\t5\t氧|化"
-    guard let traditionalIndex = lines.firstIndex(of: traditionalRow) else {
-      Issue.record("測試樣本裡必須有繁體軌的「碳」trigram 條目（型別 6）。")
-      return
-    }
-    guard let simplifiedIndex = lines.firstIndex(of: simplifiedRow) else {
-      Issue.record("測試樣本裡必須有簡體軌的「碳」trigram 條目（型別 5）。")
-      return
+    func patchRow(typeID: Int, score: Double) -> Bool {
+      guard let index = lines.firstIndex(where: { $0.hasPrefix("!改到\t\(typeID)\t") })
+      else { return false }
+      var fields = lines[index].split(separator: "\t", omittingEmptySubsequences: false)
+        .map(String.init)
+      guard fields.count >= 5 else { return false }
+      for i in stride(from: 2, to: fields.count, by: 2) {
+        fields[i] = String(score)
+      }
+      lines[index] = fields.joined(separator: "\t")
+      return true
     }
 
-    // 只改分數、不動型別與前文，故「哪一軌」完全由第三欄的 5／6 決定。
-    lines[traditionalIndex] = "碳\t-1.25\t6\t氧|化"
-    lines[simplifiedIndex] = "碳\t-0.36\t5\t氧|化"
+    guard patchRow(typeID: 6, score: -1.25) else {
+      Issue.record("測試樣本裡必須有繁體軌的「改到」帶前文條目（型別 6）。")
+      return
+    }
+    guard patchRow(typeID: 5, score: -0.36) else {
+      Issue.record("測試樣本裡必須有簡體軌的「改到」帶前文條目（型別 5）。")
+      return
+    }
     let patchedTextMap = lines.joined(separator: "\n")
 
     let traditionalInstance = LXAssembly.LXFacade(isCHS: false)
@@ -110,30 +110,16 @@ struct LXFacadeMultigramTests {
       }
     }
 
-    func contextCarryingCarbonProbabilities(_ instance: LXAssembly.LXFacade) -> [Double] {
-      instance.unigramsFor(keyArray: ["ㄊㄢˋ"])
-        .filter { $0.current == "碳" && $0.previous == "化" && $0.anterior == "氧" }
-        .map(\.probability)
-    }
+    let traditional = traditionalInstance.unigramsFor(keyArray: ["ㄍㄞˇ", "ㄉㄠˋ"])
+      .filter { $0.current == "改到" && ["會議", "活動"].contains($0.previous ?? "") }
+    let simplified = simplifiedInstance.unigramsFor(keyArray: ["ㄍㄞˇ", "ㄉㄠˋ"])
+      .filter { $0.current == "改到" && ["会议", "活动"].contains($0.previous ?? "") }
 
-    let traditionalProbabilities = contextCarryingCarbonProbabilities(traditionalInstance)
-    let simplifiedProbabilities = contextCarryingCarbonProbabilities(simplifiedInstance)
-
-    #expect(
-      traditionalProbabilities.count == 1,
-      "繁體模式在「氧 化」前文鏈下只該看到一筆「碳」，實得 \(traditionalProbabilities.count) 筆。"
-    )
-    #expect(
-      simplifiedProbabilities.count == 1,
-      "簡體模式在「氧 化」前文鏈下只該看到一筆「碳」，實得 \(simplifiedProbabilities.count) 筆。"
-    )
-    #expect(
-      abs((traditionalProbabilities.first ?? 0) - -1.25) < 0.001,
-      "繁體模式必須取用型別 6 的那一筆（−1.25），實得 \(traditionalProbabilities.first ?? 0)。"
-    )
-    #expect(
-      abs((simplifiedProbabilities.first ?? 0) - -0.36) < 0.001,
-      "簡體模式必須取用型別 5 的那一筆（−0.36），實得 \(simplifiedProbabilities.first ?? 0)。"
-    )
+    #expect(traditional.count == 2, "繁體模式應只看到兩筆繁體前文條目。")
+    #expect(simplified.count == 2, "簡體模式應只看到兩筆簡體前文條目。")
+    #expect(traditional.allSatisfy { abs($0.probability - -1.25) < 0.001 })
+    #expect(simplified.allSatisfy { abs($0.probability - -0.36) < 0.001 })
+    #expect(traditional.allSatisfy { $0.anterior == nil })
+    #expect(simplified.allSatisfy { $0.anterior == nil })
   }
 }

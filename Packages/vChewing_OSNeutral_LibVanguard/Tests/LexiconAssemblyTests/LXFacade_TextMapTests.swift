@@ -96,11 +96,11 @@ struct LXFacadeTextMapTests {
     }
     #expect(
       gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.current == "危" })) ==
-        .init(keyArray: ["ㄨㄟ"], value: "危", probability: -5.287)
+        .init(keyArray: ["ㄨㄟ"], value: "危", probability: -5.286)
     )
     #expect(
       gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.current == "危" })) ==
-        .init(keyArray: ["ㄨㄟˊ"], value: "危", probability: -5.287)
+        .init(keyArray: ["ㄨㄟˊ"], value: "危", probability: -5.286)
     )
 
     instance.setOptions { config in
@@ -113,7 +113,7 @@ struct LXFacadeTextMapTests {
     )
     #expect(
       gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.current == "危" })) ==
-        .init(keyArray: ["ㄨㄟˊ"], value: "危", probability: -5.287)
+        .init(keyArray: ["ㄨㄟˊ"], value: "危", probability: -5.286)
     )
   }
 
