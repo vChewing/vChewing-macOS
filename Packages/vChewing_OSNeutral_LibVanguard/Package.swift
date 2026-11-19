@@ -126,6 +126,9 @@ let package = Package(
           name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
         )
       },
+      resources: buildResources {
+        Resource.process("Resources")
+      },
       swiftSettings: buildSwiftSettings {
         .defaultIsolation(MainActor.self) // set Default Actor Isolation
       }

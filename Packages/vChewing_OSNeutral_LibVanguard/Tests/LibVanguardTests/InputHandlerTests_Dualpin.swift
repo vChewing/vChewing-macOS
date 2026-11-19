@@ -824,7 +824,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - 字面節點之後的數字連打
 
-  /// 組字器尾端為字面標點節（如 `_punctuation_1`）時，其後之數字鍵不得被
+  /// 組字器尾端為字面標點節（如 `_punct_1`）時，其後之數字鍵不得被
   /// 「覆寫身後聲調」（`performRearIntonationOverrideIfNeeded`）之流程當作聲調鍵吞掉：
   /// 該流程須認出後節點並非讀音音節而放行，令數字續落標點鏈、逐鍵成節。
   /// 狂打開關之兩態皆然——本缺陷與狂打無涉，狂打只是叫它更容易被撞見。

@@ -236,7 +236,7 @@ extension SessionProtocol {
   public func candidatePairs(conv: Bool = false) -> [CandidateInState] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     let keyChainOfFirstCandidate = state.candidates[0].keyArray.joined()
-    let punctuationKeyHeaderMatched = keyChainOfFirstCandidate.contains("_punctuation")
+    let punctuationKeyHeaderMatched = keyChainOfFirstCandidate.contains("_punct")
     if !conv || prefs.cns11643Enabled || punctuationKeyHeaderMatched {
       return state.candidates
     }

@@ -175,7 +175,7 @@ extension InputHandlerProtocol {
 
   /// 半形模式下，若當前節點是 `\`／`|` 的單一標點，回傳可注入之完整成對候選。
   ///
-  /// 半形辭典（`_half_punctuation_\`／`_half_punctuation_|`）只收單邊字元；成對候選
+  /// 半形辭典（`_half_punct_\`／`_half_punct_|`）只收單邊字元；成對候選
   /// 由本表注入，故不必為此另發一版辭典。注入僅發生在候選窗，不改變節點本身。
   func halfWidthPairedPunctuationCandidatesForCurrentNode() -> [Homa.CandidatePair] {
     guard prefs.halfWidthPunctuationEnabled,
@@ -187,7 +187,7 @@ extension InputHandlerProtocol {
     guard index < sentence.count, starts[index] == location else { return [] }
     let gram = sentence[index]
     guard gram.segLength == 1, gram.keyArray.count == 1,
-          ["_half_punctuation_\\", "_half_punctuation_|"].contains(gram.keyArray[0]) else { return [] }
+          ["_half_punct_\\", "_half_punct_|"].contains(gram.keyArray[0]) else { return [] }
     return PairedPunctuation.halfWidthPairValues.map {
       Homa.CandidatePair(keyArray: gram.keyArray, value: $0)
     }

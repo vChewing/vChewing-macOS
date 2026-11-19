@@ -6,14 +6,11 @@
 
 /// 成對標點之對照表。
 ///
-/// 全形資料來自 `vChewing-VanguardLexicon/Sources/LibVanguardChewingData/Resources/components/
-/// common/data-punctuations.txt` 之三組單邊候選：
-/// `_punctuation_[`／`_punctuation_]`、`_punctuation_{`／`_punctuation_}`、
-/// `_punctuation_(`／`_punctuation_)`。三組之左右候選逐項對位；本表即該對位之固化。
+/// 成對關係來自 `Sources/Shared/Resources/data-paired-punctuations.txt`；該檔隨
+/// `LibVanguard` 動態庫出貨，執行期以 `PunctuationData` 解析，不依賴辭典版本。
 ///
-/// 半形候選四對（`[]`、`{}`、`()`、`<>`）之單邊索引鍵為 `_half_punctuation_` 系列；
-/// 其候選由 `InputHandler` 依本表注入，不依賴辭典版本。另收 `｢｣` 一對，供 `[`／`]`
-/// 輪替時同步。
+/// 半形候選之單邊索引鍵為 `_half_punct_` 系列；其完整成對候選由 `InputHandler`
+/// 依本表注入。
 ///
 /// 本表刻意不依賴執行期辭典：成對關係是輸入法之語義，不是候選權重；且拆對與同步
 /// 皆須在候選窗之外獨立判定。
@@ -40,12 +37,14 @@ public enum PairedPunctuation {
     uniqueKeysWithValues: pairs.map { ($0.right, $0.rightKey) }
   )
 
-  /// 半形模式下、`\`／`|` 兩鍵可注入之完整成對候選（依序）。
-  public static let halfWidthPairValues: [String] = ["[]", "{}", "()", "<>"]
+  /// 半形模式下、`\`／`|` 兩鍵可注入之完整成對候選（依資料檔順序）。
+  public static let halfWidthPairValues: [String] = pairs
+    .filter { $0.leftKey.hasPrefix("_half_punct_") }
+    .map { $0.left + $0.right }
 
   /// 該索引鍵是否屬於成對標點之單邊元件（全形或半形）。
   public static func isPunctuationComponentKey(_ key: String) -> Bool {
-    key.hasPrefix("_punctuation_") || key.hasPrefix("_half_punctuation_")
+    key.hasPrefix("_punct_") || key.hasPrefix("_half_punct_")
   }
 
   public static func isLeftComponent(_ value: String) -> Bool {
@@ -87,37 +86,9 @@ public enum PairedPunctuation {
 
   /// 三元組：(左元件, 右元件, 左索引鍵, 右索引鍵)。
   ///
-  /// 三組索引鍵之左右候選在 `data-punctuations.txt` 中逐項對位；此處照錄，不另排序。
-  private static let pairs: [(left: String, right: String, leftKey: String, rightKey: String)] = [
-    ("「", "」", "_punctuation_[", "_punctuation_]"),
-    ("“", "”", "_punctuation_[", "_punctuation_]"),
-    ("《", "》", "_punctuation_[", "_punctuation_]"),
-    ("〔", "〕", "_punctuation_[", "_punctuation_]"),
-    ("【", "】", "_punctuation_[", "_punctuation_]"),
-    ("［", "］", "_punctuation_[", "_punctuation_]"),
-    ("﹁", "﹂", "_punctuation_[", "_punctuation_]"),
-    ("«", "»", "_punctuation_[", "_punctuation_]"),
-    ("︽", "︾", "_punctuation_[", "_punctuation_]"),
-    ("︹", "︺", "_punctuation_[", "_punctuation_]"),
-    ("︻", "︼", "_punctuation_[", "_punctuation_]"),
-    ("﹇", "﹈", "_punctuation_[", "_punctuation_]"),
-    ("『", "』", "_punctuation_{", "_punctuation_}"),
-    ("‘", "’", "_punctuation_{", "_punctuation_}"),
-    ("｛", "｝", "_punctuation_{", "_punctuation_}"),
-    ("〈", "〉", "_punctuation_{", "_punctuation_}"),
-    ("〖", "〗", "_punctuation_{", "_punctuation_}"),
-    ("﹃", "﹄", "_punctuation_{", "_punctuation_}"),
-    ("‹", "›", "_punctuation_{", "_punctuation_}"),
-    ("︷", "︸", "_punctuation_{", "_punctuation_}"),
-    ("︿", "﹀", "_punctuation_{", "_punctuation_}"),
-    ("︗", "︘", "_punctuation_{", "_punctuation_}"),
-    ("（", "）", "_punctuation_(", "_punctuation_)"),
-    ("︵", "︶", "_punctuation_(", "_punctuation_)"),
-    // 半形：候選由 InputHandler 注入，索引鍵用 `_half_punctuation_` 系列。
-    ("[", "]", "_half_punctuation_[", "_half_punctuation_]"),
-    ("｢", "｣", "_half_punctuation_[", "_half_punctuation_]"),
-    ("{", "}", "_half_punctuation_{", "_half_punctuation_}"),
-    ("(", ")", "_half_punctuation_(", "_half_punctuation_)"),
-    ("<", ">", "_half_punctuation_<", "_half_punctuation_>"),
-  ]
+  /// 由 `data-paired-punctuations.txt` 逐列解析；順序即資料檔順序，不另排序。
+  private static let pairs: [(left: String, right: String, leftKey: String, rightKey: String)] =
+    PunctuationData.pairedEntries.map {
+      (left: $0.left, right: $0.right, leftKey: $0.leftKey, rightKey: $0.rightKey)
+    }
 }

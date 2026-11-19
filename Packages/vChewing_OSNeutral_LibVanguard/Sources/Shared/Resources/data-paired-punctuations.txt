@@ -1,0 +1,9 @@
+# data-paired-punctuations.txt — paired punctuation identity.
+# Format: <leftKey> <rightKey> <pair> <pair>...  (ASCII space delimiter; each pair is exactly two characters)
+_punct_[ _punct_] 「」 “” 《》 〔〕 【】 ［］ ﹁﹂ «» ︽︾ ︹︺ ︻︼ ﹇﹈
+_punct_{ _punct_} 『』 ‘’ ｛｝ 〈〉 〖〗 ﹃﹄ ‹› ︷︸ ︿﹀ ︗︘
+_punct_( _punct_) （） ︵︶
+_half_punct_[ _half_punct_] [] ｢｣
+_half_punct_{ _half_punct_} {}
+_half_punct_( _half_punct_) ()
+_half_punct_< _half_punct_> <>

@@ -1381,7 +1381,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - Option-based punctuation in full-width mode
 
-  /// 全形模式下，Option+標點應正常命中 _alt_punctuation_ 條目。
+  /// 全形模式下，Option+標點應正常命中 _alt_punct_ 條目。
   @Test("IH-MixedAlnum-036 Option punctuation works in full-width mode")
   func test_IH_MixedAlnum_036_OptionPunctuationWorksInFullWidthMode() throws {
     guard let testHandler, let testSession else {
@@ -1412,7 +1412,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     let optSemicolonHW = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
     #expect(
       !testHandler.triageInput(event: optSemicolonHW),
-      "Option+; in half-width mode should pass through (no _half_alt_punctuation_ entry)"
+      "Option+; in half-width mode should pass through (no _half_alt_punct_ entry)"
     )
   }
 

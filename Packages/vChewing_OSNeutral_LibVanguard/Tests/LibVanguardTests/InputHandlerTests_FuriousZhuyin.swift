@@ -293,7 +293,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     prepareTwoPendingKeys()
     typeSentence("[")
     #expect(
-      testHandler.assembler.actualKeys == ["ㄍㄠ", "_punctuation_["],
+      testHandler.assembler.actualKeys == ["ㄍㄠ", "_punct_["],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(

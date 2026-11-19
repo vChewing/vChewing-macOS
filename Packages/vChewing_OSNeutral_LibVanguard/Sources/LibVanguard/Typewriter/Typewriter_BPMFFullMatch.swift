@@ -485,7 +485,7 @@ extension BPMFFullMatchTypewriter {
     for scalar in readingKey.unicodeScalars {
       playbackComposer.receiveKey(fromPhonabet: scalar)
     }
-    // 後節點必須真的是讀音音節。否則（例如字面標點節 `_punctuation_1`）此處
+    // 後節點必須真的是讀音音節。否則（例如字面標點節 `_punct_1`）此處
     // 不得吞掉聲調鍵，而得放行給後續處置，讓同一按鍵繼續走標點鏈。
     guard playbackComposer.phonabetKeyForQuery(pronounceableOnly: true) != nil else {
       return nil

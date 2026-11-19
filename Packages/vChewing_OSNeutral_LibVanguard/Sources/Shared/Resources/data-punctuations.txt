@@ -1,0 +1,225 @@
+# data-punctuations.txt — vChewing punctuation candidates.
+# Format: <key> <value> <value>...  (ASCII space delimiter; score is always 0.0, omitted)
+_alt_ctrl_punct_, 《 〈
+_alt_ctrl_punct_. 》 〉
+_alt_ctrl_punct_/ ・
+_alt_ctrl_punct_0 0 ０
+_alt_ctrl_punct_1 1 １
+_alt_ctrl_punct_2 2 ２
+_alt_ctrl_punct_3 3 ３
+_alt_ctrl_punct_4 4 ４
+_alt_ctrl_punct_5 5 ５
+_alt_ctrl_punct_6 6 ６
+_alt_ctrl_punct_7 7 ７
+_alt_ctrl_punct_8 8 ８
+_alt_ctrl_punct_9 9 ９
+_alt_punct_' ・ §
+_alt_punct_, ≤ ≰ ≦ ≨ ≼ ⊆ ⊈ ⊊ ⊑ ⋚ ⋜ ⋞ ⋠ ⋢ ⋤ ⊴ ⋬ ⩽ ⩿ ⪁ ⪃ ⪇ ⪋ ⪍ ⪑ ⪓ ⪕ ⪗ ⪙ ⪛ ⪟ ⪨ ⪬ ⪯ ⪱ ⪳ ⪵ ⪷ ⪹ ⫃ ⫅ ⫉ ⫋ ⫑ ⫹ ⭂ ⭊
+_alt_punct_- –
+_alt_punct_. ≥ ≱ ≧ ≩ ≽ ⊇ ⊉ ⊋ ⊒ ⋛ ⋝ ⋟ ⋡ ⋣ ⋥ ⊵ ⋭ ⩾ ⪀ ⪂ ⪄ ⪈ ⪌ ⪎ ⪒ ⪔ ⪖ ⪘ ⪚ ⪜ ⪠ ⪩ ⪭ ⪰ ⪲ ⪴ ⪶ ⪸ ⪺ ⫄ ⫆ ⫊ ⫌ ⫒ ⫺ ⭈ ⥵
+_alt_punct_/ ／ ÷ ∞
+_alt_punct_0 0 ０ 〇 零
+_alt_punct_1 1 １ 一
+_alt_punct_2 2 ２ 二
+_alt_punct_3 3 ３ 三
+_alt_punct_4 4 ４ 四
+_alt_punct_5 5 ５ 五
+_alt_punct_6 6 ６ 六
+_alt_punct_7 7 ７ 七
+_alt_punct_8 8 ８ 八
+_alt_punct_9 9 ９ 九
+_alt_punct_; … ⋮ ﹏
+_alt_punct_= ≠ ≄ ≅ ≆ ≇ ≈ ≉ ≊ ≌ ≑ ≒ ≓ ≔ ≕ ≖ ≗ ≛ ≜ ≝ ≟ ⋍ ⋕ ⌸ ⍯ ⧣ ⧤ ⩵ ⩦ ⩮ ⩯ ⩰ ⩱ ⩲ ⩳ ⩴ ⩶ ⩷ ⪮
+_alt_punct_[ “ ‘
+_alt_punct_\ ＼ “” ‘’
+_alt_punct_] ” ’
+_alt_punct_¥ + \
+_alt_punct_· `
+_ctrl_punct_' 、
+_ctrl_punct_, ，
+_ctrl_punct_. 。
+_ctrl_punct_/ ？
+_ctrl_punct_; ；
+_half_punct_! !
+_half_punct_" "
+_half_punct_# #
+_half_punct_$ $ ¥ £ ₽ € ¢ ฿
+_half_punct_% %
+_half_punct_& &
+_half_punct_' '
+_half_punct_( (
+_half_punct_) )
+_half_punct_* * ×
+_half_punct_+ +
+_half_punct_- -
+_half_punct_0 0
+_half_punct_1 1
+_half_punct_2 2
+_half_punct_3 3
+_half_punct_4 4
+_half_punct_5 5
+_half_punct_6 6
+_half_punct_7 7
+_half_punct_8 8
+_half_punct_9 9
+_half_punct_: :
+_half_punct_; ;
+_half_punct_< <
+_half_punct_= =
+_half_punct_> >
+_half_punct_? ? ÷
+_half_punct_@ @
+_half_punct_ETen26_" "
+_half_punct_ETen26_' '
+_half_punct_ETen26_, ,
+_half_punct_ETen26_. .
+_half_punct_ETen26_: :
+_half_punct_ETen26_; ;
+_half_punct_ETen26_< <
+_half_punct_ETen26_> >
+_half_punct_ETen_' '
+_half_punct_ETen_: : ;
+_half_punct_ETen_< , <
+_half_punct_ETen_> . >
+_half_punct_ETen_` `
+_half_punct_HanyuPinyin_" "
+_half_punct_HanyuPinyin_' '
+_half_punct_HanyuPinyin_, ,
+_half_punct_HanyuPinyin_- -
+_half_punct_HanyuPinyin_. .
+_half_punct_HanyuPinyin_: :
+_half_punct_HanyuPinyin_; ;
+_half_punct_HanyuPinyin_< <
+_half_punct_HanyuPinyin_> >
+_half_punct_HanyuPinyin__ _
+_half_punct_Hsu_" "
+_half_punct_Hsu_' '
+_half_punct_Hsu_, ,
+_half_punct_Hsu_- -
+_half_punct_Hsu_. .
+_half_punct_Hsu_: :
+_half_punct_Hsu_; ;
+_half_punct_Hsu_< <
+_half_punct_Hsu_> >
+_half_punct_Hsu__ _
+_half_punct_Standard_" "
+_half_punct_Standard_' '
+_half_punct_Standard_: : ;
+_half_punct_Standard_< , ､ <
+_half_punct_Standard_> . ｡ >
+_half_punct_[ [ ｢
+_half_punct_\ \ /
+_half_punct_] ] ｣
+_half_punct_^ ^
+_half_punct__ - _
+_half_punct_` `
+_half_punct_{ {
+_half_punct_| |
+_half_punct_} }
+_half_punct_~ ~
+_half_punct_¥ ¥
+_letter_A A a Ａ ａ
+_letter_B B b Ｂ ｂ
+_letter_C C c Ｃ ｃ
+_letter_D D d Ｄ ｄ
+_letter_E E e Ｅ ｅ
+_letter_F F f Ｆ ｆ
+_letter_G G g Ｇ ｇ
+_letter_H H h Ｈ ｈ
+_letter_I I i Ｉ ｉ
+_letter_J J j Ｊ ｊ
+_letter_K K k Ｋ ｋ
+_letter_L L l Ｌ ｌ
+_letter_M M m Ｍ ｍ
+_letter_N N n Ｎ ｎ
+_letter_O O o Ｏ ｏ
+_letter_P P p Ｐ ｐ
+_letter_Q Q q Ｑ ｑ
+_letter_R R r Ｒ ｒ
+_letter_S S s Ｓ ｓ
+_letter_T T t Ｔ ｔ
+_letter_U U u Ｕ ｕ
+_letter_V V v Ｖ ｖ
+_letter_W W w Ｗ ｗ
+_letter_X X x Ｘ ｘ
+_letter_Y Y y Ｙ ｙ
+_letter_Z Z z Ｚ ｚ
+_punct_! ！
+_punct_" ； “ ” ．
+_punct_# ＃
+_punct_$ ＄ ￥ ￡ ￠ ₽ € ¥ £ ¢ $ ฿
+_punct_% ％
+_punct_& ＆
+_punct_' 、 ‘ ’
+_punct_( （ ︵
+_punct_) ） ︶
+_punct_* ＊ ✕
+_punct_+ ＋ ＝ ↑ ↓ ← →
+_punct_- ─
+_punct_0 0
+_punct_1 1
+_punct_2 2
+_punct_3 3
+_punct_4 4
+_punct_5 5
+_punct_6 6
+_punct_7 7
+_punct_8 8
+_punct_9 9
+_punct_: ：
+_punct_; ；
+_punct_< ，
+_punct_= ＝ ⇆ ⇄ ⇅ ⇵
+_punct_> 。 ．
+_punct_? ？
+_punct_@ ＠
+_punct_ETen26_, ，
+_punct_ETen26_. 。 ．
+_punct_ETen26_: ：
+_punct_ETen26_; ；
+_punct_ETen26_< 〈
+_punct_ETen26_> 〉
+_punct_ETen_" ；
+_punct_ETen_: ：
+_punct_ETen_< ，
+_punct_ETen_> 。 ．
+_punct_HanyuPinyin_, ，
+_punct_HanyuPinyin_. 。 ．
+_punct_HanyuPinyin_: ：
+_punct_HanyuPinyin_; ；
+_punct_HanyuPinyin_< 〈
+_punct_HanyuPinyin_> 〉
+_punct_HanyuPinyin__ ＿
+_punct_Hsu_, ，
+_punct_Hsu_. 。 ．
+_punct_Hsu_: ：
+_punct_Hsu_; ；
+_punct_Hsu_< 〈
+_punct_Hsu_> 〉
+_punct_Hsu__ ＿
+_punct_Standard_" ； “ ” ．
+_punct_Standard_: ： ；
+_punct_Standard_< ， 〈 《 ︿ ︽
+_punct_Standard_> 。 〉 》 ﹀ ︾ ．
+_punct_[ 「 “ 《 〔 【 ［ ﹁ « ︽ ︹ ︻ ﹇
+_punct_\ 、 ＼ ／ 【】 〖〗 〔〕 ︻︼ ︗︘ ︹︺
+_punct_] 」 ” 》 〕 】 ］ ﹂ » ︾ ︺ ︼ ﹈
+_punct_^ ＾
+_punct__ — … － ＿ ─ │ –
+_punct_list 　 ， 、 。 ． ‧ ； ： ？ ！ ︰ … ‥ ﹐ ﹑ ﹒ · ﹔ ﹕ ﹖ ﹗ ｜ – ︱ — ︳ ╴ ︴ ﹏ （ ） ︵ ︶ ｛ ｝ ︷ ︸ 〔 〕 ︹ ︺ 【 】 ︻ ︼ 《 》 ︽ ︾ 〈 〉 ︿ ﹀ 「 」 ﹁ ﹂ 『 』 ﹃ ﹄ ﹙ ﹚ ﹛ ﹜ ﹝ ﹞ ‘ ’ “ ” 〝 〞 ‵ ′ ＃ ＆ ＊ ※ § 〃 ○ ● △ ▲ ◎ ☆ ★ ◇ ◆ □ ■ ▽ ▼ ㊣ ℅ ¯ ￣ ＿ ˍ ﹉ ﹊ ﹍ ﹎ ﹋ ﹌ ＆ ﹠ ﹡ ＋ － × ÷ ± √ ＜ ＞ ＝ ≦ ≧ ≠ ∞ ≒ ≡ ﹢ ﹣ ﹤ ﹥ ﹦ ～ ∩ ∪ ⊥ ∠ ∟ ⊿ ㏒ ㏑ ∫ ∮ ∵ ∴ ♀ ♂ ⊕ ⊙ ↑ ↓ ← → ↖ ↗ ↙ ↘ ∥ ∣ ／ ＼ ∕ ﹨ ＄ ￥ 〒 ￠ ￡ ％ ＠ ℃ ℉ ﹩ ﹪ ﹫ ㏕ ㎜ ㎝ ㎞ ㏎ ㎡ ㎎ ㎏ ㏄ ° 兙 兛 兞 兝 兡 兣 嗧 瓩 糎 ▁ ▂ ▃ ▄ ▅ ▆ ▇ █ ▏ ▎ ▍ ▌ ▋ ▊ ▉ ┼ ┴ ┬ ┤ ├ ▔ ─ │ ▕ ┌ ┐ └ ┘ ╭ ╮ ╰ ╯ ═ ╞ ╪ ╡ ◢ ◣ ◥ ◤ ╱ ╲ ╳ ０ １ ２ ３ ４ ５ ６ ７ ８ ９ Ⅰ Ⅱ Ⅲ Ⅳ Ⅴ Ⅵ Ⅶ Ⅷ Ⅸ Ⅹ 〡 〢 〣 〤 〥 〦 〧 〨 〩 十 卄 卅 Ａ Ｂ Ｃ Ｄ Ｅ Ｆ Ｇ Ｈ Ｉ Ｊ Ｋ Ｌ Ｍ Ｎ Ｏ Ｐ Ｑ Ｒ Ｓ Ｔ Ｕ Ｖ Ｗ Ｘ Ｙ Ｚ ａ ｂ ｃ ｄ ｅ ｆ ｇ ｈ ｉ ｊ ｋ ｌ ｍ ｎ ｏ ｐ ｑ ｒ ｓ ｔ ｕ ｖ ｗ ｘ ｙ ｚ Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω ㄅ ㄆ ㄇ ㄈ ㄉ ㄊ ㄋ ㄌ ㄍ ㄎ ㄏ ㄐ ㄑ ㄒ ㄓ ㄔ ㄕ ㄖ ㄗ ㄘ ㄙ ㄚ ㄛ ㄜ ㄝ ㄞ ㄟ ㄠ ㄡ ㄢ ㄣ ㄤ ㄥ ㄦ ㄧ ㄨ ㄩ ˙ ˉ ˊ ˇ ˋ ╔ ╦ ╗ ╠ ╬ ╣ ╚ ╩ ╝ ╒ ╤ ╕ ╞ ╪ ╡ ╘ ╧ ╛ ╓ ╥ ╖ ╟ ╫ ╢ ╙ ╨ ╜ ║ ═ ╭ ╮ ╰ ╯ ▓
+_punct_{ 『 ‘ ｛ 〈 〖 ﹃ ‹ ︷ ︿ ︗
+_punct_| … ｜ 《》 〈〉 ︽︾ ︿﹀ 、 ＼ ／ 【】 〖〗 〔〕 ︻︼ ︗︘ ︹︺
+_punct_} 』 ’ ｝ 〉 〗 ﹄ › ︸ ﹀ ︘
+_punct_~ ～ 〜
+_punct_¥ ￥ 、 ＼ ／ 【】 〖〗 〔〕 ︻︼ ︗︘ ︹︺
+_punct_· ｀ ～ 〜
+_shift_alt_punct_0 ０ 〇 零 0
+_shift_alt_punct_1 １ 一 1
+_shift_alt_punct_2 ２ 二 2
+_shift_alt_punct_3 ３ 三 3
+_shift_alt_punct_4 ４ 四 4
+_shift_alt_punct_5 ５ 五 5
+_shift_alt_punct_6 ６ 六 6
+_shift_alt_punct_7 ７ 七 7
+_shift_alt_punct_8 ８ 八 8
+_shift_alt_punct_9 ９ 九 9

@@ -120,7 +120,7 @@ extension HomaTestsRoot {
         }
       )
 
-      try assembler.insertKey("_punctuation_Standard_<")
+      try assembler.insertKey("_punct_Standard_<")
       let values = assembler.segments[0][1]?.grams.map(\.current)
       #expect(values == ["，", "〈", "《"])
     }

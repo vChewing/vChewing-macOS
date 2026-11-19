@@ -1813,8 +1813,8 @@ extension InputHandlerProtocol {
   func handlePunctuationList(alternative: Bool, isJIS: Bool = false) -> Bool {
     guard let session = session, session.state.type != .ofDeactivated else { return false }
     if alternative {
-      if currentLM.lxQuerier.hasUnigrams(for: ["_punctuation_list"]) {
-        if isComposerOrCalligrapherEmpty, (try? assembler.insertKey("_punctuation_list")) != nil {
+      if currentLM.lxQuerier.hasUnigrams(for: ["_punct_list"]) {
+        if isComposerOrCalligrapherEmpty, (try? assembler.insertKey("_punct_list")) != nil {
           // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
           let textToCommit = commitOverflownComposition
           var inputting = generateStateOfInputting()

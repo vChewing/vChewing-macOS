@@ -588,8 +588,8 @@ extension InputHandlerProtocol {
   /// 標點／符號查表所用之方案名前綴（通常與 `currentKeyboardParser` 同值）。
   ///
   /// ★ P309：雙拼雖有自己的方案槽，**其標點資料仍住漢語拼音方案之下**
-  /// （`_punctuation_HanyuPinyin_,`）：語言模型內既無 `_punctuation_DualpinMSPY_,`、
-  /// 亦無裸前綴之 `_punctuation_,` 可退（實測兩者 `hasUnigrams` 皆為 false，遂令雙拼狂打之
+  /// （`_punct_HanyuPinyin_,`）：語言模型內既無 `_punct_DualpinMSPY_,`、
+  /// 亦無裸前綴之 `_punct_,` 可退（實測兩者 `hasUnigrams` 皆為 false，遂令雙拼狂打之
   /// 標點鍵一律落於 `A9BFF20E` 之 error 退回、且素材不被消費）。事主 2026-10-14 裁定
   /// 「雙拼的標點走漢語拼音標點處理方法」，故**雙拼狂打生效時**改報拼音槽之方案名。
   ///
@@ -1117,19 +1117,19 @@ extension InputHandlerProtocol {
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String? {
     if prefs.halfWidthPunctuationEnabled {
       let hasCtrlOrOption = input.isHoldingAny([.control, .option])
-      return hasCtrlOrOption ? nil : "_half_punctuation_"
+      return hasCtrlOrOption ? nil : "_half_punct_"
     }
     // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。
     // 但如果去掉「input.isMainAreaNumKey」這個限定條件的話，可能會影響其他依賴 Shift 鍵輸入的符號。
     if input.isMainAreaNumKey,
        input.commonKeyModifierFlags == [.option, .shift] {
-      return "_shift_alt_punctuation_"
+      return "_shift_alt_punct_"
     }
     switch (input.isControlHeld, input.isOptionHeld) {
-    case (true, true): return "_alt_ctrl_punctuation_"
-    case (true, false): return "_ctrl_punctuation_"
-    case (false, true): return "_alt_punctuation_"
-    case (false, false): return "_punctuation_"
+    case (true, true): return "_alt_ctrl_punct_"
+    case (true, false): return "_ctrl_punct_"
+    case (false, true): return "_alt_punct_"
+    case (false, false): return "_punct_"
     }
   }
 

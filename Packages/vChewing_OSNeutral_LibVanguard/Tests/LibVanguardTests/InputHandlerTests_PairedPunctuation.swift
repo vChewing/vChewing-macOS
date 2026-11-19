@@ -35,7 +35,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testSession.candidatePairSelectionConfirmed(at: index)
 
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_[", "_punctuation_]"],
+      testHandler.assembler.actualKeys == ["_punct_[", "_punct_]"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -119,7 +119,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     // 把左元件換成非成對的「、」：游標置於左元件之後，刪左元件，再插入 `\` 鍵（首候選為「、」）。
     testHandler.assembler.cursor = 1
     #expect((try? testHandler.assembler.dropKey(direction: .rear)) != nil)
-    #expect((try? testHandler.assembler.insertKey("_punctuation_\\")) != nil)
+    #expect((try? testHandler.assembler.insertKey("_punct_\\")) != nil)
     let before = testHandler.assembler.assembledSentence.map(\.value)
     #expect(before.count == 2, "實得：\(before)")
     guard before.count == 2 else { return }
@@ -140,14 +140,14 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     guard selectSplitPair("【】") else { return }
 
     testHandler.assembler.cursor = 1 // 左元件之後、右元件之前。
-    #expect((try? testHandler.assembler.insertKey("_punctuation_\\")) != nil)
+    #expect((try? testHandler.assembler.insertKey("_punct_\\")) != nil)
     let inserted = testHandler.assembler.assembledSentence.map(\.value)
     #expect(inserted.count == 3, "實得：\(inserted)")
     guard inserted.count == 3 else { return }
     #expect(inserted[1] != "】", "實得：\(inserted)")
 
     #expect((try? testHandler.assembler.overrideCandidate(
-      .init(keyArray: ["_punctuation_["], value: "《"),
+      .init(keyArray: ["_punct_["], value: "《"),
       at: 0,
       type: .withSpecified,
       isExplicitlyOverridden: false
@@ -167,7 +167,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     guard selectCandidate("、") else { return }
 
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_\\"],
+      testHandler.assembler.actualKeys == ["_punct_\\"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -206,7 +206,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     guard selectSplitPair("〈〉", trigger: "|") else { return }
 
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_{", "_punctuation_}"],
+      testHandler.assembler.actualKeys == ["_punct_{", "_punct_}"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -233,28 +233,28 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       Set(map.compactMap { $0.value == key ? $0.key : nil })
     }
     #expect(
-      lexiconValues(for: "_punctuation_[") ==
-        tableValues(for: "_punctuation_[", in: PairedPunctuation.leftKeyMap)
+      lexiconValues(for: "_punct_[") ==
+        tableValues(for: "_punct_[", in: PairedPunctuation.leftKeyMap)
     )
     #expect(
-      lexiconValues(for: "_punctuation_]") ==
-        tableValues(for: "_punctuation_]", in: PairedPunctuation.rightKeyMap)
+      lexiconValues(for: "_punct_]") ==
+        tableValues(for: "_punct_]", in: PairedPunctuation.rightKeyMap)
     )
     #expect(
-      lexiconValues(for: "_punctuation_{") ==
-        tableValues(for: "_punctuation_{", in: PairedPunctuation.leftKeyMap)
+      lexiconValues(for: "_punct_{") ==
+        tableValues(for: "_punct_{", in: PairedPunctuation.leftKeyMap)
     )
     #expect(
-      lexiconValues(for: "_punctuation_}") ==
-        tableValues(for: "_punctuation_}", in: PairedPunctuation.rightKeyMap)
+      lexiconValues(for: "_punct_}") ==
+        tableValues(for: "_punct_}", in: PairedPunctuation.rightKeyMap)
     )
     #expect(
-      lexiconValues(for: "_punctuation_(") ==
-        tableValues(for: "_punctuation_(", in: PairedPunctuation.leftKeyMap)
+      lexiconValues(for: "_punct_(") ==
+        tableValues(for: "_punct_(", in: PairedPunctuation.leftKeyMap)
     )
     #expect(
-      lexiconValues(for: "_punctuation_)") ==
-        tableValues(for: "_punctuation_)", in: PairedPunctuation.rightKeyMap)
+      lexiconValues(for: "_punct_)") ==
+        tableValues(for: "_punct_)", in: PairedPunctuation.rightKeyMap)
     )
   }
 
@@ -281,7 +281,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     #expect(reached, "未輪替到【】")
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_\\"],
+      testHandler.assembler.actualKeys == ["_punct_\\"],
       "輪替到 pair 不應拆對：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -302,7 +302,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.assembler.cursor = 1 // 整對之後。
     #expect(testHandler.handleBackward(input: KBEvent.KeyEventData.dataArrowLeft.asEvent))
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_[", "_punctuation_]"],
+      testHandler.assembler.actualKeys == ["_punct_[", "_punct_]"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -324,7 +324,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.assembler.cursor = 0 // 整對之前。
     #expect(testHandler.handleForward(input: KBEvent.KeyEventData.dataArrowRight.asEvent))
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_[", "_punctuation_]"],
+      testHandler.assembler.actualKeys == ["_punct_[", "_punct_]"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -346,7 +346,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.assembler.cursor = 1 // 整對之後。
     #expect(testHandler.handleBackward(input: KBEvent.KeyEventData.shiftLeftEvent.asEvent))
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_\\"],
+      testHandler.assembler.actualKeys == ["_punct_\\"],
       "標記游標不應拆對：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -389,7 +389,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     #expect(testHandler.handleBackward(input: KBEvent.KeyEventData.dataArrowLeft.asEvent))
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_[", "_punctuation_]"],
+      testHandler.assembler.actualKeys == ["_punct_[", "_punct_]"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(testHandler.assembler.cursor == 0, "實得：\(testHandler.assembler.cursor)")
@@ -407,10 +407,10 @@ extension LibVanguardTestsRoot.InputHandlerTests {
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
     let cases: [(pair: String, keys: [String], values: [String])] = [
-      ("[]", ["_half_punctuation_[", "_half_punctuation_]"], ["[", "]"]),
-      ("{}", ["_half_punctuation_{", "_half_punctuation_}"], ["{", "}"]),
-      ("()", ["_half_punctuation_(", "_half_punctuation_)"], ["(", ")"]),
-      ("<>", ["_half_punctuation_<", "_half_punctuation_>"], ["<", ">"]),
+      ("[]", ["_half_punct_[", "_half_punct_]"], ["[", "]"]),
+      ("{}", ["_half_punct_{", "_half_punct_}"], ["{", "}"]),
+      ("()", ["_half_punct_(", "_half_punct_)"], ["(", ")"]),
+      ("<>", ["_half_punct_<", "_half_punct_>"], ["<", ">"]),
     ]
     for item in cases {
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -447,11 +447,11 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
     // 測試辭典只收 `[`／`]`；真實辭典另有 `｢`／`｣`。此處補上後者以驗同步。
     testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: ["_half_punctuation_["], value: "｢", score: 0),
+      unigram: .init(keyArray: ["_half_punct_["], value: "｢", score: 0),
       isFiltering: false
     )
     testHandler.currentLM.insertTemporaryData(
-      unigram: .init(keyArray: ["_half_punctuation_]"], value: "｣", score: 0),
+      unigram: .init(keyArray: ["_half_punct_]"], value: "｣", score: 0),
       isFiltering: false
     )
     testHandler.assembler.cursor = 1 // 左元件之後、右元件之前。
@@ -471,7 +471,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer { testSession.resetInputHandler(forceComposerCleanup: true) }
     typeSentence("\\")
     let didOverride = testHandler.assembler.overrideCandidate(
-      .init(keyArray: ["_punctuation_\\"], value: "︻︼"),
+      .init(keyArray: ["_punct_\\"], value: "︻︼"),
       at: 0,
       overrideType: .withSpecified,
       isExplicitlyOverridden: false
@@ -480,7 +480,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.assembler.cursor = 1
     #expect(testHandler.handleBackward(input: KBEvent.KeyEventData.dataArrowLeft.asEvent))
     #expect(
-      testHandler.assembler.actualKeys == ["_punctuation_[", "_punctuation_]"],
+      testHandler.assembler.actualKeys == ["_punct_[", "_punct_]"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -499,7 +499,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     defer { testSession.resetInputHandler(forceComposerCleanup: true) }
     guard selectSplitPair("【】") else { return }
     let didOverride = testHandler.assembler.overrideCandidate(
-      .init(keyArray: ["_punctuation_]"], value: "﹈"),
+      .init(keyArray: ["_punct_]"], value: "﹈"),
       at: 1,
       overrideType: .withSpecified,
       isExplicitlyOverridden: false
@@ -537,7 +537,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     testHandler.prefs.halfWidthPunctuationEnabled = true
     guard selectSplitPair("<>", trigger: "|") else { return }
     #expect(
-      testHandler.assembler.actualKeys == ["_half_punctuation_<", "_half_punctuation_>"],
+      testHandler.assembler.actualKeys == ["_half_punct_<", "_half_punct_>"],
       "實得：\(testHandler.assembler.actualKeys)"
     )
     #expect(
@@ -555,16 +555,16 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     }
     defer { testSession.resetInputHandler(forceComposerCleanup: true) }
 
-    #expect((try? testHandler.assembler.insertKey("_punctuation_[")) != nil)
-    #expect((try? testHandler.assembler.insertKey("_punctuation_}")) != nil)
+    #expect((try? testHandler.assembler.insertKey("_punct_[")) != nil)
+    #expect((try? testHandler.assembler.insertKey("_punct_}")) != nil)
     let didLeft = testHandler.assembler.overrideCandidate(
-      .init(keyArray: ["_punctuation_["], value: "「"),
+      .init(keyArray: ["_punct_["], value: "「"),
       at: 0,
       overrideType: .withSpecified,
       isExplicitlyOverridden: false
     )
     let didRight = testHandler.assembler.overrideCandidate(
-      .init(keyArray: ["_punctuation_}"], value: "』"),
+      .init(keyArray: ["_punct_}"], value: "』"),
       at: 1,
       overrideType: .withSpecified,
       isExplicitlyOverridden: false
@@ -590,7 +590,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
   private func prepareWholePair(
     _ pairValue: String = "【】",
     trigger: String = "\\",
-    key: String = "_punctuation_\\"
+    key: String = "_punct_\\"
   )
     -> Bool {
     guard let testHandler else { return false }

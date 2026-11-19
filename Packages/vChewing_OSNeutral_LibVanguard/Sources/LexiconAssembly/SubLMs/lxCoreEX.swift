@@ -69,6 +69,12 @@ extension LXAssembly {
     /// 偵測資料庫辭典內是否已經有載入的資料。
     var isLoaded: Bool { !entries.isEmpty }
 
+    /// 舊資料檔之 `_punctuation` 前綴改讀為 `_punct`；載入期一次收斂。
+    static func normalizeLegacyPunctuationKey(_ key: String) -> String {
+      guard key.contains("_punctuation") else { return key }
+      return key.replacingOccurrences(of: "_punctuation", with: "_punct")
+    }
+
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
@@ -157,6 +163,7 @@ extension LXAssembly {
         let keyRange = shouldReverse ? secondCellRange : firstCellRange
         var theKey = String(decoding: rawData[keyRange], as: UTF8.self)
         theKey.convertToPhonabets()
+        theKey = Self.normalizeLegacyPunctuationKey(theKey)
         protoLineMap[theKey, default: []].append(lineRange)
         diagnosticLines.append((lineNumber, lineRange))
       }
@@ -832,6 +839,7 @@ extension LXAssembly {
 
     /// 二分搜尋 key，回傳對應 entries 的範圍（同 key 的行連續排列）。
     private func entryRange(forKey key: String) -> Range<Int>? {
+      let key = Self.normalizeLegacyPunctuationKey(key)
       let keyUTF8 = Array(key.utf8)
       // Lower bound.
       var lo = 0, hi = entries.count

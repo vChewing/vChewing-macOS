@@ -101,6 +101,9 @@ let package = Package(
         .product(
           name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
         ),
+      ],
+      resources: [
+        .process("Resources"),
       ]
     ),
     .target(

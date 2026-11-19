@@ -57,6 +57,25 @@ struct LXCoreEXTests {
   }
 
   @Test
+  func testLegacyPunctuationKeyNormalizedOnLoad() throws {
+    var lxTest = LXAssembly.LXCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lxTest.replaceData(textData: """
+    _punctuation_[ 「
+    _punctuation_[ “
+    _half_punctuation_| |
+    """)
+    #expect(lxTest.hasUnigramsFor(key: "_punct_["))
+    #expect(lxTest.unigramsFor(key: "_punct_[").map(\.current) == ["「", "“"])
+    #expect(lxTest.hasUnigramsFor(key: "_punctuation_["))
+    #expect(lxTest.unigramsFor(key: "_half_punct_|").map(\.current) == ["|"])
+  }
+
+  @Test
   func testKeysMatchingPrefix() throws {
     var lxTest = LXAssembly.LXCoreEX(
       reverse: false,

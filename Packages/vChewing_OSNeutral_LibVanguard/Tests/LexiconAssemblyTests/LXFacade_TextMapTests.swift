@@ -40,7 +40,7 @@ struct LXFacadeTextMapTests {
       .init(keyArray: strCakeKey, value: "蛋糕", probability: -4.072),
     ])
     #expect(gramTriple(of: instance.getHaninSymbolMenuUnigrams()[1]) == .init(
-      keyArray: ["_punctuation_list"],
+      keyArray: ["_punct_list"],
       value: "，",
       probability: 0.0
     ))
@@ -344,12 +344,12 @@ struct LXFacadeTextMapTests {
 
     let instance = LXAssembly.LXFacade(isCHS: false)
     let textMap = makeTextMap([
-      ("_alt_punctuation_,", [("，", -9.9, 4)]),
+      ("_alt_punct_,", [("，", -9.9, 4)]),
     ])
 
     #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
-    #expect(gramsContainValue(instance.unigramsFor(keyArray: ["_alt_punctuation_,"]), "，"))
-    #expect(instance.hasUnigramsFor(keyArray: ["_alt_punctuation_,"]))
+    #expect(gramsContainValue(instance.unigramsFor(keyArray: ["_alt_punct_,"]), "，"))
+    #expect(instance.hasUnigramsFor(keyArray: ["_alt_punct_,"]))
   }
 
   @Test
@@ -360,17 +360,17 @@ struct LXFacadeTextMapTests {
 
     let instance = LXAssembly.LXFacade(isCHS: false)
     let textMap = makeTextMap([
-      ("_punctuation_,", [("，", -9.9, 4)]),
+      ("_punct_,", [("，", -9.9, 4)]),
     ])
 
     #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
 
-    let grams = instance.unigramsFor(keyArray: ["_punctuation_,"])
+    let grams = instance.unigramsFor(keyArray: ["_punct_,"])
     let fullWidth = grams.first(where: { $0.current == "，" })
     let halfWidth = grams.first(where: { $0.current == "," })
 
-    #expect(gramTriple(of: fullWidth) == .init(keyArray: ["_punctuation_,"], value: "，", probability: -9.9))
-    #expect(gramTriple(of: halfWidth) == .init(keyArray: ["_punctuation_,"], value: ",", probability: -9.9001))
+    #expect(gramTriple(of: fullWidth) == .init(keyArray: ["_punct_,"], value: "，", probability: -9.9))
+    #expect(gramTriple(of: halfWidth) == .init(keyArray: ["_punct_,"], value: ",", probability: -9.9001))
   }
 
   @Test
@@ -381,12 +381,12 @@ struct LXFacadeTextMapTests {
 
     let instance = LXAssembly.LXFacade(isCHS: false)
     let textMap = makeTextMap([
-      ("_punctuation_Standard_<", [("，", -9.9, 4), ("〈", -9.9, 4), ("《", -9.9, 4)]),
+      ("_punct_Standard_<", [("，", -9.9, 4), ("〈", -9.9, 4), ("《", -9.9, 4)]),
     ])
 
     #expect(LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap))
 
-    let grams = instance.unigramsFor(keyArray: ["_punctuation_Standard_<"])
+    let grams = instance.unigramsFor(keyArray: ["_punct_Standard_<"])
     #expect(grams.map(\.current).prefix(3).elementsEqual(["，", "〈", "《"]))
     #expect(grams.prefix(3).allSatisfy { $0.probability == -9.9 })
   }
@@ -702,7 +702,7 @@ struct LXFacadeTextMapTests {
         (value: "阿", probability: -5.0, typeID: 5),
         (value: "あ", probability: -13.0, typeID: 8),
       ]),
-      ("_punctuation_comma", [
+      ("_punct_comma", [
         (value: "，", probability: 0.0, typeID: 4),
       ]),
     ])
@@ -717,7 +717,7 @@ struct LXFacadeTextMapTests {
     #expect(!gramsContainValue(grams4A, "，"))
 
     // Underscore key should return letterPunctuations.
-    let grams4Punct = instance.unigramsFor(keyArray: ["_punctuation_comma"])
+    let grams4Punct = instance.unigramsFor(keyArray: ["_punct_comma"])
     #expect(gramsContainValue(grams4Punct, "，"))
   }
 

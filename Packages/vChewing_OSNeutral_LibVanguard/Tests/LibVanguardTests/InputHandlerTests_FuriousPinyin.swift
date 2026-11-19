@@ -2997,7 +2997,7 @@ extension LibVanguardTestsRoot.InputHandlerTests {
 
   // MARK: - 字面節點之後的數字連打
 
-  /// 「覆寫身後聲調」之流程於後節點並非讀音音節（如字面標點節 `_punctuation_1`）時
+  /// 「覆寫身後聲調」之流程於後節點並非讀音音節（如字面標點節 `_punct_1`）時
   /// 會誤吞數字鍵——該缺陷住拼音家族共用的打字機鏈路，雙拼之境見 `IH-Dualpin-013`；
   /// 於此另立一測，使拼音側亦不得復發。
   @Test("IH-FuriousPinyin-016 Consecutive digit keys insert literal nodes")

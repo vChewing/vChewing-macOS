@@ -111,7 +111,7 @@ extension POMTestSuite {
     func testTolerant_UnderscoreReadingIgnored() {
       let pom = LXAssembly.LXPerceptor(capacity: tolerantCapacity, dataURL: tolerantNullURL)
       pom.memorizePerception(
-        (ngramKey: "(_punctuation,，)&(shi4,是)", candidate: "是"),
+        (ngramKey: "(_punct,，)&(shi4,是)", candidate: "是"),
         timestamp: tolerantNowTimeStamp
       )
       let grams = makeAssembled([("shi4", "是")])

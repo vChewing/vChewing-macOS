@@ -168,7 +168,7 @@ extension LXAssembly.LXFacade {
   func getHaninSymbolMenuUnigrams() -> [Homa.Gram] {
     guard let trie = factory.trie else { return [] }
     let nodes = trie.getNodes(
-      keyArray: ["_punctuation_list"],
+      keyArray: ["_punct_list"],
       filterType: [],
       partiallyMatch: false,
       longerSegment: false
@@ -176,8 +176,8 @@ extension LXAssembly.LXFacade {
     let entries = nodes.flatMap(\.entries)
     return makeFactoryUnigrams(
       entries: entries,
-      keyArray: ["_punctuation_list"],
-      sourceKey: "_punctuation_list",
+      keyArray: ["_punct_list"],
+      sourceKey: "_punct_list",
       entryType: .letterPunctuations,
       includeHalfWidthVariants: false
     )
@@ -225,7 +225,7 @@ extension LXAssembly.LXFacade {
     entryType: VanguardTrie.Trie.EntryType
   )
     -> [Homa.Gram] {
-    if key == "_punctuation_list" { return [] }
+    if key == "_punct_list" { return [] }
     guard let trie = factory.trie else { return [] }
     if config.partialMatchEnabled {
       return factoryPartiallyMatchedUnigramsFor(
@@ -256,7 +256,7 @@ extension LXAssembly.LXFacade {
     entryType: VanguardTrie.Trie.EntryType
   )
     -> [Homa.Gram] {
-    if subsetKey == "_punctuation_list" { return [] }
+    if subsetKey == "_punct_list" { return [] }
     guard let trie = factory.trie else { return [] }
     let nodes = trie.getNodes(
       keyArray: subsetKeyArray,
@@ -421,7 +421,7 @@ extension LXAssembly.LXFacade {
   }
 
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
-    if key == "_punctuation_list" { return nil }
+    if key == "_punct_list" { return nil }
     guard let trie = factory.trie else { return nil }
     let nodes = trie.getNodes(
       keyArray: [key],
@@ -537,7 +537,7 @@ extension LXAssembly.LXFacade {
         anterior: entry.anterior
       ))
 
-      guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
+      guard includeHalfWidthVariants, sourceKey.contains("_punct") else { continue }
       let halfWidthValue = entry.value.applyingTransformFW2HW(reverse: false)
       if halfWidthValue != entry.value {
         extraHalfWidthGrams.append(
@@ -588,7 +588,7 @@ extension LXAssembly.LXFacade {
       ))
 
       let sourceKey = queriedGram.keyArray.joined(separator: "-")
-      guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
+      guard includeHalfWidthVariants, sourceKey.contains("_punct") else { continue }
       let halfWidthValue = queriedGram.value.applyingTransformFW2HW(reverse: false)
       if halfWidthValue != queriedGram.value {
         extraHalfWidthGrams.append(

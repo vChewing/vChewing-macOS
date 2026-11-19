@@ -227,7 +227,7 @@ extension POMTestSuite {
         },
         {
           "p": { "ovr": { "【】": { "ts": 1760420369.484758, "cnt": 2 } } },
-          "k": "()&()&(_punctuation_|,【】)"
+          "k": "()&()&(_punct_|,【】)"
         },
         {
           "k": "()&()&(ㄧˋ-ㄧˋ,意譯)",
@@ -235,7 +235,7 @@ extension POMTestSuite {
         },
         {
           "p": { "ovr": { "《》": { "ts": 1760365764.630261, "cnt": 1 } } },
-          "k": "()&()&(_punctuation_|,《》)"
+          "k": "()&()&(_punct_|,《》)"
         },
         {
           "k": "(ㄧ,一)&(ㄎㄞ-ㄕˇ,開始)&(ㄓ,隻)",
@@ -251,7 +251,7 @@ extension POMTestSuite {
         },
         {
           "p": { "ovr": { "→": { "ts": 1760275750.28729, "cnt": 1 } } },
-          "k": "()&()&(_punctuation_+,→)"
+          "k": "()&()&(_punct_+,→)"
         }
       ]
       """
@@ -262,7 +262,7 @@ extension POMTestSuite {
       pom.loadData(from: pairs)
 
       #expect(pom.mutLRUMap.count == 5)
-      #expect(!pom.mutLRUMap.keys.contains(where: { $0.contains("_punctuation_") }))
+      #expect(!pom.mutLRUMap.keys.contains(where: { $0.contains("_punct_") }))
 
       pom.bleachUnigrams()
 
@@ -336,12 +336,12 @@ extension POMTestSuite {
     @Test
     func testPOM_BS09_IgnoresUnderscorePrefixedReadings() throws {
       let pom = LXAssembly.LXPerceptor(dataURL: nullURL)
-      let punctuationKey = "()&()&(_punctuation_|,《》)"
+      let punctuationKey = "()&()&(_punct_|,《》)"
       pom.memorizePerception((punctuationKey, "《》"), timestamp: nowTimeStamp)
       #expect(pom.mutLRUMap.isEmpty)
       #expect(pom.getSuggestion(key: punctuationKey, timestamp: nowTimeStamp + 1) == nil)
 
-      let dashedKey = "()&()&(ㄍㄡˇ-_punctuation_|,狗，)"
+      let dashedKey = "()&()&(ㄍㄡˇ-_punct_|,狗，)"
       pom.memorizePerception((dashedKey, "狗，"), timestamp: nowTimeStamp)
       #expect(pom.mutLRUMap.isEmpty)
       #expect(pom.getSuggestion(key: dashedKey, timestamp: nowTimeStamp + 1) == nil)

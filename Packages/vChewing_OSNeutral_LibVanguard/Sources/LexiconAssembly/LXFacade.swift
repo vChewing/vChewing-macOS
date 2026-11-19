@@ -19,8 +19,8 @@ extension LXAssembly {
   /// 享有與其它節點完全相同的組字器語義：可被游標移動、可與前後文一同遞交、
   /// 且不會被誤認為「用於分隔讀音的實際空格」。
   ///
-  /// - Remark: 這兩把鍵與 `_punctuation_list` 同屬「保留給輸入法內部使用的虛擬鍵」，
-  ///   但在資料來源上不同：`_punctuation_list` 由原廠辭典實際持有，
+  /// - Remark: 這兩把鍵與 `_punct_list` 同屬「保留給輸入法內部使用的虛擬鍵」，
+  ///   但在資料來源上不同：`_punct_list` 由原廠辭典實際持有，
   ///   而 `_SPACE_HW` / `_SPACE_FW` 純粹由程式就地合成、辭典內查無此鍵。
   public enum VirtualSpaceKey: String, CaseIterable, Sendable {
     /// 半形空白：由 `Space` 鍵插入。
@@ -885,6 +885,8 @@ extension LXAssembly {
     )
     var lxReplacements = LXReplacements()
     var lxAssociates = LXAssociates()
+    /// 原廠標點子模組（資料已自原廠辭典抽離，見 P359）。
+    var lxFactoryPunctuation = FactoryPunctuation.shared
     /// 使用者自訂候選字詞排序表（只影響候選窗之陳列次序、不參與組句）。
     var lxCandidateSequence = LXCandidateSequence()
 
@@ -979,9 +981,11 @@ extension LXAssembly {
           return true
         }
 
-        if keyChain.hasPrefix("_"), keyChain.count > 1,
-           hasFactoryChoppedUnigramsFor(keyArray: keyArray, entryType: .letterPunctuations) {
-          return true
+        if keyChain.hasPrefix("_"), keyChain.count > 1 {
+          if hasFactoryChoppedUnigramsFor(keyArray: keyArray, entryType: .letterPunctuations) {
+            return true
+          }
+          if lxFactoryPunctuation.hasUnigramsFor(keyArray: keyArray) { return true }
         }
 
         if config.isCNSEnabled,
@@ -1114,11 +1118,16 @@ extension LXAssembly {
         )
         // `_` 開頭的特殊 key（標點、半形標點、特殊符號）存放在 MISC 欄位。
         if keyChain.hasPrefix("_"), keyChain.count > 1 {
-          rawAllUnigrams += factoryUnigramsFor(
+          let factoryPunctuation = factoryUnigramsFor(
             key: keyChain,
             keyArray: flatKeyArray,
             entryType: .letterPunctuations
           )
+          rawAllUnigrams += factoryPunctuation
+          // P359：標點資料已移出原廠辭典；僅在辭典未供給時由子模組補上。
+          if factoryPunctuation.isEmpty {
+            rawAllUnigrams += lxFactoryPunctuation.unigramsFor(keyArray: flatKeyArray)
+          }
         }
         // 原廠核心辭典內容。
         factoryCoreUnigramsResult = factoryCoreUnigramsFor(
@@ -1264,7 +1273,7 @@ extension LXAssembly {
 
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: flatKeyArray))
 
-      if keyChain == "_punctuation_list" {
+      if keyChain == "_punct_list" {
         rawAllUnigrams.append(contentsOf: getHaninSymbolMenuUnigrams())
       }
 
@@ -1800,7 +1809,7 @@ extension LXAssembly {
         rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: subKeyChain, keyArray: subKeyArray))
       }
 
-      if keyChain == "_punctuation_list" {
+      if keyChain == "_punct_list" {
         rawAllUnigrams.append(contentsOf: getHaninSymbolMenuUnigrams())
       }
 
