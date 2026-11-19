@@ -1610,6 +1610,11 @@ extension InputHandlerProtocol {
       }
       session.switchState(generateStateOfInputting())
     } else {
+      if !input.isCommandHeld, !input.isControlHeld,
+         splitPairedPunctuationIfCursorWouldCross(direction: .front) {
+        session.switchState(generateStateOfInputting())
+        return true
+      }
       if (try? assembler.moveCursorStepwise(to: .front)) != nil {
         session.switchState(generateStateOfInputting())
       } else {
@@ -1681,6 +1686,11 @@ extension InputHandlerProtocol {
       }
       session.switchState(generateStateOfInputting())
     } else {
+      if !input.isCommandHeld, !input.isControlHeld,
+         splitPairedPunctuationIfCursorWouldCross(direction: .rear) {
+        session.switchState(generateStateOfInputting())
+        return true
+      }
       if (try? assembler.moveCursorStepwise(to: .rear)) != nil {
         session.switchState(generateStateOfInputting())
       } else {
@@ -1728,6 +1738,7 @@ extension InputHandlerProtocol {
     var tooltipPayload: TooltipPayload?
     var errorCode: String?
     var debugIntel: String?
+    let syncLocation = actualNodeCursorPosition
 
     do {
       let revolution = try assembler.revolveCandidate(
@@ -1751,6 +1762,10 @@ extension InputHandlerProtocol {
 
     if let debugIntel, errorCode != nil {
       errorCode? += "  INTEL:\n\(debugIntel)"
+    }
+
+    if tooltipPayload != nil {
+      synchronizePairedPunctuationIfNeeded(at: syncLocation)
     }
 
     guard let tooltipPayload else {

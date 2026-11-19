@@ -242,6 +242,11 @@ public final class MockSession: @MainActor SessionCoreProtocol {
         switchState(inputHandler.generateStateOfInputting())
         return
       }
+      if inputHandler.splitPairedPunctuationIfNeeded(candidate: selectedValue) {
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
+      let syncLocation = inputHandler.actualNodeCursorPosition
       inputHandler.consolidateNode(
         candidate: selectedValue,
         respectCursorPushing: true,
@@ -249,6 +254,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
         skipObservation: !inputHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel,
         explicitlyChosen: true
       )
+      inputHandler.synchronizePairedPunctuationIfNeeded(at: syncLocation)
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if inputHandler.prefs.useSCPCTypingMode {

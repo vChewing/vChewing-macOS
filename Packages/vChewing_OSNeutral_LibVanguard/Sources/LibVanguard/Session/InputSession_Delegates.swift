@@ -327,6 +327,11 @@ extension SessionProtocol {
         switchState(inputHandler.generateStateOfInputting())
         return
       }
+      if inputHandler.splitPairedPunctuationIfNeeded(candidate: selectedValue) {
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
+      let syncLocation = inputHandler.actualNodeCursorPosition
       inputHandler.consolidateNode(
         candidate: selectedValue,
         respectCursorPushing: true,
@@ -334,6 +339,7 @@ extension SessionProtocol {
         skipObservation: !prefs.fetchSuggestionsFromPerceptionOverrideModel,
         explicitlyChosen: true
       )
+      inputHandler.synchronizePairedPunctuationIfNeeded(at: syncLocation)
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if prefs.useSCPCTypingMode {
