@@ -8,6 +8,17 @@ import LibVanguard
 import Shared
 import SwiftExtension
 
+/// 跨平台之 ARC 暫存池：`autoreleasepool` 只存在於帶 Objective-C 執行期之平台（Darwin），
+/// Linux 與 Windows 之 Swift 找不到該符號，故於彼處直接執行。
+@inline(__always)
+func withARCPool<T>(_ body: () throws -> T) rethrows -> T {
+  #if canImport(ObjectiveC)
+    return try autoreleasepool(invoking: body)
+  #else
+    return try body()
+  #endif
+}
+
 // MARK: - BenchRunner
 
 /// 以真 `InputSession` 驅動合成之按鍵，量測每一次 `handleEvent` 之耗時。
@@ -115,7 +126,7 @@ enum BenchRunner {
       }
       for event in sequence {
         // 每鍵各自一個自動釋放池：真輸入法每個事件都由 run loop 收工時排空一次。
-        autoreleasepool {
+        withARCPool {
           let started = DispatchTime.now().uptimeNanoseconds
           _ = session.handleEvent(event)
           samples.append(Double(DispatchTime.now().uptimeNanoseconds - started) / 1_000.0)
