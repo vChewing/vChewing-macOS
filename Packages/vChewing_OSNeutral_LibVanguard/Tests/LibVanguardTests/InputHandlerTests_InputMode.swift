@@ -375,4 +375,117 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
     #expect(testSession.recentCommissions.joined() == "ˊ")
   }
+
+  /// 後置游標模式（微軟新注音式）下，`generateStateOfCandidates()` 本身即須造出圈選範圍。
+  ///
+  /// 不得再依賴選字窗反白第 0 格所觸發的 `candidatePairHighlightChanged(at:)` 預覽回呼：
+  /// 任何不自動反白的宿主（測試替身、其他前端）都應看得到圈選。範圍須恰為待選節點。
+  @Test("IH-InputMode-008 Rear cursor mode marks the pending node without a UI callback")
+  func test_IH_InputMode_008_RearCursorModeMarksPendingNodeWithoutUICallback() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄘㄜˋ 測 -1
+    ㄕˋ 試 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.prefs.useRearCursorMode = false
+      testHandler.prefs.dodgeInvalidEdgeCandidateCursorPosition = true
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+    clearTestPOM()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.useRearCursorMode = true
+    testHandler.prefs.dodgeInvalidEdgeCandidateCursorPosition = true
+    testHandler.clear()
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄘㄜˋ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄕˋ") }
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    // 「測試」在測試辭典內為兩節點，游標在最前（== assembler.length）。
+    #expect(testHandler.assembler.length == 2)
+    #expect(
+      testHandler.assembler.assembledSentence.count == 2,
+      "測試資料應組出兩節點；實得 \(testHandler.assembler.assembledSentence.map(\.value))"
+    )
+    #expect(testHandler.assembler.cursor == 2)
+
+    // 直接開選字窗：全程不呼叫 `candidatePairHighlightChanged(at:)`。
+    let candidateState = testHandler.generateStateOfCandidates()
+    #expect(!candidateState.candidates.isEmpty)
+    testSession.switchState(candidateState)
+
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(
+      !testSession.state.markedRange.isEmpty,
+      "後置模式開窗即須自帶非零圈選範圍；實得 \(testSession.state.markedRange)"
+    )
+    #expect(
+      testSession.state.markedRange == 1 ..< 2,
+      "圈選範圍須恰為待選之最末節點（試），不得含前一節點；實得 \(testSession.state.markedRange)"
+    )
+    #expect(
+      testSession.state.displayedText == "測試",
+      "實得 \(testSession.state.displayedText)"
+    )
+
+    // 冪等：選字窗反白首項時會回呼預覽；開窗已是 `.front`，再推一次不得越界或改變範圍。
+    let rangeBeforePreview = testSession.state.markedRange
+    testSession.candidatePairHighlightChanged(at: 0)
+    #expect(
+      testSession.state.markedRange == rangeBeforePreview,
+      "預覽回呼不得改變已成立之圈選範圍；預覽前 \(rangeBeforePreview)、預覽後 \(testSession.state.markedRange)"
+    )
+  }
+
+  /// 前置游標模式之回歸：`generateStateOfCandidates()` 仍把 marker 往 `.rear` 推，
+  /// 只覆蓋「結束於游標」的那個節點——不得因後置模式之修正而反向。
+  @Test("IH-InputMode-009 Front cursor mode still marks the node ending at the cursor")
+  func test_IH_InputMode_009_FrontCursorModeStillMarksNodeEndingAtCursor() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄘㄜˋ 測 -1
+    ㄕˋ 試 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.prefs.useRearCursorMode = false
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+    clearTestPOM()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.useRearCursorMode = false
+    testHandler.clear()
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄘㄜˋ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄕˋ") }
+    testHandler.assembler.cursor = 1
+    testSession.switchState(testHandler.generateStateOfInputting())
+    #expect(testHandler.assembler.assembledSentence.count == 2)
+
+    let candidateState = testHandler.generateStateOfCandidates()
+    #expect(!candidateState.candidates.isEmpty)
+    testSession.switchState(candidateState)
+
+    #expect(
+      testSession.state.markedRange == 0 ..< 1,
+      "前置模式之圈選範圍須為游標前那個節點（測）；實得 \(testSession.state.markedRange)"
+    )
+    #expect(!testSession.state.markedRange.isEmpty)
+  }
 }

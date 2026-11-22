@@ -867,12 +867,21 @@ extension InputHandlerProtocol {
       cursor: assembler.cursor
     )
     result.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
-    if !prefs.useRearCursorMode {
-      let markerBackup = assembler.marker
+    // 圈選範圍：前置模式把 marker 往 `.rear` 推、覆蓋「結束於游標」的那個節點；
+    // 後置模式則相反，游標停在待選節點之後端，須把 marker 往 `.front` 推。
+    // 游標若已在前方盡頭（`cursor == length`），往 `.front` 推會 `cursorAlreadyAtBorder`。
+    // 此時待選節點即「結束於游標」者（與 `fetchRawQueriedCandidatesFromAssembler` 之
+    // `.endAt` 臂同源），故改往 `.rear` 推；不得以 `min(cursor + 1, length)` 一類寫法
+    // 繞過節點邊界（那會把範圍截在半個節點上）。
+    let markerBackup = assembler.marker
+    if prefs.useRearCursorMode {
+      let isAtFrontEdge = assembler.isCursorAtAssemblerEdge(direction: .front)
+      try? assembler.jumpCursorBySegment(to: isAtFrontEdge ? .rear : .front, isMarker: true)
+    } else {
       try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)
-      result.marker = assembler.marker
-      assembler.marker = markerBackup
     }
+    result.marker = assembler.marker
+    assembler.marker = markerBackup
     return result
   }
 
