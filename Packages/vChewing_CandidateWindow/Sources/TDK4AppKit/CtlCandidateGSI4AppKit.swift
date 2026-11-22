@@ -185,7 +185,6 @@ extension GSI4AppKit {
           layout: currentLayout,
           locale: delegate.localeForFontFallbacks
         )
-        Self.thePool.highlight(at: 0)
         lastCandidates = candidates
         lastDisplayConfig = displayConfig
       }

@@ -202,6 +202,32 @@ struct TDK4AppKitTests {
     #expect(pool.maxLinesPerPage == 1, "未展開時 maxLinesPerPage 應為 1")
   }
 
+  /// 驗證：`reinit` 自身即把高亮重設回首項——`construct` 已呼叫 `highlight(at: 0)`，
+  /// 故 `reloadData` 不必在 `reinit` 之後再補一次（該重複呼叫只會多跑一趟 O(N) 掃描）。
+  @Test
+  func testReinitResetsHighlightToFirstCandidate() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    // 先移到非首項，確保 reinit 真的會重設。
+    pool.highlight(at: 5)
+    #expect(pool.highlightedIndex == 5)
+    #expect(pool.candidateDataAll.first?.isHighlighted == false)
+
+    pool.reinit(
+      candidates: variableCandidatesINMU,
+      lines: 4,
+      isExpanded: true,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    #expect(pool.highlightedIndex == 0, "reinit 後高亮應回到首項")
+    #expect(pool.candidateDataAll.first?.isHighlighted == true, "首格應為高亮")
+    #expect(pool.candidateLines.first?.first?.isHighlighted == true, "首行之首格應為高亮")
+  }
+
   /// 驗證：init 構造時 isExpanded 也應被正確保留。
   @Test
   func testIsExpandedCorrectAfterInit() throws {
