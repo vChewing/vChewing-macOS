@@ -171,7 +171,10 @@ public final class SecurityAgentHelper {
   /// 而主執行緒則被扣住——對輸入法而言，這等同於停止回應。故本制改為先取得啟用、再以
   /// `orderFrontRegardless()` 逼出視窗，且整個呈現過程不進入任何巢狀執行迴圈。
   private func presentWarning(for targets: [Int32: NSRunningApplication]) {
-    var entries: [String] = ["i18n:securityAgentHelper.warningMessage.header".i18n]
+    // 引言（冒號收尾）之後緊接被偵測到的執行緒，其後才是說明與建議行動。如此分三段而不用
+    // 逐項空行，是為了讓長文在 841 點高的卡片裡不致於被聽牌式的空白切碎。
+    let intro = "i18n:securityAgentHelper.warningMessage.header".i18n
+    var abuserBlocks: [String] = []
     for (matchedPID, matchedApp) in targets.sorted(by: { $0.key < $1.key }) {
       var builder = ContiguousArray<String>(["[PID: \(matchedPID)]"])
       let bundleURL = matchedApp.bundleURL ?? matchedApp.executableURL
@@ -184,13 +187,19 @@ public final class SecurityAgentHelper {
       } else if let bundleIdentifier = matchedApp.bundleIdentifier {
         builder.append(" \(bundleIdentifier)")
       }
-      entries.append(builder.joined())
+      abuserBlocks.append(builder.joined())
     }
-    entries.append("i18n:securityAgentHelper.warningMessage.footer".i18n)
+    let notes = "i18n:securityAgentHelper.warningMessage.headerNotes".i18n
+    let advice = "i18n:securityAgentHelper.warningMessage.footer".i18n
+    let body = [
+      intro + "\n" + abuserBlocks.joined(separator: "\n\n"),
+      notes,
+      advice,
+    ].joined(separator: "\n\n")
 
     let alert = Self.makeWarningAlert(
       title: "i18n:securityAgentHelper.warningMessage.title".i18n,
-      body: entries.joined(separator: "\n\n"),
+      body: body,
       buttonTitle: "i18n:Common.OK".i18n
     )
 
