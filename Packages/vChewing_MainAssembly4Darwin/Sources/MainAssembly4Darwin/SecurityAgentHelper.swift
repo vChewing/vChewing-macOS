@@ -61,6 +61,15 @@ public final class SecurityAgentHelper {
     vCLog(forced: true, "SecurityAgentHelper recorded a clean exit; the abnormal-death streak is cleared.")
   }
 
+  /// 供診斷宿主（`vChewingDebuggable`）以合成內容觸發**同一條**呈現路徑，便於目視核對版面。
+  ///
+  /// 合成之「濫用者」即宿主自身，故訊息內容、警示組裝、視窗配置與非阻塞呈現皆與生產路徑一致。
+  public func presentDiagnosticWarning() {
+    dismissWarning(nil)
+    let sample = NSRunningApplication.current
+    presentWarning(for: [sample.processIdentifier: sample])
+  }
+
   @objc
   public func checkAndHandle(_: Timer) {
     beatHeart()
@@ -99,6 +108,23 @@ public final class SecurityAgentHelper {
 
   private(set) var ledger: SecurityAgentSessionLedger
   private(set) var isInSafeMode: Bool
+
+  /// 組出警示並**先行排版**。
+  ///
+  /// `NSAlert` 之版面不是隨內容即時長出來的：按鈕槽之隱藏、標題與內文之換行與其視窗尺寸，全部
+  /// 由 `-layout` 一次算定。模態呈現（`runModal`／`beginSheetModal`）會代為呼叫，本方為免阻塞
+  /// 主執行緒而自取 `window` 直接 `orderFrontRegardless()`，故必須自己叫——少了這一步，拿到的
+  /// 是一份未經配置的視窗：三個按鈕槽全露（其中兩個空白）、抑制列以 `<Do not show this message
+  /// again>` 之未本地化佔位字串現形、而標題與內文各被壓成一行十六點。
+  static func makeWarningAlert(title: String, body: String, buttonTitle: String) -> NSAlert {
+    let alert = NSAlert()
+    alert.alertStyle = .warning
+    alert.messageText = title
+    alert.informativeText = body
+    alert.addButton(withTitle: buttonTitle)
+    alert.layout()
+    return alert
+  }
 
   // MARK: Private
 
@@ -162,11 +188,11 @@ public final class SecurityAgentHelper {
     }
     entries.append("i18n:securityAgentHelper.warningMessage.footer".i18n)
 
-    let alert = NSAlert()
-    alert.alertStyle = .warning
-    alert.messageText = "i18n:securityAgentHelper.warningMessage.title".i18n
-    alert.informativeText = entries.joined(separator: "\n\n")
-    alert.addButton(withTitle: "i18n:Common.OK".i18n)
+    let alert = Self.makeWarningAlert(
+      title: "i18n:securityAgentHelper.warningMessage.title".i18n,
+      body: entries.joined(separator: "\n\n"),
+      buttonTitle: "i18n:Common.OK".i18n
+    )
 
     let window = alert.window
     window.level = .floating

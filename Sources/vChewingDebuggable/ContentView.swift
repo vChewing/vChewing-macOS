@@ -51,6 +51,10 @@ struct ContentView: View {
         Button("Clear logs") { viewModel.clearLogs() }
           .disabled(viewModel.isBusy)
       }
+      HStack(spacing: 12) {
+        // 觸發輸入法那條 SecureEventInput 濫用警示，用以目視核對版面。重複按下會先收掉舊的。
+        Button("Trigger SecureEventInput warning") { viewModel.triggerSecureEventInputWarning() }
+      }
 
       Text(viewModel.statusSummary)
         .font(.system(.callout))
@@ -252,6 +256,11 @@ final class DiagnosticsViewModel {
   func revealLogFolder() {
     log("Revealing log folder…")
     NSWorkspace.shared.open(Self.logsDirectory)
+  }
+
+  func triggerSecureEventInputWarning() {
+    log("Trigger SecureEventInput warning…")
+    SecurityAgentHelper.shared.presentDiagnosticWarning()
   }
 
   func snapshotHeap(tag: String = "heap snapshot") {
