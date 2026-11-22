@@ -23,7 +23,7 @@ let package = Package(
     .macOS(.v10_15),
   ],
   dependencies: [
-    .package(url: "https://gitee.com/vChewing/vChewing-VanguardLexicon.git", exact: "5.0.5"),
+    .package(url: "https://gitee.com/vChewing/vChewing-VanguardLexicon.git", exact: "5.0.6"),
   ],
   targets: [
     .target(
