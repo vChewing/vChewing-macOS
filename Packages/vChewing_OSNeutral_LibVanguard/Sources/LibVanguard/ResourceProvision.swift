@@ -42,9 +42,14 @@ public enum ResourceProvision {
 
   /// 當前各項資源的可用狀態，供宿主診斷部署問題。
   ///
-  /// 本套件與其依賴在執行期需要的檔案資源僅此一項；
+  /// 本套件與其依賴在執行期需要的檔案資源共三項：BPMFVS 之注音標記表（`LibVanguard_BPMFVS`）、
+  /// 原廠標點語料與成對標點關係（兩者同住 `LibVanguard_Shared`）。
   /// 回報的是「該資源是否已成功載入」而非「路徑是否存在」。
   public static func availabilityReport() -> [String: Bool] {
-    ["BPMFVS.phonic_table_Z": BPMFVS.isDataTableLoaded]
+    [
+      "BPMFVS.phonic_table_Z": BPMFVS.isDataTableLoaded,
+      "PunctuationData.records": PunctuationData.isLoaded,
+      "PunctuationData.pairedEntries": PunctuationData.hasPairedEntries,
+    ]
   }
 }

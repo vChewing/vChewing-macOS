@@ -98,6 +98,7 @@ let package = Package(
     .target(
       name: "Shared",
       dependencies: [
+        "ResourceLocator",
         .product(
           name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
         ),

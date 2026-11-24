@@ -122,6 +122,7 @@ let package = Package(
     Target.target(
       name: "Shared",
       dependencies: buildTargetDependencies {
+        "ResourceLocator"
         Target.Dependency.product(
           name: "VanguardSwiftExtension", package: "VanguardSwiftExtension"
         )

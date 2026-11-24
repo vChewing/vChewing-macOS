@@ -135,10 +135,42 @@ struct ResourceLocatorTests {
     }
   }
 
+  /// SwiftPM 於 Swift 5.10 產出的資源 bundle 是「扁平」形制：載荷直接在 `.bundle` 目錄內、
+  /// 且**沒有 `Info.plist`**——`Bundle(url:)` 對這種目錄的行為不受 Foundation 保證。5.10 legacy
+  /// 之 `.app` 正是把資源 bundle 以這個形制放進 `Contents/Resources/`，故查找器必須認得它：
+  /// 先試 `Bundle(url:)`，落空再逐檔查找（此即本用例所守之後備）。
+  @Test("[ResourceLocator] FlatResourceBundleIsFound")
+  func testFlatResourceBundleIsFound() throws {
+    let scratchURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("ResourceLocatorTests-\(UUID().uuidString)")
+    let bundleURL = scratchURL.appendingPathComponent("\(Self.flatBundleName).bundle")
+    try FileManager.default.createDirectory(at: bundleURL, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: scratchURL) }
+    try "flat bundle fixture".write(
+      to: bundleURL.appendingPathComponent("FlatFixture.txt"),
+      atomically: true,
+      encoding: .utf8
+    )
+    try ResourceLocator.withTemporarySpecifications {
+      ResourceLocator.resourceRootURL = scratchURL
+      let url = try #require(
+        ResourceLocator.url(
+          forResource: "FlatFixture",
+          withExtension: "txt",
+          inSwiftPMResourceBundleNamed: Self.flatBundleName,
+          anchor: ResourceLocatorAnchor.self
+        )
+      )
+      #expect(url.path.hasPrefix(scratchURL.path))
+      #expect(try String(contentsOf: url, encoding: .utf8) == "flat bundle fixture")
+    }
+  }
+
   // MARK: Private
 
   private static let ownBundleName = "LibVanguard_ResourceLocatorTests"
   private static let aliasBundleName = "AliasedProbeBundle"
   private static let relocatedBundleName = "RelocatedProbeBundle"
   private static let clearedBundleName = "ClearedProbeBundle"
+  private static let flatBundleName = "FlatProbeBundle"
 }

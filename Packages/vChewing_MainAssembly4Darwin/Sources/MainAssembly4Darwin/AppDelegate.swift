@@ -84,6 +84,19 @@ extension AppDelegate {
   func suppressUserDataMonitor(for interval: TimeInterval) {
     Self.folderMonitor.value.suppressEvents(for: interval)
   }
+
+  /// 把資源可用狀態寫進診斷日誌。
+  ///
+  /// 原廠標點語料與 BPMFVS 注音標記表皆隨庫以資源 bundle 出貨；缺席時不再崩潰，但功能會靜默
+  /// 退化（標點只剩原廠辭典所供者），故每輪起動記一行——成功路徑亦須留下身分，否則
+  /// 「資源沒載到」與「程式沒走到這裡」在事後無從分辨。
+  private static func logResourceAvailability() {
+    let report = ResourceProvision.availabilityReport()
+      .sorted { $0.key < $1.key }
+      .map { "\($0.key)=\($0.value)" }
+      .joined(separator: ", ")
+    vCLog(forced: true, "ResourceProvision: \(report)")
+  }
 }
 
 // MARK: - Public Functions
@@ -148,6 +161,7 @@ extension AppDelegate {
     // 核心辭典連線、磁帶載入、使用者語模初期化：
     // 延後至下一個 RunLoop 迭代以避免阻塞 applicationWillFinishLaunching。
     asyncOnMain {
+      Self.logResourceAvailability()
       LXMgr.connectCoreDB()
       LXMgr.loadCassetteData()
       LXMgr.initUserLexicons()

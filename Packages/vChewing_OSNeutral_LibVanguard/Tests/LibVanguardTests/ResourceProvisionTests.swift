@@ -20,7 +20,47 @@ extension LibVanguardTestsRoot {
   struct ResourceProvisionTests {
     @Test("[ResourceProvision] BundledResourcesAreAvailable")
     func testBundledResourcesAreAvailable() {
-      #expect(ResourceProvision.availabilityReport() == ["BPMFVS.phonic_table_Z": true])
+      let report = ResourceProvision.availabilityReport()
+      #expect(
+        report.keys.sorted() == [
+          "BPMFVS.phonic_table_Z",
+          "PunctuationData.pairedEntries",
+          "PunctuationData.records",
+        ]
+      )
+      #expect(report.values.allSatisfy { $0 })
+    }
+
+    /// 生產碼不得使用 SwiftPM 自動生成的 `Bundle.module`。
+    ///
+    /// 該 accessor 於 Swift 5.10 只探「`Bundle.main.bundleURL` ＋ 資源 bundle 名」與建置機上
+    /// 那條絕對路徑；資源 bundle 實際住在 `.app/Contents/Resources/`，故換一台機器啟動即
+    /// `fatalError`（5.10 legacy 之輸入法因此完全無法啟動）。資源查找一律走 `ResourceLocator`。
+    @Test("[ResourceProvision] ShippingSourcesAvoidBundleModule")
+    func testShippingSourcesAvoidBundleModule() throws {
+      let packageRoot = URL(fileURLWithPath: #filePath)
+        .deletingLastPathComponent() // LibVanguardTests/
+        .deletingLastPathComponent() // Tests/
+        .deletingLastPathComponent() // 套件根
+      let sourcesRoot = packageRoot.appendingPathComponent("Sources")
+      let enumerator = try #require(
+        FileManager.default.enumerator(
+          at: sourcesRoot, includingPropertiesForKeys: [.isRegularFileKey]
+        )
+      )
+      var offenders = [String]()
+      for case let url as URL in enumerator where url.pathExtension == "swift" {
+        // 測試素材目標不在出貨閉包內：其 `Bundle.module` 只為載入測試資料。
+        guard !url.pathComponents.contains("LXAssemblyMaterials4Tests") else { continue }
+        let text = try String(contentsOf: url, encoding: .utf8)
+        for line in text.split(whereSeparator: \.isNewline) {
+          let trimmed = line.trimmingCharacters(in: .whitespaces)
+          guard !trimmed.hasPrefix("//") else { continue }
+          guard trimmed.contains("Bundle.module") else { continue }
+          offenders.append(url.lastPathComponent)
+        }
+      }
+      #expect(offenders.isEmpty, "生產碼不得使用 `Bundle.module`：\(offenders.sorted())")
     }
 
     @Test("[ResourceProvision] MissingResourceReturnsNilWithoutTrapping")

@@ -32,4 +32,16 @@ struct PunctuationDataTests {
       }
     )
   }
+
+  @Test("載入狀態可回報")
+  func loadedState() {
+    #expect(PunctuationData.isLoaded)
+    #expect(PunctuationData.hasPairedEntries)
+  }
+
+  /// 資料檔缺席時回 `nil`、不崩潰：這條路徑在 5.10 legacy 佈局下曾是 `fatalError`。
+  @Test("查無資源檔時回 nil")
+  func missingResourceReturnsNil() {
+    #expect(PunctuationData.loadText("no-such-punctuation-data-114514") == nil)
+  }
 }
