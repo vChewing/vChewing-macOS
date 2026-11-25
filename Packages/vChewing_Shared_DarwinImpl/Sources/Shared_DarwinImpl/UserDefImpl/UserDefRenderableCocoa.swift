@@ -6,6 +6,7 @@
 
 import AppKit
 import Foundation
+import ObjectiveC
 
 // MARK: - UserDefRenderableCocoa
 
@@ -245,12 +246,25 @@ extension UserDefRenderableCocoa {
             dropMenu.addItem(newItem)
           }
         } else {
+          // 三個排列槽若只以預設值繫結直寫 `UserDefaults`，`PrefMgr.keyboardParser` 的
+          // 分流（槽位＋`pinyinTypingEnabled` 等閘門）一概不發生——與「直接設定」之按鈕
+          // 走的是不同條路，選了等於沒選（P364）。故改走與按鈕相同的入口。
           btnPopup.bind(
             .selectedTag,
             to: NSUserDefaultsController.shared,
             withKeyPath: "values.\(def.rawValue)",
             options: [.continuouslyUpdatesValue: true]
           )
+          // 顯示仍賴上列繫結（按鈕改值時選單才會跟著動）；寫入則另加一層、補走
+          // 「直接設定」按鈕所用的同一個入口 `PrefMgr.keyboardParser`（P364）。
+          if Self.parserSlots.contains(def) {
+            let proxy = ParserSlotActionProxy()
+            btnPopup.target = proxy
+            btnPopup.action = #selector(ParserSlotActionProxy.apply(_:))
+            objc_setAssociatedObject(
+              btnPopup, &Self.parserSlotProxyKey, proxy, .OBJC_ASSOCIATION_RETAIN
+            )
+          }
           optionsLocalized.forEach { entity in
             guard let tag = entity?.0, let title = entity?.1.i18n else {
               dropMenu.addItem(.separator())
@@ -307,5 +321,36 @@ extension UserDef {
 
   public func toCocoaRenderable() -> UserDefRenderableCocoa {
     .init(def: self)
+  }
+}
+
+// MARK: - 三個排列槽之下拉選單（P364）
+
+extension UserDefRenderableCocoa {
+  /// 三個排列槽（其寫入須經 `PrefMgr.keyboardParser` 之分流，與「直接設定」之按鈕同路）。
+  static let parserSlots: Set<UserDef> = [
+    .kKeyboardParser4Zhuyin, .kKeyboardParser4Pinyin, .kKeyboardParser4Dualpin,
+  ]
+
+  nonisolated(unsafe) static var parserSlotProxyKey: UInt8 = 0
+}
+
+// MARK: - ParserSlotActionProxy
+
+/// 供三個排列槽之下拉選單用的動作代理：與「直接設定」之按鈕呼叫同一個 setter。
+///
+/// 之所以不沿用 `NSUserDefaultsController` 之繫結：那條路只寫 `UserDefaults`，不會走
+/// `PrefMgr.keyboardParser` 之分流（槽位＋`pinyinTypingEnabled` 等閘門），故與按鈕之效果
+/// 不一致——那正是「下拉選單失效、按鈕卻有效」的由來（P364）。
+final class ParserSlotActionProxy: NSObject {
+  @objc
+  func apply(_ sender: NSPopUpButton) {
+    let raw = sender.selectedTag()
+    PrefMgr.shared.keyboardParser = raw
+    // 與「直接設定」之按鈕同步調：排列定了，客體之鍵盤佈局亦須跟著走（P364）。
+    if let parser = KeyboardParser(rawValue: raw),
+       let layout = UserDef.resolvedScreenKeyboardLayout(for: parser) {
+      PrefMgr.shared.basicKeyboardLayout = layout
+    }
   }
 }

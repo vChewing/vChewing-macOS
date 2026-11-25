@@ -462,30 +462,43 @@ extension InputHandlerProtocol {
   }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
-  public func ensureKeyboardParser() {
+  /// 若注拼槽現行排列與偏好所要求者不合，則就地重建。
+  ///
+  /// 只該在「注拼槽必為空」的時機呼叫（例如啟用）：`ensureKeyboardParser()` 會清空注拼槽，
+  /// 於組字途中呼叫即丟失未成音之緩衝（P364 之兩次失敗嘗試即此）。
+  public func ensureKeyboardParserIfNeeded() {
+    guard composer.parser != mandarinParserForCurrentType else { return }
+    ensureKeyboardParser()
+  }
+
+  /// 當前偏好所對應之注音／拼音排列。
+  var mandarinParserForCurrentType: Tekkon.MandarinParser {
     switch currentKeyboardParserType {
-    case .ofStandard: composer.ensureParser(arrange: .ofDachen)
-    case .ofDachen26: composer.ensureParser(arrange: .ofDachen26)
-    case .ofETen: composer.ensureParser(arrange: .ofETen)
-    case .ofHsu: composer.ensureParser(arrange: .ofHsu)
-    case .ofETen26: composer.ensureParser(arrange: .ofETen26)
-    case .ofIBM: composer.ensureParser(arrange: .ofIBM)
-    case .ofMiTAC: composer.ensureParser(arrange: .ofMiTAC)
-    case .ofFakeSeigyou: composer.ensureParser(arrange: .ofFakeSeigyou)
-    case .ofSeigyou: composer.ensureParser(arrange: .ofSeigyou)
-    case .ofStarlight: composer.ensureParser(arrange: .ofStarlight)
-    case .ofAlvinLiu: composer.ensureParser(arrange: .ofAlvinLiu)
-    case .ofHanyuPinyin: composer.ensureParser(arrange: .ofHanyuPinyin)
-    case .ofSecondaryPinyin: composer.ensureParser(arrange: .ofSecondaryPinyin)
-    case .ofYalePinyin: composer.ensureParser(arrange: .ofYalePinyin)
-    case .ofHualuoPinyin: composer.ensureParser(arrange: .ofHualuoPinyin)
-    case .ofUniversalPinyin: composer.ensureParser(arrange: .ofUniversalPinyin)
-    case .ofWadeGilesPinyin: composer.ensureParser(arrange: .ofWadeGilesPinyin)
+    case .ofStandard: return .ofDachen
+    case .ofDachen26: return .ofDachen26
+    case .ofETen: return .ofETen
+    case .ofHsu: return .ofHsu
+    case .ofETen26: return .ofETen26
+    case .ofIBM: return .ofIBM
+    case .ofMiTAC: return .ofMiTAC
+    case .ofFakeSeigyou: return .ofFakeSeigyou
+    case .ofSeigyou: return .ofSeigyou
+    case .ofStarlight: return .ofStarlight
+    case .ofAlvinLiu: return .ofAlvinLiu
+    case .ofHanyuPinyin: return .ofHanyuPinyin
+    case .ofSecondaryPinyin: return .ofSecondaryPinyin
+    case .ofYalePinyin: return .ofYalePinyin
+    case .ofHualuoPinyin: return .ofHualuoPinyin
+    case .ofUniversalPinyin: return .ofUniversalPinyin
+    case .ofWadeGilesPinyin: return .ofWadeGilesPinyin
     // 雙拼之組音區恆為漢語拼音：雙拼方案之選擇另由 `prefs.keyboardParser4Dualpin` 與
     // `prefs.dualpinSchemaJSON` 承載（見 `currentKeyboardParserType`）。
-    case .ofDualpinCustom, .ofDualpinGBT17, .ofDualpinMSPY:
-      composer.ensureParser(arrange: .ofHanyuPinyin)
+    case .ofDualpinCustom, .ofDualpinGBT17, .ofDualpinMSPY: return .ofHanyuPinyin
     }
+  }
+
+  public func ensureKeyboardParser() {
+    composer.ensureParser(arrange: mandarinParserForCurrentType)
     composer.clear()
     composer.phonabetCombinationCorrectionEnabled = prefs.autoCorrectReadingCombination
       && !prefs.mixedAlphanumericalEnabled

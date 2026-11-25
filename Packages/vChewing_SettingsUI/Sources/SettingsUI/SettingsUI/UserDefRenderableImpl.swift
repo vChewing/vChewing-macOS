@@ -7,6 +7,7 @@
 // condition，<6.2 分支不提供替代實作。
 #if compiler(>=6.2)
 
+  import Shared_DarwinImpl
   import SwiftUI
 
   // MARK: - UserDef 自繪控件擴充（必須與特化 render() 同模組，以正確解析方法呼叫）
@@ -314,6 +315,9 @@
               where options.isEmpty
               && [.kKeyboardParser4Pinyin, .kKeyboardParser4Zhuyin, .kKeyboardParser4Dualpin]
               .contains(def): // 鐵恨注拼引擎的佈局模式選項（注音／拼音／雙拼各自列示其值域）。
+              // 顯示仍綁 `@AppStorage`（否則按鈕改值時本列不會重繪——P364 之實測），
+              // 寫入則於變更後補走「直接設定」按鈕所用的同一個入口 `PrefMgr.keyboardParser`：
+              // 該 setter 才會分流槽位並同步 `pinyinTypingEnabled` 等閘門。
               Picker(
                 LocalizedStringKey(metaData.shortTitle ?? ""),
                 selection: binding
@@ -331,6 +335,15 @@
                 ) { item in
                   if [7, 100, 200].contains(item.rawValue) { Divider() }
                   Text(item.localizedMenuName).tag(item.rawValue)
+                }
+              }
+              .onChange(of: binding.wrappedValue) { newValue in
+                PrefMgr.shared.keyboardParser = newValue
+                // 「直接設定」之按鈕一向是「設排列 ＋ 設佈局」一起做；此處補上佈局那半步，
+                // 否則客體之鍵盤佈局（螢幕鍵盤所見者）仍停在舊值（P364）。
+                if let parser = KeyboardParser(rawValue: newValue),
+                   let layout = UserDef.resolvedScreenKeyboardLayout(for: parser) {
+                  PrefMgr.shared.basicKeyboardLayout = layout
                 }
               }
             case .integer where !options.isEmpty:

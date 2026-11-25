@@ -256,6 +256,8 @@ extension SessionProtocol {
       syncPopupCompositionBufferRetention()
       lastAppliedKeyboardLayout = nil
       setKeyLayout()
+      // 排列偏好可能已被設定界面直寫（P364）；啟用時注拼槽必為空，此處對帳無損。
+      inputHandler?.ensureKeyboardParserIfNeeded()
       return
     }
 
@@ -337,6 +339,8 @@ extension SessionProtocol {
     this.inputHandler?.releaseLatchedAlnumState(announce: false)
     this.isActivated = true // 登記啟用狀態。
     this.setKeyLayout()
+    // 同上：排列偏好之改動於啟用時補上（此時組字器與注拼槽皆已清空）。
+    this.inputHandler?.ensureKeyboardParserIfNeeded()
 
     if !OSUtils.isRunningUnitTests {
       asyncOnMain {
