@@ -16,15 +16,7 @@ extension LibVanguardTestsRoot {
   /// 若讀穿快取未隨之失效，`PrefMgr` 便會一直讀到舊值。本用例把該路徑釘住。
   @Suite("SwiftExtensionDefaultsExternalWriteTests")
   struct SwiftExtensionDefaultsExternalWriteTests {
-    /// Linux／Windows 之 Foundation 不為「另一實例之寫入」派 `didChangeNotification`，故
-    /// 「跨實例失效」這條路徑僅 Darwin 可測；本專案之生產目標亦只有 macOS。
-    nonisolated private static let crossInstanceInvalidationIsTestable: Bool = {
-      #if os(macOS)
-        return true
-      #else
-        return false
-      #endif
-    }()
+    // MARK: Internal
 
     @Test(.enabled(if: crossInstanceInvalidationIsTestable))
     func writeThroughAnotherInstanceInvalidatesTheCache() {
@@ -48,7 +40,6 @@ extension LibVanguardTestsRoot {
       #expect(store.integer(forKey: "KeyboardParser4Zhuyin") == 4)
     }
 
-
     /// 平台中立之對照：`DefaultsStore` 自身之寫入必定失效（不依賴 Foundation 之通知）。
     @Test
     func writeThroughTheStoreItselfInvalidatesTheCache() {
@@ -68,5 +59,17 @@ extension LibVanguardTestsRoot {
       store.set(4, forKey: "KeyboardParser4Zhuyin")
       #expect(store.integer(forKey: "KeyboardParser4Zhuyin") == 4) // 自身寫入即失效
     }
+
+    // MARK: Private
+
+    /// Linux／Windows 之 Foundation 不為「另一實例之寫入」派 `didChangeNotification`，故
+    /// 「跨實例失效」這條路徑僅 Darwin 可測；本專案之生產目標亦只有 macOS。
+    nonisolated private static let crossInstanceInvalidationIsTestable: Bool = {
+      #if os(macOS)
+        return true
+      #else
+        return false
+      #endif
+    }()
   }
 }

@@ -26,6 +26,12 @@ public protocol DefaultsStore: AnyObject, Sendable {
 
   /// 移除指定鍵。
   nonisolated func removeObject(forKey key: String)
+
+  /// 依平臺與系統版本決定是否刻意同步；預設 no-op。
+  ///
+  /// - Important: 本方法必須是**協定要求**，不可只放協定擴充：`any DefaultsStore` 上之
+  ///   extension-only 方法係靜態派送，實作端之覆寫永遠不會被呼叫。
+  nonisolated func doSynchronize()
 }
 
 extension DefaultsStore {
@@ -59,9 +65,8 @@ extension DefaultsStore {
     object(forKey: key) as? [Any]
   }
 
-  /// 保留給自 `UserDefaults` 移植過來之呼叫點；`UserDefaults` 自 macOS 10.12 起即已即時落盤，
-  /// 故本協定之實作無事可做。
-  nonisolated public func synchronize() {}
+  /// 預設 no-op：記憶體容器等無落盤之實作即沿用。
+  nonisolated public func doSynchronize() {}
 }
 
 // MARK: - UserDefaultsStore
@@ -137,6 +142,23 @@ public final class UserDefaultsStore: DefaultsStore, @unchecked Sendable {
   nonisolated public func removeObject(forKey key: String) {
     defaults.removeObject(forKey: key)
     invalidate(key)
+  }
+
+  /// 依平臺與系統版本決定是否刻意同步。
+  ///
+  /// - macOS 10.8 起 cfprefsd 代管落盤（Core Foundation 之 10.8 release notes：`CFPreferencesSynchronize()`
+  ///   因而 `-[NSUserDefaults synchronize]`「now automatic in virtually all cases」），故為 no-op；
+  ///   本倉 macOS 地板為 10.9，故實務恆真。更古早之 macOS 與非 Darwin 才直呼 `synchronize()`——
+  ///   後者之上游 `set` 只把鍵標為 dirty，須顯式落盤。
+  nonisolated public func doSynchronize() {
+    #if canImport(Darwin)
+      #if os(macOS)
+        if #available(macOS 10.8, *) { return }
+      #else
+        return
+      #endif
+    #endif
+    _ = defaults.synchronize()
   }
 
   /// 清空整份快取（外部改動之通知，與測試）。

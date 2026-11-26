@@ -78,8 +78,8 @@ extension PrefMgr {
     useSCPCTypingMode = useSCPCTypingMode
     phraseReplacementEnabled = phraseReplacementEnabled
     associatedPhrasesEnabled = associatedPhrasesEnabled
-    // ③ 顯式同步：常駐行程雖有 cfprefsd 代理，顯式同步無害且便於測試。
-    OSUtils.defaultsStore.synchronize()
+    // ③ 依平臺與系統版本刻意同步：macOS 10.8+ 為 no-op；古早 macOS 與非 Darwin 才實際落盤。
+    OSUtils.defaultsStore.doSynchronize()
     // ④ 另有一項推式狀態 `inputHandler.assembler.maxSegLength` 並非即時：
     //    其值於 `initInputHandler()` 時才重推，故須待下一次啟用輸入源時才會生效。
   }
