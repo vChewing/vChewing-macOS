@@ -23,16 +23,25 @@ jobs:
           source: swift.org
           # Swift 6.4+ is required: 6.2 / 6.3 are blocked by the manifests
           # (`Package@swift-6.2.swift` / `Package@swift-6.3.swift`), cf. P216 §13.6.
-          # Note: the 6.4 series' swift.org identifiers carry the patch zero
-          # (`swift-6.4.0-release` / `6.4.0-RELEASE`), unlike the 6.2 / 6.3 series.
-          swift-version: swift-6.4.0-release
-          swift-build: 6.4.0-RELEASE
+          # Pin the same 6.4.3-RELEASE as the LibVanguard repo and Linux.
+          swift-version: swift-6.4.3-release
+          swift-build: 6.4.3-RELEASE
           # 可选：cache: true
 
-      - name: Swift version + run tests (custom package-path)
+      - name: Build tests in release
         shell: pwsh
         run: |
           swift --version
-          # SwiftPM on Windows can race while copying a resource bundle into
-          # multiple test products (LibVanguard_Shared.bundle); serialize.
-          swift test --package-path ./Packages/vChewing_OSNeutral_LibVanguard/ --jobs 1
+          # Release compilation coverage. `@testable import` needs
+          # -enable-testing in release (P289). The test step below runs the
+          # release configuration with -Onone, because plain -O discovers zero
+          # Swift Testing tests on Windows.
+          swift build --build-tests -c release --package-path ./Packages/vChewing_OSNeutral_LibVanguard/ --jobs 1 -Xswiftc -enable-testing
+
+      - name: Run tests (release, unoptimized)
+        shell: pwsh
+        run: |
+          # `-Onone` keeps the Swift Testing content records alive in a release
+          # build on Windows; with plain `-O` the runner sees none of them.
+          # `--jobs 1` serializes the Windows resource-bundle copy race.
+          swift test -c release --package-path ./Packages/vChewing_OSNeutral_LibVanguard/ --jobs 1 -Xswiftc -Onone
