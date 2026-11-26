@@ -552,11 +552,15 @@ extension BundleAppsLegacyPlugin {
       )
     }
 
-    // ── Keyboard layout bundle ──
-    try fm.copyItem(
-      at: srcRes.appendingPathComponent("vChewingKeyLayout.bundle"),
-      to: resources.appendingPathComponent("vChewingKeyLayout.bundle")
-    )
+    // ── Ukelele keyboard layouts（P365）：平鋪，理由同 `BundleApps`。 ──
+    let keyLayoutSource = srcRes
+    for file in try fm.contentsOfDirectory(atPath: keyLayoutSource.path)
+      .filter({ $0.hasSuffix(".keylayout") }).sorted() {
+      try fm.copyItem(
+        at: keyLayoutSource.appendingPathComponent(file),
+        to: resources.appendingPathComponent(file)
+      )
+    }
 
     // ── Root-level license and script files ──
     for file in [

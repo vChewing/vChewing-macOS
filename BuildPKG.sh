@@ -41,8 +41,7 @@ fi
 
 TARGET='vChewing'
 IME_APP="Build/Products/Release/${TARGET}.app"
-KEYLAYOUT_BUNDLE="Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle"
-KEYLAYOUT_RESOURCES="${KEYLAYOUT_BUNDLE}/Contents/Resources"
+KEYLAYOUT_RESOURCES="Sources/vChewingIME_macOS/Resources"
 ASSETS_DIR="ValueAdd/PKGInstallerAssets"
 OUTPUT_DIR="Build"
 
@@ -106,8 +105,8 @@ if [ ! -d "${IME_APP}" ]; then
     exit 1
 fi
 
-if [ ! -d "${KEYLAYOUT_BUNDLE}" ]; then
-    echo "Error: ${KEYLAYOUT_BUNDLE} not found." >&2
+if [ ! -d "${KEYLAYOUT_RESOURCES}" ]; then
+    echo "Error: ${KEYLAYOUT_RESOURCES} not found." >&2
     exit 1
 fi
 
@@ -131,10 +130,13 @@ trap cleanup_staging EXIT
 # Stage the IME app bundle.
 cp -R "${IME_APP}" "${STAGING_ROOT}/Library/Input Methods/"
 
-# Stage the keyboard layout bundle.
-cp -R "${KEYLAYOUT_BUNDLE}" "${STAGING_ROOT}/Library/Keyboard Layouts/"
+# The Ukelele layouts are bundled inside `vChewing.app/Contents/Resources/` (flat) and are
+# registered as the input method's private keyboard layouts. They are still staged into
+# `~/Library/Keyboard Layouts/` as well, because such a registration only becomes visible to
+# other processes (including the client that draws the on-screen keyboard) after one login
+# cycle; the loose copies keep the first run of a fresh login working. Once the switch has a
+# restart prompt, this staging block goes away and uninstalling the app becomes enough.
 
-# Stage individual .keylayout files.
 for keylayout in "${KEYLAYOUT_RESOURCES}"/vChewing*.keylayout; do
     [ -e "${keylayout}" ] || continue
     cp "${keylayout}" "${STAGING_ROOT}/Library/Keyboard Layouts/"
@@ -195,17 +197,6 @@ if [ "${SIGN_PRODUCT}" -eq 1 ]; then
             "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app" || true
     fi
 
-    if [ -d "${STAGING_ROOT}/Library/Keyboard Layouts/vChewingKeyLayout.bundle" ]; then
-        if bundle_is_signed_by_team "${STAGING_ROOT}/Library/Keyboard Layouts/vChewingKeyLayout.bundle" "${TEAM_ID}"; then
-            echo "Keyboard layout bundle is already signed by Team ID ${TEAM_ID}; skipping re-sign."
-        else
-            echo "Signing keyboard layout bundle with Team ID ${TEAM_ID}..."
-            codesign --force --sign "${TEAM_ID}" \
-                --options runtime \
-                --timestamp \
-                "${STAGING_ROOT}/Library/Keyboard Layouts/vChewingKeyLayout.bundle"
-        fi
-    fi
 fi
 
 # Stage installer scripts with the canonical names expected by pkgbuild.

@@ -50,23 +50,23 @@
 
     @discardableResult
     public static func registerInputMethod() -> Bool {
-      let instances = TISInputSource.allRegisteredInstancesOfThisInputMethod
-      if instances.isEmpty {
-        // 有實例尚未登記。執行登記手續。
-        consoleLog("Registering input source.")
-        if !TISInputSource.registerInputSource() {
-          consoleLog("Input source registration failed.")
-          return false
-        }
+      // P365：一律重新登記，**不得**因「模式早已登記」而跳過——私有佈局只在（重新）登記時被掃描；
+      // 若因短路而略過，升級後新增或改名的佈局就永遠不會被登記（實測：升級路徑下 0 筆）。
+      consoleLog("Registering input source.")
+      if !TISInputSource.registerInputSource() {
+        consoleLog("Input source registration failed.")
+        return false
       }
+      // 登記之後才檢索：先前以登記前之快照作 enable 迴圈，首裝時恆空。
       var succeeded = true
-      instances.forEach {
+      TISInputSource.allRegisteredInstancesOfThisInputMethod.forEach {
         consoleLog("Enabling input source: \($0.identifier)")
         if !$0.activate() {
           consoleLog("Failed from enabling input source: \($0.identifier)")
           succeeded = false
         }
       }
+      consoleLog("Bundled keyboard layouts: \(IMKHelper.bundledKeyLayoutAvailabilitySummary())")
       return succeeded
     }
 

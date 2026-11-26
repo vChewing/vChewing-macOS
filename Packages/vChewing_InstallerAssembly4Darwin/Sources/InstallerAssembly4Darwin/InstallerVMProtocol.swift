@@ -184,25 +184,24 @@ extension InstallerVMProtocol {
       escalates: true
     )
 
+    // P365：升級時亦須一律重新登記——私有佈局只在（重新）登記時被掃描；否則舊版使用者
+    // 升級之後，同綑的佈局永遠不會出現。
+    OSUtils.consoleLog(
+      "Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString)."
+    )
+    let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
+    if !status {
+      // 讓使用者自己藉由 UI 結束安裝程式。
+      finishWithAlert(.missingAfterRegistration)
+    }
     if allRegisteredInstancesOfThisInputMethod.isEmpty {
-      OSUtils.consoleLog(
-        "Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString)."
+      let message = String(
+        format: NSLocalizedString(
+          "i18n:Installer.CannotFindInputSourceAfterRegistration:%@", comment: ""
+        ) + "(#D41J0U8U)",
+        imeIdentifier
       )
-      let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
-      if !status {
-        // 讓使用者自己藉由 UI 結束安裝程式。
-        finishWithAlert(.missingAfterRegistration)
-      }
-
-      if allRegisteredInstancesOfThisInputMethod.isEmpty {
-        let message = String(
-          format: NSLocalizedString(
-            "i18n:Installer.CannotFindInputSourceAfterRegistration:%@", comment: ""
-          ) + "(#D41J0U8U)",
-          imeIdentifier
-        )
-        OSUtils.consoleLog(message)
-      }
+      OSUtils.consoleLog(message)
     }
 
     // 結束文字輸入選單的 agent 程序（TextInputMenuAgent）：須在輸入源啟用（register）之前完成，

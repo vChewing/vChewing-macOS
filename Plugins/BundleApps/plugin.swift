@@ -266,11 +266,22 @@ extension BundleAppsPlugin {
       try fm.copyItem(at: srcRes.appending(path: file), to: resources.appending(path: file))
     }
 
-    // ── Keyboard layout bundle ──
-    try fm.copyItem(
-      at: srcRes.appending(path: "vChewingKeyLayout.bundle"),
-      to: resources.appending(path: "vChewingKeyLayout.bundle")
-    )
+    // ── Ukelele keyboard layouts（P365）──
+    //
+    // 六份 `.keylayout` 於原始碼樹即置於 `Resources/` 根、並**平鋪**複製進 `Contents/Resources/`：
+    // 系統只在該形制下把它們登記為「輸入法私有佈局」（不可選取、隨輸入法一起卸除）。先前之巢狀
+    // `vChewingKeyLayout.bundle` 從未被登記（其 `KLInfo_*` 亦然），故已自原始碼樹移除。
+    let keyLayoutSource = srcRes
+    let keyLayouts = try fm.contentsOfDirectory(atPath: keyLayoutSource.path)
+      .filter { $0.hasSuffix(".keylayout") }.sorted()
+    guard keyLayouts.count == 6 else {
+      throw PluginError("Expected 6 bundled .keylayout files, found \(keyLayouts.count).")
+    }
+    for file in keyLayouts {
+      try fm.copyItem(
+        at: keyLayoutSource.appending(path: file), to: resources.appending(path: file)
+      )
+    }
 
     // ── Root-level license and script files ──
     for file in [

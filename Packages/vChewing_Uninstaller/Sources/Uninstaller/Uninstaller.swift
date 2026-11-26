@@ -80,7 +80,7 @@ public enum Uninstaller {
     let arrKeyLayoutFiles = [
       "/vChewing ETen.keylayout", "/vChewingKeyLayout.bundle", "/vChewing MiTAC.keylayout",
       "/vChewing IBM.keylayout", "/vChewing FakeSeigyou.keylayout",
-      "/vChewing Dachen.keylayout",
+      "/vChewing Seigyou.keylayout", "/vChewing Dachen.keylayout",
     ]
 
     // 先移除各種鍵盤佈局。

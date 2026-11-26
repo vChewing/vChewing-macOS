@@ -28,6 +28,18 @@ extension PrefMgr {
       }
     }
 
+    // P365：舊佈局識別碼（鬆散檔推導者與舊 `KLInfo` 宣告者）先遷移至私有佈局識別碼，
+    // 否則下列糾錯會因「查無此識別碼」而把使用者已選之佈局重設為大千。
+    let migratedBasicLayout = IMKHelper.migratedBasicKeyboardLayoutIdentifier(basicKeyboardLayout)
+    if migratedBasicLayout != basicKeyboardLayout {
+      basicKeyboardLayout = migratedBasicLayout
+    }
+    let migratedAlphanumericalLayout =
+      IMKHelper.migratedBasicKeyboardLayoutIdentifier(alphanumericalKeyboardLayout)
+    if migratedAlphanumericalLayout != alphanumericalKeyboardLayout {
+      alphanumericalKeyboardLayout = migratedAlphanumericalLayout
+    }
+
     // 基礎鍵盤排列選項糾錯。
     let matchedResults = TISInputSource.match(identifiers: [
       basicKeyboardLayout,

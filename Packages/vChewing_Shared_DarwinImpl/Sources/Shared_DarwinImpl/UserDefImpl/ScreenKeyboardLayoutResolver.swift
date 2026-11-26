@@ -16,43 +16,56 @@ extension UserDef {
   /// 倚天 ⇒ `ZhuyinEten`），故選排列時亦須把客體之鍵盤佈局一併帶上——那才是螢幕鍵盤／
   /// 客體鍵位所見者（`InputSession.setKeyLayout()` 之唯一出口）。P364。
   ///
-  /// - Note: 唯音自帶之五個 Ukelele 佈局可能以「佈局 bundle 所宣告之識別碼」或「鬆散檔
-  ///   所推導之 `org.unknown.*` 識別碼」其一現身，故各給兩案、由呼叫端探測。
+  /// - Note: 唯音自帶之六個 Ukelele 佈局有兩種識別碼形制：同綑之私有佈局
+  ///   （`<bundleID>.keylayout.*`，跨一次登入週期後方對客體可見）與鬆散檔推導者
+  ///   （`org.unknown.*`）。目前候選只收後者，理由見下表首條註。
   public static func screenKeyboardLayoutCandidates(for parser: KeyboardParser) -> [String] {
+    // - Important: 候選只收「此刻對客體可見」者：Apple 之佈局，與鬆散檔推導之
+    //   `org.unknown.*`。同綑之私有佈局（`<bundleID>.keylayout.*`）雖自 P365 起隨 app 出貨，
+    //   但其登記須**跨一次登入週期**才對其他行程可見；在此之前客體查無此 ID、遂退回 ABC
+    //   （實測 2026-11-26）。待切換時機有配套（例如提示使用者重啟）再改收私有 ID。
     switch parser {
     case .ofDachen26, .ofStandard:
-      return ["com.apple.keylayout.ZhuyinBopomofo"]
+      return [
+        "com.apple.keylayout.ZhuyinBopomofo",
+        "org.unknown.keylayout.vChewingDachen",
+      ]
     case .ofETen, .ofETen26:
       return [
-        "org.atelierInmu.vChewing.keyLayouts.vchewingeten",
-        "org.unknown.keylayout.vChewingETen",
         "com.apple.keylayout.ZhuyinEten",
+        "org.unknown.keylayout.vChewingETen",
       ]
     case .ofIBM:
       return [
-        "org.atelierInmu.vChewing.keyLayouts.vchewingibm",
         "org.unknown.keylayout.vChewingIBM",
       ]
     case .ofMiTAC:
       return [
-        "org.atelierInmu.vChewing.keyLayouts.vchewingmitac",
         "org.unknown.keylayout.vChewingMiTAC",
+      ]
+    case .ofSeigyou:
+      // 精業自本版起有專屬佈局（偽精業之小改款：介母與ㄦ共四鍵不同）。
+      return [
+        "org.unknown.keylayout.vChewingSeigyou",
       ]
     case .ofFakeSeigyou:
       return [
-        "org.atelierInmu.vChewing.keyLayouts.vchewingfakeseigyou",
         "org.unknown.keylayout.vChewingFakeSeigyou",
       ]
     case .ofDualpinCustom, .ofDualpinGBT17, .ofDualpinMSPY, .ofHanyuPinyin,
          .ofHualuoPinyin, .ofSecondaryPinyin,
          .ofUniversalPinyin, .ofWadeGilesPinyin, .ofYalePinyin:
       return ["com.apple.keylayout.ABC"]
-    // 精業（`ofSeigyou`）不提供螢幕鍵盤支援；許氏／星光／劉氏亦無對位之 Ukelele 佈局。
-    case .ofAlvinLiu, .ofHsu, .ofSeigyou, .ofStarlight:
+    // 許氏／星光／劉氏無對位之 Ukelele 佈局。
+    case .ofAlvinLiu, .ofHsu, .ofStarlight:
       return []
     }
   }
 
+  /// 於當前環境解析出可用之佈局識別碼。
+  ///
+  /// - Note: 私有佈局在同一登入內雖已見於 TIS，客體仍可能解析不了（退回 ABC），須跨一次登入
+  ///   週期方可用——故本解析**不得**只憑「本行程看得到」就認定立即生效。
   /// 於當前環境解析出可用的佈局識別碼；無對應、或候選皆未安裝時回 `nil`（呼叫端即不動原值）。
   public static func resolvedScreenKeyboardLayout(for parser: KeyboardParser) -> String? {
     let available = Set(IMKHelper.allowedBasicLayoutsAsTISInputSources.compactMap { $0?.id })

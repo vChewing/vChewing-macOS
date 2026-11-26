@@ -5,7 +5,7 @@
 import Foundation
 import Testing
 
-/// 護欄：`vChewingKeyLayout.bundle` 內五個 Ukelele 佈局的 **command state**。
+/// 護欄：`Resources/` 內六個 Ukelele 佈局的 **command state**。
 ///
 /// 病灶：`⌘`／`⌃⌘` 系和弦在這些佈局上必須落到拉丁字母表，客體（Chromium 系）才拿得到
 /// `c`／`w` 一類字元；若落到注音表或控制字元表，客體的熱鍵即失效（`⌃⌘C` 會得到 `ㄏ`／`0x03`）。
@@ -26,7 +26,7 @@ final class KeyLayoutCommandStateTests {
     let names = try FileManager.default.contentsOfDirectory(atPath: Self.layoutDir.path)
       .filter { $0.hasSuffix(".keylayout") }
       .sorted()
-    #expect(names.count == 5, "佈局數應為五；實際 \(names)")
+    #expect(names.count == 6, "佈局數應為六；實際 \(names)")
 
     for name in names {
       let xml = try String(contentsOf: Self.layoutDir.appendingPathComponent(name), encoding: .utf8)
@@ -68,6 +68,34 @@ final class KeyLayoutCommandStateTests {
     }
   }
 
+  /// 護欄：精業（Seigyou）佈局之四鍵須與官網排列表一致（P365）。
+  ///
+  /// 精業係偽精業之小改款：介母 ㄧ／ㄨ／ㄩ 落於 `-`／`[`／`'`，ㄦ落於 `=`；而偽精業之介母在
+  /// `4`／`5`／`7`、ㄦ在 `-`。此四鍵若漂移，螢幕鍵盤即與排列不符。
+  @Test
+  func testSeigyouKeyLayoutMatchesThePublishedTable() throws {
+    let url = Self.layoutDir.appendingPathComponent("vChewing Seigyou.keylayout")
+    let xml = try String(contentsOf: url, encoding: .utf8)
+    #expect(xml.contains("name=\"vChewing Seigyou\""))
+
+    // 取出 16c 之 base keyMap（index 0）——螢幕鍵盤所見者。
+    guard let mapRange = xml.range(of: "<keyMapSet id=\"16c\">"),
+          let baseRange = xml.range(
+            of: "<keyMap index=\"0\"", range: mapRange.upperBound ..< xml.endIndex
+          ),
+          let closeRange = xml.range(of: "</keyMap>", range: baseRange.upperBound ..< xml.endIndex)
+    else {
+      Issue.record("找不到 16c 之 base keyMap。")
+      return
+    }
+    let base = String(xml[baseRange.upperBound ..< closeRange.lowerBound])
+    let expected: [Int: String] = [27: "ㄧ", 33: "ㄨ", 39: "ㄩ", 24: "ㄦ", 21: "4", 23: "5", 26: "7"]
+    for (code, want) in expected {
+      let needle = "<key code=\"\(code)\" output=\"\(want)\""
+      #expect(base.contains(needle), "code \(code) 應輸出 \(want)")
+    }
+  }
+
   // MARK: Private
 
   private struct Select {
@@ -92,7 +120,7 @@ final class KeyLayoutCommandStateTests {
       .deletingLastPathComponent() // …/Packages
       .deletingLastPathComponent() // 工作區根
       .appendingPathComponent(
-        "Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle/Contents/Resources"
+        "Sources/vChewingIME_macOS/Resources"
       )
   }
 
