@@ -513,6 +513,22 @@ extension LXAssembly.LXFacade {
     return true
   }
 
+  /// 「原廠辭典僅傳回符合全字庫讀音者」之單一出口（單鍵路徑與替代讀音路徑共用）。
+  ///
+  /// 判準一律取**該元圖自身之讀音**（`unigram.keyArray`）——這既是
+  /// `kFilterNonCNSReadingsForCHTInput` 之語義，也令兩條查詢路徑共用同一規則。舊制之替代讀音
+  /// 路徑係以「查詢之任一展開變體符合即放行」判之，遂令桶查詢幾乎不可能 demote；且該式須先
+  /// 展開笛卡爾積，超預算時整段過濾被靜默略過。改以自身讀音之後，兩者一併收口。
+  /// - Parameter unigram: 待判之元圖。
+  /// - Returns: 合規者原樣回傳；不合規之**單音節**元圖 demote 至 −9.5、**多讀音詞組**剔除（nil）。
+  ///   單音節取 demote 而非剔除係既有之 UX 裁定：否則「播」（CNS 僅收 ㄅㄛˋ）一類常用字會在
+  ///   ㄅㄛ 讀音下整批消失。
+  func cnsReadingFiltered(_ unigram: Homa.Gram) -> Homa.Gram? {
+    guard !checkCNSConformation(for: unigram, keyArray: unigram.keyArray) else { return unigram }
+    guard unigram.keyArray.count == 1 else { return nil }
+    return .init(keyArray: unigram.keyArray, value: unigram.current, score: -9.5)
+  }
+
   /// Automatically generated half-width punctuation aliases should stay selectable,
   /// but must rank behind the lexicon's canonical full-width entry.
   private static let generatedHalfWidthPunctuationPenalty = 0.0001

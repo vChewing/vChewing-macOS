@@ -1176,18 +1176,9 @@ extension LXAssembly {
           key: keyChain,
           keyArray: flatKeyArray
         )
+        // 與替代讀音路徑共用同一出口（判準取元圖自身之讀音）：單音節 demote、多讀音剔除。
         if config.filterNonCNSReadings, !isCHS {
-          // 對單個漢字（flatKeyArray.count == 1）的不合規 Unigram 僅 demote score 至 -9.5，而非濾除。
-          if flatKeyArray.count == 1 {
-            factoryCoreUnigramsResult = factoryCoreUnigramsResult.map { thisUnigram in
-              guard !checkCNSConformation(for: thisUnigram, keyArray: flatKeyArray) else { return thisUnigram }
-              return .init(keyArray: thisUnigram.keyArray, value: thisUnigram.current, score: -9.5)
-            }
-          } else {
-            factoryCoreUnigramsResult.removeAll { thisUnigram in
-              !checkCNSConformation(for: thisUnigram, keyArray: flatKeyArray)
-            }
-          }
+          factoryCoreUnigramsResult = factoryCoreUnigramsResult.compactMap(cnsReadingFiltered)
         }
         if config.filterFactoryKanjisOfNonCurrentInputMode, flatKeyArray.count == 1 {
           factoryCoreUnigramsResult.removeAll { thisUnigram in
@@ -1726,31 +1717,24 @@ extension LXAssembly {
           keyArray: choppedKeyArray,
           strategy: .configuredLookup
         )
-        // 笛卡爾預算超閾時，展開組合不可用，無法做 CNS 讀音比對，跳過此過濾。
-        if config.filterNonCNSReadings, !isCHS, !cartesianBudgetExceeded {
-          if flatKeyArray.count == 1 {
-            factoryCoreUnigramsResult = factoryCoreUnigramsResult.map { unigram in
-              guard expandedKeyArrays.contains(where: { checkCNSConformation(for: unigram, keyArray: $0) }) else {
-                return .init(keyArray: unigram.keyArray, value: unigram.current, score: -9.5)
-              }
-              return unigram
-            }
-          } else {
-            factoryCoreUnigramsResult.removeAll { unigram in
-              !expandedKeyArrays.contains(where: { checkCNSConformation(for: unigram, keyArray: $0) })
-            }
-          }
+        // 判準一律以**元圖自身之讀音**為準（P369）。舊制以「查詢之任一展開變體符合即放行」：
+        // 桶查詢（單一注音前綴之全體補全）因此幾乎不可能 demote；而該式又須先展開笛卡爾積
+        // ⇒ 預算超閾時整段過濾被靜默略過（`!cartesianBudgetExceeded` 之守衛即其補丁）。
+        // 改以自身讀音之後，兩者一併收口，且不再依賴展開。
+        if config.filterNonCNSReadings, !isCHS {
+          factoryCoreUnigramsResult = factoryCoreUnigramsResult.compactMap(cnsReadingFiltered)
         }
+        // 同型之第二處（P369 順帶收口）：原以「全部展開變體皆為反側特有」判之，超預算時
+        // `expandedKeyArrays` 為空 ⇒ `allSatisfy` 對空集合恆真 ⇒ 整批核心元圖被清空。
+        // 改以元圖自身之讀音判之，既不依賴展開、亦不再有空的空集合語義。
         if config.filterFactoryKanjisOfNonCurrentInputMode, flatKeyArray.count == 1 {
           factoryCoreUnigramsResult.removeAll { thisUnigram in
             guard let firstChar = thisUnigram.current.first else { return false }
-            return expandedKeyArrays.allSatisfy { subKeyArray in
-              factory.plainBopomofo.isExclusive(
-                isCHS: !isCHS,
-                reading: subKeyArray.joined(separator: "-"),
-                target: firstChar
-              ) == true
-            }
+            return factory.plainBopomofo.isExclusive(
+              isCHS: !isCHS,
+              reading: thisUnigram.keyArray.joined(separator: "-"),
+              target: firstChar
+            ) == true
           }
         }
         rawAllUnigrams += factoryCoreUnigramsResult

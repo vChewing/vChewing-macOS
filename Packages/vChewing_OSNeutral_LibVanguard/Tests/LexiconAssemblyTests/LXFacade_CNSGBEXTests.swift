@@ -167,6 +167,106 @@ struct LXFacadeCNSGBEXTests {
     #expect(suppressed.contains { $0.current == Self.fengCoreChar })
   }
 
+  // MARK: - 讀音過濾（僅傳回符合全字庫讀音者）
+
+  /// 判準須以**每個元圖自身之讀音**為準，不得以「查詢之任一展開變體符合」放行。
+  ///
+  /// 病灶（P369）：替代讀音路徑原以 `expandedKeyArrays.contains(where:)` 判之 ⇒ 桶查詢
+  /// （單一注音前綴之全體補全）只需**任何一個**變體符合即整批放行，故實機上 demote 恆為 0。
+  @Test
+  func testFilterUsesEachGramsOwnReadingInPlaceOfAnyVariant() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = Self.makeReadingFilterFixtureInstance()
+    // 未啟用過濾時，桶查詢照舊取原廠核心分數。
+    let unfilteredBucket = instance.unigramsFor(keyArray: Self.boBucket, partiallyMatch: false)
+    #expect(Self.score(of: Self.filteredChar, in: unfilteredBucket) == -4.5)
+
+    instance.setOptions { config in
+      config.filterNonCNSReadings = true
+    }
+    // 「播」自身之讀音 ㄅㄛ 之 CNS 值集（僅「玻」）不含「播」⇒ 應 demote 至 −9.5；
+    // 舊制因查詢另含 ㄅㄛˋ（其值集有「播」）而放行、維持 −4.5。
+    let filteredBucket = instance.unigramsFor(keyArray: Self.boBucket, partiallyMatch: false)
+    #expect(Self.score(of: Self.filteredChar, in: filteredBucket) == -9.5)
+    // 單一讀音之查詢語義不變（同一結論）。
+    let filteredExact = instance.unigramsFor(keyArray: ["ㄅㄛ"])
+    #expect(Self.score(of: Self.filteredChar, in: filteredExact) == -9.5)
+  }
+
+  /// 單音節取 demote（不剔除）、多讀音詞組取剔除——段數判準以元圖自身為準。
+  @Test
+  func testFilterDemotesUnigramsAndDropsPhrasesByOwnSegmentCount() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = Self.makeReadingFilterFixtureInstance()
+    instance.setOptions { config in
+      config.filterNonCNSReadings = true
+    }
+
+    // 單音節：「播」仍在清單內，只是沉到 −9.5（既有 UX 裁定：否則常用字會整批消失）。
+    let exact = instance.unigramsFor(keyArray: ["ㄅㄛ"])
+    #expect(Self.score(of: Self.filteredChar, in: exact) == -9.5)
+    // 多讀音詞組：「播播」（ㄅㄛ-ㄅㄛ）整列剔除。
+    let filteredPhrase = instance.unigramsFor(keyArray: Self.boBoPhraseKey)
+    #expect(!filteredPhrase.map(\.current).contains(Self.filteredPhraseValue))
+    instance.setOptions { config in
+      config.filterNonCNSReadings = false
+    }
+    let unfilteredPhrase = instance.unigramsFor(keyArray: Self.boBoPhraseKey)
+    #expect(unfilteredPhrase.map(\.current).contains(Self.filteredPhraseValue))
+  }
+
+  /// 笛卡爾積超預算時亦須過濾——舊制因需先展開組合而整段略過（靜默失效）。
+  @Test
+  func testFilterAppliesEvenWhenCartesianBudgetIsExceeded() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = Self.makeReadingFilterFixtureInstance()
+    // 5 個位置各 4 個替代讀音 ⇒ 4⁵ = 1,024 > 625（`kCartesianProductBudgetLimit`）。
+    let longBucket: [Homa.PossibleKey] = Array(
+      repeating: .multipleKeys(["ㄅㄚ", "ㄅㄚˊ", "ㄅㄚˇ", "ㄅㄚˋ"]),
+      count: 5
+    )
+    instance.setOptions { config in
+      config.filterNonCNSReadings = false
+    }
+    let unfilteredLong = instance.unigramsFor(keyArray: longBucket, partiallyMatch: false)
+    #expect(unfilteredLong.map(\.current).contains(Self.overBudgetPhraseValue))
+    instance.setOptions { config in
+      config.filterNonCNSReadings = true
+    }
+    let filteredLong = instance.unigramsFor(keyArray: longBucket, partiallyMatch: false)
+    #expect(!filteredLong.map(\.current).contains(Self.overBudgetPhraseValue))
+  }
+
+  /// 同型之第二處（反側特有字之過濾）：原以「全部展開變體皆為反側特有」判之，超預算時
+  /// `expandedKeyArrays` 為空 ⇒ `allSatisfy` 對空集合恆真 ⇒ 整批核心元圖被清空。
+  @Test
+  func testContradictoryModeFilterDoesNotWipeWhenCartesianBudgetIsExceeded() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+
+    let instance = Self.makeReadingFilterFixtureInstance()
+    instance.setOptions { config in
+      config.filterFactoryKanjisOfNonCurrentInputMode = true
+      config.filterNonCNSReadings = false
+    }
+    // 單一位置、650 個替代讀音 ⇒ 笛卡爾積 650 > 625（觸發超預算且仍走「單音節」分支）。
+    let wideBucket: [Homa.PossibleKey] = [
+      .multipleKeys(["ㄅㄚ", "ㄅㄚˊ", "ㄅㄚˇ", "ㄅㄚˋ"] + (0 ..< 646).map { "ㄅㄧ\($0)" }),
+    ]
+    let grams = instance.unigramsFor(keyArray: wideBucket, partiallyMatch: false)
+    #expect(grams.map(\.current).contains("八"))
+  }
+
   // MARK: Private
 
   private static let fengKey: [String] = ["ㄈㄥ"]
@@ -177,6 +277,12 @@ struct LXFacadeCNSGBEXTests {
   private static let feng2CNSValues = ["㑄", "㑅"]
   private static let cnsOnlyChar = "㐽"
   private static let gbexOnlyChar = "𫲸"
+
+  private static let boBucket: [Homa.PossibleKey] = [.multipleKeys(["ㄅㄛ", "ㄅㄛˋ"])]
+  private static let boBoPhraseKey: [String] = ["ㄅㄛ", "ㄅㄛ"]
+  private static let filteredChar = "播"
+  private static let filteredPhraseValue = "播播"
+  private static let overBudgetPhraseValue = "八八八八八"
 
   /// 含 3 個 CNS、2 個 GBEX、1 個原廠核心字之夾具；另立一讀音供「跨組合累計」之驗證。
   ///
@@ -213,6 +319,49 @@ struct LXFacadeCNSGBEXTests {
       config.alwaysSupplyETenDOSUnigrams = false
     }
     return instance
+  }
+
+  /// 讀音過濾之夾具：兩個同族讀音（ㄅㄛ／ㄅㄛˋ）、一個同讀音重疊詞、一個五音節長詞。
+  ///
+  /// - ㄅㄛ 之 CNS 值集僅「玻」⇒ 其下的「播」不合規（舊制會被 ㄅㄛˋ 那一格放行）。
+  /// - ㄅㄛˋ 之 CNS 值集為「播」⇒ 該讀音下合規。
+  /// - ㄅㄚ 之 CNS 值集僅「巴」⇒ 「八八八八八」之五位皆不合規（供超預算之驗證）。
+  private static func makeReadingFilterFixtureInstance() -> LXAssembly.LXFacade {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t8
+    KEY_COUNT\t5
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    @-4.5\t播\t播
+    玻\t-11\t7
+    @-4.2\t簸\t簸
+    播\t-11\t7
+    @-5.5\t播播\t播播
+    @-4.5\t八\t八
+    巴\t-11\t7
+    @-6\t八八八八八\t八八八八八
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    ㄅㄛ\t0\t2
+    ㄅㄛˋ\t2\t2
+    ㄅㄛ-ㄅㄛ\t4\t1
+    ㄅㄚ\t5\t2
+    ㄅㄚ-ㄅㄚ-ㄅㄚ-ㄅㄚ-ㄅㄚ\t7\t1
+    """
+    let instance = LXAssembly.LXFacade(isCHS: false)
+    _ = LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: textMap)
+    instance.setOptions { config in
+      config.isCNSEnabled = true
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
+    return instance
+  }
+
+  private static func score(of value: String, in grams: [Homa.Gram]) -> Double? {
+    grams.first { $0.current == value }?.probability
   }
 
   private static func cnsValues(in grams: [Homa.Gram]) -> [String] {
