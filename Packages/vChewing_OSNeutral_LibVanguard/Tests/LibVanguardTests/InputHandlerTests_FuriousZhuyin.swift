@@ -2207,6 +2207,66 @@ extension LibVanguardTestsRoot.InputHandlerTests {
     )
   }
 
+  // MARK: - 簡拼窗之首
+
+  /// 注音簡拼之窗首不得是「只覆蓋尾端一個音節」之組句預覽。
+  ///
+  /// 鍵入 ㄋㄔ 時，組字器尾鍵為單注音 `ㄋ`、注拼槽為 `ㄔ` ⇒ 簡拼 cells 為 `["ㄋ","ㄔ"]`。
+  /// 既有之 copilot 預覽係以「尾端音節之聲調桶」插入組字器副本試算，其結果只覆蓋 `ㄔ`
+  /// 一個位置（實測為「吃」）——它不是整段輸入之組句結果，置頂後把整詞簡拼候選壓後一名：
+  /// 修前窗首為「吃」、整詞之首「農場」退居第 2、`奶茶` 第 7（第二頁）。故簡拼格鏈成立時，
+  /// 該預覽與「讀音原字串回退值」同級降權 ⇒ 窗首為簡拼區塊之首，與拼音 α 窗同序（P262）。
+  /// 真辭典之窗首即 `農場`，`奶茶` 升至第 6（第一頁）。
+  ///
+  /// 本測試釘三件事：① 窗首即整詞簡拼候選（此處以臨時詞條 `農場` 代表）；② copilot 窗首
+  /// 高亮時，內文組字區顯示該候選（與 ㄍㄋㄋ 之 `狗男女` 同型——高亮預覽走
+  /// `previewFuriousHighlightedCandidate`）；③ 就地選字一次寫入兩段讀音。
+  @Test("IH-FuriousZhuyin-044 Abbreviation window leads with the whole-word block")
+  func test_IH_FuriousZhuyin_044_AbbreviationWindowLeadsWithWholeWordBlock() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      leaveFuriousTestEnvironment()
+    }
+    enterZhuyinFuriousTestEnvironment()
+    clearTestPOM()
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄋㄨㄥˊ", "ㄔㄤˇ"], value: "農場", score: -1.0),
+      isFiltering: false
+    )
+
+    typeSentence("st") // ㄋ → ㄔ
+    #expect(
+      testHandler.furiousZhuyinAbbreviationCells == ["ㄋ", "ㄔ"],
+      "實得：\(testHandler.furiousZhuyinAbbreviationCells ?? [])"
+    )
+    let values = testSession.state.candidates.map(\.value)
+    #expect(values.first == "農場", "窗首應為整詞簡拼候選，實得：\(values.prefix(5))")
+    guard let index = testSession.state.candidates.firstIndex(where: { $0.value == "農場" }) else {
+      Issue.record("簡拼候選「農場」未入 copilot 窗：\(values.prefix(20))")
+      return
+    }
+
+    // 窗首高亮 ⇒ 內文組字區顯示該候選（不經空白、不動真組字器）。
+    testSession.candidatePairHighlightChanged(at: index)
+    #expect(
+      testSession.state.displayedTextConverted == "農場",
+      "內文組字區應顯示窗首高亮之候選，實得：\(testSession.state.displayedTextConverted)"
+    )
+
+    // 就地選字：兩段讀音一次就位、注拼槽清空。
+    testSession.candidatePairSelectionConfirmed(at: index)
+    #expect(
+      testHandler.assembler.actualKeys == ["ㄋㄨㄥˊ", "ㄔㄤˇ"],
+      "實得：\(testHandler.assembler.actualKeys)"
+    )
+    #expect(generateDisplayedText() == "農場", "實得：\(generateDisplayedText())")
+    #expect(testHandler.composer.isEmpty)
+  }
+
   // MARK: - Test harness
 
   /// 把測試環境切成注音狂打（其餘輸入法一律關閉），並重置組字狀態。

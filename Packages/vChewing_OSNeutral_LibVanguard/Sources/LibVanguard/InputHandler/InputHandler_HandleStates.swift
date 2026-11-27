@@ -275,6 +275,13 @@ extension InputHandlerProtocol {
   )
     -> [CandidateInState] {
     let bucket = furiousContext.bucket
+    // 注音簡拼 cells（≥2 格時成立）與其整詞候選。置頂與排序皆須知悉「當前輸入是否跨
+    // 多個簡拼位置、且語言模組確有整詞命中」，故只算一次——同一判準不得在本函式內出現
+    // 兩份，查詢亦不得重複。
+    let zhuyinAbbreviationCells = furiousZhuyinAbbreviationCells
+    let zhuyinAbbreviationGrams = zhuyinAbbreviationCells.map {
+      currentLM.lxQuerier.abbreviatedWordCandidates(keysChopped: $0)
+    } ?? []
     var seenValues = Set<String>()
     // 置頂段：組句預覽（crossingPair／preview）與 POM 建議——保持原順序置頂。
     var anchored: [CandidateInState] = []
@@ -330,6 +337,20 @@ extension InputHandlerProtocol {
       if seenValues.insert(crossingPair.value).inserted {
         anchored.append(crossingPair)
       }
+    } else if !zhuyinAbbreviationGrams.isEmpty {
+      // 簡拼格鏈（≥2 格）成立且**確有整詞命中**時，此「前方預覽」只覆蓋尾端一個
+      // 音節，而輸入實際跨多個位置（如 ㄋ｜ㄔ 之 ㄔ）——它不是整段輸入之組句結果，置頂
+      // 會把整詞簡拼候選壓後一名（實測 ㄋㄔ：窗首為單音節猜測「吃」、整詞之首「農場」
+      // 退居第 2、奶茶第 7）。故與原字串回退值同級降權，俾簡拼區塊之首居首，與拼音 α
+      // 窗同序（P262）。無整詞命中時則不降權——彼時尾端猜測仍是唯一有意義之候選。
+      if seenValues.insert(furiousContext.preview).inserted {
+        ranked.append(
+          (
+            keyArray: bucket, value: furiousContext.preview,
+            weight: Self.rawReadingFallbackWeight, abbreviationOrder: nil
+          )
+        )
+      }
     } else if bucket.contains(furiousContext.preview) {
       // 原字串回退值：降級入 `ranked`，權重取地板值俾其沉於同長度之真詞之後。
       if seenValues.insert(furiousContext.preview).inserted {
@@ -383,9 +404,8 @@ extension InputHandlerProtocol {
     // ＋ 注拼槽之當前讀音」；`abbreviatedWordCandidates` 對各 cell 作逐位置 byte 前綴匹配
     // （單次有界 Trie 查詢，無展開表、無笛卡爾積）。與前方候選同一清單 ⇒ 沿用本函式之
     // 置頂／排序／去重；選取時由 `applyFuriousFrontCandidate` 之簡拼覆寫路徑處理。
-    if let abbreviationCells = furiousZhuyinAbbreviationCells {
-      for (order, gram) in currentLM.lxQuerier
-        .abbreviatedWordCandidates(keysChopped: abbreviationCells).enumerated() {
+    if !zhuyinAbbreviationGrams.isEmpty {
+      for (order, gram) in zhuyinAbbreviationGrams.enumerated() {
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
         ranked.append(
