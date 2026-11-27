@@ -767,7 +767,7 @@ extension InputHandlerProtocol {
           return furiousSyllableScoreFloor
         }
         let bucket = Tekkon.makeToneInsensitiveVariants(of: zhuyin)
-        let grams = self.currentLM.lxQuerier.grams(for: [.multipleKeys(bucket)])
+        let grams = self.copilotFrontGrams(for: [.multipleKeys(bucket)])
         return grams.map(\.probability).max() ?? furiousSyllableScoreFloor
       }
     )
@@ -840,7 +840,7 @@ extension InputHandlerProtocol {
           return furiousSyllableScoreFloor
         }
         let bucket = Tekkon.makeToneInsensitiveVariants(of: zhuyin)
-        let grams = self.currentLM.lxQuerier.grams(for: [.multipleKeys(bucket)])
+        let grams = self.copilotFrontGrams(for: [.multipleKeys(bucket)])
         return grams.map(\.probability).max() ?? furiousSyllableScoreFloor
       }
     )
@@ -860,7 +860,7 @@ extension InputHandlerProtocol {
             })
       else { continue }
       // 整詞查詢：該切分全部段的音節桶——只取「整段匹配」的完整詞（段數一致）。
-      let grams = currentLM.lxQuerier.grams(for: keyBuckets.map { .multipleKeys($0) })
+      let grams = copilotFrontGrams(for: keyBuckets.map { .multipleKeys($0) })
       guard let top = grams
         .filter({ $0.keyArray.count == candidate.count })
         .max(by: { $0.probability < $1.probability }),

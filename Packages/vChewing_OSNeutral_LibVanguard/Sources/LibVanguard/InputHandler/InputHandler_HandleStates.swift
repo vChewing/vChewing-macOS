@@ -96,6 +96,9 @@ extension InputHandlerProtocol {
     // 以組字器副本（copilot）試算前方組句；不影響原組字器。
     let mainLength = assembler.length
     let copilot = assembler.copy
+    copilot.gramQuerier = { [weak self] keyArray in
+      self?.copilotFrontGrams(for: keyArray) ?? []
+    }
     guard (try? copilot.insertKeys([bucket])) != nil else { return nil }
     // 一次遍歷同時擷取主段範圍與越過主段長度的前方部分。
     // 擷取紀律（與既有的「完全越界取全部、橫跨取越界部分」互為鏡像）：
@@ -208,6 +211,31 @@ extension InputHandlerProtocol {
   /// 恆居末位——但仍保留於清單內（使用者仍可顯式選取該讀音）。
   static var rawReadingFallbackWeight: Double { -1e9 }
 
+  /// copilot 候選窗對 CNS／GBEX 之補充供給上限（每查詢、每來源）。
+  ///
+  /// **何以需要**：狂打之未完成讀音以「合法前綴之全體補全」為桶（單聲母即可展開為 20–300
+  /// 個音節鍵），CNS 開啟時每個鍵再各取全字庫之全部字（單一讀音可達數百、單鍵可達數千格）
+  /// ⇒ 單一按鍵即得 2.5k–10k 格候選；而同一批元圖每拍還要被重排三次（copilot 預覽、POM
+  /// 建議各建一個組字器副本，加上候選清單本身）。實測（P368）單鍵中位由 2.35 ms 升至
+  /// 17.5 ms、最壞 36.8 ms。
+  ///
+  /// **何以只砍尾**：CNS 元圖之權重恆為 −11（原廠核心多在 −5…−9.9），故其只落在清單尾端；
+  /// 實測上限 0／200／無限三者之前 60 名候選逐字相同，僅尾端長度不同。200 之額度仍留五頁
+  /// 以上之 CNS 尾，兼顧「CNS 開啟者仍見得到全字庫字」。
+  ///
+  /// **界線**：只施用於 copilot 窗之建構（預覽之投機插入與候選清單）；標準選字窗、組字器
+  /// 之 `gramQuerier` 與 `hasGrams` 一概不受限。CNS／GBEX 各計一份額度（二者同為 −11，且在
+  /// 「先插入者勝」之去重下 GBEX 恆在 CNS 之後）。
+  static var copilotSupplementalSupplyLimit: Int { 200 }
+
+  /// 以 copilot 窗之供給上限查詢元圖：供 copilot 組字器副本之 `gramQuerier` 與本窗諸查詢使用。
+  func copilotFrontGrams(for keyArray: [Homa.PossibleKey]) -> [Homa.Gram] {
+    currentLM.lxQuerier.grams(
+      for: keyArray,
+      supplyLimit: Self.copilotSupplementalSupplyLimit
+    )
+  }
+
   /// 以給定拼音字母流計算簡拼整詞的 cells（前述閘門由呼叫方把守）。
   /// 跨檔案 extension（`InputHandler_FuriousResegmentation` 的 α 自動套用）亦需使用，
   /// 故不設為 private。
@@ -259,6 +287,9 @@ extension InputHandlerProtocol {
     // 「以固定順序來陳列選字窗內的候選字」啟用時亦不置頂（POM 不影響候選陳列順序）。
     if prefs.fetchSuggestionsFromPerceptionOverrideModel, !prefs.useFixedCandidateOrderOnSelection {
       let copilot = assembler.copy
+      copilot.gramQuerier = { [weak self] keyArray in
+        self?.copilotFrontGrams(for: keyArray) ?? []
+      }
       if (try? copilot.insertKeys([.multipleKeys(bucket)])) != nil {
         let suggestion = currentLM.fetchPOMSuggestion(
           assembledResult: copilot.assembledSentence,
@@ -316,7 +347,7 @@ extension InputHandlerProtocol {
     }
     // 跨邊界候選：最後提交鍵＋前方桶的雙鍵查詢（組字器為空時不查）。
     if let lastKey = assembler.keys.last {
-      for gram in currentLM.lxQuerier.grams(for: [lastKey, .multipleKeys(bucket)]) {
+      for gram in copilotFrontGrams(for: [lastKey, .multipleKeys(bucket)]) {
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
         ranked.append(
@@ -331,7 +362,7 @@ extension InputHandlerProtocol {
       let maxSuffixLength = min(assembler.keys.count, 3)
       for suffixLength in 2 ... maxSuffixLength {
         let suffixKeys = Array(assembler.keys.suffix(suffixLength))
-        for gram in currentLM.lxQuerier.grams(for: suffixKeys + [.multipleKeys(bucket)]) {
+        for gram in copilotFrontGrams(for: suffixKeys + [.multipleKeys(bucket)]) {
           guard !gram.current.isEmpty else { continue }
           guard seenValues.insert(gram.current).inserted else { continue }
           ranked.append(
@@ -341,7 +372,7 @@ extension InputHandlerProtocol {
       }
     }
     // 前方單音節候選：語言模組對讀音桶的查詢結果，依原順序取用、按 value 去重（保留先出現者）。
-    for gram in currentLM.lxQuerier.grams(for: [.multipleKeys(bucket)]) {
+    for gram in copilotFrontGrams(for: [.multipleKeys(bucket)]) {
       guard !gram.current.isEmpty else { continue }
       guard seenValues.insert(gram.current).inserted else { continue }
       ranked.append(

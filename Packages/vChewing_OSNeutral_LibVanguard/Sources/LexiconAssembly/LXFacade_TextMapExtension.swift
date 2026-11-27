@@ -223,10 +223,13 @@ extension LXAssembly.LXFacade {
     )
   }
 
+  /// - Parameter supplyLimit: 該型別之供給上限（每查詢）；nil＝不限。只供 CNS／GBEX 之補充
+  ///   取用使用——其餘型別之呼叫端皆不傳，故語義不變。
   func factoryUnigramsFor(
     key: String,
     keyArray: [String],
-    entryType: VanguardTrie.Trie.EntryType
+    entryType: VanguardTrie.Trie.EntryType,
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
     if key == "_punct_list" { return [] }
@@ -235,7 +238,8 @@ extension LXAssembly.LXFacade {
       return factoryPartiallyMatchedUnigramsFor(
         queryKeyArray: keyArray,
         entryType: entryType,
-        trie: trie
+        trie: trie,
+        supplyLimit: supplyLimit
       )
     }
     let nodes = trie.getNodes(
@@ -250,7 +254,8 @@ extension LXAssembly.LXFacade {
       keyArray: keyArray,
       sourceKey: key,
       entryType: entryType,
-      includeHalfWidthVariants: true
+      includeHalfWidthVariants: true,
+      supplyLimit: supplyLimit
     )
   }
 
@@ -284,7 +289,8 @@ extension LXAssembly.LXFacade {
   func factoryPartiallyMatchedUnigramsFor(
     queryKeyArray: [String],
     entryType: VanguardTrie.Trie.EntryType,
-    trie: VanguardTrie.TextMapTrie
+    trie: VanguardTrie.TextMapTrie,
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
     let queriedGrams = trie.queryGrams(
@@ -295,7 +301,8 @@ extension LXAssembly.LXFacade {
     return makeFactoryUnigrams(
       queriedGrams: queriedGrams,
       entryType: entryType,
-      includeHalfWidthVariants: true
+      includeHalfWidthVariants: true,
+      supplyLimit: supplyLimit
     )
   }
 
@@ -313,10 +320,16 @@ extension LXAssembly.LXFacade {
 
   /// 「&」連讀查詢的原廠辭典版本，可指定逐位置前綴語義（與 `partialMatchEnabled` 偏好無關）。
   /// 供狂拼整詞簡拼查詢（R2-α）使用：簡拼整詞查詢恆為逐位置前綴比對。
+  /// - Parameter supplyLimit: 該型別之供給上限（每查詢、跨各組合累計）；nil＝不限。
+  ///   `keysChopped` 之一格含 N 個替代讀音時會展開為 N 次查詢，本上限**跨展開累計**，
+  ///   故「上限 200」即整次查詢至多 200 筆，而非每組合 200 筆。取前者之因：copilot 窗之桶
+  ///   可達 300 鍵，逐組合各 200 筆等於不設限。截取之次序為 trie 之組合序／值列序
+  ///   （確定性，見下之排序說明），非分數序——分數序在截取之後才由本函式尾端決定。
   func factoryChoppedUnigramsFor(
     keyArray: [String],
     entryType: VanguardTrie.Trie.EntryType,
-    partiallyMatch: Bool
+    partiallyMatch: Bool,
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
     guard let trie = factory.trie else { return [] }
@@ -326,14 +339,19 @@ extension LXAssembly.LXFacade {
       partiallyMatch: partiallyMatch
     )
     guard !entryGroups.isEmpty else { return [] }
-    let grams = entryGroups.flatMap { group in
-      makeFactoryUnigrams(
+    var remaining = supplyLimit ?? Int.max
+    var grams: [Homa.Gram] = []
+    for group in entryGroups where remaining > 0 {
+      let groupGrams = makeFactoryUnigrams(
         entries: group.entries,
         keyArray: group.keyArray,
         sourceKey: group.keyArray.joined(separator: "-"),
         entryType: entryType,
-        includeHalfWidthVariants: true
+        includeHalfWidthVariants: true,
+        supplyLimit: remaining
       )
+      grams += groupGrams
+      remaining -= groupGrams.count
     }
     // 詞值去重、保留最高機率者（狂拼 copilot 窗候選排序修正）：
     // 同一個詞值可能以「無調墊底」與「聲調專屬」兩種讀音鍵同時存在
@@ -404,23 +422,37 @@ extension LXAssembly.LXFacade {
   /// 排序規則：GBEX 資料放在 CNS 資料之後；簡體中文模式例外，GBEX 優先於 CNS。
   /// 因為最終 consolidate 以「先插入者勝」去重且保持插入順序，此處的排列次序即為同權重
   /// （CNS／GBEX 基礎權重皆為 -11）下的候選次序。
+  /// - Parameter supplyLimit: 每來源之供給上限（CNS、GBEX 各計）；nil＝不限。
   func supplementalCNSAndGBEXUnigramsFor(
     key: String,
-    keyArray: [String]
+    keyArray: [String],
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
-    let cnsGrams = factoryUnigramsFor(key: key, keyArray: keyArray, entryType: .cns)
-    let gbexGrams = factoryUnigramsFor(key: key, keyArray: keyArray, entryType: .gbex)
+    let cnsGrams = factoryUnigramsFor(
+      key: key, keyArray: keyArray, entryType: .cns, supplyLimit: supplyLimit
+    )
+    let gbexGrams = factoryUnigramsFor(
+      key: key, keyArray: keyArray, entryType: .gbex, supplyLimit: supplyLimit
+    )
     return isCHS ? gbexGrams + cnsGrams : cnsGrams + gbexGrams
   }
 
   /// CNS+GBEX 模式的補充單元圖（「&」連讀／chopped 查詢路徑），排序規則同上。
+  /// - Parameter supplyLimit: 每來源之供給上限（CNS、GBEX 各計、跨展開累計）；nil＝不限。
   func supplementalChoppedCNSAndGBEXUnigramsFor(
-    keyArray: [String]
+    keyArray: [String],
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
-    let cnsGrams = factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .cns)
-    let gbexGrams = factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .gbex)
+    let cnsGrams = factoryChoppedUnigramsFor(
+      keyArray: keyArray, entryType: .cns, partiallyMatch: config.partialMatchEnabled,
+      supplyLimit: supplyLimit
+    )
+    let gbexGrams = factoryChoppedUnigramsFor(
+      keyArray: keyArray, entryType: .gbex, partiallyMatch: config.partialMatchEnabled,
+      supplyLimit: supplyLimit
+    )
     return isCHS ? gbexGrams + cnsGrams : cnsGrams + gbexGrams
   }
 
@@ -505,17 +537,21 @@ extension LXAssembly.LXFacade {
     }
   }
 
+  /// - Parameter supplyLimit: 本次取用之上限（nil＝不限）；只計主條目、不含半形變體之補列。
   private func makeFactoryUnigrams(
     entries: [VanguardTrie.Trie.Entry],
     keyArray: [String],
     sourceKey: String,
     entryType: VanguardTrie.Trie.EntryType,
-    includeHalfWidthVariants: Bool
+    includeHalfWidthVariants: Bool,
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
+    let limit = supplyLimit ?? Int.max
     var grams: [Homa.Gram] = []
     var extraHalfWidthGrams: [Homa.Gram] = []
     for entry in entries where entry.typeID == entryType {
+      guard grams.count < limit else { break }
       if entryType == .nonKanji,
          config.suppressFactoryUnigramsOfKanaSyllables,
          Self.isKanaSyllableValue(entry.value) {
@@ -561,12 +597,15 @@ extension LXAssembly.LXFacade {
   private func makeFactoryUnigrams(
     queriedGrams: [VanguardTrie.TrieGram],
     entryType: VanguardTrie.Trie.EntryType,
-    includeHalfWidthVariants: Bool
+    includeHalfWidthVariants: Bool,
+    supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
+    let limit = supplyLimit ?? Int.max
     var grams: [Homa.Gram] = []
     var extraHalfWidthGrams: [Homa.Gram] = []
     for queriedGram in queriedGrams {
+      guard grams.count < limit else { break }
       if entryType == .nonKanji,
          config.suppressFactoryUnigramsOfKanaSyllables,
          Self.isKanaSyllableValue(queriedGram.value) {

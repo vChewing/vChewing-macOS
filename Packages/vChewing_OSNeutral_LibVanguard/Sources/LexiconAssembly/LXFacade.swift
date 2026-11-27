@@ -201,6 +201,21 @@ extension LXAssembly {
         lxFacade.unigramsFor(keyArray: keyArray, partiallyMatch: lxFacade.config.partialMatchEnabled)
       }
 
+      /// 附「補充供給上限」之版本：CNS／GBEX 之取用至多各 `supplyLimit` 筆，其餘來源不受限。
+      ///
+      /// 消費者是狂打之 copilot 候選窗——該窗以「未完成讀音之全體補全」為桶（20–300 鍵），
+      /// 每鍵再各取全字庫之全部字時，單一按鍵即得數千至近萬格候選，而同一批元圖每拍還要
+      /// 被重排三次。CNS 元圖之權重恆為 −11（原廠核心多在 −5…−9.9），只落在清單尾端。
+      /// **本參數不是全域閘**：不寫入 `config`（那會進快取指紋、每次切換即清空整個 LRU），
+      /// 而係逐查詢之維度並進入快取鍵；未傳者語義與既有呼叫端完全相同。
+      public func grams(for keyArray: [Homa.PossibleKey], supplyLimit: Int) -> [Homa.Gram] {
+        lxFacade.unigramsFor(
+          keyArray: keyArray,
+          partiallyMatch: lxFacade.config.partialMatchEnabled,
+          supplyLimit: supplyLimit
+        )
+      }
+
       /// 給定讀音索引鍵陣列（相容舊版 `[String]` 介面），回傳經處理的單元圖陣列。
       ///
       /// 與 `grams(for: [Homa.PossibleKey])` 的差異：本重載接受顯式的 `partiallyMatch` 參數，
@@ -1054,28 +1069,55 @@ extension LXAssembly {
     }
 
     /// 給定讀音索引鍵陣列，讓 LXFacade 給出對應的經過處理的單元圖陣列。
-    /// - Parameter keyArray: 給定的讀音索引鍵陣列（相容舊版 [String] 介面）。
+    /// - Parameters:
+    ///   - keyArray: 給定的讀音索引鍵陣列（相容舊版 [String] 介面）。
+    ///   - partiallyMatch: 是否對使用者片語啟用前綴部分匹配。
+    ///   - supplyLimit: CNS／GBEX 之補充供給上限（每查詢、每來源）；nil＝不限。
     /// - Returns: 對應的經過處理的單元圖陣列。
-    func unigramsFor(keyArray: [String], partiallyMatch: Bool = false) -> [Homa.Gram] {
-      unigramsFor(keyArray: keyArray.map { Homa.PossibleKey.singleKey($0) }, partiallyMatch: partiallyMatch)
+    func unigramsFor(
+      keyArray: [String],
+      partiallyMatch: Bool = false,
+      supplyLimit: Int? = nil
+    )
+      -> [Homa.Gram] {
+      unigramsFor(
+        keyArray: keyArray.map { Homa.PossibleKey.singleKey($0) },
+        partiallyMatch: partiallyMatch,
+        supplyLimit: supplyLimit
+      )
     }
 
     /// 給定讀音索引鍵陣列，讓 LXFacade 給出對應的經過處理的單元圖陣列。
     /// - Parameters:
     ///   - keyArray: 給定的讀音索引鍵陣列。
     ///   - partiallyMatch: 是否對使用者片語啟用前綴部分匹配。
+    ///   - supplyLimit: CNS／GBEX 之補充供給上限（每查詢、每來源）；nil＝不限。
+    ///     只截「補充資料」之供給，不動原廠核心、使用者片語、符號等其餘來源。
+    ///     此值係查詢語義之一維，故一併進入快取鍵（見 `cacheKeyTaggingSupplyLimit`）。
     /// - Returns: 對應的經過處理的單元圖陣列。
-    func unigramsFor(keyArray: [Homa.PossibleKey], partiallyMatch: Bool) -> [Homa.Gram] {
+    func unigramsFor(
+      keyArray: [Homa.PossibleKey],
+      partiallyMatch: Bool,
+      supplyLimit: Int? = nil
+    )
+      -> [Homa.Gram] {
       let hasAlternatives = keyArray.contains { $0.count > 1 }
 
       if hasAlternatives {
-        return unigramsForWithAlternatives(keyArray: keyArray, partiallyMatch: partiallyMatch)
+        return unigramsForWithAlternatives(
+          keyArray: keyArray,
+          partiallyMatch: partiallyMatch,
+          supplyLimit: supplyLimit
+        )
       }
 
       // Fast path: single key per position — use existing logic unchanged
       let flatKeyArray = keyArray.map(\.first)
       let keyChain = flatKeyArray.joined(separator: "-")
-      let cacheKey = partiallyMatch ? "\(keyChain)\tPM1" : "\(keyChain)\tPM0"
+      let cacheKey = Self.cacheKeyTaggingSupplyLimit(
+        partiallyMatch ? "\(keyChain)\tPM1" : "\(keyChain)\tPM0",
+        supplyLimit
+      )
       let noEmptyKey = !flatKeyArray.isEmpty && flatKeyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
       /// 給空白鍵指定輸出值。
@@ -1166,7 +1208,8 @@ extension LXAssembly {
         if config.isCNSEnabled {
           rawAllUnigrams += supplementalCNSAndGBEXUnigramsFor(
             key: keyChain,
-            keyArray: flatKeyArray
+            keyArray: flatKeyArray,
+            supplyLimit: supplyLimit
           )
         }
         // 額外掛載的語言模組來源（多來源掛載）：預設為空，故對既有行為零影響。
@@ -1583,6 +1626,16 @@ extension LXAssembly {
       return result
     }
 
+    /// 為查詢快取之鍵補上「補充供給上限」這一維。
+    ///
+    /// 同一讀音可能一次以「上限 N」取（copilot 窗）、一次以「不限」取（標準選字窗），
+    /// 兩者之結果不同，故不得共用快取條目。不限者回傳原鍵——既有條目之鍵形因此不變，
+    /// 亦省去為既有呼叫端重算一次。
+    private static func cacheKeyTaggingSupplyLimit(_ base: String, _ supplyLimit: Int?) -> String {
+      guard let supplyLimit else { return base }
+      return "\(base)\tSL\(supplyLimit)"
+    }
+
     /// 移出與該列同值之臨時記錄（整檔重載本會清空整個臨時表，增量路徑只清這一筆）。
     private func removeTemporaryDuplicate(ofRow row: String, isFiltering: Bool) {
       let cells = row.split(separator: " ").prefix(2).map(String.init)
@@ -1629,10 +1682,16 @@ extension LXAssembly {
 
     /// 處理含替代讀音的鍵陣列查詢。
     /// 對原廠辭典 trie 使用 chopped（"&" 連接）路徑，對使用者資料使用展開路徑。
-    private func unigramsForWithAlternatives(keyArray: [Homa.PossibleKey], partiallyMatch: Bool) -> [Homa.Gram] {
+    /// - Parameter supplyLimit: CNS／GBEX 之補充供給上限（每查詢、每來源）；nil＝不限。
+    private func unigramsForWithAlternatives(
+      keyArray: [Homa.PossibleKey],
+      partiallyMatch: Bool,
+      supplyLimit: Int? = nil
+    )
+      -> [Homa.Gram] {
       let flatKeyArray = keyArray.map(\.first)
       let keyChain = flatKeyArray.joined(separator: "-")
-      let cacheKey = "ALT\t\(keyArray.hashValue)"
+      let cacheKey = Self.cacheKeyTaggingSupplyLimit("ALT\t\(keyArray.hashValue)", supplyLimit)
       let noEmptyKey = !flatKeyArray.isEmpty && flatKeyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
       // 檢查 LRU 快取
@@ -1696,7 +1755,10 @@ extension LXAssembly {
         }
         rawAllUnigrams += factoryCoreUnigramsResult
         if config.isCNSEnabled {
-          rawAllUnigrams += supplementalChoppedCNSAndGBEXUnigramsFor(keyArray: choppedKeyArray)
+          rawAllUnigrams += supplementalChoppedCNSAndGBEXUnigramsFor(
+            keyArray: choppedKeyArray,
+            supplyLimit: supplyLimit
+          )
         }
         // 額外掛載的語言模組來源（多來源掛載）：預設為空，故對既有行為零影響。
         // 替代讀音路徑以 "&" 連讀鍵詢問，與原廠辭典的 chopped 路徑一致。
