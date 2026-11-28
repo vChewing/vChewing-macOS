@@ -27,7 +27,7 @@ if [ -z "$APP" ]; then
   exit 0
 fi
 if [ ! -d "$APP/Contents" ]; then
-  warn "找不到 app bundle：$APP（略過收錄）"
+  warn "找不到 app bundle：${APP}（略過收錄）"
   exit 0
 fi
 
@@ -77,7 +77,7 @@ fi
 # 故 `index.html`（目錄入口之跳轉頁）在本情境無用武之地，不收。
 SRC="$ASSISTANT_DIR/dist/assistant.html"
 if [ ! -f "$SRC" ]; then
-  warn "產物缺席：$SRC（略過收錄）"
+  warn "產物缺席：${SRC}（略過收錄）"
   exit 0
 fi
 
