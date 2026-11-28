@@ -7,7 +7,7 @@
 # 假設當前輸入法有正確安裝，則您需要移除下述內容：
 
 rm -rf ~/Library/Input\ Methods/vChewing.app
-# 佈局 bundle 僅存在於 v5.0.6 及更早之安裝；自 v5.0.7 起不再隨安裝包提供，列出僅為清理殘檔。
+# 佈局 bundle 僅存在於 v5.0.6 及更早之安裝；自 v5.1.0 起不再隨安裝包提供，列出僅為清理殘檔。
 rm -rf ~/Library/Keyboard\ Layouts/vChewingKeyLayout.bundle
 rm ~/Library/Keyboard\ Layouts/vChewing\ MiTAC.keylayout
 rm ~/Library/Keyboard\ Layouts/vChewing\ IBM.keylayout
