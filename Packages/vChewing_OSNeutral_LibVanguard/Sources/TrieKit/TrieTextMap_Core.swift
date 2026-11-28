@@ -44,12 +44,19 @@ extension VanguardTrie {
         to: bounds.keyMapLineStart
       )
       if validateValues {
-        try Self.validateValueLines(
+        self.presentEntryTypes = try Self.validateValueLines(
           in: data,
           offsets: valuesLineOffsets,
           valuesEndOffset: bounds.keyMapLineStart,
           isTyping: header.isTyping,
           defaultProbs: header.defaultProbs
+        )
+      } else {
+        self.presentEntryTypes = Self.scanPresentEntryTypes(
+          in: data,
+          offsets: valuesLineOffsets,
+          valuesEndOffset: bounds.keyMapLineStart,
+          isTyping: header.isTyping
         )
       }
       self.valuesLineOffsets = valuesLineOffsets
@@ -78,6 +85,18 @@ extension VanguardTrie {
     // MARK: Public
 
     public let readingSeparator: Character
+
+    /// 本 TextMap 內實際出現過條目的 entry typeID 集合。
+    ///
+    /// TextMap 沒有「宣告某 table 但零筆」之表示法，故「空 table」即「其 typeID 不在此集合內」。
+    /// 該集合於初始化時一次算定：逐行驗證路徑直接以解析結果累加；受信任之免驗證路徑
+    /// 以 VALUES 行首與欄位位置判型（與 `parseValidatedValueLine` 之四種行型別一致）。
+    public private(set) var presentEntryTypes: Set<Int32>
+
+    /// 該 entry type 在本 TextMap 內是否至少有一筆條目。
+    public func hasEntries(ofType type: VanguardTrie.Trie.EntryType) -> Bool {
+      presentEntryTypes.contains(type.rawValue)
+    }
 
     public func reverseLookup(for kanji: String) -> [String]? {
       ensureReverseLookupIndex()
@@ -295,6 +314,7 @@ extension VanguardTrie.TextMapTrie {
     )
   }
 
+  /// - Returns: 本檔 VALUES 區段實際出現過條目的 entry typeID 集合。
   private static func validateValueLines(
     in data: Data,
     offsets: [UInt32],
@@ -302,7 +322,9 @@ extension VanguardTrie.TextMapTrie {
     isTyping: Bool,
     defaultProbs: [Int32: Double]
   )
-    throws {
+    throws
+    -> Set<Int32> {
+    var presentEntryTypes: Set<Int32> = []
     for lineIndex in offsets.indices {
       let start = Int(offsets[lineIndex])
       var end = lineIndex + 1 < offsets.count ? Int(offsets[lineIndex + 1]) : valuesEndOffset
@@ -311,11 +333,14 @@ extension VanguardTrie.TextMapTrie {
       }
       let line = extractString(from: data, start: start, end: end)
       do {
-        _ = try VanguardTrie.TrieIO.parseValidatedValueLine(
+        let entries = try VanguardTrie.TrieIO.parseValidatedValueLine(
           line,
           isTyping: isTyping,
           defaultProbs: defaultProbs
         )
+        for entry in entries {
+          presentEntryTypes.insert(entry.typeID.rawValue)
+        }
       } catch {
         throw VanguardTrie.TrieIO.Exception.deserializationFailed(
           NSError(domain: "VanguardTrie.TextMapTrie", code: -1, userInfo: [
@@ -324,6 +349,130 @@ extension VanguardTrie.TextMapTrie {
         )
       }
     }
+    return presentEntryTypes
+  }
+
+  /// 受信任、免逐行驗證之 TextMap 的 table 存在性掃描。
+  ///
+  /// 只讀行首與 tab 位置，不配置 `String`、亦不解析詞值。判型與 `parseValidatedValueLine`
+  /// 一致：`>typeID` 且恰兩欄＝型別 A；`@機率`、恰三欄且機率為十進位、僅 TYPING＝型別 B
+  /// （CHS 對 5、CHT 對 6；空 cell 與 BEL 佔位不算）；`!` 起首且至少五欄＝型別 D
+  /// （typeID 在第二欄）；其餘至少三欄者＝型別 C（typeID 在第三欄）。
+  /// 舊式 bare grouped line（`機率\tchs\tcht`）視同型別 B。
+  private static func scanPresentEntryTypes(
+    in data: Data,
+    offsets: [UInt32],
+    valuesEndOffset: Int,
+    isTyping: Bool
+  )
+    -> Set<Int32> {
+    var result: Set<Int32> = []
+    let tabByte = UInt8(ascii: "\t")
+    let belByte: UInt8 = 0x07
+    data.withUnsafeBytes { rawBuffer in
+      let buffer = rawBuffer.bindMemory(to: UInt8.self)
+
+      func parseInt32(from start: Int, to end: Int) -> Int32? {
+        guard end > start else { return nil }
+        var value: Int32 = 0
+        for index in start ..< end {
+          let byte = buffer[index]
+          guard byte >= 0x30, byte <= 0x39 else { return nil }
+          let multiplied = value.multipliedReportingOverflow(by: 10)
+          guard !multiplied.overflow else { return nil }
+          let added = multiplied.partialValue.addingReportingOverflow(Int32(byte - 0x30))
+          guard !added.overflow else { return nil }
+          value = added.partialValue
+        }
+        return value
+      }
+
+      /// 只接受 `-?\d+(\.\d+)?`——足以辨識 builder 產出的機率欄，且不配置 `String`。
+      func isPlainDecimal(from start: Int, to end: Int) -> Bool {
+        var index = start
+        guard index < end else { return false }
+        if buffer[index] == 0x2D {
+          index += 1
+        }
+        var sawDigit = false
+        while index < end, buffer[index] >= 0x30, buffer[index] <= 0x39 {
+          sawDigit = true
+          index += 1
+        }
+        if index < end, buffer[index] == 0x2E {
+          index += 1
+          while index < end, buffer[index] >= 0x30, buffer[index] <= 0x39 {
+            index += 1
+          }
+        }
+        return sawDigit && index == end
+      }
+
+      func noteGroupedCell(from cellStart: Int, to cellEnd: Int, typeID: Int32) {
+        guard cellEnd > cellStart else { return }
+        guard !(cellEnd - cellStart == 1 && buffer[cellStart] == belByte) else { return }
+        result.insert(typeID)
+      }
+
+      for lineIndex in offsets.indices {
+        let start = Int(offsets[lineIndex])
+        var end = lineIndex + 1 < offsets.count ? Int(offsets[lineIndex + 1]) : valuesEndOffset
+        while end > start, buffer[end - 1] == 0x0A || buffer[end - 1] == 0x0D {
+          end -= 1
+        }
+        guard end > start else { continue }
+
+        var tab0 = -1
+        var tab1 = -1
+        var tab2 = -1
+        var tabCount = 0
+        var cursor = start
+        while cursor < end, tabCount < 4 {
+          if buffer[cursor] == tabByte {
+            switch tabCount {
+            case 0: tab0 = cursor
+            case 1: tab1 = cursor
+            case 2: tab2 = cursor
+            default: break
+            }
+            tabCount += 1
+          }
+          cursor += 1
+        }
+
+        switch buffer[start] {
+        case 0x3E where tabCount == 1: // 型別 A：>typeID
+          if let typeID = parseInt32(from: start + 1, to: tab0) {
+            result.insert(typeID)
+          }
+        case 0x40 where tabCount == 2 && isTyping
+          && isPlainDecimal(from: start + 1, to: tab0): // 型別 B：@probability
+          noteGroupedCell(from: tab0 + 1, to: tab1, typeID: 5)
+          noteGroupedCell(from: tab1 + 1, to: end, typeID: 6)
+        case 0x21 where tabCount >= 4: // 型別 D：!value
+          if let typeID = parseInt32(from: tab0 + 1, to: tab1) {
+            result.insert(typeID)
+          }
+        default:
+          // 舊式 bare grouped line：機率、CHS、CHT 三欄；第三欄不是 typeID。
+          if isTyping, tabCount == 2,
+             isPlainDecimal(from: start, to: tab0),
+             !isPlainDecimal(from: tab0 + 1, to: tab1),
+             parseInt32(from: tab1 + 1, to: end) == nil {
+            noteGroupedCell(from: tab0 + 1, to: tab1, typeID: 5)
+            noteGroupedCell(from: tab1 + 1, to: end, typeID: 6)
+            continue
+          }
+          // 型別 C：value、probability、typeID（+ context）。
+          guard tabCount >= 2 else { continue }
+          let typeEnd = tabCount >= 3 ? tab2 : end
+          if let typeID = parseInt32(from: tab1 + 1, to: typeEnd) {
+            result.insert(typeID)
+          }
+        }
+      }
+    }
+    return result
   }
 
   private static func parseHeaderContent(_ content: String) -> HeaderInfo {

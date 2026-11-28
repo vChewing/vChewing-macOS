@@ -260,6 +260,85 @@ struct TrieKitTextMapTests {
     #expect(fullType4 == lazyType4)
   }
 
+  @Test("[TrieKit] TextMapTrie reports which entry-type tables are present when loading")
+  func testTextMapTriePresentEntryTypes() throws {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t5
+    KEY_COUNT\t1
+    DEFAULT_PROB_4\t0
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    @-5.25\t册\t\u{7}
+    >4\t，|。
+    _NORM\t0\t2
+    !詞\t10\t-3\t前文\t-4\t前文2
+    乙\t-3\t8
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    ㄘㄜˋ\t0\t5
+    """
+
+    let validated = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8), validateValues: true)
+    let trusted = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8), validateValues: false)
+
+    #expect(validated.presentEntryTypes == [2, 4, 5, 8, 10])
+    #expect(trusted.presentEntryTypes == validated.presentEntryTypes)
+    #expect(validated.hasEntries(ofType: .init(rawValue: 4)))
+    #expect(!validated.hasEntries(ofType: .init(rawValue: 6)))
+  }
+
+  @Test("[TrieKit] Table-presence scan disambiguates prefixed values and legacy grouped lines")
+  func testTextMapTriePresentEntryTypesAmbiguousShapes() throws {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t5
+    KEY_COUNT\t1
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    >foo\t0.5\t6
+    !foo\t0.5\t7
+    @foo\t0.5\t8
+    -9.465\t数 樹\t數
+    123\t-13\t9
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    foo\t0\t5
+    """
+
+    for validateValues in [true, false] {
+      let trie = try VanguardTrie.TextMapTrie(
+        data: Data(textMap.utf8),
+        validateValues: validateValues
+      )
+      #expect(trie.presentEntryTypes == [5, 6, 7, 8, 9])
+    }
+  }
+
+  @Test("[TrieKit] Empty-values TextMap loads with an empty table-presence set")
+  func testTextMapTrieEmptyPresentEntryTypes() throws {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t2.0
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t0
+    KEY_COUNT\t0
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    """
+
+    for validateValues in [true, false] {
+      let trie = try VanguardTrie.TextMapTrie(
+        data: Data(textMap.utf8),
+        validateValues: validateValues
+      )
+      #expect(trie.presentEntryTypes.isEmpty)
+    }
+  }
+
   @Test("[TrieKit] TextMapTrie supports TRIE_TEXTMAP type with grouped and individual entries")
   func testTextMapTrieGenericTrieTextMap() throws {
     let trie = VanguardTrie.Trie(separator: "-")
