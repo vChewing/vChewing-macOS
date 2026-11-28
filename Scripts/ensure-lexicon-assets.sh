@@ -51,7 +51,7 @@ if assets_ok && stamp_matches; then
   exit 0
 fi
 
-echo "note: 語料庫資產與 lexicon pin（$pinned）不符或不存在，先跑 make lexiconModern…" >&2
+echo "note: 語料庫資產與 lexicon pin（${pinned}）不符或不存在，先跑 make lexiconModern…" >&2
 # `MODERN_SWIFT_EXTRA_FLAGS` 由呼叫端（plugin 會把建置環境原樣帶入）轉遞，供受拘束之 shell 傳
 # `--disable-sandbox` 一類旗標；正常環境不設，manifest 沙箱照舊。
 if [ -n "${MODERN_SWIFT_EXTRA_FLAGS:-}" ]; then
@@ -61,6 +61,6 @@ else
 fi
 
 if ! assets_ok || ! stamp_matches; then
-  echo "錯誤：make lexiconModern 之後，$assets 仍不完整或仍與 pin（$pinned）不符。" >&2
+  echo "錯誤：make lexiconModern 之後，$assets 仍不完整或仍與 pin（${pinned}）不符。" >&2
   exit 1
 fi

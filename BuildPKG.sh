@@ -92,6 +92,15 @@ if [ "${SIGN_PRODUCT}" -eq 1 ] && [ -z "${TEAM_ID}" ]; then
     exit 1
 fi
 
+# `--sign` may be handed a full codesign identity ("Developer ID Application: … (TEAMID)").
+# The lexicon metadata needs the bare Team ID, and `codesign --sign <TEAMID>` accepts it too.
+case "${TEAM_ID}" in
+    *"("*")"*)
+        TEAM_ID="${TEAM_ID##*(}"
+        TEAM_ID="${TEAM_ID%)}"
+        ;;
+esac
+
 if [ "${SIGN_PRODUCT}" -eq 1 ]; then
     PKG_NAME="${TARGET}-macOS-${MARKETING_VERSION}-signed.pkg"
 else
@@ -162,6 +171,12 @@ bundle_is_signed_by_team() {
 # Bundles already signed by the same Team ID and accepted by spctl are left
 # untouched, because re-signing would invalidate an existing notarization ticket.
 if [ "${SIGN_PRODUCT}" -eq 1 ]; then
+    echo "Stamping lexicon metadata with Team ID ${TEAM_ID}..."
+    /bin/bash "${SCRIPT_DIR}/Scripts/stamp-lexicon-metadata.sh" \
+        --path "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app" \
+        --vendor "${TEAM_ID}" \
+        --upgrade-vendor
+
     ENTITLEMENTS_SRC="Sources/vChewingIME_macOS/Resources/vChewing.entitlements"
     if bundle_is_signed_by_team "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app" "${TEAM_ID}"; then
         echo "App bundle is already signed by Team ID ${TEAM_ID}; skipping re-sign."

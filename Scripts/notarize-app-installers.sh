@@ -48,7 +48,7 @@ usage() {
   --legacy <path.xcarchive>   指定 legacy（Aqua）版安裝器的 archive（預設取最新一份）
   --only modern|legacy        只處理其中一顆
   --out <dir>                 zip 產物目錄（預設 Build/Notarized）
-  --identity <id|team-id>     codesign 身分（預設 $VCHEWING_TEAM_ID，否則 WEY3MS268C）
+  --identity <id|team-id>     codesign 身分（預設 ${VCHEWING_TEAM_ID}，否則 WEY3MS268C）
   --profile <name>            notarytool 的 keychain profile（預設 AC_PASSWORD）
   --sign-only                 只重簽與驗章，不送審、不 staple（產物不可發佈）
   --keep-staging              保留 Build/Notarization/ 內的暫存 bundle
@@ -84,6 +84,16 @@ MARKETING_VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionStrin
 
 log() { printf '%s\n' "$*"; }
 die() { printf '錯誤：%s\n' "$*" >&2; exit 1; }
+
+# `--identity` 可以是完整 codesign 身分（"Developer ID Application: … (TEAMID)"）或裸 Team ID。
+# 語料庫之 `_VENDOR` 只收後者；`codesign --sign` 兩者皆收。
+TEAM_ID="$IDENTITY"
+case "$IDENTITY" in
+  *"("*")"*)
+    TEAM_ID="${IDENTITY##*(}"
+    TEAM_ID="${TEAM_ID%)}"
+    ;;
+esac
 
 # 最新一份 archive：檔名形如 `vChewingInstaller-2026-11-13-0212hrs.xcarchive`、
 # `vChewingInstallerLegacy-2026-11-13-0212hrs.xcarchive`。兩者的前綴互不包含，故用
@@ -168,7 +178,7 @@ notarize_bundle() {
   log "  ── 送審 ──"
   log "  壓縮：$(basename "$zip")"
   ditto -c -k --sequesterRsrc --keepParent "$app" "$zip"
-  log "  送交 Apple（profile：$PROFILE）…這一步通常要幾分鐘。"
+  log "  送交 Apple（profile：${PROFILE}）…這一步通常要幾分鐘。"
   xcrun notarytool submit "$zip" --keychain-profile "$PROFILE" --wait \
     --output-format json >"$result" 2>/dev/null || true
   submission_id="$(plutil -extract id raw -o - "$result" 2>/dev/null || true)"
@@ -182,7 +192,7 @@ notarize_bundle() {
     exit 1
   fi
   rm -f "$result"
-  log "  ✓ 公證通過（id：$submission_id）"
+  log "  ✓ 公證通過（id：${submission_id}）"
 
   log "  ── staple ──"
   xcrun stapler staple "$app"
@@ -218,14 +228,18 @@ process_artifact() {
 
   version="$(archive_version "$archive")"
   if [ "$version" != "$MARKETING_VERSION" ]; then
-    die "archive 版本（${version:-未知}）與 Release-Version.plist（$MARKETING_VERSION）不符；請先重跑該 archive 目標。"
+    die "archive 版本（${version:-未知}）與 Release-Version.plist（${MARKETING_VERSION}）不符；請先重跑該 archive 目標。"
   fi
   log "  版本：$version"
 
-  [ -d "$apps_dir/$app_name" ] || die "archive 內沒有 $app_name：$apps_dir"
+  [ -d "$apps_dir/$app_name" ] || die "archive 內沒有 ${app_name}：$apps_dir"
   rm -rf "$staged"
   mkdir -p "$STAGING_ROOT"
   ditto "$apps_dir/$app_name" "$staged"
+
+  log "  ── 語料庫 metadata ──"
+  /bin/bash "$REPO_ROOT/Scripts/stamp-lexicon-metadata.sh" \
+    --path "$staged" --vendor "$TEAM_ID" --upgrade-vendor
 
   log "  ── 由內而外重簽 ──"
   local target count=0
@@ -263,7 +277,7 @@ case "$identities" in
 esac
 [ "$SIGN_ONLY" -eq 1 ] || xcrun notarytool --version >/dev/null 2>&1 || die "notarytool 不可用。"
 
-log "vChewing .app 版安裝包公證產線（版本 $MARKETING_VERSION）"
+log "vChewing .app 版安裝包公證產線（版本 ${MARKETING_VERSION}）"
 if [ "$SIGN_ONLY" -eq 1 ]; then
   log "⚠️  --sign-only：僅重簽與驗章。"
 fi

@@ -313,6 +313,11 @@ extension BundleAppsPlugin {
       try fm.copyItem(at: bundle, to: resources.appending(path: name))
     }
 
+    // ── Lexicon metadata（簽章之前）──
+    // `_COMMIT_HASH` 之 tag SHA 與 `_VENDOR` 之 Team ID 皆須在簽名前蓋章。建置階段尚不知
+    // 簽名者，故先落規定的 `VANGUARDLEXICON`；發佈簽名腳本會再升級成實際 Team ID。
+    try stampLexiconMetadata(in: appDir, packageDir: packageDir)
+
     // ── Configuration Assistant（教學文章）之收錄 ──
     // 必須在簽章之前：資源受簽章封印。見 `embedAssistant` 之說明。
     embedAssistant(into: appDir, packageDir: packageDir)
@@ -341,6 +346,28 @@ extension BundleAppsPlugin {
       additionalEntitlements: additionalEntitlements
     )
     try codesign(at: appDir, entitlements: processedEntitlements, nestedCode: embeddedDylibs)
+  }
+
+  /// Stamps `_COMMIT_HASH` (the pinned lexicon tag's SHA) and `_VENDOR` in the factory TextMap
+  /// inside the assembled app. Must run before signing, because the signature seals every resource.
+  ///
+  /// The vendor is set to the specified fallback here: the build has no signer yet (it signs
+  /// ad-hoc). `BuildPKG.sh` and `Scripts/notarize-app-installers.sh` upgrade it to the actual
+  /// Apple Developer Team ID right before they apply the distribution signature.
+  private func stampLexiconMetadata(in appDir: URL, packageDir: URL) throws {
+    let script = packageDir.appending(path: "Scripts/stamp-lexicon-metadata.sh")
+    guard FileManager.default.fileExists(atPath: script.path) else {
+      throw PluginError("Lexicon metadata stamper is missing: \(script.path)")
+    }
+    print("🏷️  Stamping lexicon metadata…")
+    _ = try run(
+      "/bin/bash",
+      arguments: [
+        script.path,
+        "--path", appDir.path,
+        "--vendor", "VANGUARDLEXICON",
+      ]
+    )
   }
 }
 
