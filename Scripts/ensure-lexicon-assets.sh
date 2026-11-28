@@ -41,6 +41,13 @@ stamp_matches() {
   [ "$(head -1 "$stamp")" = "$pinned" ]
 }
 
+# Xcode 直建不經 `Plugins/BundleApps`，故在此把已確保的資產先落 `VANGUARDLEXICON`；
+# 發佈簽名腳本（`BuildPKG.sh`／`notarize-app-installers.sh`）再升級成實際 Team ID。
+stamp_assets() {
+  /bin/bash "$repo_root/Scripts/stamp-lexicon-metadata.sh" \
+    --path "$assets" --vendor "VANGUARDLEXICON"
+}
+
 pinned=$(sed -n 's/.*exact: "\([0-9][0-9.]*\)".*/\1/p' "$manifest" | head -1)
 if [ -z "$pinned" ]; then
   echo "錯誤：在 $manifest 找不到 lexicon 版本 pin。" >&2
@@ -48,6 +55,7 @@ if [ -z "$pinned" ]; then
 fi
 
 if assets_ok && stamp_matches; then
+  stamp_assets
   exit 0
 fi
 
@@ -64,3 +72,5 @@ if ! assets_ok || ! stamp_matches; then
   echo "錯誤：make lexiconModern 之後，$assets 仍不完整或仍與 pin（${pinned}）不符。" >&2
   exit 1
 fi
+
+stamp_assets
