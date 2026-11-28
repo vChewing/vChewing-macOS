@@ -108,9 +108,17 @@ public final class LXMgr {
       factory: true,
       ext: "txtMap"
     )
+    // 外置辭典可能缺某些 table。此時把它當主辭典、內建者當逐 table 的回退實例；
+    // 顯式指定 dbPath（debug harness）時不掛回退，以免把正式辭典摻進測試資料。
+    let fallbackPath: String? = {
+      guard dbPath == nil, path != bundledPath else { return nil }
+      return bundledPath
+    }()
     LXAssembly.LXFacade.connectFactoryDictionary(
       textMapPath: path,
-      validateValues: path != bundledPath
+      fallbackTextMapPath: fallbackPath,
+      validateValues: path != bundledPath,
+      validateFallbackValues: false
     ) { resultBool in
       precondition(resultBool, "vChewing factory TextMap loading failed.")
       #if compiler(>=6.2)

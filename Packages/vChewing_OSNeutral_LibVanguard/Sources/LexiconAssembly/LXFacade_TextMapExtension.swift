@@ -32,10 +32,22 @@ extension LXAssembly.LXFacade {
     case strictSuperset
   }
 
+  /// 連接原廠辭典。
+  /// - Parameters:
+  ///   - textMapPath: 主辭典路徑。
+  ///   - fallbackTextMapPath: 回退辭典路徑（通常是 app 同捆者）。主辭典缺某個
+  ///     entry type 之 table 時，該 table 的查詢改落此處；語義見 `FactoryDictionary.trie(for:)`。
+  ///   - dropPreviousConnection: 連接前是否先斷開既有連線。
+  ///   - validateValues: 是否逐行驗證主辭典之 VALUES。
+  ///   - validateFallbackValues: 是否逐行驗證回退辭典之 VALUES。回退辭典若為受簽章保護之
+  ///     bundled 資產，可傳 `false` 以省下驗證成本。
+  ///   - completionHandler: 完成回呼。回退辭典載入失敗不會令整體失敗（僅記日誌）。
   public static func connectFactoryDictionary(
     textMapPath: String,
+    fallbackTextMapPath: String? = nil,
     dropPreviousConnection: Bool = true,
     validateValues: Bool = true,
+    validateFallbackValues: Bool = true,
     completionHandler: (@Sendable (Bool) -> ())? = nil
   ) {
     if dropPreviousConnection {
@@ -47,17 +59,28 @@ extension LXAssembly.LXFacade {
       completionHandler?(false)
       return
     }
+    let resolvedFallbackPath = fallbackTextMapPath.flatMap { resolveTextMapPath(from: $0) }
+    if fallbackTextMapPath != nil, resolvedFallbackPath == nil {
+      vCLMLog("Factory fallback TextMap path not found: \(fallbackTextMapPath ?? "")")
+    }
 
     if !asyncLoadingUserData {
       do {
         let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
-        factoryTrie = try VanguardTrie.TextMapTrie(data: textMapData, validateValues: validateValues)
+        let newTrie = try VanguardTrie.TextMapTrie(data: textMapData, validateValues: validateValues)
+        let newFallbackTrie = loadFallbackFactoryTrie(
+          at: resolvedFallbackPath,
+          validateValues: validateFallbackValues
+        )
+        factoryTrie = newTrie
+        FactoryDictionary.shared.fallbackTrie = newFallbackTrie
         vCLMLog("Factory TextMap loading complete: \(resolvedTextMapPath)")
         completionHandler?(true)
         return
       } catch {
         vCLMLog("Factory TextMap loading failed: \(error.localizedDescription)")
         factoryTrie = nil
+        FactoryDictionary.shared.fallbackTrie = nil
         completionHandler?(false)
         return
       }
@@ -67,12 +90,18 @@ extension LXAssembly.LXFacade {
           do {
             let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
             let newTrie = try VanguardTrie.TextMapTrie(data: textMapData, validateValues: validateValues)
+            let newFallbackTrie = loadFallbackFactoryTrie(
+              at: resolvedFallbackPath,
+              validateValues: validateFallbackValues
+            )
             factoryTrie = newTrie
+            FactoryDictionary.shared.fallbackTrie = newFallbackTrie
             vCLMLog("Factory TextMap async loading complete: \(resolvedTextMapPath)")
             completionHandler?(true)
           } catch {
             vCLMLog("Factory TextMap async loading failed: \(error.localizedDescription)")
             factoryTrie = nil
+            FactoryDictionary.shared.fallbackTrie = nil
             completionHandler?(false)
           }
         }
@@ -81,13 +110,30 @@ extension LXAssembly.LXFacade {
     }
   }
 
+  private static func loadFallbackFactoryTrie(
+    at path: String?,
+    validateValues: Bool
+  )
+    -> VanguardTrie.TextMapTrie? {
+    guard let path else { return nil }
+    do {
+      let data = try Data(contentsOf: URL(fileURLWithPath: path), options: [.mappedIfSafe])
+      return try VanguardTrie.TextMapTrie(data: data, validateValues: validateValues)
+    } catch {
+      vCLMLog("Factory fallback TextMap loading failed: \(error.localizedDescription)")
+      return nil
+    }
+  }
+
   /// 斷開**本實例**所持之原廠辭典。
   public func disconnectFactoryDictionary() {
     factory.trie = nil
+    factory.fallbackTrie = nil
   }
 
   public static func disconnectFactoryDictionary() {
     FactoryDictionary.shared.trie = nil
+    FactoryDictionary.shared.fallbackTrie = nil
   }
 
   /// 驗證外部 TextMap 工廠辭典檔案的 schema 正確性。
@@ -139,10 +185,12 @@ extension LXAssembly.LXFacade {
 
     do {
       factory.trie = try VanguardTrie.TextMapTrie(data: Data(textMapData.utf8))
+      factory.fallbackTrie = nil
       return true
     } catch {
       vCLMLog("Factory TextMap test fixture loading failed: \(error.localizedDescription)")
       factory.trie = nil
+      factory.fallbackTrie = nil
       return false
     }
   }
@@ -160,16 +208,22 @@ extension LXAssembly.LXFacade {
     return result
   }
 
+  /// 反查：主辭典查得之讀音在前，回退辭典補其缺者；兩者皆無即 `nil`。
+  ///
+  /// 反查沒有 type 參數，故不走逐 table 回退，而是逐字合流（同一讀音只留一次）。
   public static func getFactoryReverseLookupData(with kanji: String) -> [String]? {
-    guard let readings = factoryTrie?.reverseLookup(for: kanji) else { return nil }
-    return readings
+    let primary = factoryTrie?.reverseLookup(for: kanji) ?? []
+    let fallback = FactoryDictionary.shared.fallbackTrie?.reverseLookup(for: kanji) ?? []
+    var seen: Set<String> = []
+    let merged = (primary + fallback).filter { seen.insert($0).inserted }
+    return merged.isEmpty ? nil : merged
   }
 
   func getHaninSymbolMenuUnigrams() -> [Homa.Gram] {
-    guard let trie = factory.trie else { return [] }
+    guard let trie = factory.trie(for: .letterPunctuations) else { return [] }
     let nodes = trie.getNodes(
       keyArray: ["_punct_list"],
-      filterType: [],
+      filterType: .letterPunctuations,
       partiallyMatch: false,
       longerSegment: false
     )
@@ -233,7 +287,7 @@ extension LXAssembly.LXFacade {
   )
     -> [Homa.Gram] {
     if key == "_punct_list" { return [] }
-    guard let trie = factory.trie else { return [] }
+    guard let trie = factory.trie(for: entryType) else { return [] }
     if config.partialMatchEnabled {
       return factoryPartiallyMatchedUnigramsFor(
         queryKeyArray: keyArray,
@@ -244,7 +298,7 @@ extension LXAssembly.LXFacade {
     }
     let nodes = trie.getNodes(
       keyArray: keyArray,
-      filterType: [],
+      filterType: entryType,
       partiallyMatch: false,
       longerSegment: false
     )
@@ -266,10 +320,10 @@ extension LXAssembly.LXFacade {
   )
     -> [Homa.Gram] {
     if subsetKey == "_punct_list" { return [] }
-    guard let trie = factory.trie else { return [] }
+    guard let trie = factory.trie(for: entryType) else { return [] }
     let nodes = trie.getNodes(
       keyArray: subsetKeyArray,
-      filterType: [],
+      filterType: entryType,
       partiallyMatch: false,
       longerSegment: true
     )
@@ -332,7 +386,7 @@ extension LXAssembly.LXFacade {
     supplyLimit: Int? = nil
   )
     -> [Homa.Gram] {
-    guard let trie = factory.trie else { return [] }
+    guard let trie = factory.trie(for: entryType) else { return [] }
     let entryGroups = trie.getEntryGroups(
       keysChopped: keyArray,
       filterType: entryType,
@@ -399,10 +453,10 @@ extension LXAssembly.LXFacade {
     case .configuredLookup:
       return factoryChoppedUnigramsFor(keyArray: keyArray, entryType: entryType)
     case .strictSuperset:
-      guard let trie = factory.trie else { return [] }
+      guard let trie = factory.trie(for: entryType) else { return [] }
       let entryGroups = trie.getEntryGroups(
         keysChopped: keyArray,
-        filterType: [],
+        filterType: entryType,
         partiallyMatch: false
       )
       return entryGroups.flatMap { group in
@@ -458,10 +512,10 @@ extension LXAssembly.LXFacade {
 
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
     if key == "_punct_list" { return nil }
-    guard let trie = factory.trie else { return nil }
+    guard let trie = factory.trie(for: .cns) else { return nil }
     let nodes = trie.getNodes(
       keyArray: [key],
-      filterType: [],
+      filterType: .cns,
       partiallyMatch: false,
       longerSegment: false
     )
@@ -472,8 +526,8 @@ extension LXAssembly.LXFacade {
   }
 
   func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
-    guard let trie = factory.trie else { return false }
     let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
+    guard let trie = factory.trie(for: entryType) else { return false }
     if config.partialMatchEnabled {
       return trie.hasGrams(
         keyArray,
@@ -483,7 +537,7 @@ extension LXAssembly.LXFacade {
     }
     let nodes = trie.getNodes(
       keyArray: keyArray,
-      filterType: [],
+      filterType: entryType,
       partiallyMatch: false,
       longerSegment: false
     )
@@ -492,13 +546,13 @@ extension LXAssembly.LXFacade {
 
   /// 輕量版 factoryUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
   func hasFactoryUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
-    guard let trie = factory.trie else { return false }
+    guard let trie = factory.trie(for: entryType) else { return false }
     return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
   }
 
   /// 輕量版 factoryChoppedUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
   func hasFactoryChoppedUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
-    guard let trie = factory.trie else { return false }
+    guard let trie = factory.trie(for: entryType) else { return false }
     return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
   }
 

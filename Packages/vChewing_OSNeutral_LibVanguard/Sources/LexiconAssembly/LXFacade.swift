@@ -353,18 +353,21 @@ extension LXAssembly {
     /// 應在適當的時機呼叫，避免舊查詢結果污染新的查詢。
     public static func flushTrieCaches() {
       FactoryDictionary.shared.trie?.flushCaches()
+      FactoryDictionary.shared.fallbackTrie?.flushCaches()
     }
 
     /// 釋放原廠辭典反查索引佔用的記憶體。
     /// 關閉獨立 RevLookup 視窗後可呼叫；下次反查會自動重新建立。
     public static func flushFactoryReverseLookupIndex() {
       FactoryDictionary.shared.trie?.flushReverseLookupIndex()
+      FactoryDictionary.shared.fallbackTrie?.flushReverseLookupIndex()
     }
 
     /// 預先建立原廠辭典反查索引。
     /// 在 RevLookup 視窗顯示時呼叫，使首次查詢無需等待 lazy build。
     public static func preloadFactoryReverseLookupIndex() {
       FactoryDictionary.shared.trie?.ensureReverseLookupIndex()
+      FactoryDictionary.shared.fallbackTrie?.ensureReverseLookupIndex()
     }
 
     public func setCassetCandidateKeyValidator(_ validator: @Sendable @escaping (String) -> Bool) {

@@ -140,7 +140,7 @@ extension LXAssembly {
       partiallyMatchedKeysHandler: ((Set<[String]>) -> ())?
     )
       -> Bool {
-      guard let trie = factory.trie else { return false }
+      guard let trie = factory.trie(for: filterType) else { return false }
       return trie.hasGrams(
         keys,
         filterType: filterType,
@@ -156,7 +156,7 @@ extension LXAssembly {
       partiallyMatchedKeysPostHandler: ((Set<[String]>) -> ())?
     )
       -> [Homa.Gram] {
-      guard let trie = factory.trie else { return [] }
+      guard let trie = factory.trie(for: filterType) else { return [] }
       let trieGrams = trie.queryGrams(
         keys,
         filterType: filterType,
@@ -172,7 +172,7 @@ extension LXAssembly {
       filterType: VanguardTrie.Trie.EntryType
     )
       -> [Homa.Gram]? {
-      guard let trie = factory.trie else { return nil }
+      guard let trie = factory.trie(for: filterType) else { return nil }
       return trie.queryAssociatedPhrasesAsGrams(
         previous,
         anterior: anteriorValue,

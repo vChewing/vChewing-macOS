@@ -36,6 +36,32 @@ public final class FactoryDictionary: @unchecked Sendable {
     }
   }
 
+  /// 原廠辭典之回退實例（通常是 app 同捆者）。指派即遞增辭典世代。
+  ///
+  /// 僅當 `trie` 缺某個 entry type 之 table 時，該 type 的查詢才落到此處；
+  /// 語義見 `trie(for:)`。
+  public var fallbackTrie: VanguardTrie.TextMapTrie? {
+    didSet {
+      dictionaryGeneration &+= 1
+    }
+  }
+
+  /// 依 entry type 決定本次查詢應落哪一個原廠辭典實例。
+  ///
+  /// - 沒有任何回退實例時，恆回 `trie`（舊行為）。
+  /// - `trie` 對該 type 至少有一筆條目時，回 `trie`——**不**與回退實例合流。
+  /// - `trie` 對該 type 零條目時，回 `fallbackTrie`；回退實例亦無該 type 時，
+  ///   呼叫端拿到的自然仍是空結果。
+  /// - `filterType` 為空（跨 type 查詢）或非單一 type 時，回 `trie`：
+  ///   跨 type 的逐表合流不在本函式之語義內。
+  public func trie(for type: VanguardTrie.Trie.EntryType) -> VanguardTrie.TextMapTrie? {
+    guard !type.isEmpty, Self.discreteEntryTypeIDs.contains(type.rawValue) else {
+      return trie ?? fallbackTrie
+    }
+    if let trie, trie.hasEntries(ofType: type) { return trie }
+    return fallbackTrie ?? trie
+  }
+
   // MARK: Internal
 
   var plainBopomofo = LXAssembly.LXPlainBopomofo()
@@ -61,4 +87,9 @@ public final class FactoryDictionary: @unchecked Sendable {
   func bumpDictionaryGeneration() {
     dictionaryGeneration &+= 1
   }
+
+  // MARK: Private
+
+  /// TextMap 內以單一 typeID 成表的 entry type（3 為保留、100 屬磁帶，皆不在內）。
+  private static let discreteEntryTypeIDs: Set<Int32> = [2, 4, 5, 6, 7, 8, 9, 10, 11]
 }
